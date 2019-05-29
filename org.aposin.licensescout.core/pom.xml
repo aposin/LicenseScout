@@ -132,9 +132,14 @@
 						<owner>${project.organization.name}</owner>
 					</properties>
 					<includes>
-						<!-- include java sources-->
-						<include>src/**/*.java</include>
+						<!-- include all sources-->
+						<include>src/**</include>
 					</includes>
+					<excludes>
+						<exclude>**/*.xml</exclude>
+						<exlucde>**/*.txt</exlucde>
+						<exclude>**/*.csv</exclude>
+					</excludes>
 				</configuration>
 			</plugin>
 
