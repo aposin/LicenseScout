@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/aposin/LicenseScout.svg?branch=master)](https://travis-ci.org/aposin/LicenseScout)
+
 # LicenseScout
 
 LicenseScout is a Maven Plug-in to identify third-party artifacts (libraries) and their licenses, in Java as well as JavaScript projects.
