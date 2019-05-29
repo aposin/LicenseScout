@@ -1,4 +1,8 @@
 [![Build Status](https://travis-ci.org/aposin/LicenseScout.svg?branch=master)](https://travis-ci.org/aposin/LicenseScout)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/68b073442bd540f4a0a0ca1b33e5181b)](https://www.codacy.com/app/aposin-bot/LicenseScout?utm_source=github.com&utm_medium=referral&utm_content=aposin/LicenseScout&utm_campaign=Badge_Grade)
+![GitHub top language](https://img.shields.io/github/languages/top/aposin/LicenseScout.svg)
+[![CLA assistant](https://cla-assistant.io/readme/badge/aposin/LicenseScout)](https://cla-assistant.io/aposin/LicenseScout)
+[![GitHub](https://img.shields.io/github/license/aposin/LicenseScout.svg)](https://github.com/aposin/LicenseScout/blob/master/LICENSE)
 
 # LicenseScout
 
