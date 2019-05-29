@@ -1,0 +1,19 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.aposin.licensescout</groupId>
+	<artifactId>org.aposin.licensescout.quickstart</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<description>Aggregator POM that builds locally the LicenseScout, the sample configuration for the LicenseScout, and executes the LicenseScout to generate a license report for itself</description>
+
+	<modules>
+		<module>../org.aposin.licensescout.parent</module>
+		<module>../org.aposin.licensescout.core</module>
+		<module>../org.aposin.licensescout.configuration.sample</module>
+		<module>../org.aposin.licensescout.licensereport</module>
+	</modules>
+
+</project>

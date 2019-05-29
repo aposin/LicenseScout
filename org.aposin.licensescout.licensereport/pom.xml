@@ -1,0 +1,273 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.aposin.licensescout</groupId>
+		<artifactId>org.aposin.licensescout.parent</artifactId>
+		<version>1.3.1-SNAPSHOT</version>
+		<relativePath>../org.aposin.licensescout.parent</relativePath>
+	</parent>
+
+	<groupId>org.aposin.licensescout</groupId>
+	<artifactId>org.aposin.licensescout.licensereport</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<description>Generates a license report for the LicenseScout itself.</description>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<org.aposin.licensescout.version>1.3.1-SNAPSHOT</org.aposin.licensescout.version>
+		<!-- LicenseScout Configuration Data -->
+		<org.aposin.licensescout.configuration.version>1.0.0-SNAPSHOT</org.aposin.licensescout.configuration.version>
+		<licensescout-configuration.dir>${project.build.directory}/licensescout-configuration</licensescout-configuration.dir>
+
+		<licensescout.buildName>${project.artifactId}</licensescout.buildName>
+		<licensescout.buildVersion>${project.version}</licensescout.buildVersion>
+
+		<!-- URL to be added to License Reports (Back Reference to Jenkins Build 
+			which generated the Report) -->
+		<!-- <licensescout.buildUrl>${env.BUILD_URL}</licensescout.buildUrl> -->
+
+		<!-- LicenseScout database configuration -->
+		<licensescout.writeResultsToDatabase>true</licensescout.writeResultsToDatabase>
+		<licensescout.database.url>jdbc:mysql://localhost:3306/licensescout?useUnicode=true&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=UTC</licensescout.database.url>
+		<licensescout.database.username>......</licensescout.database.username><!-- 
+			NOTE: recommended to provide via settings.xml -->
+		<licensescout.database.password>......</licensescout.database.password><!-- 
+			NOTE: recommended to provide via settings.xml -->
+
+		<licensescout.licensereport.classifier>licensereport</licensescout.licensereport.classifier>
+
+		<!-- Configuration related to generated License Report Result Files -->
+		<licensescout.outputDirectory>${project.build.directory}</licensescout.outputDirectory>
+		<licensescout.outputFilename.html>licenses_${project.artifactId}.html</licensescout.outputFilename.html>
+		<licensescout.outputFilename.csv>licenses_${project.artifactId}.csv</licensescout.outputFilename.csv>
+		<licensescout.outputFilename.txt>licenses_${project.artifactId}.txt</licensescout.outputFilename.txt>
+		<licensereport.path.html>${licensescout.outputDirectory}/${licensescout.outputFilename.html}</licensereport.path.html>
+		<licensereport.path.csv>${licensescout.outputDirectory}/${licensescout.outputFilename.csv}</licensereport.path.csv>
+		<licensereport.path.txt>${licensescout.outputDirectory}/${licensescout.outputFilename.txt}</licensereport.path.txt>
+		<dependenciesDirectory>${project.build.directory}/licenseScoutDependencies</dependenciesDirectory>
+
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.aposin.licensescout</groupId>
+			<artifactId>licensescout-maven-plugin</artifactId>
+			<version>${org.aposin.licensescout.version}</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<!-- NOTE: needs to be activated in child poms that want to use this 
+					execution by overriding the phase with something different from 'none' for 
+					the same execution id. -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>unpack-licensescout-configuration</id>
+							<phase>generate-resources</phase>
+							<goals>
+								<goal>unpack</goal>
+							</goals>
+							<configuration>
+								<artifactItems>
+									<artifactItem>
+										<groupId>org.aposin.licensescout</groupId>
+										<artifactId>org.aposin.licensescout.configuration.sample</artifactId>
+										<version>${org.aposin.licensescout.configuration.version}</version>
+										<classifier>configuration</classifier>
+										<type>zip</type>
+										<overWrite>true</overWrite>
+										<outputDirectory>${licensescout-configuration.dir}</outputDirectory>
+									</artifactItem>
+								</artifactItems>
+								<overWriteReleases>false</overWriteReleases>
+								<overWriteSnapshots>true</overWriteSnapshots>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+
+				<!-- groupId: org.codehaus.mojo -->
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>build-helper-maven-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>attach-licensereport</id>
+							<phase>none</phase>
+							<goals>
+								<goal>attach-artifact</goal>
+							</goals>
+							<configuration>
+								<artifacts>
+									<artifact>
+										<file>${licensereport.path.html}</file>
+										<classifier>${licensescout.licensereport.classifier}</classifier>
+										<type>htm</type>
+									</artifact>
+									<artifact>
+										<file>${licensereport.path.csv}</file>
+										<classifier>${licensescout.licensereport.classifier}</classifier>
+										<type>csv</type>
+									</artifact>
+									<artifact>
+										<file>${licensereport.path.txt}</file>
+										<classifier>${licensescout.licensereport.classifier}</classifier>
+										<type>txt</type>
+									</artifact>
+								</artifacts>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.aposin.licensescout</groupId>
+					<artifactId>licensescout-maven-plugin</artifactId>
+					<version>${org.aposin.licensescout.version}</version>
+					<configuration>
+						<outputDirectory>${licensescout.outputDirectory}</outputDirectory>
+						<outputs>
+							<output>
+								<type>HTML</type>
+								<filename>${licensescout.outputFilename.html}</filename>
+								<url>${licensereport.url.html}</url>
+							</output>
+							<output>
+								<type>CSV</type>
+								<filename>${licensescout.outputFilename.csv}</filename>
+								<url>${licensereport.url.csv}</url>
+							</output>
+							<output>
+								<type>TXT</type>
+								<filename>${licensescout.outputFilename.txt}</filename>
+								<url>${licensereport.url.txt}</url>
+							</output>
+						</outputs>
+
+						<licensesFilename>${licensescout-configuration.dir}/licenses.xml</licensesFilename>
+						<providersFilename>${licensescout-configuration.dir}/providers.xml</providersFilename>
+						<noticesFilename>${licensescout-configuration.dir}/notices.xml</noticesFilename>
+						<checkedArchivesFilename>${licensescout-configuration.dir}/checkedarchives.csv</checkedArchivesFilename>
+						<licenseUrlMappingsFilename>${licensescout-configuration.dir}/urlmappings.csv</licenseUrlMappingsFilename>
+						<licenseNameMappingsFilename>${licensescout-configuration.dir}/namemappings.csv</licenseNameMappingsFilename>
+						<globalFiltersFilename>${licensescout-configuration.dir}/globalfilters.csv</globalFiltersFilename>
+						<filteredVendorNamesFilename>${licensescout-configuration.dir}/filteredvendornames.csv</filteredVendorNamesFilename>
+
+						<writeResultsToDatabase>${licensescout.writeResultsToDatabase}</writeResultsToDatabase>
+						<writeResultsToDatabaseForSnapshotBuilds>false</writeResultsToDatabaseForSnapshotBuilds>
+						<resultDatabaseConfiguration>
+							<jdbcUrl>${licensescout.database.url}</jdbcUrl>
+							<username>${licensescout.database.username}</username>
+							<password>${licensescout.database.password}</password>
+						</resultDatabaseConfiguration>
+						<buildName>${licensescout.buildName}</buildName>
+						<buildVersion>${licensescout.buildVersion}</buildVersion>
+						<buildUrl>${licensescout.buildUrl}</buildUrl>
+					</configuration>
+				</plugin>
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.codehaus.mojo</groupId>
+										<artifactId>build-helper-maven-plugin</artifactId>
+										<versionRange>[${build-helper-maven-plugin.version},)</versionRange>
+										<goals>
+											<goal>regex-properties</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack-licensescout-configuration</id>
+						<phase>generate-resources</phase>
+					</execution>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${dependenciesDirectory}</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>false</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.aposin.licensescout</groupId>
+				<artifactId>licensescout-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>find-licenses</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>scanJava</goal>
+						</goals>
+						<configuration>
+							<scanDirectory>${dependenciesDirectory}</scanDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>regex-properties-licensescout1</id>
+						<phase>initialize</phase>
+					</execution>
+					<execution>
+						<id>regex-properties-licensescout2</id>
+						<phase>initialize</phase>
+					</execution>
+					<execution>
+						<id>regex-properties-licensescout3</id>
+						<phase>initialize</phase>
+					</execution>
+					<execution>
+						<id>attach-licensereport</id>
+						<phase>verify</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+
+</project>

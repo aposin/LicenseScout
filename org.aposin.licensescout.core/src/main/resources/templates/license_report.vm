@@ -1,0 +1,309 @@
+#*
+ * Copyright © 2018 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *#
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>ABS 3rd-party Libraries - License Overview</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.29.0/js/jquery.tablesorter.min.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+	$(document).ready(function() 
+	    { 
+	        $("#license_table").tablesorter(); 
+	    } 
+	); 
+
+</script>
+<script type="text/javascript">
+//<![CDATA[
+
+function ShowHide(myid){
+	$("#" + myid).animate({"height": "toggle"}, { duration: 500 });
+	
+	var text = $("#" + myid + "_license_name");
+	if(text.css("font-weight") == "bold"){
+		text.css("font-weight", "normal");
+	}else{
+		text.css("font-weight", "bold");
+	}
+	
+	
+}
+//]]>
+</script>
+
+
+<style>
+body {
+	font-family:arial;
+	font-size: 12px;
+	/* font-family: "Verdana", Times, sans-serif; */
+}
+
+h1 { font-size: 20px; }
+
+a { color: #0645AD; }
+
+#dirtystyle { color:red; font-weight:bold; }
+
+td.row_1 { background-color: #ffffff; border: 1px solid #ccc; }
+td.row_0 { background-color: #f9f9f9; border: 1px solid #ccc; }
+
+table {
+	border-collapse:collapse;
+	border: 1px solid #ccc;
+}
+
+table.tablesorter {
+	margin:10px 0pt 15px;
+	width: 100%;
+}
+
+table > thead > tr > th {
+	background-color: #e6EEEE;
+	background-repeat: no-repeat;
+	background-position: center right;
+	cursor: pointer;
+	padding: 4px;
+	border: 1px solid #ccc;
+}
+
+table td {
+	color: #2d2d2d;
+	padding: 4px;
+	vertical-align: top;
+}
+
+table.tablesorter thead tr .tablesorter-headerUnSorted {
+	background-image: url(data:image/gif;base64,R0lGODlhFQAJAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAkAAAIXjI+AywnaYnhUMoqt3gZXPmVg94yJVQAAOw==);
+}
+
+table.tablesorter thead tr .tablesorter-headerAsc {
+	background-image: url(data:image/gif;base64,R0lGODlhFQAEAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAQAAAINjI8Bya2wnINUMopZAQA7);
+	background-color: #8dbdd8;
+}
+
+table.tablesorter thead tr .tablesorter-headerDesc {
+	background-image: url(data:image/gif;base64,R0lGODlhFQAEAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAQAAAINjB+gC+jP2ptn0WskLQA7);
+	background-color: #8dbdd8;
+}
+</style>
+</head>
+
+<body>
+<h1>3rd Party Libraries</h1>
+
+<p>Source: $sourcePath</p>
+
+
+<h2>Detection status statistics</h2>
+
+
+<table id="detection_statistics_table">
+	<thead>
+		<tr>
+			<th>Detection status</th>
+			<th>Number of libraries</th>
+		</tr>	
+	</thead>
+<tbody>
+
+#foreach($statisticsEntry in $detectionStatusStatistics.entrySet())
+<tr>
+	#if (($velocityCount % 2) == 0)
+	#set ($count = 0)
+	#else
+	#set ($count = 1)
+	#end
+	
+	#set ($style = "row_" + $count)
+
+	<td class="$style"><span title="Detection status">$statisticsEntry.key</span></td>
+	<td class="$style"><span title="Count">$statisticsEntry.value</span></td>
+</tr>
+#end
+</tbody>
+</table>
+
+<h2>Legal status statistics</h2>
+
+
+<table id="legal_statistics_table">
+	<thead>
+		<tr>
+			<th>Legal status</th>
+			<th>Number of libraries</th>
+		</tr>	
+	</thead>
+<tbody>
+
+#foreach($statisticsEntry in $legalStatusStatistics.entrySet())
+<tr>
+	#if (($velocityCount % 2) == 0)
+	#set ($count = 0)
+	#else
+	#set ($count = 1)
+	#end
+	
+	#set ($style = "row_" + $count)
+
+	<td class="$style"><span title="Legal status">$statisticsEntry.key</span></td>
+	<td class="$style"><span title="Count">$statisticsEntry.value</span></td>
+</tr>
+#end
+</tbody>
+</table>
+
+<h2>General statistics</h2>
+
+
+<table id="general_statistics_table">
+	<thead>
+		<tr>
+			<th>Value</th>
+			<th>Value</th>
+		</tr>	
+	</thead>
+<tbody>
+
+<tr>
+	<td class="$style"><span title="License candidate files count">License candidate files count</span></td>
+	<td class="$style"><span title="Count">$generalStatistics.candidateLicenseFileCount</span></td>
+</tr>
+<tr>
+	<td class="$style"><span title="Total archive count">Total archive count</span></td>
+	<td class="$style"><span title="Count">$generalStatistics.totalArchiveCount</span></td>
+</tr>
+
+</tbody>
+</table>
+
+
+<h2>Distinct Licenses found</h2>
+<ul>
+#foreach($license in $distinctLicenses)
+	<li><a href="$license.urlPublic" title="$license.name" target="_blank">$license.name $license.version ($license.legalStatus)</a></li>
+#end
+</ul>
+
+<h2>Archives - List</h2>
+
+#set ($count = 0)
+#set ($td_Id = 0)
+
+<table id="license_table">
+	<thead>
+		<tr>
+			<th>Library</th>
+			<th>Version</th>
+			<th>Detection Status</th>
+			<th>Legal Status</th>
+			<th>Licenses</th>
+			#if($reportConfiguration.showDocumentationUrl)
+			<th>Documentation</th>
+			#end
+			#if($reportConfiguration.showPathColumn)
+			<th>Path</th>
+			#end
+			#if($reportConfiguration.showMessageDigestColumn)
+			<th>Message digest ($messageDigestAlgorithm)</th>
+			#end
+			#if($reportConfiguration.showLicenseCandidateFilesColumn)
+			<th>Candidate License files</th>
+			#end
+		</tr>	
+	</thead>
+<tbody>
+#foreach($archive in $archiveFiles)
+
+<tr>
+	#if (($velocityCount % 2) == 0)
+	#set ($count = 0)
+	#else
+	#set ($count = 1)
+	#end
+	
+	#set ($style = "row_" + $count)
+
+	<td class="$style"><span title="$archive.path">$archive.fileName</span></td>
+	<td class="$style"><span title="$archive.version">$archive.version</span></td>
+	<td class="$style"><span title="$archive.detectionStatus">$archive.detectionStatus</span></td>
+	<td class="$style"><span title="$archive.legalStatus">$archive.legalStatus</span></td>
+	<td class="$style" style="white-space:normal">
+		#foreach($license in $archive.licenses)
+		
+			#set ($files = "<ul>")
+			#foreach($path in $archive.getFilePaths($license))
+			#set ($files = $files + "<li>" + $path + "</li>")
+			#end
+			#set ($files = $files + "</ul>")
+		
+			#set ($td_Id = $td_Id + 1)
+			#set ($myId = "td_" + $td_Id)
+			#set ($myId_license_name = "td_" + $td_Id + "_license_name")
+		
+			<a onclick="ShowHide('$myId'); return false;" href="#"><span id="$myId_license_name" style="font-weight:normal">$license.name
+			#if ($license.versionPresent)			
+				Version $license.version			
+			#end
+			</span>
+			</a>
+			<br/>
+			<div style="display: none; padding-left: 30px;" id="$myId">
+				<p>
+					<a href="$license.urlPublic" title="$license.name" target="_blank">Public License URL</a>
+					#if($license.urlLocal)
+						&nbsp;<a href="./lizenzen/$license.urlLocal" title="$license.name" target="_blank">Local License URL</a>
+					#end	
+				</p>
+				<p><b>Referencing Files</b></p>
+				$files
+			</div>
+			<br/>	
+		#end
+	</td>
+	#if($reportConfiguration.showDocumentationUrl)
+	<td class="$style">
+	#if($archive.documentationUrl &&  !$archive.documentationUrl.empty)
+	<a href="$archive.documentationUrl" title="$archive.documentationUrl" target="_blank">Documentation</a>
+	#end
+	</td>
+	#end
+	#if($reportConfiguration.showPathColumn)
+	<td class="$style"><span title="$archive.path">$archive.path</span></td>
+	#end
+	#if($reportConfiguration.showMessageDigestColumn)
+	<td class="$style"><span title="$archive.messageDigestString">$archive.messageDigestString</span></td>
+	#end
+	#if($reportConfiguration.showLicenseCandidateFilesColumn)
+	<td class="$style">
+		#foreach($candidateFilePath in $archive.licenseCandidateFiles)
+		$candidateFilePath <br/>
+		#end
+	</td>
+	#end
+</tr>
+#end
+</tbody>
+
+</table>
+
+
+</body>
+</html>
