@@ -13,10 +13,10 @@ install:
   
 script:
   - if [[ $TYPE == test ]]; then
-      mvn test
+      mvn test;
     elif [[ $TYPE == check ]]; then
-      mvn license:check
+      mvn license:check;
     else
-      echo "$TYPE type not recognized"
-      exit 1
+      echo "$TYPE type not recognized";
+      exit 1;
     fi
