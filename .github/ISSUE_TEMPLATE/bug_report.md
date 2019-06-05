@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-
+label: 'Status: Pending, Type: Bug'
 ---
 
 <!--- Provide a general summary of the Issue in the Title above -->
