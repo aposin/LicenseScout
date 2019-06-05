@@ -12,11 +12,11 @@ install:
   - mvn -DskipTests=true -Dmaven.javadoc.skip=true install
   
 script:
-  if [[ $TYPE == test ]]; then
-    mvn test
-  elif [[ $TYPE == check ]]; then
-    mvn license:check
-  else
-    echo "Test type not recognized: $TYPE"
-    exit 1
-  fi
+  - if [[ $TYPE == test ]]; then
+      mvn test;
+    elif [[ $TYPE == check ]]; then
+      mvn license:check;
+    else
+      echo "$TYPE type not recognized";
+      exit 1;
+    fi
