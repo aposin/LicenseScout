@@ -1,0 +1,22 @@
+language: java
+jdk:
+  - openjdk11
+env:
+  matrix:
+    - TYPE=test
+    - TYPE=check
+
+before_install:
+  - cd org.aposin.licensescout.core
+install:
+  - mvn -DskipTests=true -Dmaven.javadoc.skip=true install
+  
+script:
+  if [[ $TYPE == test ]]; then
+    mvn test
+  elif [[ $TYPE == check ]]; then
+    mvn license:check
+  else
+    echo "Test type not recognized: $TYPE"
+    exit 1
+  fi
