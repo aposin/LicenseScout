@@ -47,6 +47,8 @@
 		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
 		<versions-maven-plugin.version>2.7</versions-maven-plugin.version>
 		
+		<jacoco.version>0.8.4</jacoco.version>
+		
 		<license-maven-plugin.version>3.0</license-maven-plugin.version>
 	</properties>
 
@@ -191,6 +193,12 @@
 					<groupId>com.mycila</groupId>
 					<artifactId>license-maven-plugin</artifactId>
 					<version>${license-maven-plugin.version}</version>
+				</plugin>
+	
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>${jacoco.version}</version>
 				</plugin>
 	
 				<!-- groupId: org.eclipse.m2e -->
