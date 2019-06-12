@@ -20,3 +20,6 @@ script:
       echo "$TYPE type not recognized";
       exit 1;
     fi
+
+after_success:
+  - if [[ $TYPE == test ]]; then bash <(curl -s https://codecov.io/bash) -X gcov -X coveragepy; fi
