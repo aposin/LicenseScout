@@ -11,6 +11,8 @@
 # Please keep the list sorted alphabetically, companies/organizations first, individuals second.
  
 # Organization/Companies
+Allianz Technology GmbH <https://www.allianz.com/en/about-us/who-we-are/regions-countries/austria.html#TabVerticalNegative61899907821>
+
 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry <https://aposin.org>
  
 # Individuals
