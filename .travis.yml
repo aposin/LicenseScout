@@ -6,11 +6,15 @@ env:
     - TYPE=test
     - TYPE=check
 
+cache:
+  directories:
+    - $HOME/.m2
+
 before_install:
   - cd org.aposin.licensescout.core
 install:
   - mvn -DskipTests=true -Dmaven.javadoc.skip=true install
-  
+
 script:
   - if [[ $TYPE == test ]]; then
       mvn test;
