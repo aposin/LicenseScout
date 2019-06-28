@@ -9,7 +9,7 @@
 # LicenseScout
 
 LicenseScout is a Maven Plug-in to identify third-party artifacts (libraries) and their licenses, in Java as well as JavaScript projects.
-The goal is to get an overview over the used licenses, and the artifacts for which no license could be detected. A proper output document is generated listing the used licenses and the corresponding license texts.
+The goal is to get an overview over the used licenses, and the artifacts for which no license could be detected. A proper output document is generated listing the used licenses and the corresponding license texts. In a configuration file each license identified is marked as ACCEPTED or NOT_ACCEPTED. This decision depends on the your project's license and may require legal support.
 
 
 ## Getting started
