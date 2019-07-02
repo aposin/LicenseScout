@@ -13,7 +13,7 @@ cache:
 before_install:
   - cd org.aposin.licensescout.core
 install:
-  - mvn -DskipTests=true -Dmaven.javadoc.skip=true install
+  - mvn -DskipTests=true -Dmaven.javadoc.skip=true package
 
 script:
   - if [[ $TYPE == test ]]; then
