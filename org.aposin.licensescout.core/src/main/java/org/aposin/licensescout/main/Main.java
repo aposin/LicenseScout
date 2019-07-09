@@ -65,10 +65,10 @@ public class Main {
 
         File outputFile = null;
         int argsTargetLength = 4; //set required args length
-        
+
         //arg 0 -> -pathtoscan
         if (args.length != argsTargetLength) {
-            throw new IllegalArgumentException("Wrong count of parameters, must be " + Integer.toString(argsTargetLength););
+            throw new IllegalArgumentException("Wrong count of parameters, must be " + Integer.toString(argsTargetLength));
         }
 
         int i = 0;
