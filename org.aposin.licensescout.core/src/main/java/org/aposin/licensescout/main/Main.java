@@ -64,13 +64,14 @@ public class Main {
         AbstractFinder finder = new JavaJarFinder(licenseStoreData, new JavaUtilLog(Logger.getGlobal()));
 
         File outputFile = null;
-
+        int argsTargetLength = 4; //set required args length
+        
         //arg 0 -> -pathtoscan
-        if (args.length < 4 || args.length > 4) {
-            throw new IllegalArgumentException("wrong count of parameter!");
+        if (args.length != argsTargetLength) {
+            throw new IllegalArgumentException("Wrong count of parameters, must be " + Integer.toString(argsTargetLength););
         }
-        int i = 0;
 
+        int i = 0;
         while (i < args.length) {
             if ("-pathtoscan".equalsIgnoreCase(args[i])) {
                 String searchPath = args[++i];
