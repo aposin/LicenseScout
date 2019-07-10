@@ -33,6 +33,7 @@ public class OutputResult {
     private ILegalStatusStatistics legalStatusStatistics;
     private GeneralStatistics generalStatistics;
     private String messageDigestAlgorithm;
+    private boolean pomResolutionUsed;
 
     /**
      */
@@ -50,7 +51,7 @@ public class OutputResult {
     /**
      * @param finderResult the finderResult to set
      */
-    public final void setFinderResult(FinderResult finderResult) {
+    public final void setFinderResult(final FinderResult finderResult) {
         this.finderResult = finderResult;
     }
 
@@ -92,7 +93,7 @@ public class OutputResult {
     /**
      * @param generalStatistics the generalStatistics to set
      */
-    public final void setGeneralStatistics(GeneralStatistics generalStatistics) {
+    public final void setGeneralStatistics(final GeneralStatistics generalStatistics) {
         this.generalStatistics = generalStatistics;
     }
 
@@ -106,8 +107,22 @@ public class OutputResult {
     /**
      * @param messageDigestAlgorithm the messageDigestAlgorithm to set
      */
-    public final void setMessageDigestAlgorithm(String messageDigestAlgorithm) {
+    public final void setMessageDigestAlgorithm(final String messageDigestAlgorithm) {
         this.messageDigestAlgorithm = messageDigestAlgorithm;
+    }
+
+    /**
+     * @return the pomResolutionUsed
+     */
+    public final boolean isPomResolutionUsed() {
+        return pomResolutionUsed;
+    }
+
+    /**
+     * @param pomResolutionUsed the pomResolutionUsed to set
+     */
+    public final void setPomResolutionUsed(final boolean pomResolutionUsed) {
+        this.pomResolutionUsed = pomResolutionUsed;
     }
 
 }

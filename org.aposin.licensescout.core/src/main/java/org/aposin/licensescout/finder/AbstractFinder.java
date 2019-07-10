@@ -172,4 +172,5 @@ public abstract class AbstractFinder {
         }
     }
 
+    public abstract boolean isPomResolutionUsed();
 }

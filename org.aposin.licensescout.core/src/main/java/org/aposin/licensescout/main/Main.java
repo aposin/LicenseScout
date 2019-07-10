@@ -18,6 +18,7 @@ package org.aposin.licensescout.main;
 import java.io.File;
 import java.util.logging.Logger;
 
+import org.aposin.licensescout.configuration.RunParameters;
 import org.aposin.licensescout.exporter.GeneralStatistics;
 import org.aposin.licensescout.exporter.HtmlExporter;
 import org.aposin.licensescout.exporter.IDetectionStatusStatistics;
@@ -33,7 +34,7 @@ import org.aposin.licensescout.util.JavaUtilLog;
 
 /**
  * Stand-alone entry point for the licenseScout.
- *  
+ * 
  * <h1>Usage:</h1>
  * 
  * <code>Main -pathtoscan some_path_to_an_directory_to_scan -pathtoreport some_path_to_a_report_directory</code>
@@ -55,18 +56,23 @@ public class Main {
      * The main method.
      * 
      * @param args the arguments
-     * @throws Exception 
+     * @throws Exception
      */
     public static void main(String[] args) throws Exception {
         File source;
         File target;
         LicenseStoreData licenseStoreData = null;
-        AbstractFinder finder = new JavaJarFinder(licenseStoreData, new JavaUtilLog(Logger.getGlobal()));
+        final JavaUtilLog log = new JavaUtilLog(Logger.getGlobal());
+        final RunParameters runParameters = new RunParameters();
+        // TODO: set parameters in RunParameters
+        // runParameters.setNexusCentralBaseUrl(nexusCentralBaseUrl);
+        // runParameters.setConnectTimeout(connectTimeout);
+        AbstractFinder finder = new JavaJarFinder(licenseStoreData, runParameters, log);
 
         File outputFile = null;
-        int argsTargetLength = 4; //set required args length
+        int argsTargetLength = 4; // set required args length
 
-        //arg 0 -> -pathtoscan
+        // arg 0 -> -pathtoscan
         if (args.length != argsTargetLength) {
             throw new IllegalArgumentException("Wrong count of parameters, must be " + Integer.toString(argsTargetLength));
         }

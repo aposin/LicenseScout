@@ -21,6 +21,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.aposin.licensescout.archive.ArchiveType;
+import org.aposin.licensescout.configuration.RunParameters;
 import org.aposin.licensescout.finder.AbstractFinder;
 import org.aposin.licensescout.finder.JavascriptNpmFinder;
 import org.aposin.licensescout.license.LicenseStoreData;
@@ -65,7 +66,8 @@ public class NpmScanMojo extends AbstractScanMojo {
      * {@inheritDoc}
      */
     @Override
-    protected AbstractFinder createFinder(final LicenseStoreData licenseStoreData, final ILFLog log) {
+    protected AbstractFinder createFinder(final LicenseStoreData licenseStoreData, RunParameters runParameters,
+                                          final ILFLog log) {
         final AbstractFinder javascriptFinder = new JavascriptNpmFinder(licenseStoreData, log,
                 npmExcludedDirectoryNames);
         javascriptFinder.setScanDirectory(scanDirectory);
