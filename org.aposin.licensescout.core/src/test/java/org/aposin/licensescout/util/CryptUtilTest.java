@@ -27,7 +27,7 @@ import org.junit.Test;
  */
 public class CryptUtilTest {
 
-    private static final String EXPECTED_MESSAGE_DIGEST_STRING = "58D1E17FFE5109A7AE296CAAFCADFDBE6A7D176F0BC4AB01E12A689B0499D8BD";
+    private static final String EXPECTED_MESSAGE_DIGEST_STRING = "83A2CA29DBAA80C0D6B6369448D0EDC0ACF30CA6E35C86F1E4C43A4915179F0D";
 
     /**
      * Test for {@link CryptUtil#calculateMessageDigest(File)}.
@@ -36,7 +36,7 @@ public class CryptUtilTest {
      */
     @Test
     public void testCalculateMessageDigest() throws IOException {
-        final File file = new File("src/test/resources/licensetexts/apache2/LICENSE-2.0.txt");
+        final File file = new File("src/test/resources/licensetexts/apache2/LICENSE-2.0-without-newlines.txt");
         final byte[] result = CryptUtil.calculateMessageDigest(file);
         System.out.println("result hexstring: " + MiscUtil.getHexString(result));
         final String referenceString = EXPECTED_MESSAGE_DIGEST_STRING;
