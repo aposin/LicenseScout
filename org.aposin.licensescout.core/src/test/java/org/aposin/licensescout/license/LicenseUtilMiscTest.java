@@ -15,7 +15,7 @@
  */
 package org.aposin.licensescout.license;
 
-import org.aposin.licensescout.license.LicenseUtil;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -43,6 +43,26 @@ public class LicenseUtilMiscTest {
         //        Assert.assertEquals("License.length", 5, result.size());
         //        License license = result.get(0);
         //        Assert.assertEquals("License.name", "Academic Free License", license.getName());
+    }
+
+    /**
+     * Test for {@link LicenseUtil#getLicenseNameWithVersion(License)}.
+     */
+    @Test
+    public void testGetLicenseNameWithVersion1() {
+        final License license = new License("spdxIdent", "name", LegalStatus.ACCEPTED, "author", "1.0", "url", "text",
+                null);
+        Assert.assertEquals("license name", "name Version 1.0", LicenseUtil.getLicenseNameWithVersion(license));
+    }
+
+    /**
+     * Test for {@link LicenseUtil#getLicenseNameWithVersion(License)}.
+     */
+    @Test
+    public void testGetLicenseNameWithVersion2() {
+        final License license = new License("spdxIdent", "name", LegalStatus.ACCEPTED, "author", null, "url", "text",
+                null);
+        Assert.assertEquals("license name", "name", LicenseUtil.getLicenseNameWithVersion(license));
     }
 
 }
