@@ -16,17 +16,17 @@
 package org.aposin.licensescout.license;
 
 /**
- * Legal state of a license (is it an open source license that is OK for Allianz).
+ * Legal state of a license (is it an open source license that is OK for the Company).
  * 
  */
 public enum LegalStatus {
 
     /**
-     * License is accepted by Allianz as an open source license that can be used.
+     * License is accepted by the Company as an open source license that can be used.
      */
     ACCEPTED,
     /**
-     * License is not accepted by Allianz as an open source license that can be used.
+     * License is not accepted by the Company as an open source license that can be used.
      */
     NOT_ACCEPTED,
     /**
