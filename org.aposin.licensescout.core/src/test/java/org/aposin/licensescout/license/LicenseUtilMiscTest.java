@@ -30,22 +30,6 @@ import org.junit.Test;
 public class LicenseUtilMiscTest {
 
     /**
-     * 
-     */
-    @Test
-    public void testGetLicense() {
-        //        List<License> result = LicenseStore.getLicense(null);
-        //        Assert.assertNull("getLicense() result", result);
-        //        result = LicenseStore.getLicense("EPL");
-        //        Assert.assertNull("getLicense() result", result);
-        //        result = LicenseStore.getLicense("ACADEMIC FREE LICENSE");
-        //        Assert.assertNotNull("getLicense() result", result);
-        //        Assert.assertEquals("License.length", 5, result.size());
-        //        License license = result.get(0);
-        //        Assert.assertEquals("License.name", "Academic Free License", license.getName());
-    }
-
-    /**
      * Test for {@link LicenseUtil#getLicenseNameWithVersion(License)}.
      */
     @Test
