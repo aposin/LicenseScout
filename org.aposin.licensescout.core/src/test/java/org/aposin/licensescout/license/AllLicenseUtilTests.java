@@ -31,7 +31,8 @@ import org.junit.runners.Suite.SuiteClasses;
         LicenseUtilDetectLicensesTest.class, //
         LicenseUtilEvaluateLicensesTest.class, //
         LicenseUtilGetMatchedVersionFromLineTest.class, //
-        LicenseUtilMiscTest.class //
+        LicenseUtilMiscTest.class,
+        LicenseUtilStatisticsTest.class//
 })
 public class AllLicenseUtilTests {
 
