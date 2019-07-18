@@ -9,7 +9,7 @@
 
 	<name>Help Test for License Scout Maven Plugin</name>
 
-	<url>http://www.allianz.at/</url>
+	<url>https://aposin.org/</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
