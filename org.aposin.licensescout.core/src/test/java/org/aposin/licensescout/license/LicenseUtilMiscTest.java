@@ -33,7 +33,7 @@ public class LicenseUtilMiscTest {
      * Test for {@link LicenseUtil#getLicenseNameWithVersion(License)}.
      */
     @Test
-    public void testGetLicenseNameWithVersion1() {
+    public void testGetLicenseNameWithVersionActuallyPresent() {
         final License license = new License("spdxIdent", "name", LegalStatus.ACCEPTED, "author", "1.0", "url", "text",
                 null);
         Assert.assertEquals("license name", "name Version 1.0", LicenseUtil.getLicenseNameWithVersion(license));
@@ -43,7 +43,7 @@ public class LicenseUtilMiscTest {
      * Test for {@link LicenseUtil#getLicenseNameWithVersion(License)}.
      */
     @Test
-    public void testGetLicenseNameWithVersion2() {
+    public void testGetLicenseNameWithVersionNullVersion() {
         final License license = new License("spdxIdent", "name", LegalStatus.ACCEPTED, "author", null, "url", "text",
                 null);
         Assert.assertEquals("license name", "name", LicenseUtil.getLicenseNameWithVersion(license));

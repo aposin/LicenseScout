@@ -42,7 +42,7 @@ public class LicenseUtilStatisticsTest {
      */
     @Test
     public void testCalculateGeneralStatisticsEmptyList() {
-        final Collection<Archive> archives = new ArrayList<Archive>();
+        final Collection<Archive> archives = new ArrayList<>();
         final GeneralStatistics generalStatistics = LicenseUtil.calculateGeneralStatistics(archives);
         Assert.assertEquals("candidateLicenseFileCount", 0, generalStatistics.getCandidateLicenseFileCount());
         Assert.assertEquals("totalArchiveCount", 0, generalStatistics.getTotalArchiveCount());
@@ -53,8 +53,11 @@ public class LicenseUtilStatisticsTest {
      */
     @Test
     public void testCalculateGeneralStatisticsRealList() {
-        final Collection<Archive> archives = new ArrayList<Archive>();
-        for (int i = 1; i <= 3; i++) {
+        final Collection<Archive> archives = new ArrayList<>();
+        final int expectedTotalArchiveCount = 3;
+        int expectedCandidateLicenseFileCount = 0;
+        for (int i = 1; i <= expectedTotalArchiveCount; i++) {
+            expectedCandidateLicenseFileCount += i;
             Archive archive = new Archive(ArchiveType.JAVA, "archive" + i, "", "");
             for (int j = 1; j <= i; j++) {
                 archive.addLicenseCandidateFile("candidateFile" + j);
@@ -62,8 +65,9 @@ public class LicenseUtilStatisticsTest {
             archives.add(archive);
         }
         final GeneralStatistics generalStatistics = LicenseUtil.calculateGeneralStatistics(archives);
-        Assert.assertEquals("candidateLicenseFileCount", 6, generalStatistics.getCandidateLicenseFileCount());
-        Assert.assertEquals("totalArchiveCount", 3, generalStatistics.getTotalArchiveCount());
+        Assert.assertEquals("candidateLicenseFileCount", expectedCandidateLicenseFileCount,
+                generalStatistics.getCandidateLicenseFileCount());
+        Assert.assertEquals("totalArchiveCount", expectedTotalArchiveCount, generalStatistics.getTotalArchiveCount());
     }
 
     /**
@@ -71,7 +75,7 @@ public class LicenseUtilStatisticsTest {
      */
     @Test
     public void testCalculateDetectionStatusStatisticsEmptyList() {
-        final Collection<Archive> archives = new ArrayList<Archive>();
+        final Collection<Archive> archives = new ArrayList<>();
         final IDetectionStatusStatistics detectionStatusStatistics = LicenseUtil
                 .calculateDetectionStatusStatistics(archives);
         Assert.assertEquals("detectionStatusStatistics (DETECTED)", 0,
@@ -93,9 +97,10 @@ public class LicenseUtilStatisticsTest {
      */
     @Test
     public void testCalculateDetectionStatusStatisticsRealList() {
-        final Collection<Archive> archives = new ArrayList<Archive>();
+        final Collection<Archive> archives = new ArrayList<>();
         for (DetectionStatus detectionStatus : DetectionStatus.values()) {
             final int ordinal = detectionStatus.ordinal();
+            // NOTE: zero count for DetectionStatus DETECTED is intentional to test the case of no archive of a certain DetectionStatus.
             for (int i = 0; i < ordinal; i++) {
                 final Archive archive = new Archive(ArchiveType.JAVA, "archive" + i, "", "");
                 archive.setDetectionStatus(detectionStatus);
@@ -123,7 +128,7 @@ public class LicenseUtilStatisticsTest {
      */
     @Test
     public void testCalculateLegalStatusStatisticsEmptyList() {
-        final Collection<Archive> archives = new ArrayList<Archive>();
+        final Collection<Archive> archives = new ArrayList<>();
         final ILegalStatusStatistics legalStatusStatistics = LicenseUtil.calculateLegalStatusStatistics(archives);
         Assert.assertEquals("legalStatusStatistics (ACCEPTED)", 0,
                 (int) legalStatusStatistics.get(LegalStatus.ACCEPTED));
@@ -139,7 +144,8 @@ public class LicenseUtilStatisticsTest {
      */
     @Test
     public void testCalculateLegalStatusStatisticsRealList() {
-        final Collection<Archive> archives = new ArrayList<Archive>();
+        final Collection<Archive> archives = new ArrayList<>();
+        // NOTE: zero count for LegalStatus ACCEPTED is intentional to test the case of no archive of a certain LegalStatus.
         for (LegalStatus legalStatus : LegalStatus.values()) {
             final int ordinal = legalStatus.ordinal();
             for (int i = 0; i < ordinal; i++) {
