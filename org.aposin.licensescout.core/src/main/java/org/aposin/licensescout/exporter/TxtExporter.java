@@ -73,11 +73,10 @@ public class TxtExporter implements IReportExporter {
     @Override
     public void export(final OutputResult outputResult, final ReportConfiguration reportConfiguration)
             throws Exception {
-        final String nl = "\n";
+        final String nl = System.lineSeparator();
         final File outputFile = reportConfiguration.getOutputFile();
         final List<Archive> archiveFiles = outputResult.getFinderResult().getArchiveFiles();
-        try (
-                Writer osWriter = new OutputStreamWriter(new FileOutputStream(outputFile), OUTPUT_FILE_ENCODING);
+        try (Writer osWriter = new OutputStreamWriter(new FileOutputStream(outputFile), OUTPUT_FILE_ENCODING);
                 final BufferedWriter bw = new BufferedWriter(osWriter);) {
 
             Collections.sort(archiveFiles);
@@ -90,15 +89,16 @@ public class TxtExporter implements IReportExporter {
             final List<License> usedLicenses = getSortedLicenses(usedLicensesMap);
 
             final StringBuilder sb = new StringBuilder();
-            final String header = "License Report\n\n"
-                    + " Copyright (c) 2018 Association for the promotion of open-source insurance software \r\n"
-                    + "and for the establishment of open interface standards in the insurance industry. \r\n"
-                    + "All Rights Reserved.\r\n" + "\r\n"
-                    + "This product is licensed to you under the Apache License, Version 2.0 (the \"License\"). \r\n"
-                    + "You may not use this product except in compliance with the License. \r\n" + "\r\n"
-                    + "In the following sections you can find \r\n" + "- List of used/linked software projects\r\n"
-                    + "- Notices to the used artifacts\r\n"
-                    + "- List of used artifacts with license info and vendor plugin names\r\n" + "- License texts\n\n";
+            final String header = "License Report" + nl + nl
+                    + " Copyright (c) 2018 Association for the promotion of open-source insurance software " + nl
+                    + "and for the establishment of open interface standards in the insurance industry. " + nl
+                    + "All Rights Reserved." + nl + nl
+                    + "This product is licensed to you under the Apache License, Version 2.0 (the \"License\"). " + nl
+                    + "You may not use this product except in compliance with the License. " + nl + "" + nl
+                    + "In the following sections you can find " + nl + "- List of used/linked software projects" + nl
+                    + "- Notices to the used artifacts" + nl
+                    + "- List of used artifacts with license info and vendor plugin names" + nl + "- License texts" + nl
+                    + nl;
             sb.append(header);
 
             sb.append(nl).append(nl);
@@ -168,7 +168,7 @@ public class TxtExporter implements IReportExporter {
 
     private void appendSeparatorLine(final StringBuilder sb) {
         sb.append("====================================================================");
-        sb.append("\n");
+        sb.append(System.lineSeparator());
     }
 
     /**
