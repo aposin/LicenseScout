@@ -167,7 +167,7 @@ Is responsible for handling and validating pull requests regarding the contribut
   - (Dictator, if any) 
 
 - Contributors: Everyone who has contributed something back to the project.
-- Community Members: People who use the project. They might be active in conversations or express their opinion on the project’s direction.
+- Community Members: People who use the project. They might be active in conversations or express their opinions on the project’s direction.
 
 ### Communication
 
