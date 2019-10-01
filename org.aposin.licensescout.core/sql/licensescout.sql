@@ -28,7 +28,7 @@ SET time_zone = "+00:00";
 -- Tabellenstruktur für Tabelle `Builds`
 --
 
-CREATE TABLE `Builds` (
+CREATE TABLE "Builds" (
   `Id` int(11) NOT NULL,
   `Buildname` varchar(255) NOT NULL,
   `Version` varchar(255) NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE `Builds` (
 -- Tabellenstruktur für Tabelle `DetectedLicenses`
 --
 
-CREATE TABLE `DetectedLicenses` (
+CREATE TABLE "DetectedLicenses" (
   `Id` int(11) NOT NULL,
   `FK_LibraryData_Id` int(11) NOT NULL,
   `License_Name` varchar(500) NOT NULL
@@ -57,7 +57,7 @@ CREATE TABLE `DetectedLicenses` (
 -- Tabellenstruktur für Tabelle `LibraryData`
 --
 
-CREATE TABLE `LibraryData` (
+CREATE TABLE "LibraryData" (
   `Id` int(11) NOT NULL,
   `FK_Build_Id` int(11) NOT NULL,
   `Selected_License` varchar(500) NOT NULL,
@@ -78,19 +78,19 @@ CREATE TABLE `LibraryData` (
 --
 -- Indizes für die Tabelle `Builds`
 --
-ALTER TABLE `Builds`
+ALTER TABLE "Builds"
   ADD PRIMARY KEY (`Id`);
 
 --
 -- Indizes für die Tabelle `DetectedLicenses`
 --
-ALTER TABLE `DetectedLicenses`
+ALTER TABLE "DetectedLicenses"
   ADD PRIMARY KEY (`Id`);
 
 --
 -- Indizes für die Tabelle `LibraryData`
 --
-ALTER TABLE `LibraryData`
+ALTER TABLE "LibraryData"
   ADD PRIMARY KEY (`Id`);
 
 --
