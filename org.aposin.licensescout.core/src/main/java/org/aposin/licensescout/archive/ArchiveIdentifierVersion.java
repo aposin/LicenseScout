@@ -15,6 +15,8 @@
  */
 package org.aposin.licensescout.archive;
 
+import java.util.Objects;
+
 /**
  * Identifier for an archive bases on name and version.
  * 
@@ -42,52 +44,17 @@ public class ArchiveIdentifierVersion extends ArchiveIdentifier {
         return version;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (!(o instanceof ArchiveIdentifierVersion)) { return false; }
+        if (!super.equals(o)) { return false; }
+        ArchiveIdentifierVersion that = (ArchiveIdentifierVersion) o;
+        return Objects.equals(getVersion(), that.getVersion());
+    }
+
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((getArchiveType() == null) ? 0 : getArchiveType().hashCode());
-        result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
-        result = prime * result + ((version == null) ? 0 : version.hashCode());
-        return result;
+        return Objects.hash(super.hashCode(), getVersion());
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        ArchiveIdentifierVersion other = (ArchiveIdentifierVersion) obj;
-        if (getArchiveType() != other.getArchiveType()) {
-            return false;
-        }
-        if (getName() == null) {
-            if (other.getName() != null) {
-                return false;
-            }
-        } else if (!getName().equals(other.getName())) {
-            return false;
-        }
-        if (version == null) {
-            if (other.version != null) {
-                return false;
-            }
-        } else if (!version.equals(other.version)) {
-            return false;
-        }
-        return true;
-    }
-
 }

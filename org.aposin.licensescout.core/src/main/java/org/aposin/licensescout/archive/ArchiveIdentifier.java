@@ -15,6 +15,8 @@
  */
 package org.aposin.licensescout.archive;
 
+import java.util.Objects;
+
 /**
  * Base class for Identifier for an archive bases on name.
  * 
@@ -70,44 +72,18 @@ public abstract class ArchiveIdentifier {
         return name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (!(o instanceof ArchiveIdentifier)) { return false; }
+        ArchiveIdentifier that = (ArchiveIdentifier) o;
+        return getArchiveType() == that.getArchiveType() &&
+            getNameMatchingType() == that.getNameMatchingType() &&
+            Objects.equals(getName(), that.getName());
+    }
+
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((archiveType == null) ? 0 : archiveType.hashCode());
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        return result;
+        return Objects.hash(getArchiveType(), getNameMatchingType(), getName());
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        ArchiveIdentifier other = (ArchiveIdentifier) obj;
-        if (archiveType != other.archiveType) {
-            return false;
-        }
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        return true;
-    }
-
 }
