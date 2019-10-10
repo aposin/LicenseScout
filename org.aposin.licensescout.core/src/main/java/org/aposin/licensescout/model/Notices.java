@@ -60,7 +60,7 @@ public class Notices {
         final String identifier = notice.getIdentifier();
         if (!StringUtils.isEmpty(identifier)) {
             final Notice existingNotice = store.get(identifier);
-            if (existingNotice != null && existingNotice != notice) {
+            if (existingNotice != null && !existingNotice.equals(notice)) {
                 log.warn("double notice identifier: '" + identifier + "'");
             }
             store.put(identifier, notice);

@@ -85,7 +85,7 @@ public class LicenseStoreData {
         final String spdxIdentifier = license.getSpdxIdentifier();
         if (!StringUtils.isEmpty(spdxIdentifier)) {
             final License existingLicense = spdxStore.get(spdxIdentifier);
-            if (existingLicense != null && existingLicense != license) {
+            if (existingLicense != null && !existingLicense.equals(license)) {
                 log.warn("double SPDX identifier: '" + spdxIdentifier + "'");
             }
             spdxStore.put(spdxIdentifier, license);
@@ -100,7 +100,7 @@ public class LicenseStoreData {
     private void addToUrlStore(final String url, final License license, ILFLog log) {
         if (!StringUtils.isEmpty(url)) {
             final License existingLicense = urlStore.get(url);
-            if (existingLicense != null && existingLicense != license) {
+            if (existingLicense != null && !existingLicense.equals(license)) {
                 log.warn("double License URL: '" + url + "'");
             }
             urlStore.put(url, license);

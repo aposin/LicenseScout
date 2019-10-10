@@ -161,8 +161,6 @@ public class LicenseCheckedList {
                     }
                 }
             }
-        } finally {
-            // EMPTY
         }
     }
 
