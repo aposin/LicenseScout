@@ -198,7 +198,7 @@ public class JavaJarFinder extends AbstractFinder {
                     getLog().debug("parseUnpackedJarArchive(): recognized as normal file");
                     if (isCandidateLicenseFile(entryName)) {
                         archive.addLicenseCandidateFile(newFilePath);
-                    } ;
+                    }
                     try (final InputStream inputStream = entryContainer.getInputStream()) {
                         final Collection<License> licenses = checkFileForLicenses(inputStream, entryName,
                                 getLicenseStoreData());

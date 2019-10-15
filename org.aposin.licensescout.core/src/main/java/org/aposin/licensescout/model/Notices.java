@@ -100,7 +100,26 @@ public class Notices {
     }
 
     private class NoticeSaxHandler extends AbstractSaxHandler {
+    	
+        private static final String ELEMENT_NOTICES = "notices";
+        private static final String ELEMENT_NOTICE = "notice";
+        private static final String ELEMENT_TEXT = "text";
 
+        private String identifier;
+        private String text;
+
+
+        /**
+         * Constructor.
+         * @param log the logger
+         */
+        public NoticeSaxHandler(final ILFLog log) {
+            super(log);
+            setElementHandler(new NopElementHandler(ELEMENT_NOTICES));
+            setElementHandler(new StandardNoticeHandler());
+            setElementHandler(new TextElementHandler());
+        }
+        
         private class StandardNoticeHandler implements IElementHandler {
 
             /**
@@ -145,25 +164,6 @@ public class Notices {
                 NoticeSaxHandler.this.text = text;
             }
         }
-
-        private static final String ELEMENT_NOTICES = "notices";
-        private static final String ELEMENT_NOTICE = "notice";
-        private static final String ELEMENT_TEXT = "text";
-
-        private String identifier;
-        private String text;
-
-        /**
-         * Constructor.
-         * @param log the logger
-         */
-        public NoticeSaxHandler(final ILFLog log) {
-            super(log);
-            setElementHandler(new NopElementHandler(ELEMENT_NOTICES));
-            setElementHandler(new StandardNoticeHandler());
-            setElementHandler(new TextElementHandler());
-        }
-
     }
 
 }
