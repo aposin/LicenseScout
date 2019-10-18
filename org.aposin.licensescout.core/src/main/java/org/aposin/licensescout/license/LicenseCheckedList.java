@@ -149,7 +149,7 @@ public class LicenseCheckedList {
                 final String providerId = values[PROVIDER_INDEX].trim();
                 final Provider provider = getProviderFromId(providers, providerId, log);
                 final String noticeId = values[NOTICE_INDEX].trim();
-                final Notice notice = getNoticeFromId(notices, noticeId, log);
+                final Notice notice = getNoticeFromId(notices, noticeId);
 
                 if (archiveIdentifier != null) {
                     final LicenseResult licenseResult = fetchLicenseResult(licenseStoreData, log, values,
@@ -398,7 +398,7 @@ public class LicenseCheckedList {
             protected void processText(final String text) {
                 final String identifier = text;
                 if (!StringUtils.isEmpty(identifier)) {
-                    notice = getNoticeFromId(getNotices(), identifier, getLog());
+                    notice = getNoticeFromId(getNotices(), identifier);
                 }
             }
         }
@@ -670,7 +670,7 @@ public class LicenseCheckedList {
         return sb;
     }
 
-    private static Notice getNoticeFromId(final Notices notices, final String noticeId, final ILFLog log) {
+    private static Notice getNoticeFromId(final Notices notices, final String noticeId) {
         // NOTE: notice in license list is optional. So no error or warning here.
         return notices.getNoticeByIdentifier(noticeId);
     }

@@ -439,19 +439,6 @@ public abstract class AbstractScanMojo extends AbstractMojo {
         }
     }
 
-    private List<Alarm> checkForAlarms(final List<Archive> archives) {
-        final List<Alarm> alarms = new ArrayList<>();
-        for (final Archive archive : archives) {
-            if (archive.getProvider() == null) {
-                alarms.add(new Alarm(AlarmCause.PROVIDER_MISSING, archive));
-            }
-            if (hasUnacceptedState(archive)) {
-                alarms.add(new Alarm(AlarmCause.UNACCEPTED_STATE, archive));
-            }
-        }
-        return alarms;
-    }
-
     private void writeResultsToDatabase(final BuildInfo buildInfo, final List<Archive> archives, final ILFLog log) {
         if (writeResultsToDatabase) {
             if (isSnapshotVersion(buildVersion) && !writeResultsToDatabaseForSnapshotBuilds) {
