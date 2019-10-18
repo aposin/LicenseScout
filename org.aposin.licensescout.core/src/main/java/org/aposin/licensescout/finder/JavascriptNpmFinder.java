@@ -137,7 +137,7 @@ public class JavascriptNpmFinder extends AbstractFinder {
             getLog().warn("No licenses and no name mapping found for license name: '" + npmArchiveLicenseName + "'");
             parseArchiveDirForLicenseFile(foundArchive, file, filePath);
         }
-        parseArchiveDirForLicenseText(foundArchive, file, filePath);
+        parseArchiveDirForLicenseText(foundArchive, file);
 
         final boolean noLicenseInformationFound = foundArchive.getLicenses().isEmpty();
 
@@ -192,7 +192,7 @@ public class JavascriptNpmFinder extends AbstractFinder {
         }
     }
 
-    private void parseArchiveDirForLicenseText(final Archive archive, final File parent, final String filePath)
+    private void parseArchiveDirForLicenseText(final Archive archive, final File parent)
             throws IOException {
         getLog().debug("parseArchiveDir(): processing " + parent.getAbsolutePath());
         final File[] entries = parent.listFiles();
