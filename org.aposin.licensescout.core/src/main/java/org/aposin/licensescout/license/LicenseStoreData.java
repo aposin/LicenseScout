@@ -189,7 +189,142 @@ public class LicenseStoreData {
         addToSpdxAndUrlStore(license, log);
     }
 
-    private class LicenseSaxHandler extends AbstractSaxHandler {
+    /**
+	 * Reads license URL mappings from a CSV file.
+	 * 
+	 * @param filename
+	 * @param log the logger
+	 * @throws IOException
+	 */
+	public void readUrlMappings(final String filename, final ILFLog log) throws IOException {
+	    String line = "";
+	    final String cvsSplitBy = ",";
+	
+	    try (final BufferedReader br = new BufferedReader(new FileReader(filename))) {
+	
+	        while ((line = br.readLine()) != null) {
+	            if (StringUtils.isEmpty(line) || line.startsWith("#")) {
+	                continue;
+	            }
+	            final String[] values = line.split(cvsSplitBy);
+	            final String url = values[0].trim();
+	            final int numLicenseNames = values.length - 1;
+	            final List<License> licenses = new ArrayList<>();
+	            for (int i = 0; i < numLicenseNames; i++) {
+	                final String spdxIdentifier = values[i + 1].trim();
+	                final License license = getLicenseBySpdxIdentifier(spdxIdentifier);
+	                if (license != null) {
+	                    licenses.add(license);
+	                } else {
+	                    log.info("readUrlMappings: SPDX identifier not found: " + spdxIdentifier);
+	                }
+	            }
+	            urlMappings.put(url, licenses);
+	        }
+	    }
+	}
+
+	/**
+	 * Reads license name mappings from a CSV file.
+	 * 
+	 * @param filename
+	 * @param log the logger
+	 * @throws IOException
+	 */
+	public void readNameMappings(final String filename, final ILFLog log) throws IOException {
+	    String line = "";
+	    final String cvsSplitBy = ",";
+	
+	    try (final BufferedReader br = new BufferedReader(new FileReader(filename))) {
+	
+	        while ((line = br.readLine()) != null) {
+	            if (StringUtils.isEmpty(line) || line.startsWith("#")) {
+	                continue;
+	            }
+	            final String[] values = line.split(cvsSplitBy);
+	            final String mappedName = values[0].trim();
+	            final int numLicenseNames = values.length - 1;
+	            final List<License> licenses = new ArrayList<>();
+	            for (int i = 0; i < numLicenseNames; i++) {
+	                final String spdxIdentifier = values[i + 1].trim();
+	                final License license = getLicenseBySpdxIdentifier(spdxIdentifier);
+	                if (license != null) {
+	                    licenses.add(license);
+	                } else {
+	                    log.info("readNameMappings: SPDX identifier not found: " + spdxIdentifier);
+	                }
+	            }
+	            nameMappings.put(mappedName, licenses);
+	        }
+	    }
+	}
+
+	private class LicenseSaxHandler extends AbstractSaxHandler {
+    	
+        private static final String ELEMENT_LICENSES = "licenses";
+        private static final String ELEMENT_LICENSE = "license";
+        private static final String ELEMENT_SPDX_IDENTIFIER = "spdxIdentifier";
+        private static final String ELEMENT_LEGAL_STATUS = "legalStatus";
+        private static final String ELEMENT_NAME = "name";
+        private static final String ELEMENT_AUTHOR = "author";
+        private static final String ELEMENT_VERSION = "version";
+        private static final String ELEMENT_ALTERNATIVE_VERSION = "alternativeVersion";
+        private static final String ELEMENT_PUBLIC_URL = "publicUrl";
+        private static final String ELEMENT_SECONDARY_URL = "secondaryUrl";
+        private static final String ELEMENT_LICENSE_SET = "licenseSet";
+        private static final String ELEMENT_DETECTION_STRING = "detectionString";
+        private static final String ELEMENT_NOTICE = "notice";
+        private static final String ELEMENT_LICENSE_TEXT = "licenseText";
+
+        private final Notices notices;
+        private final Map<String, License> licenseInternalIds = new HashMap<>();
+        private String licenseInternalId;
+        private String spdxIdentifier;
+        private LegalStatus legalStatus;
+        private String name;
+        private String author;
+        private String version;
+        private List<String> alternativeVersions;
+        private String publicUrl;
+        private List<String> secondaryUrls;
+        private List<License> licenseSet;
+        private List<String> detectionStrings;
+        private Notice notice;
+        private String licenseText;
+
+        private final IElementHandler standardLicenseHandler = new StandardLicenseHandler();
+        private final IElementHandler licenseSetLicenseHandler = new LicenseSetLicenseHandler();
+
+        /**
+         * Constructor.
+         * @param notices 
+         * @param log the logger
+         */
+        public LicenseSaxHandler(final Notices notices, final ILFLog log) {
+            super(log);
+            this.notices = notices;
+            setElementHandler(new NopElementHandler(ELEMENT_LICENSES));
+            setElementHandler(standardLicenseHandler);
+            setElementHandler(new SpdxIdentifierElementHandler());
+            setElementHandler(new LegalStatusElementHandler());
+            setElementHandler(new NameElementHandler());
+            setElementHandler(new AuthorElementHandler());
+            setElementHandler(new VersionElementHandler());
+            setElementHandler(new AlternativeVersionElementHandler());
+            setElementHandler(new PublicUrlElementHandler());
+            setElementHandler(new SecondaryUrlElementHandler());
+            setElementHandler(new LicenseSetElementHandler());
+            setElementHandler(new DetectionStringElementHandler());
+            setElementHandler(new NoticeElementHandler());
+            setElementHandler(new LicenseTextElementHandler());
+        }
+
+        /**
+         * @return the notices
+         */
+        protected final Notices getNotices() {
+            return notices;
+        }
 
         private class StandardLicenseHandler implements IElementHandler {
 
@@ -510,141 +645,6 @@ public class LicenseStoreData {
             @Override
             protected void processText(final String text) {
                 licenseText = text;
-            }
-        }
-
-        private static final String ELEMENT_LICENSES = "licenses";
-        private static final String ELEMENT_LICENSE = "license";
-        private static final String ELEMENT_SPDX_IDENTIFIER = "spdxIdentifier";
-        private static final String ELEMENT_LEGAL_STATUS = "legalStatus";
-        private static final String ELEMENT_NAME = "name";
-        private static final String ELEMENT_AUTHOR = "author";
-        private static final String ELEMENT_VERSION = "version";
-        private static final String ELEMENT_ALTERNATIVE_VERSION = "alternativeVersion";
-        private static final String ELEMENT_PUBLIC_URL = "publicUrl";
-        private static final String ELEMENT_SECONDARY_URL = "secondaryUrl";
-        private static final String ELEMENT_LICENSE_SET = "licenseSet";
-        private static final String ELEMENT_DETECTION_STRING = "detectionString";
-        private static final String ELEMENT_NOTICE = "notice";
-        private static final String ELEMENT_LICENSE_TEXT = "licenseText";
-
-        private final Notices notices;
-        private final Map<String, License> licenseInternalIds = new HashMap<>();
-        private String licenseInternalId;
-        private String spdxIdentifier;
-        private LegalStatus legalStatus;
-        private String name;
-        private String author;
-        private String version;
-        private List<String> alternativeVersions;
-        private String publicUrl;
-        private List<String> secondaryUrls;
-        private List<License> licenseSet;
-        private List<String> detectionStrings;
-        private Notice notice;
-        private String licenseText;
-
-        private final IElementHandler standardLicenseHandler = new StandardLicenseHandler();
-        private final IElementHandler licenseSetLicenseHandler = new LicenseSetLicenseHandler();
-
-        /**
-         * Constructor.
-         * @param notices 
-         * @param log the logger
-         */
-        public LicenseSaxHandler(final Notices notices, final ILFLog log) {
-            super(log);
-            this.notices = notices;
-            setElementHandler(new NopElementHandler(ELEMENT_LICENSES));
-            setElementHandler(standardLicenseHandler);
-            setElementHandler(new SpdxIdentifierElementHandler());
-            setElementHandler(new LegalStatusElementHandler());
-            setElementHandler(new NameElementHandler());
-            setElementHandler(new AuthorElementHandler());
-            setElementHandler(new VersionElementHandler());
-            setElementHandler(new AlternativeVersionElementHandler());
-            setElementHandler(new PublicUrlElementHandler());
-            setElementHandler(new SecondaryUrlElementHandler());
-            setElementHandler(new LicenseSetElementHandler());
-            setElementHandler(new DetectionStringElementHandler());
-            setElementHandler(new NoticeElementHandler());
-            setElementHandler(new LicenseTextElementHandler());
-        }
-
-        /**
-         * @return the notices
-         */
-        protected final Notices getNotices() {
-            return notices;
-        }
-    }
-
-    /**
-     * Reads license URL mappings from a CSV file.
-     * 
-     * @param filename
-     * @param log the logger
-     * @throws IOException
-     */
-    public void readUrlMappings(final String filename, final ILFLog log) throws IOException {
-        String line = "";
-        final String cvsSplitBy = ",";
-
-        try (final BufferedReader br = new BufferedReader(new FileReader(filename))) {
-
-            while ((line = br.readLine()) != null) {
-                if (StringUtils.isEmpty(line) || line.startsWith("#")) {
-                    continue;
-                }
-                final String[] values = line.split(cvsSplitBy);
-                final String url = values[0].trim();
-                final int numLicenseNames = values.length - 1;
-                final List<License> licenses = new ArrayList<>();
-                for (int i = 0; i < numLicenseNames; i++) {
-                    final String spdxIdentifier = values[i + 1].trim();
-                    final License license = getLicenseBySpdxIdentifier(spdxIdentifier);
-                    if (license != null) {
-                        licenses.add(license);
-                    } else {
-                        log.info("readUrlMappings: SPDX identifier not found: " + spdxIdentifier);
-                    }
-                }
-                urlMappings.put(url, licenses);
-            }
-        }
-    }
-
-    /**
-     * Reads license name mappings from a CSV file.
-     * 
-     * @param filename
-     * @param log the logger
-     * @throws IOException
-     */
-    public void readNameMappings(final String filename, final ILFLog log) throws IOException {
-        String line = "";
-        final String cvsSplitBy = ",";
-
-        try (final BufferedReader br = new BufferedReader(new FileReader(filename))) {
-
-            while ((line = br.readLine()) != null) {
-                if (StringUtils.isEmpty(line) || line.startsWith("#")) {
-                    continue;
-                }
-                final String[] values = line.split(cvsSplitBy);
-                final String mappedName = values[0].trim();
-                final int numLicenseNames = values.length - 1;
-                final List<License> licenses = new ArrayList<>();
-                for (int i = 0; i < numLicenseNames; i++) {
-                    final String spdxIdentifier = values[i + 1].trim();
-                    final License license = getLicenseBySpdxIdentifier(spdxIdentifier);
-                    if (license != null) {
-                        licenses.add(license);
-                    } else {
-                        log.info("readNameMappings: SPDX identifier not found: " + spdxIdentifier);
-                    }
-                }
-                nameMappings.put(mappedName, licenses);
             }
         }
     }

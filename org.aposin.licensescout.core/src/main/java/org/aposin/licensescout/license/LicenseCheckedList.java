@@ -192,303 +192,6 @@ public class LicenseCheckedList {
         xmlReader.parse(file.toURI().toString());
     }
 
-    private class ArchiveSaxHandler extends AbstractSaxHandler {
-
-        private class StandardArchiveHandler implements IElementHandler {
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public String getElementName() {
-                return ELEMENT_ARCHIVE;
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            public void startElement(String uri, String localName, String qName, final Attributes attributes) {
-                archiveType = null;
-                name = null;
-                patternType = null;
-                version = null;
-                messageDigest = null;
-                licenses = new ArrayList<>();
-                documentationUrl = null;
-                notice = null;
-                provider = null;
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            public void endElement(String uri, String localName, String qName) {
-                ArchiveIdentifier archiveIdentifier = null;
-                if (archiveType == null) {
-                    getLog().warn("No archive type for archive! Line: " + getLineNumberInformation());
-                }
-                if (name == null) {
-                    getLog().warn("No name for archive! Line: " + getLineNumberInformation());
-                }
-                if (patternType != null) {
-                    archiveIdentifier = new ArchiveIdentifierPattern(archiveType, patternType, name);
-                } else {
-                    if (version != null) {
-                        archiveIdentifier = new ArchiveIdentifierVersion(archiveType, name, version);
-                    }
-                    if (messageDigest != null) {
-                        archiveIdentifier = new ArchiveIdentifierMessageDigest(archiveType, name, messageDigest);
-                    }
-                }
-
-                if (archiveIdentifier != null) {
-                    final LicenseResult licenseResult = fetchLicenseResult(licenses, documentationUrl, notice,
-                            provider);
-                    if (archiveIdentifier.getNameMatchingType() == NameMatchingType.EXACT) {
-                        manualArchives.put(archiveIdentifier, licenseResult);
-                    } else {
-                        manualPatternArchives.put((ArchiveIdentifierPattern) archiveIdentifier, licenseResult);
-                    }
-                }
-            }
-        }
-
-        private class ArchiveTypeElementHandler extends AbstractTextElementHandler {
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public String getElementName() {
-                return ELEMENT_ARCHIVE_TYPE;
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            protected void processText(final String text) {
-                archiveType = ArchiveType.valueOf(ArchiveType.class, text);
-            }
-        }
-
-        private class NameElementHandler extends AbstractTextElementHandler {
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public String getElementName() {
-                return ELEMENT_NAME;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            protected void startElementHook(final String uri, final String localName, final String qName,
-                                            final Attributes attributes) {
-                final String typeText = attributes.getValue(ATTRIBUTE_TYPE);
-                if (typeText != null) {
-                    switch (typeText) {
-                        case "exact":
-                            patternType = null;
-                            break;
-                        case "regexname":
-                            patternType = PatternType.PATTERN_ON_FILENAME;
-                            break;
-                        case "regexpath":
-                            patternType = PatternType.PATTERN_ON_FILENAME;
-                            break;
-                        default:
-                            getLog().warn("Unknown matching type: '" + typeText + "'");
-                            break;
-                    }
-                }
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            protected void processText(final String text) {
-                name = text;
-            }
-        }
-
-        private class VersionElementHandler extends AbstractTextElementHandler {
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public String getElementName() {
-                return ELEMENT_VERSION;
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            protected void processText(final String text) {
-                version = text;
-            }
-        }
-
-        private class MessageDigestElementHandler extends AbstractTextElementHandler {
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public String getElementName() {
-                return ELEMENT_MESSAGE_DIGEST;
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            protected void processText(final String text) {
-                messageDigest = text;
-            }
-        }
-
-        private class DocumentationUrlElementHandler extends AbstractTextElementHandler {
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public String getElementName() {
-                return ELEMENT_DOCUMENTATION_URL;
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            protected void processText(final String text) {
-                documentationUrl = text;
-            }
-        }
-
-        private class LicenseElementHandler extends AbstractTextElementHandler {
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public String getElementName() {
-                return ELEMENT_LICENSE;
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            protected void processText(final String text) {
-                final License license = licenseStoreData.getLicenseBySpdxIdentifier(text);
-                if (license == null) {
-                    getLog().warn("Cannot find license with SPDX ID '" + text + "'");
-                } else {
-                    licenses.add(license);
-                }
-            }
-        }
-
-        private class NoticeElementHandler extends AbstractTextElementHandler {
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public String getElementName() {
-                return ELEMENT_NOTICE;
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            protected void processText(final String text) {
-                final String identifier = text;
-                if (!StringUtils.isEmpty(identifier)) {
-                    notice = getNoticeFromId(getNotices(), identifier);
-                }
-            }
-        }
-
-        private class ProviderElementHandler extends AbstractTextElementHandler {
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public String getElementName() {
-                return ELEMENT_PROVIDER;
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            protected void processText(final String text) {
-                final String identifier = text;
-                provider = getProviderFromId(getProviders(), identifier, getLog());
-            }
-        }
-
-        private static final String ELEMENT_ARCHIVES = "archives";
-        private static final String ELEMENT_ARCHIVE = "archive";
-        private static final String ELEMENT_ARCHIVE_TYPE = "archiveType";
-        private static final String ELEMENT_NAME = "name";
-        private static final String ELEMENT_VERSION = "version";
-        private static final String ELEMENT_MESSAGE_DIGEST = "messageDigest";
-        private static final String ELEMENT_DOCUMENTATION_URL = "documentationUrl";
-        private static final String ELEMENT_PROVIDER = "provider";
-        private static final String ELEMENT_NOTICE = "notice";
-        private static final String ELEMENT_LICENSES = "licenses";
-        private static final String ELEMENT_LICENSE = "license";
-
-        private final LicenseStoreData licenseStoreData;
-        private final Notices notices;
-        private final Providers providers;
-
-        private String name;
-        private String version;
-        private PatternType patternType;
-        private List<License> licenses;
-        private ArchiveType archiveType;
-        private String messageDigest;
-        private String documentationUrl;
-        private Notice notice;
-        private Provider provider;
-
-        /**
-         * Constructor.
-         * @param licenseStoreData 
-         * @param notices 
-         * @param providers 
-         * @param log the logger
-         */
-        public ArchiveSaxHandler(final LicenseStoreData licenseStoreData, final Notices notices,
-                final Providers providers, final ILFLog log) {
-            super(log);
-            this.licenseStoreData = licenseStoreData;
-            this.notices = notices;
-            this.providers = providers;
-            setElementHandler(new NopElementHandler(ELEMENT_ARCHIVES));
-            setElementHandler(new StandardArchiveHandler());
-            setElementHandler(new ArchiveTypeElementHandler());
-            setElementHandler(new NameElementHandler());
-            setElementHandler(new VersionElementHandler());
-            setElementHandler(new MessageDigestElementHandler());
-            setElementHandler(new DocumentationUrlElementHandler());
-            setElementHandler(new NoticeElementHandler());
-            setElementHandler(new ProviderElementHandler());
-            setElementHandler(new NopElementHandler(ELEMENT_LICENSES));
-            setElementHandler(new LicenseElementHandler());
-        }
-
-        /**
-         * @return the notices
-         */
-        protected final Notices getNotices() {
-            return notices;
-        }
-
-        /**
-         * @return the providers
-         */
-        protected final Providers getProviders() {
-            return providers;
-        }
-
-    }
-
     /**
      * @param licenseStoreData
      * @param log
@@ -682,4 +385,300 @@ public class LicenseCheckedList {
         }
         return provider;
     }
+
+	private class ArchiveSaxHandler extends AbstractSaxHandler {
+		
+	    private static final String ELEMENT_ARCHIVES = "archives";
+	    private static final String ELEMENT_ARCHIVE = "archive";
+	    private static final String ELEMENT_ARCHIVE_TYPE = "archiveType";
+	    private static final String ELEMENT_NAME = "name";
+	    private static final String ELEMENT_VERSION = "version";
+	    private static final String ELEMENT_MESSAGE_DIGEST = "messageDigest";
+	    private static final String ELEMENT_DOCUMENTATION_URL = "documentationUrl";
+	    private static final String ELEMENT_PROVIDER = "provider";
+	    private static final String ELEMENT_NOTICE = "notice";
+	    private static final String ELEMENT_LICENSES = "licenses";
+	    private static final String ELEMENT_LICENSE = "license";
+	
+	    private final LicenseStoreData licenseStoreData;
+	    private final Notices notices;
+	    private final Providers providers;
+	
+	    private String name;
+	    private String version;
+	    private PatternType patternType;
+	    private List<License> licenses;
+	    private ArchiveType archiveType;
+	    private String messageDigest;
+	    private String documentationUrl;
+	    private Notice notice;
+	    private Provider provider;
+	
+	    /**
+	     * Constructor.
+	     * @param licenseStoreData 
+	     * @param notices 
+	     * @param providers 
+	     * @param log the logger
+	     */
+	    public ArchiveSaxHandler(final LicenseStoreData licenseStoreData, final Notices notices,
+	            final Providers providers, final ILFLog log) {
+	        super(log);
+	        this.licenseStoreData = licenseStoreData;
+	        this.notices = notices;
+	        this.providers = providers;
+	        setElementHandler(new NopElementHandler(ELEMENT_ARCHIVES));
+	        setElementHandler(new StandardArchiveHandler());
+	        setElementHandler(new ArchiveTypeElementHandler());
+	        setElementHandler(new NameElementHandler());
+	        setElementHandler(new VersionElementHandler());
+	        setElementHandler(new MessageDigestElementHandler());
+	        setElementHandler(new DocumentationUrlElementHandler());
+	        setElementHandler(new NoticeElementHandler());
+	        setElementHandler(new ProviderElementHandler());
+	        setElementHandler(new NopElementHandler(ELEMENT_LICENSES));
+	        setElementHandler(new LicenseElementHandler());
+	    }
+	
+	    /**
+	     * @return the notices
+	     */
+	    protected final Notices getNotices() {
+	        return notices;
+	    }
+	
+	    /**
+	     * @return the providers
+	     */
+	    protected final Providers getProviders() {
+	        return providers;
+	    }
+	
+	    private class StandardArchiveHandler implements IElementHandler {
+	
+	        /**
+	         * {@inheritDoc}
+	         */
+	        @Override
+	        public String getElementName() {
+	            return ELEMENT_ARCHIVE;
+	        }
+	
+	        /** {@inheritDoc} */
+	        @Override
+	        public void startElement(String uri, String localName, String qName, final Attributes attributes) {
+	            archiveType = null;
+	            name = null;
+	            patternType = null;
+	            version = null;
+	            messageDigest = null;
+	            licenses = new ArrayList<>();
+	            documentationUrl = null;
+	            notice = null;
+	            provider = null;
+	        }
+	
+	        /** {@inheritDoc} */
+	        @Override
+	        public void endElement(String uri, String localName, String qName) {
+	            ArchiveIdentifier archiveIdentifier = null;
+	            if (archiveType == null) {
+	                getLog().warn("No archive type for archive! Line: " + getLineNumberInformation());
+	            }
+	            if (name == null) {
+	                getLog().warn("No name for archive! Line: " + getLineNumberInformation());
+	            }
+	            if (patternType != null) {
+	                archiveIdentifier = new ArchiveIdentifierPattern(archiveType, patternType, name);
+	            } else {
+	                if (version != null) {
+	                    archiveIdentifier = new ArchiveIdentifierVersion(archiveType, name, version);
+	                }
+	                if (messageDigest != null) {
+	                    archiveIdentifier = new ArchiveIdentifierMessageDigest(archiveType, name, messageDigest);
+	                }
+	            }
+	
+	            if (archiveIdentifier != null) {
+	                final LicenseResult licenseResult = fetchLicenseResult(licenses, documentationUrl, notice,
+	                        provider);
+	                if (archiveIdentifier.getNameMatchingType() == NameMatchingType.EXACT) {
+	                    manualArchives.put(archiveIdentifier, licenseResult);
+	                } else {
+	                    manualPatternArchives.put((ArchiveIdentifierPattern) archiveIdentifier, licenseResult);
+	                }
+	            }
+	        }
+	    }
+	
+	    private class ArchiveTypeElementHandler extends AbstractTextElementHandler {
+	
+	        /**
+	         * {@inheritDoc}
+	         */
+	        @Override
+	        public String getElementName() {
+	            return ELEMENT_ARCHIVE_TYPE;
+	        }
+	
+	        /** {@inheritDoc} */
+	        @Override
+	        protected void processText(final String text) {
+	            archiveType = ArchiveType.valueOf(ArchiveType.class, text);
+	        }
+	    }
+	
+	    private class NameElementHandler extends AbstractTextElementHandler {
+	
+	        /**
+	         * {@inheritDoc}
+	         */
+	        @Override
+	        public String getElementName() {
+	            return ELEMENT_NAME;
+	        }
+	
+	        /**
+	         * {@inheritDoc}
+	         */
+	        @Override
+	        protected void startElementHook(final String uri, final String localName, final String qName,
+	                                        final Attributes attributes) {
+	            final String typeText = attributes.getValue(ATTRIBUTE_TYPE);
+	            if (typeText != null) {
+	                switch (typeText) {
+	                    case "exact":
+	                        patternType = null;
+	                        break;
+	                    case "regexname":
+	                        patternType = PatternType.PATTERN_ON_FILENAME;
+	                        break;
+	                    case "regexpath":
+	                        patternType = PatternType.PATTERN_ON_FILENAME;
+	                        break;
+	                    default:
+	                        getLog().warn("Unknown matching type: '" + typeText + "'");
+	                        break;
+	                }
+	            }
+	        }
+	
+	        /** {@inheritDoc} */
+	        @Override
+	        protected void processText(final String text) {
+	            name = text;
+	        }
+	    }
+	
+	    private class VersionElementHandler extends AbstractTextElementHandler {
+	
+	        /**
+	         * {@inheritDoc}
+	         */
+	        @Override
+	        public String getElementName() {
+	            return ELEMENT_VERSION;
+	        }
+	
+	        /** {@inheritDoc} */
+	        @Override
+	        protected void processText(final String text) {
+	            version = text;
+	        }
+	    }
+	
+	    private class MessageDigestElementHandler extends AbstractTextElementHandler {
+	
+	        /**
+	         * {@inheritDoc}
+	         */
+	        @Override
+	        public String getElementName() {
+	            return ELEMENT_MESSAGE_DIGEST;
+	        }
+	
+	        /** {@inheritDoc} */
+	        @Override
+	        protected void processText(final String text) {
+	            messageDigest = text;
+	        }
+	    }
+	
+	    private class DocumentationUrlElementHandler extends AbstractTextElementHandler {
+	
+	        /**
+	         * {@inheritDoc}
+	         */
+	        @Override
+	        public String getElementName() {
+	            return ELEMENT_DOCUMENTATION_URL;
+	        }
+	
+	        /** {@inheritDoc} */
+	        @Override
+	        protected void processText(final String text) {
+	            documentationUrl = text;
+	        }
+	    }
+	
+	    private class LicenseElementHandler extends AbstractTextElementHandler {
+	
+	        /**
+	         * {@inheritDoc}
+	         */
+	        @Override
+	        public String getElementName() {
+	            return ELEMENT_LICENSE;
+	        }
+	
+	        /** {@inheritDoc} */
+	        @Override
+	        protected void processText(final String text) {
+	            final License license = licenseStoreData.getLicenseBySpdxIdentifier(text);
+	            if (license == null) {
+	                getLog().warn("Cannot find license with SPDX ID '" + text + "'");
+	            } else {
+	                licenses.add(license);
+	            }
+	        }
+	    }
+	
+	    private class NoticeElementHandler extends AbstractTextElementHandler {
+	
+	        /**
+	         * {@inheritDoc}
+	         */
+	        @Override
+	        public String getElementName() {
+	            return ELEMENT_NOTICE;
+	        }
+	
+	        /** {@inheritDoc} */
+	        @Override
+	        protected void processText(final String text) {
+	            final String identifier = text;
+	            if (!StringUtils.isEmpty(identifier)) {
+	                notice = getNoticeFromId(getNotices(), identifier);
+	            }
+	        }
+	    }
+	
+	    private class ProviderElementHandler extends AbstractTextElementHandler {
+	
+	        /**
+	         * {@inheritDoc}
+	         */
+	        @Override
+	        public String getElementName() {
+	            return ELEMENT_PROVIDER;
+	        }
+	
+	        /** {@inheritDoc} */
+	        @Override
+	        protected void processText(final String text) {
+	            final String identifier = text;
+	            provider = getProviderFromId(getProviders(), identifier, getLog());
+	        }
+	    }
+	}
 }
