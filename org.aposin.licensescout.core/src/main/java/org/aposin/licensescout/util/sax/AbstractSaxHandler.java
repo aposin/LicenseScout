@@ -29,37 +29,6 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class AbstractSaxHandler extends DefaultHandler {
 
-    protected abstract class AbstractTextElementHandler implements IElementHandler {
-
-        /** {@inheritDoc} */
-        @Override
-        public final void startElement(final String uri, final String localName, final String qName,
-                                       final Attributes attributes) {
-            characterCollector = new StringBuilder();
-            startElementHook(uri, localName, qName, attributes);
-        }
-
-        protected void startElementHook(final String uri, final String localName, final String qName,
-                                        final Attributes attributes) {
-            // DO NOTHING
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public final void endElement(final String uri, final String localName, final String qName) {
-            final String tmp = getCollectedCharacters();
-            processText(tmp);
-        }
-
-        protected abstract void processText(String text);
-
-        private String getCollectedCharacters() {
-            final String tmp = characterCollector.toString();
-            characterCollector = null;
-            return tmp.trim();
-        }
-    }
-
     protected static final String ATTRIBUTE_ID = "id";
     protected static final String ATTRIBUTE_IDREF = "idref";
     protected static final String ATTRIBUTE_TYPE = "type";
@@ -157,4 +126,35 @@ public class AbstractSaxHandler extends DefaultHandler {
             return "";
         }
     }
+
+	protected abstract class AbstractTextElementHandler implements IElementHandler {
+	
+	    /** {@inheritDoc} */
+	    @Override
+	    public final void startElement(final String uri, final String localName, final String qName,
+	                                   final Attributes attributes) {
+	        characterCollector = new StringBuilder();
+	        startElementHook(uri, localName, qName, attributes);
+	    }
+	
+	    protected void startElementHook(final String uri, final String localName, final String qName,
+	                                    final Attributes attributes) {
+	        // DO NOTHING
+	    }
+	
+	    /** {@inheritDoc} */
+	    @Override
+	    public final void endElement(final String uri, final String localName, final String qName) {
+	        final String tmp = getCollectedCharacters();
+	        processText(tmp);
+	    }
+	
+	    protected abstract void processText(String text);
+	
+	    private String getCollectedCharacters() {
+	        final String tmp = characterCollector.toString();
+	        characterCollector = null;
+	        return tmp.trim();
+	    }
+	}
 }

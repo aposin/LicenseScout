@@ -100,6 +100,27 @@ public class Providers {
 
     private class ProviderSaxHandler extends AbstractSaxHandler {
 
+        private static final String ELEMENT_PROVIDERS = "providers";
+        private static final String ELEMENT_PROVIDER = "provider";
+        private static final String ELEMENT_NAME = "name";
+        private static final String ELEMENT_URL = "url";
+
+        private String providerIdentifier;
+        private String name;
+        private String url;
+
+        /**
+         * Constructor.
+         * @param log the logger
+         */
+        public ProviderSaxHandler(final ILFLog log) {
+            super(log);
+            setElementHandler(new NopElementHandler(ELEMENT_PROVIDERS));
+            setElementHandler(new StandardProviderHandler());
+            setElementHandler(new NameElementHandler());
+            setElementHandler(new UrlElementHandler());
+        }
+        
         private class StandardProviderHandler implements IElementHandler {
 
             /**
@@ -165,28 +186,6 @@ public class Providers {
                 url = text;
             }
         }
-
-        private static final String ELEMENT_PROVIDERS = "providers";
-        private static final String ELEMENT_PROVIDER = "provider";
-        private static final String ELEMENT_NAME = "name";
-        private static final String ELEMENT_URL = "url";
-
-        private String providerIdentifier;
-        private String name;
-        private String url;
-
-        /**
-         * Constructor.
-         * @param log the logger
-         */
-        public ProviderSaxHandler(final ILFLog log) {
-            super(log);
-            setElementHandler(new NopElementHandler(ELEMENT_PROVIDERS));
-            setElementHandler(new StandardProviderHandler());
-            setElementHandler(new NameElementHandler());
-            setElementHandler(new UrlElementHandler());
-        }
-
     }
 
 }
