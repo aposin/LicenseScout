@@ -33,29 +33,29 @@ public class VendorArchiveListFilterTest {
 	@Test
 	public void testFilterVendor() {
 		final VendorArchiveListFilter filter = new VendorArchiveListFilter(Collections.singletonList(FILTERED_VENDOR), new NullLog(), true);
-		doTestFilter(filter, getMockedArchivesForVendor(FILTERED_VENDOR), 0);
+		assertFilterSize(filter, getMockedArchivesForVendor(FILTERED_VENDOR), 0);
 	}
 	
 	@Test
 	public void testNoFilterVendor() {
 		final VendorArchiveListFilter filter = new VendorArchiveListFilter(Collections.singletonList(FILTERED_VENDOR), new NullLog(), true);
-		doTestFilter(filter, getMockedArchivesForVendor(INCLUDED_VENDOR), 1);
+		assertFilterSize(filter, getMockedArchivesForVendor(INCLUDED_VENDOR), 1);
 	}
 	
 	@Test
 	public void testNoFilterSimilarVendor() {
 		final VendorArchiveListFilter filter = new VendorArchiveListFilter(Collections.singletonList(FILTERED_VENDOR), new NullLog(), true);
-		doTestFilter(filter, getMockedArchivesForVendor(FILTERED_VENDOR + " 2"), 1);
+		assertFilterSize(filter, getMockedArchivesForVendor(FILTERED_VENDOR + " 2"), 1);
 	}
 	
 	@Test
 	public void testFilterSeveral() {
 		final VendorArchiveListFilter filter = new VendorArchiveListFilter(Arrays.asList(FILTERED_VENDOR, FILTERED_VENDOR + " 2"), new NullLog(), true);
-		doTestFilter(filter, getMockedArchivesForVendor(FILTERED_VENDOR, INCLUDED_VENDOR, FILTERED_VENDOR + " 2", INCLUDED_VENDOR), 2);
+		assertFilterSize(filter, getMockedArchivesForVendor(FILTERED_VENDOR, INCLUDED_VENDOR, FILTERED_VENDOR + " 2", INCLUDED_VENDOR), 2);
 		
 	}
 	
-	private static void doTestFilter(final VendorArchiveListFilter filter, final List<Archive> archives, final int expectedSizeAfterFilter) {
+	private static void assertFilterSize(final VendorArchiveListFilter filter, final List<Archive> archives, final int expectedSizeAfterFilter) {
 		filter.filter(archives);
 		Assert.assertEquals(expectedSizeAfterFilter,  archives.size());
 	}
