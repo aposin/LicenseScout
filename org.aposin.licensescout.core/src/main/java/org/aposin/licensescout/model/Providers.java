@@ -59,7 +59,7 @@ public class Providers {
         final String identifier = provider.getIdentifier();
         if (!StringUtils.isEmpty(identifier)) {
             final Provider existingProvider = store.get(identifier);
-            if (existingProvider != null && existingProvider != provider) {
+            if (existingProvider != null && !existingProvider.equals(provider)) {
                 log.warn("double provider identifier: '" + identifier + "'");
             }
             store.put(identifier, provider);
