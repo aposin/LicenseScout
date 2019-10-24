@@ -6,7 +6,13 @@
 [![CLA assistant](https://cla-assistant.io/readme/badge/aposin/LicenseScout)](https://cla-assistant.io/aposin/LicenseScout)
 [![GitHub](https://img.shields.io/github/license/aposin/LicenseScout.svg)](https://github.com/aposin/LicenseScout/blob/master/LICENSE)
 
-# LicenseScout
+---
+
+<p align="center">
+<img src="org.aposin.licensescout.documentation/images/png/LS_logo_with_text_green.png" width="350">
+</p>
+
+---
 
 LicenseScout is a Maven Plug-in to identify third-party artifacts (libraries) and their licenses, in Java as well as JavaScript projects.
 The goal is to get an overview over the used licenses, and the artifacts for which no license could be detected. A proper output document is generated listing the used licenses and the corresponding license texts. In a configuration file each license identified is marked as ACCEPTED or NOT_ACCEPTED. This decision depends on the your project's license and may require legal support.
