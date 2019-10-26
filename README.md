@@ -20,7 +20,7 @@ The goal is to get an overview over the used licenses, and the artifacts for whi
 
 ## Getting started
 
-For detail information, see the [full documentation](org.aposin.licensescout.core/doc/documentation.adoc).
+For detail information, see the [full documentation](org.aposin.licensescout.documentation/doc/documentation.adoc).
 
 ### Prerequisites
 
