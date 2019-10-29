@@ -18,6 +18,7 @@ package org.aposin.licensescout.license;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
@@ -27,26 +28,33 @@ import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.aposin.licensescout.archive.Archive;
 import org.aposin.licensescout.util.ILFLog;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
- *
+ * Utility methods related to accessing a server that is caching maven central.
+ * 
+ * <p>The instance of this class checks if the server is reachable under the configured URL. 
  */
 public class ArtifactServerUtil {
 
     private final String mavenCentralBaseUrl;
     private final int connectTimeoutInMilliseconds;
+    private final ILFLog log;
     private final boolean cachedCheckAccess;
 
     /**
      * Constructor.
      * 
-     * @param mavenCentralBaseUrl
+     * @param mavenCentralBaseUrl the URL to a locally caching server of maven central
+     * @param connectTimeoutInMilliseconds the connect timeout
+     * @param log the logger 
      */
     public ArtifactServerUtil(final String mavenCentralBaseUrl, final int connectTimeoutInMilliseconds,
             final ILFLog log) {
         this.mavenCentralBaseUrl = mavenCentralBaseUrl;
         this.connectTimeoutInMilliseconds = connectTimeoutInMilliseconds;
-        this.cachedCheckAccess = checkAccess(log);
+        this.log = log;
+        this.cachedCheckAccess = checkAccess();
     }
 
     /**
@@ -55,7 +63,7 @@ public class ArtifactServerUtil {
      * @param log a logger
      * @return true if the artifact server is accessible under the configured base URL, false otherwise
      */
-    private boolean checkAccess(final ILFLog log) {
+    private boolean checkAccess() {
         // we check the presence of
         // 'org.apache.maven.plugins:maven-plugin-plugin:jar:3.6.0'
         final String groupId = "org.apache.maven.plugins";
@@ -85,9 +93,9 @@ public class ArtifactServerUtil {
     }
 
     /**
-     * @return the nexusCentralBaseUrl
+     * @return the mavenCentralBaseUrl
      */
-    private final String getNexusCentralBaseUrl() {
+    private final String getMavenCentralBaseUrl() {
         return mavenCentralBaseUrl;
     }
 
@@ -97,66 +105,30 @@ public class ArtifactServerUtil {
      * @param inputStream      input source of the POM file
      * @param archive          the archive to add the licenses to
      * @param filePath         path of the POM file (for information only)
-     * @param licenseStoreData
-     * @param log              the logger
+     * @param licenseStoreData the license data object
      * @return true if one or more licenses have been added, false otherwise
      */
     public boolean addLicensesFromPom(final InputStream inputStream, final Archive archive, final String filePath,
-                                      final LicenseStoreData licenseStoreData, final ILFLog log) {
+                                      final LicenseStoreData licenseStoreData) {
         try {
             log.debug("Checking POM file: " + filePath);
-            final MavenXpp3Reader xpp3Reader = new MavenXpp3Reader();
-            final Model model = xpp3Reader.read(inputStream);
-
-            final List<org.apache.maven.model.License> licenses = model.getLicenses();
-            boolean licenseFound = false;
-            for (final org.apache.maven.model.License license : licenses) {
-                final String licenseUrl = license.getUrl();
-                final String licenseName = license.getName();
-                log.debug("License name: " + licenseName);
-                log.debug("License URL: " + licenseUrl);
-                final boolean licenseFoundForUrl = LicenseUtil.handleLicenseUrl(licenseUrl, archive, filePath,
-                        licenseStoreData, log);
-                licenseFound |= licenseFoundForUrl;
-                boolean licenseFoundForName = false;
-                if (!licenseFoundForUrl) {
-                    licenseFoundForName = LicenseUtil.handleLicenseName(licenseName, archive, filePath,
-                            licenseStoreData, log);
-                    licenseFound |= licenseFoundForName;
-                }
-                if (!licenseFoundForUrl && !licenseFoundForName) {
-                    log.warn("Neither license name nor license URL mapping found for name/URL: " + licenseName + " / "
-                            + licenseUrl);
-                }
-            }
+            final Model model = getMavenModel(inputStream);
+            boolean licenseFound = evaluatePomLicenses(archive, filePath, licenseStoreData, model);
             // try parent POM resolution only if we know we can reach the artifact server
-            if (!licenseFound && cachedCheckAccess) {
+            if (!licenseFound && isCachedCheckAccess()) {
                 // try parent POM from Maven central or a proxy of it on an artifact server
                 final Parent parent = model.getParent();
                 if (parent != null) {
-                    final String groupId = parent.getGroupId();
-                    final String artifactId = parent.getArtifactId();
-                    final String version = parent.getVersion();
-                    final String urlString = getArtifactUrlString(groupId, artifactId, version);
-                    final URL url = new URL(urlString);
+                    final URL url = getParentUrl(parent);
                     InputStream parentInputStream;
                     try {
-                        final URLConnection urlConnection = url.openConnection();
-                        urlConnection.setConnectTimeout(connectTimeoutInMilliseconds);
-                        parentInputStream = urlConnection.getInputStream();
+                        parentInputStream = getInputStream(url);
                     } catch (FileNotFoundException e) {
-                        log.debug("Parent POM not found on Nexus: " + urlString);
+                        log.debug("Parent POM not found on artifact server: " + url.toString());
                         return licenseFound;
                     }
-                    if (parentInputStream != null) {
-                        try {
-                            final String newFilePath = filePath + "![parent POM](" + parent.getId() + ")";
-                            licenseFound |= addLicensesFromPom(parentInputStream, archive, newFilePath,
-                                    licenseStoreData, log);
-                        } finally {
-                            parentInputStream.close();
-                        }
-                    }
+                    licenseFound |= processParentLicenses(archive, filePath, licenseStoreData, parent,
+                            parentInputStream);
                 }
             }
             return licenseFound;
@@ -166,8 +138,71 @@ public class ArtifactServerUtil {
         }
     }
 
+    private boolean processParentLicenses(final Archive archive, final String filePath,
+                                          final LicenseStoreData licenseStoreData, final Parent parent,
+                                          InputStream parentInputStream)
+            throws IOException {
+        boolean licenseFoundLocal = false;
+        if (parentInputStream != null) {
+            try {
+                final String newFilePath = filePath + "![parent POM](" + parent.getId() + ")";
+                licenseFoundLocal = addLicensesFromPom(parentInputStream, archive, newFilePath, licenseStoreData);
+            } finally {
+                parentInputStream.close();
+            }
+        }
+        return licenseFoundLocal;
+    }
+
+    private boolean evaluatePomLicenses(final Archive archive, final String filePath,
+                                        final LicenseStoreData licenseStoreData, final Model model) {
+        boolean licenseFound = false;
+        final List<org.apache.maven.model.License> licenses = model.getLicenses();
+        for (final org.apache.maven.model.License license : licenses) {
+            final String licenseUrl = license.getUrl();
+            final String licenseName = license.getName();
+            log.debug("License name: " + licenseName);
+            log.debug("License URL: " + licenseUrl);
+            final boolean licenseFoundForUrl = LicenseUtil.handleLicenseUrl(licenseUrl, archive, filePath,
+                    licenseStoreData, log);
+            licenseFound |= licenseFoundForUrl;
+            boolean licenseFoundForName = false;
+            if (!licenseFoundForUrl) {
+                licenseFoundForName = LicenseUtil.handleLicenseName(licenseName, archive, filePath, licenseStoreData,
+                        log);
+                licenseFound |= licenseFoundForName;
+            }
+            if (!licenseFoundForUrl && !licenseFoundForName) {
+                log.warn("Neither license name nor license URL mapping found for name/URL: " + licenseName + " / "
+                        + licenseUrl);
+            }
+        }
+        return licenseFound;
+    }
+
+    private URL getParentUrl(final Parent parent) throws MalformedURLException {
+        final String groupId = parent.getGroupId();
+        final String artifactId = parent.getArtifactId();
+        final String version = parent.getVersion();
+        final String urlString = getArtifactUrlString(groupId, artifactId, version);
+        return new URL(urlString);
+    }
+
+    private InputStream getInputStream(final URL url) throws IOException {
+        InputStream parentInputStream;
+        final URLConnection urlConnection = url.openConnection();
+        urlConnection.setConnectTimeout(connectTimeoutInMilliseconds);
+        parentInputStream = urlConnection.getInputStream();
+        return parentInputStream;
+    }
+
+    private Model getMavenModel(final InputStream inputStream) throws IOException, XmlPullParserException {
+        final MavenXpp3Reader xpp3Reader = new MavenXpp3Reader();
+        return xpp3Reader.read(inputStream);
+    }
+
     private String getArtifactUrlString(final String groupId, final String artifactId, final String version) {
-        return getNexusCentralBaseUrl() + groupId.replace('.', '/') + "/" + artifactId + "/" + version + "/"
+        return getMavenCentralBaseUrl() + groupId.replace('.', '/') + "/" + artifactId + "/" + version + "/"
                 + artifactId + "-" + version + ".pom";
     }
 

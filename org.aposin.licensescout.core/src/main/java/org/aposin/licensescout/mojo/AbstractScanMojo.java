@@ -338,6 +338,7 @@ public abstract class AbstractScanMojo extends AbstractMojo {
             writeResultsToDatabase(buildInfo, finderResult.getArchiveFiles(), log);
 
             final OutputResult outputResult = createOutputResult(finderResult);
+            outputResult.setPomResolutionUsed(finder.isPomResolutionUsed());
             final ReportConfiguration reportConfiguration = createReportConfiguration(archiveType);
 
             doOutput(log, outputResult, reportConfiguration);

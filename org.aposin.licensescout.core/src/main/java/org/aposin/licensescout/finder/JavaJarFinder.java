@@ -271,7 +271,7 @@ public class JavaJarFinder extends AbstractFinder {
                                     final ILFLog log)
             throws Exception {
         try (final InputStream inputStream = entryContainer.getInputStream()) {
-            artifactServerUtil.addLicensesFromPom(inputStream, archive, filePath, getLicenseStoreData(), log);
+            artifactServerUtil.addLicensesFromPom(inputStream, archive, filePath, getLicenseStoreData());
         }
     }
 
@@ -397,7 +397,6 @@ public class JavaJarFinder extends AbstractFinder {
      * {@inheritDoc}
      */
     @Override
-    // TODO: use this value; output it in reports
     public boolean isPomResolutionUsed() {
         return artifactServerUtil.isCachedCheckAccess();
     }

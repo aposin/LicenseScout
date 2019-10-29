@@ -36,13 +36,4 @@ public class ArtifactServerUtilTest {
         Assert.assertFalse("isCachedCheckAccess()", artifactServerUtil.isCachedCheckAccess());
     }
 
-    /**
-     * Test method for
-     * {@link org.aposin.licensescout.license.ArtifactServerUtil#addLicensesFromPom(java.io.InputStream, org.aposin.licensescout.archive.Archive, java.lang.String, org.aposin.licensescout.license.LicenseStoreData, org.aposin.licensescout.util.ILFLog)}.
-     */
-    //	@Test
-    public void testAddLicensesFromPom() {
-        //		fail("Not yet implemented");
-    }
-
 }
