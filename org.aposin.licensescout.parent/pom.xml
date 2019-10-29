@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -16,9 +17,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- Dependencies version definitions -->
-		<commons-lang3.version>3.8.1</commons-lang3.version>
-		<velocity.version>2.0</velocity.version>
-		<commons-collections4.version>4.2</commons-collections4.version>
+		<commons-lang3.version>3.9</commons-lang3.version>
+		<velocity.version>2.1</velocity.version>
+		<commons-collections4.version>4.4</commons-collections4.version>
 		<commons-io.version>2.6</commons-io.version>
 		<maven-assembly-plugin.version>3.1.1</maven-assembly-plugin.version>
 		<maven-model.version>3.6.0</maven-model.version>
@@ -27,7 +28,7 @@
 		<maven-plugin-plugin.version>3.6.0</maven-plugin-plugin.version>
 		<plexus-utils.version>3.1.1</plexus-utils.version>
 		<junit.version>4.12</junit.version>
-		<json.version>20180813</json.version>
+		<json.version>20190722</json.version>
 
 		<!-- other dependencies versions -->
 
@@ -46,9 +47,9 @@
 		<maven-jar-plugin.version>2.4</maven-jar-plugin.version>
 		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
 		<versions-maven-plugin.version>2.7</versions-maven-plugin.version>
-		
-		<jacoco.version>0.8.4</jacoco.version>
-		
+
+		<jacoco.version>0.8.5</jacoco.version>
+
 		<license-maven-plugin.version>3.0</license-maven-plugin.version>
 	</properties>
 
@@ -194,13 +195,13 @@
 					<artifactId>license-maven-plugin</artifactId>
 					<version>${license-maven-plugin.version}</version>
 				</plugin>
-	
+
 				<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
 					<version>${jacoco.version}</version>
 				</plugin>
-	
+
 				<!-- groupId: org.eclipse.m2e -->
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
 					only. It has no influence on the Maven build itself. -->
