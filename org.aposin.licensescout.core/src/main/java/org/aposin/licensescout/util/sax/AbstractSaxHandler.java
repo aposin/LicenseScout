@@ -116,6 +116,16 @@ public class AbstractSaxHandler extends DefaultHandler {
     }
 
     /**
+     * Obtains a string representing the document location, suitable for log
+     * messages.
+     * 
+     * @return a string representing the location as returned by {@link #getDocumentLocator()}
+     */
+    protected String getLocationString() {
+        return locator.getPublicId() + ":" + locator.getLineNumber() + ":" + locator.getColumnNumber();
+    }
+
+    /**
      * Obtains the current line number from the locator, if present.
      * @return the current line number as a string if the locator is present or an empty string if no locator is present
      */
