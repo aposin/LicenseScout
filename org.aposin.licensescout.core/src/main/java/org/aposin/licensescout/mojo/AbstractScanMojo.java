@@ -196,6 +196,7 @@ public abstract class AbstractScanMojo extends AbstractMojo {
      * Whether a skeleton archive XML file of all found archives should be written.
      * 
      * <p>If enabled, the file is written to {@link #archiveXmlSkeletonFile}.</p>
+     * 
      * @see #archiveXmlSkeletonFile
      */
     @Parameter(defaultValue = "false", property = "writeArchiveXmlSkeleton", required = false)
@@ -315,6 +316,7 @@ public abstract class AbstractScanMojo extends AbstractMojo {
         runParameters.setNexusCentralBaseUrl(nexusCentralBaseUrl);
         runParameters.setConnectTimeout(connectTimeout);
         final AbstractFinder finder = createFinder(licenseStoreData, runParameters, log);
+        getLog().info("Starting scan on " + scanDirectory.getAbsolutePath() + "...");
 
         try {
             final FinderResult finderResult = finder.findLicenses();
@@ -322,6 +324,7 @@ public abstract class AbstractScanMojo extends AbstractMojo {
                 getLog().info("No finder results.");
                 return;
             }
+            getLog().info("Evaluating licenses...");
             LicenseUtil.evaluateLicenses(checkedArchives, finderResult.getArchiveFiles(), licenseStoreData);
             filterGlobal(finderResult.getArchiveFiles(), globalFilters, log);
 
