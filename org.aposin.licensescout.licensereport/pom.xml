@@ -136,6 +136,7 @@
 					<artifactId>licensescout-maven-plugin</artifactId>
 					<version>${org.aposin.licensescout.version}</version>
 					<configuration>
+						<skip>false</skip>
 						<outputDirectory>${licensescout.outputDirectory}</outputDirectory>
 						<outputs>
 							<output>

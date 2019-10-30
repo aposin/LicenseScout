@@ -48,6 +48,9 @@ Key features include:
 
 |`org.aposin.licensescout.quickstart`
 |Compiles the Maven plugin, creates the sample configuration bundle and generates a license report for LicenseScout itself.
+
+|`org.aposin.licensescout.documentation`
+|Documentation and project logos for LicenseScout
 |===
 
 == Design
@@ -298,6 +301,22 @@ The documentation URL from the checked licenses list can be used in the output r
 ----
 
 If `showDocumentationUrl` is not configured the documentation URL is included into the output.
+
+==== Execution configuration
+
+The The execution of the LicenseScout can be disabled completely by configuring the parameter `skip` to `true`.
+In this case, no reading of configuration files or other processing takes place.
+Example:
+
+----
+<configuration>
+    ...
+        <skip>true</skip>
+    ...
+</configuration>
+----
+
+If `skip` is not configured the execution takes place in the normal way.
 
 ==== Results database configuration
 
