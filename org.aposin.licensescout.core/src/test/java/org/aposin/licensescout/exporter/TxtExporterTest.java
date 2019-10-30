@@ -30,11 +30,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- *
+ * Test case for {@link TxtExporter}.
  */
-public class TxtExporterTest {
-
-    private IReportExporter exporter;
+public class TxtExporterTest extends AbstractExporterTest {
 
     /**
      * @throws java.lang.Exception
@@ -44,12 +42,8 @@ public class TxtExporterTest {
         exporter = TxtExporter.getInstance();
     }
 
-    /**
-     * Test method for {@link org.aposin.licensescout.exporter.TxtExporter#getOutputFileType()}.
-     */
-    @Test
-    public void testGetOutputFileType() {
-        Assert.assertEquals("outputFileType", OutputFileType.TXT, exporter.getOutputFileType());
+    protected OutputFileType getExpectedOutputFileType() {
+        return OutputFileType.TXT;
     }
 
     /**
@@ -66,8 +60,7 @@ public class TxtExporterTest {
         outputResult.setPomResolutionUsed(false);
         final ReportConfiguration reportConfiguration = new ReportConfiguration();
         reportConfiguration.setOutputFile(outputFile);
-
-        exporter.export(outputResult, reportConfiguration);
+        getExporter().export(outputResult, reportConfiguration);
 
         final String resultContent = IOUtils.toString(new FileReader(outputFile));
         final String nl = "\n";
