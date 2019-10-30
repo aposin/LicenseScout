@@ -65,6 +65,7 @@ public class CsvExporterTest {
         final List<Archive> archiveFiles = new ArrayList<Archive>();
         final FinderResult finderResult = new FinderResult(scanDirectory, archiveFiles);
         outputResult.setFinderResult(finderResult);
+        outputResult.setPomResolutionUsed(true);
         final ReportConfiguration reportConfiguration = new ReportConfiguration();
         reportConfiguration.setOutputFile(outputFile);
         exporter.export(outputResult, reportConfiguration);

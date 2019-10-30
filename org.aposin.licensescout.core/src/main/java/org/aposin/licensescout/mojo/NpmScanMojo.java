@@ -66,7 +66,7 @@ public class NpmScanMojo extends AbstractScanMojo {
      * {@inheritDoc}
      */
     @Override
-    protected AbstractFinder createFinder(final LicenseStoreData licenseStoreData, RunParameters runParameters,
+    protected AbstractFinder createFinder(final LicenseStoreData licenseStoreData, final RunParameters runParameters,
                                           final ILFLog log) {
         final AbstractFinder javascriptFinder = new JavascriptNpmFinder(licenseStoreData, log,
                 npmExcludedDirectoryNames);
