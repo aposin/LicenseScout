@@ -783,7 +783,7 @@ public abstract class AbstractScanMojo extends AbstractMojo {
                 log.info("reading checked archives list from " + checkedArchivesFilename);
                 try {
                     checkedArchives.readCsv(checkedArchivesFilename, licenseStoreData, providers, notices, log);
-                } catch (IOException /* | ParserConfigurationException | SAXException */ e) {
+                } catch (IOException e) {
                     throw new MojoExecutionException("cannot read check archives list", e);
                 }
             } else {
