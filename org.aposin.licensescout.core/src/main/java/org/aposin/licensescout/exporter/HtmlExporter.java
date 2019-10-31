@@ -88,6 +88,7 @@ public class HtmlExporter implements IReportExporter {
         context.put("generalStatistics", outputResult.getGeneralStatistics());
         context.put("messageDigestAlgorithm", outputResult.getMessageDigestAlgorithm());
         context.put("reportConfiguration", reportConfiguration);
+        context.put("pomResolutionUsed", outputResult.isPomResolutionUsed());
 
         final Set<License> allLicenses = new HashSet<>();
         for (final Archive archive : archiveFiles) {

@@ -13,15 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aposin.licensescout.main;
+package org.aposin.licensescout.license;
 
+import org.aposin.licensescout.util.NullLog;
+import org.junit.Assert;
 import org.junit.Test;
 
-public class MainTest {
+/**
+ *
+ */
+public class ArtifactServerUtilTest {
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testWrongNumberOfArguments() throws Exception {
-		Main.main(new String[0]);
-	}
-	
+    /**
+     * Test method for
+     * {@link org.aposin.licensescout.license.ArtifactServerUtil#ArtifactServerUtil(java.lang.String, int, org.aposin.licensescout.util.ILFLog)}.
+     */
+    @Test
+    public void testArtifactServerUtil() {
+        final String serverBaseUrl = "https://repo.maven.apache.org/maven2_unaccessible/";
+        final int timeout = 400;
+        final ArtifactServerUtil artifactServerUtil = new ArtifactServerUtil(serverBaseUrl, timeout, new NullLog());
+        Assert.assertFalse("isCachedCheckAccess()", artifactServerUtil.isCachedCheckAccess());
+    }
+
 }

@@ -31,6 +31,8 @@ import java.util.jar.JarInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.aposin.licensescout.archive.Archive;
+import org.aposin.licensescout.configuration.RunParameters;
+import org.aposin.licensescout.license.ArtifactServerUtil;
 import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseStoreData;
 import org.aposin.licensescout.license.LicenseUtil;
@@ -51,14 +53,19 @@ public class JavaJarFinder extends AbstractFinder {
     private final List<String> specialArchiveNames = new ArrayList<>();
     private final FinderHandler<File, FileSystemEntryContainer, File> fileSystemFinderHandler;
     private final FinderHandler<JarEntry, JarEntryContainer, JarInputStream> jarFinderHandler;
+    private final ArtifactServerUtil artifactServerUtil;
 
     /**
      * Constructor.
-     * @param licenseStoreData 
+     * 
+     * @param licenseStoreData
+     * @param runParameters
      * @param log the logger
      */
-    public JavaJarFinder(final LicenseStoreData licenseStoreData, final ILFLog log) {
+    public JavaJarFinder(final LicenseStoreData licenseStoreData, final RunParameters runParameters, final ILFLog log) {
         super(licenseStoreData, log);
+        artifactServerUtil = new ArtifactServerUtil(runParameters.getNexusCentralBaseUrl(),
+                runParameters.getConnectTimeout(), log);
 
         fileSystemFinderHandler = new FilesystemFinderHandler(log);
         jarFinderHandler = new JarFinderHandler(log);
@@ -264,7 +271,7 @@ public class JavaJarFinder extends AbstractFinder {
                                     final ILFLog log)
             throws Exception {
         try (final InputStream inputStream = entryContainer.getInputStream()) {
-            LicenseUtil.addLicensesFromPom(inputStream, archive, filePath, getLicenseStoreData(), log);
+            artifactServerUtil.addLicensesFromPom(inputStream, archive, filePath, getLicenseStoreData());
         }
     }
 
@@ -386,6 +393,14 @@ public class JavaJarFinder extends AbstractFinder {
         return name.endsWith("pom.xml");
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isPomResolutionUsed() {
+        return artifactServerUtil.isCachedCheckAccess();
+    }
+
     @FunctionalInterface
     private static interface EntryContainer {
 
@@ -393,7 +408,7 @@ public class JavaJarFinder extends AbstractFinder {
          * Obtains an Input stream.
          * 
          * @return an Input stream
-         * @throws IOException 
+         * @throws IOException
          */
         public InputStream getInputStream() throws IOException;
     }
@@ -496,6 +511,7 @@ public class JavaJarFinder extends AbstractFinder {
 
         /**
          * Constructor.
+         * 
          * @param log the logger
          */
         public FilesystemFinderHandler(ILFLog log) {

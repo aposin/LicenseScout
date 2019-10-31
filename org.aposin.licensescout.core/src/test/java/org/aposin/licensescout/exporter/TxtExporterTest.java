@@ -63,8 +63,10 @@ public class TxtExporterTest {
         final List<Archive> archiveFiles = new ArrayList<Archive>();
         final FinderResult finderResult = new FinderResult(scanDirectory, archiveFiles);
         outputResult.setFinderResult(finderResult);
+        outputResult.setPomResolutionUsed(false);
         final ReportConfiguration reportConfiguration = new ReportConfiguration();
         reportConfiguration.setOutputFile(outputFile);
+
         exporter.export(outputResult, reportConfiguration);
 
         final String resultContent = IOUtils.toString(new FileReader(outputFile));
