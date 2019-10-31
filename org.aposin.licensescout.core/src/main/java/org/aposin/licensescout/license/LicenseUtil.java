@@ -21,10 +21,7 @@ import static org.aposin.licensescout.license.DetectionStatus.MANUAL_SELECTED;
 import static org.aposin.licensescout.license.DetectionStatus.MULTIPLE_DETECTED;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,9 +36,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Parent;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.aposin.licensescout.archive.Archive;
 import org.aposin.licensescout.archive.ArchiveIdentifierPattern;
 import org.aposin.licensescout.archive.PatternType;
@@ -60,29 +54,14 @@ import org.aposin.licensescout.util.ILFLog;
 public class LicenseUtil {
 
     private static final int VERSION_LINE_TOLERANCE = 3;
-    private static final Pattern PATTERN_NEW = Pattern.compile(".*((VERSION|V).*(\\d\\.\\d)|(VERSION|V) (\\d)).*");
-
-    private static String nexusCentralBaseUrl;
+    private static final Pattern VERSION_NUMBER_PATTERN = Pattern
+            .compile(".*((VERSION|V).*(\\d\\.\\d)|(VERSION|V) (\\d)).*");
 
     /**
      * Private constructor.
      */
     private LicenseUtil() {
         // DO NOTHING
-    }
-
-    /**
-     * @return the nexusCentralBaseUrl
-     */
-    public static final String getNexusCentralBaseUrl() {
-        return nexusCentralBaseUrl;
-    }
-
-    /**
-     * @param nexusCentralBaseUrl the nexusCentralBaseUrl to set
-     */
-    public static final void setNexusCentralBaseUrl(final String nexusCentralBaseUrl) {
-        LicenseUtil.nexusCentralBaseUrl = nexusCentralBaseUrl;
     }
 
     /**
@@ -203,7 +182,7 @@ public class LicenseUtil {
      * @return may return null if no version number has been found.
      */
     /*default*/ static String getMatchedVersionFromLine(final String lineString) {
-        final Matcher matcher = PATTERN_NEW.matcher(lineString.toUpperCase());
+        final Matcher matcher = VERSION_NUMBER_PATTERN.matcher(lineString.toUpperCase());
         String version = null;
         if (matcher.matches()) {
             if (/*matcher.groupCount() == 3 &&*/ matcher.group(2) != null) {
@@ -548,79 +527,6 @@ public class LicenseUtil {
             return licenseList;
         }
         return Collections.emptyList();
-    }
-
-    /**
-     * Adds licenses to an archive from information found in a Maven POM file.
-     * 
-     * @param inputStream input source of the POM file
-     * @param archive the archive to add the licenses to
-     * @param filePath path of the POM file (for information only)
-     * @param licenseStoreData 
-     * @param log the logger
-     * @return true if one or more licenses have been added, false otherwise
-     */
-    public static boolean addLicensesFromPom(final InputStream inputStream, final Archive archive,
-                                             final String filePath, final LicenseStoreData licenseStoreData,
-                                             final ILFLog log) {
-        try {
-            log.debug("Checking POM file: " + filePath);
-            final MavenXpp3Reader xpp3Reader = new MavenXpp3Reader();
-            final Model model = xpp3Reader.read(inputStream);
-
-            final List<org.apache.maven.model.License> licenses = model.getLicenses();
-            boolean licenseFound = false;
-            for (final org.apache.maven.model.License license : licenses) {
-                final String licenseUrl = license.getUrl();
-                final String licenseName = license.getName();
-                log.debug("License name: " + licenseName);
-                log.debug("License URL: " + licenseUrl);
-                final boolean licenseFoundForUrl = handleLicenseUrl(licenseUrl, archive, filePath, licenseStoreData,
-                        log);
-                licenseFound |= licenseFoundForUrl;
-                boolean licenseFoundForName = false;
-                if (!licenseFoundForUrl) {
-                    licenseFoundForName = handleLicenseName(licenseName, archive, filePath, licenseStoreData, log);
-                    licenseFound |= licenseFoundForName;
-                }
-                if (!licenseFoundForUrl && !licenseFoundForName) {
-                    log.warn("Neither license name nor license URL mapping found for name/URL: " + licenseName + " / "
-                            + licenseUrl);
-                }
-            }
-            if (!licenseFound) {
-                // try parent pom from Nexus repo
-                final Parent parent = model.getParent();
-                if (parent != null) {
-                    final String groupId = parent.getGroupId();
-                    final String artifactId = parent.getArtifactId();
-                    final String version = parent.getVersion();
-                    final String urlString = nexusCentralBaseUrl + groupId.replace('.', '/') + "/" + artifactId + "/"
-                            + version + "/" + artifactId + "-" + version + ".pom";
-                    final URL url = new URL(urlString);
-                    InputStream parentInputStream;
-                    try {
-                        parentInputStream = url.openStream();
-                    } catch (FileNotFoundException e) {
-                        log.debug("Parent POM not found on Nexus: " + urlString);
-                        return licenseFound;
-                    }
-                    if (parentInputStream != null) {
-                        try {
-                            final String newFilePath = filePath + "![parent POM](" + parent.getId() + ")";
-                            licenseFound |= addLicensesFromPom(parentInputStream, archive, newFilePath,
-                                    licenseStoreData, log);
-                        } finally {
-                            parentInputStream.close();
-                        }
-                    }
-                }
-            }
-            return licenseFound;
-        } catch (Exception e) {
-            log.error(e);
-            return false;
-        }
     }
 
     /**
