@@ -77,12 +77,13 @@ public abstract class AbstractVelocityExporter implements IReportExporter {
             context.put("generalStatistics", outputResult.getGeneralStatistics());
             context.put("messageDigestAlgorithm", outputResult.getMessageDigestAlgorithm());
             context.put("reportConfiguration", reportConfiguration);
-            final List<License> distinctLicenses = collectDistinctLicenses(archiveFiles);
-            context.put("distinctLicenses", distinctLicenses);
+            // TODO: re-enable
+            //context.put("pomResolutionUsed", outputResult.isPomResolutionUsed());
 
             additionalSetup(context, outputResult);
 
-            final Template template = getTemplate(reportConfiguration);
+            // TODO: fix
+            final Template template = null; //getTemplate();
 
             StringWriter sw = new StringWriter();
 
