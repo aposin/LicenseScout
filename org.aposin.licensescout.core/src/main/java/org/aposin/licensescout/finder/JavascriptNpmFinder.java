@@ -228,4 +228,12 @@ public class JavascriptNpmFinder extends AbstractFinder {
         return packageJsonFile.exists();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isPomResolutionUsed() {
+        return false;
+    }
+
 }

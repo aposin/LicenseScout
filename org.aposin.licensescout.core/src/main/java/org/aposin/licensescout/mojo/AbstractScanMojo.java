@@ -36,6 +36,7 @@ import org.aposin.licensescout.configuration.BuildInfo;
 import org.aposin.licensescout.configuration.DatabaseConfiguration;
 import org.aposin.licensescout.configuration.Output;
 import org.aposin.licensescout.configuration.OutputFileType;
+import org.aposin.licensescout.configuration.RunParameters;
 import org.aposin.licensescout.database.DatabaseWriter;
 import org.aposin.licensescout.exporter.CsvExporter;
 import org.aposin.licensescout.exporter.GeneralStatistics;
@@ -153,7 +154,7 @@ public abstract class AbstractScanMojo extends AbstractMojo {
     private LegalStatus[] cleanOutputLegalStates;
 
     /**
-     * List of licenses  that should be filtered out if cleanOutput is active, given by their SPDX identifier.
+     * List of licenses that should be filtered out if cleanOutput is active, given by their SPDX identifier.
      */
     @Parameter(property = "cleanOutputLicenseSpdxIdentifiers", required = false)
     private String[] cleanOutputLicenseSpdxIdentifiers;
@@ -171,6 +172,15 @@ public abstract class AbstractScanMojo extends AbstractMojo {
      */
     @Parameter(defaultValue = "https://repo.maven.apache.org/maven2/", property = "nexusCentralBaseUrl", required = false)
     private String nexusCentralBaseUrl;
+
+    /**
+     * Timeout for connecting to artifact server. This timeout is used when
+     * connecting to an artifact server (as configured with
+     * {@link #nexusCentralBaseUrl}) to retrieve parent POMs. The value is in
+     * milliseconds
+     */
+    @Parameter(defaultValue = "1000", property = "connectTimeout", required = false)
+    private int connectTimeout;
 
     /**
      * Whether the license XML file should be validated while reading in.
@@ -303,7 +313,10 @@ public abstract class AbstractScanMojo extends AbstractMojo {
 
         logNpmExcludedDirectoryNames(log);
         ArchiveType archiveType = getArchiveType();
-        final AbstractFinder finder = createFinder(licenseStoreData, log);
+        final RunParameters runParameters = new RunParameters();
+        runParameters.setNexusCentralBaseUrl(nexusCentralBaseUrl);
+        runParameters.setConnectTimeout(connectTimeout);
+        final AbstractFinder finder = createFinder(licenseStoreData, runParameters, log);
 
         try {
             final FinderResult finderResult = finder.findLicenses();
@@ -325,6 +338,7 @@ public abstract class AbstractScanMojo extends AbstractMojo {
             writeResultsToDatabase(buildInfo, finderResult.getArchiveFiles(), log);
 
             final OutputResult outputResult = createOutputResult(finderResult);
+            outputResult.setPomResolutionUsed(finder.isPomResolutionUsed());
             final ReportConfiguration reportConfiguration = createReportConfiguration(archiveType);
 
             doOutput(log, outputResult, reportConfiguration);
@@ -335,6 +349,7 @@ public abstract class AbstractScanMojo extends AbstractMojo {
 
     /**
      * Obtains the archive type handled by this MOJO.
+     * 
      * @return an archive type
      */
     protected abstract ArchiveType getArchiveType();
@@ -545,17 +560,19 @@ public abstract class AbstractScanMojo extends AbstractMojo {
             readLicenseNameMappings(licenseStoreData, log);
         }
 
-        LicenseUtil.setNexusCentralBaseUrl(nexusCentralBaseUrl);
         return licenseStoreData;
     }
 
     /**
      * Creates a finder.
-     * @param licenseStoreData 
+     * 
+     * @param licenseStoreData
+     * @param runParameters
      * @param log the logger
      * @return a finder
      */
-    protected abstract AbstractFinder createFinder(LicenseStoreData licenseStoreData, ILFLog log);
+    protected abstract AbstractFinder createFinder(LicenseStoreData licenseStoreData, RunParameters runParameters,
+                                                   ILFLog log);
 
     /**
      * @param log the logger
@@ -766,7 +783,7 @@ public abstract class AbstractScanMojo extends AbstractMojo {
                 log.info("reading checked archives list from " + checkedArchivesFilename);
                 try {
                     checkedArchives.readCsv(checkedArchivesFilename, licenseStoreData, providers, notices, log);
-                } catch (IOException /*| ParserConfigurationException | SAXException*/ e) {
+                } catch (IOException e) {
                     throw new MojoExecutionException("cannot read check archives list", e);
                 }
             } else {
