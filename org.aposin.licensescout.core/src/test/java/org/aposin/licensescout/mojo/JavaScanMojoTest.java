@@ -33,8 +33,7 @@ public class JavaScanMojoTest extends AbstractScanMojoTest {
      */
     @Override
     protected AbstractScanMojo createMojo() {
-        final JavaScanMojo scanMojo = new JavaScanMojo();
-        return scanMojo;
+        return new JavaScanMojo();
     }
 
     /**

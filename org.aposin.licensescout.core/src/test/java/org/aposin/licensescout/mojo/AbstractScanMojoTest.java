@@ -36,7 +36,7 @@ public abstract class AbstractScanMojoTest {
     public void testCreateFinder() throws Exception {
         final AbstractScanMojo scanMojo = createMojo();
         final AbstractFinder finder = scanMojo.createFinder(null, getLog());
-        Assert.assertEquals("finder class", getExpectedFinderClass(), finder.getClass());
+        Assert.assertEquals("class type returned by createFinder()", getExpectedFinderClass(), finder.getClass());
     }
 
     protected abstract Class<?> getExpectedFinderClass();
@@ -49,7 +49,8 @@ public abstract class AbstractScanMojoTest {
     @Test
     public void testGetArchiveType() throws Exception {
         final AbstractScanMojo scanMojo = createMojo();
-        Assert.assertEquals("getArchiveType()", getExpectedArchiveType(), scanMojo.getArchiveType());
+        Assert.assertEquals("wrong type returned by getArchiveType()", getExpectedArchiveType(),
+                scanMojo.getArchiveType());
     }
 
     protected abstract AbstractScanMojo createMojo();
@@ -67,7 +68,9 @@ public abstract class AbstractScanMojoTest {
         File directory = new File("./testdir");
         directory.delete();
         scanMojo.createDirectoryIfNotExists(directory);
-        Assert.assertEquals("createDirectoryIfNotExists()", true, directory.exists() && directory.isDirectory());
+        Assert.assertEquals(
+                "createDirectoryIfNotExists(): expected directory not existing after creating or is not a directory",
+                true, directory.exists() && directory.isDirectory());
     }
 
     /**
