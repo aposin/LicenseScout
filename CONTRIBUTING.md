@@ -16,8 +16,8 @@ This guide explains how to:
 
 #### Code of Conduct
 
-[fork]: https://github.com/ORG/REPO/fork
-[pr]: https://github.com/ORG/REPO/compare
+[fork]: https://help.github.com/en/github/getting-started-with-github/fork-a-repo
+[pr]: https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request
 [quality-manifest]: CODING_MANIFEST.md
 [code-of-conduct]: CODE_OF_CONDUCT.md
 [needed_docs]: .github/PULL_REQUEST_TEMPLATE.md
