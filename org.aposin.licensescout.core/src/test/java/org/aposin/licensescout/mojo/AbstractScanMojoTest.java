@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.logging.Logger;
 
 import org.aposin.licensescout.archive.ArchiveType;
+import org.aposin.licensescout.configuration.RunParameters;
 import org.aposin.licensescout.finder.AbstractFinder;
 import org.aposin.licensescout.util.ILFLog;
 import org.aposin.licensescout.util.JavaUtilLog;
@@ -35,8 +36,18 @@ public abstract class AbstractScanMojoTest {
     @Test
     public void testCreateFinder() throws Exception {
         final AbstractScanMojo scanMojo = createMojo();
-        final AbstractFinder finder = scanMojo.createFinder(null, getLog());
+        final RunParameters runParameters = createRunParameters();
+        final AbstractFinder finder = scanMojo.createFinder(null, runParameters, getLog());
         Assert.assertEquals("class type returned by createFinder()", getExpectedFinderClass(), finder.getClass());
+    }
+
+    private RunParameters createRunParameters() {
+        final String serverBaseUrl = "https://repo.maven.apache.org/maven2_unaccessible/";
+        final int timeout = 400;
+        final RunParameters runParameters = new RunParameters();
+        runParameters.setNexusCentralBaseUrl(serverBaseUrl);
+        runParameters.setConnectTimeout(timeout);
+        return runParameters;
     }
 
     protected abstract Class<?> getExpectedFinderClass();
