@@ -15,23 +15,9 @@
  */
 package org.aposin.licensescout.exporter;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
-import org.apache.velocity.runtime.RuntimeConstants;
-import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
-import org.aposin.licensescout.archive.Archive;
 import org.aposin.licensescout.configuration.OutputFileType;
-import org.aposin.licensescout.license.License;
 
 /**
  * The Exporter creates a HTML report listing all archives including license information.
@@ -39,7 +25,7 @@ import org.aposin.licensescout.license.License;
  * <p>This implementation uses Velocity templates to generate the output. The template used here is at
  * <code>templates/license_report.vm</code>.</p>
  */
-public class HtmlExporter implements IReportExporter {
+public class HtmlExporter extends AbstractVelocityExporter {
 
     private static final String TEMPLATES_LICENSE_REPORT_VM = "templates/license_report.vm";
 
@@ -62,60 +48,12 @@ public class HtmlExporter implements IReportExporter {
         return OutputFileType.HTML;
     }
 
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void export(final OutputResult outputResult, final ReportConfiguration reportConfiguration)
-            throws Exception {
-        final List<Archive> archiveFiles = outputResult.getFinderResult().getArchiveFiles();
-        FileWriter fileWriter = new FileWriter(reportConfiguration.getOutputFile());
-        BufferedWriter bw = new BufferedWriter(fileWriter);
-
-        Collections.sort(archiveFiles);
-
-        Velocity.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
-        Velocity.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
-
-        Velocity.init();
-
-        VelocityContext context = new VelocityContext();
-
-        context.put("archiveFiles", archiveFiles);
-        context.put("sourcePath", outputResult.getFinderResult().getScanDirectory().getAbsolutePath());
-        context.put("detectionStatusStatistics", outputResult.getDetectionStatusStatistics());
-        context.put("legalStatusStatistics", outputResult.getLegalStatusStatistics());
-        context.put("generalStatistics", outputResult.getGeneralStatistics());
-        context.put("messageDigestAlgorithm", outputResult.getMessageDigestAlgorithm());
-        context.put("reportConfiguration", reportConfiguration);
-        context.put("pomResolutionUsed", outputResult.isPomResolutionUsed());
-
-        final Set<License> allLicenses = new HashSet<>();
-        for (final Archive archive : archiveFiles) {
-            allLicenses.addAll(archive.getLicenses());
-        }
-        final List<License> distinctLicenses = new ArrayList<>(allLicenses);
-
-        Collections.sort(distinctLicenses);
-
-        context.put("distinctLicenses", distinctLicenses);
-
-        final Template template = getTemplate();
-
-        StringWriter sw = new StringWriter();
-
-        if (template != null) {
-            template.merge(context, sw);
-        }
-        bw.write(sw.getBuffer().toString());
-        bw.close();
-    }
-
-    /**
-     * Obtains the template
-     * @return the template
-     */
-    private Template getTemplate() {
+    protected Template getDefaultTemplate() {
         return Velocity.getTemplate(TEMPLATES_LICENSE_REPORT_VM);
     }
 

@@ -15,6 +15,8 @@
  */
 package org.aposin.licensescout.configuration;
 
+import java.io.File;
+
 import org.apache.maven.plugins.annotations.Parameter;
 import org.aposin.licensescout.mojo.AbstractScanMojo;
 
@@ -41,10 +43,19 @@ public class Output {
     /**
      * URL of the output file on Nexus.
      * 
-     * <p>Only used if {@link AbstractScanMojo#writeResultsToDatabase} is true. </p>
+     * <p>Only used if {@link AbstractScanMojo#writeResultsToDatabase} is true.</p>
      */
     @Parameter(property = "url", required = false)
     private String url;
+
+    /**
+     * Path of a template file (optional).
+     * 
+     * <p>Only used for types {@link OutputFileType#TXT} and
+     * {@link OutputFileType#HTML}.</p>
+     */
+    @Parameter(property = "template", required = false)
+    private File template;
 
     /**
      * @return the type
@@ -86,6 +97,20 @@ public class Output {
      */
     public final void setUrl(String url) {
         this.url = url;
+    }
+
+    /**
+     * @return the template
+     */
+    public final File getTemplate() {
+        return template;
+    }
+
+    /**
+     * @param template the template to set
+     */
+    public final void setTemplate(final File template) {
+        this.template = template;
     }
 
 }
