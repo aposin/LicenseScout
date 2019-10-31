@@ -37,7 +37,8 @@ import org.aposin.licensescout.model.Provider;
  * information.
  * 
  * <p>This implementation uses Velocity templates to generate the
- * output. The default template used (if none is configured by the user) is at
+ * output.
+ * The default template used (if none is configured by the user) is at
  * <code>templates/license_report_txt_default.vm</code>.</p>
  */
 public class TxtExporter extends AbstractVelocityExporter {

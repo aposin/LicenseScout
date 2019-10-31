@@ -51,11 +51,8 @@ public abstract class AbstractVelocityExporter implements IReportExporter {
     @Override
     public final void export(final OutputResult outputResult, final ReportConfiguration reportConfiguration)
             throws Exception {
-        final List<Archive> archiveFiles = outputResult.getFinderResult().getArchiveFiles();
         try (final FileWriter fileWriter = new FileWriter(reportConfiguration.getOutputFile());
                 final BufferedWriter bw = new BufferedWriter(fileWriter);) {
-
-            Collections.sort(archiveFiles);
 
             Velocity.setProperty(RuntimeConstants.RESOURCE_LOADER, "file,classpath");
             Velocity.setProperty("file.resource.loader.class", FileResourceLoader.class.getName());
@@ -68,30 +65,43 @@ public abstract class AbstractVelocityExporter implements IReportExporter {
 
             Velocity.init();
 
-            VelocityContext context = new VelocityContext();
+            final VelocityContext context = createVelocityContext(outputResult, reportConfiguration);
+            final Template template = getTemplate(reportConfiguration);
 
-            context.put("archiveFiles", archiveFiles);
-            context.put("sourcePath", outputResult.getFinderResult().getScanDirectory().getAbsolutePath());
-            context.put("detectionStatusStatistics", outputResult.getDetectionStatusStatistics());
-            context.put("legalStatusStatistics", outputResult.getLegalStatusStatistics());
-            context.put("generalStatistics", outputResult.getGeneralStatistics());
-            context.put("messageDigestAlgorithm", outputResult.getMessageDigestAlgorithm());
-            context.put("reportConfiguration", reportConfiguration);
-            // TODO: re-enable
-            //context.put("pomResolutionUsed", outputResult.isPomResolutionUsed());
-
-            additionalSetup(context, outputResult);
-
-            // TODO: fix
-            final Template template = null; //getTemplate();
-
-            StringWriter sw = new StringWriter();
-
-            if (template != null) {
-                template.merge(context, sw);
+            try (final StringWriter sw = new StringWriter();) {
+                if (template != null) {
+                    template.merge(context, sw);
+                }
+                bw.write(sw.getBuffer().toString());
             }
-            bw.write(sw.getBuffer().toString());
         }
+    }
+
+    private VelocityContext createVelocityContext(final OutputResult outputResult,
+                                                  final ReportConfiguration reportConfiguration) {
+        final VelocityContext context = new VelocityContext();
+        final List<Archive> archiveFiles = getSortedArchives(outputResult);
+        context.put("archiveFiles", archiveFiles);
+
+        context.put("sourcePath", outputResult.getFinderResult().getScanDirectory().getAbsolutePath());
+        context.put("detectionStatusStatistics", outputResult.getDetectionStatusStatistics());
+        context.put("legalStatusStatistics", outputResult.getLegalStatusStatistics());
+        context.put("generalStatistics", outputResult.getGeneralStatistics());
+        context.put("messageDigestAlgorithm", outputResult.getMessageDigestAlgorithm());
+        context.put("reportConfiguration", reportConfiguration);
+        context.put("pomResolutionUsed", outputResult.isPomResolutionUsed());
+
+        final List<License> distinctLicenses = collectDistinctLicenses(archiveFiles);
+        context.put("distinctLicenses", distinctLicenses);
+
+        additionalSetup(context, outputResult);
+        return context;
+    }
+
+    private List<Archive> getSortedArchives(final OutputResult outputResult) {
+        final List<Archive> archiveFiles = outputResult.getFinderResult().getArchiveFiles();
+        Collections.sort(archiveFiles);
+        return archiveFiles;
     }
 
     private List<License> collectDistinctLicenses(final List<Archive> archiveFiles) {

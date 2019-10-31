@@ -22,12 +22,13 @@ import org.aposin.licensescout.configuration.OutputFileType;
 /**
  * The Exporter creates a HTML report listing all archives including license information.
  * 
- * <p>This implementation uses Velocity templates to generate the output. The template used here is at
- * <code>templates/license_report.vm</code>.</p>
+ * <p>This implementation uses Velocity templates to generate the output.
+ * The default template used (if none is configured by the user) is at
+ * <code>templates/license_report_html_default.vm</code>.</p>
  */
 public class HtmlExporter extends AbstractVelocityExporter {
 
-    private static final String TEMPLATES_LICENSE_REPORT_VM = "templates/license_report.vm";
+    private static final String DEFAULT_TEMPLATES_LICENSE_REPORT_VM = "templates/license_report_html_default.vm";
 
     private static final IReportExporter INSTANCE = new HtmlExporter();
 
@@ -48,13 +49,12 @@ public class HtmlExporter extends AbstractVelocityExporter {
         return OutputFileType.HTML;
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
     protected Template getDefaultTemplate() {
-        return Velocity.getTemplate(TEMPLATES_LICENSE_REPORT_VM);
+        return Velocity.getTemplate(DEFAULT_TEMPLATES_LICENSE_REPORT_VM);
     }
 
 }
