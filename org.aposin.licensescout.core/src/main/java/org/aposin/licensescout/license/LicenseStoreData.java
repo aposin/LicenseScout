@@ -504,7 +504,7 @@ public class LicenseStoreData {
             /** {@inheritDoc} */
             @Override
             protected void processText(final String text) {
-                legalStatus = LegalStatus.valueOf(LegalStatus.class, text);
+                legalStatus = Enum.valueOf(LegalStatus.class, text);
             }
         }
 
