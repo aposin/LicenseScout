@@ -126,11 +126,13 @@
 				</executions>
 			</plugin>
 
+<!--
+NOTE: disabled because of CI build error 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
 			</plugin>
-
+ -->
 			<!-- groupId: org.jacoco -->
 			<plugin>
 				<groupId>org.jacoco</groupId>
