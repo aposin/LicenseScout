@@ -15,15 +15,24 @@
  */
 package org.aposin.licensescout.core.test.util;
 
+import java.io.File;
 import java.util.logging.Logger;
 
 import org.aposin.licensescout.configuration.RunParameters;
+import org.aposin.licensescout.license.LicenseStoreData;
 import org.aposin.licensescout.util.ILFLog;
 import org.aposin.licensescout.util.JavaUtilLog;
 import org.aposin.licensescout.util.NullLog;
 
+//import java.util.logging.Logger;
+//
+//import org.aposin.licensescout.configuration.RunParameters;
+//import org.aposin.licensescout.util.ILFLog;
+//import org.aposin.licensescout.util.JavaUtilLog;
+//import org.aposin.licensescout.util.NullLog;
+
 /**
- * Utility methods for testing.
+ * Utility methods for unit tests.
  *
  */
 public abstract class TestUtil {
@@ -47,8 +56,20 @@ public abstract class TestUtil {
     }
 
     /**
+     * Reads LicenseStoreData from a file for testing.
+     * @param log
+     * @return
+     * @throws Exception
+     */
+    public static LicenseStoreData readLicenseStoreData(final ILFLog log) throws Exception {
+        LicenseStoreData licenseStoreData = new LicenseStoreData();
+        licenseStoreData.readLicenses(new File("src/test/resources/configuration/licenses.xml"), null, false, log);
+        return licenseStoreData;
+    }
+
+    /**
      * Obtains a logger for testing that uses the java.util global logger.
-     * @return a logger
+     * @return an initialized log instance for testing
      */
     public static ILFLog createJavaUtilGlobalLog() {
         return new JavaUtilLog(Logger.getGlobal());

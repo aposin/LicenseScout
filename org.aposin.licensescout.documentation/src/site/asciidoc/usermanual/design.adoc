@@ -66,5 +66,8 @@ The results are written into three tables:
 * `LibraryData`
 * `DetectedLicenses`
 
-NOTE: For details on the table structure see the file `org.aposin.licensescout.core/sql/licensescout.sql`
+NOTE: For details on the table structure see the files:
 
+* `org.aposin.licensescout.core/sql/licensescout-mysql.sql`
+* `org.aposin.licensescout.core/sql/licensescout-h2.sql`
+* `org.aposin.licensescout.core/sql/licensescout-hsqldb.sql`
