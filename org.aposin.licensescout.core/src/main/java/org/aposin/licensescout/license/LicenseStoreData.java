@@ -190,77 +190,77 @@ public class LicenseStoreData {
     }
 
     /**
-	 * Reads license URL mappings from a CSV file.
-	 * 
-	 * @param filename
-	 * @param log the logger
-	 * @throws IOException
-	 */
-	public void readUrlMappings(final String filename, final ILFLog log) throws IOException {
-	    String line = "";
-	    final String cvsSplitBy = ",";
-	
-	    try (final BufferedReader br = new BufferedReader(new FileReader(filename))) {
-	
-	        while ((line = br.readLine()) != null) {
-	            if (StringUtils.isEmpty(line) || line.startsWith("#")) {
-	                continue;
-	            }
-	            final String[] values = line.split(cvsSplitBy);
-	            final String url = values[0].trim();
-	            final int numLicenseNames = values.length - 1;
-	            final List<License> licenses = new ArrayList<>();
-	            for (int i = 0; i < numLicenseNames; i++) {
-	                final String spdxIdentifier = values[i + 1].trim();
-	                final License license = getLicenseBySpdxIdentifier(spdxIdentifier);
-	                if (license != null) {
-	                    licenses.add(license);
-	                } else {
-	                    log.info("readUrlMappings: SPDX identifier not found: " + spdxIdentifier);
-	                }
-	            }
-	            urlMappings.put(url, licenses);
-	        }
-	    }
-	}
+     * Reads license URL mappings from a CSV file.
+     * 
+     * @param filename
+     * @param log the logger
+     * @throws IOException
+     */
+    public void readUrlMappings(final String filename, final ILFLog log) throws IOException {
+        String line = "";
+        final String cvsSplitBy = ",";
 
-	/**
-	 * Reads license name mappings from a CSV file.
-	 * 
-	 * @param filename
-	 * @param log the logger
-	 * @throws IOException
-	 */
-	public void readNameMappings(final String filename, final ILFLog log) throws IOException {
-	    String line = "";
-	    final String cvsSplitBy = ",";
-	
-	    try (final BufferedReader br = new BufferedReader(new FileReader(filename))) {
-	
-	        while ((line = br.readLine()) != null) {
-	            if (StringUtils.isEmpty(line) || line.startsWith("#")) {
-	                continue;
-	            }
-	            final String[] values = line.split(cvsSplitBy);
-	            final String mappedName = values[0].trim();
-	            final int numLicenseNames = values.length - 1;
-	            final List<License> licenses = new ArrayList<>();
-	            for (int i = 0; i < numLicenseNames; i++) {
-	                final String spdxIdentifier = values[i + 1].trim();
-	                final License license = getLicenseBySpdxIdentifier(spdxIdentifier);
-	                if (license != null) {
-	                    licenses.add(license);
-	                } else {
-	                    log.info("readNameMappings: SPDX identifier not found: " + spdxIdentifier);
-	                }
-	            }
-	            nameMappings.put(mappedName, licenses);
-	        }
-	    }
-	}
+        try (final BufferedReader br = new BufferedReader(new FileReader(filename))) {
 
-	private class LicenseSaxHandler extends AbstractSaxHandler {
-    	
+            while ((line = br.readLine()) != null) {
+                if (StringUtils.isEmpty(line) || line.startsWith("#")) {
+                    continue;
+                }
+                final String[] values = line.split(cvsSplitBy);
+                final String url = values[0].trim();
+                final int numLicenseNames = values.length - 1;
+                final List<License> licenses = new ArrayList<>();
+                for (int i = 0; i < numLicenseNames; i++) {
+                    final String spdxIdentifier = values[i + 1].trim();
+                    final License license = getLicenseBySpdxIdentifier(spdxIdentifier);
+                    if (license != null) {
+                        licenses.add(license);
+                    } else {
+                        log.info("readUrlMappings: SPDX identifier not found: " + spdxIdentifier);
+                    }
+                }
+                urlMappings.put(url, licenses);
+            }
+        }
+    }
+
+    /**
+     * Reads license name mappings from a CSV file.
+     * 
+     * @param filename
+     * @param log the logger
+     * @throws IOException
+     */
+    public void readNameMappings(final String filename, final ILFLog log) throws IOException {
+        String line = "";
+        final String cvsSplitBy = ",";
+
+        try (final BufferedReader br = new BufferedReader(new FileReader(filename))) {
+
+            while ((line = br.readLine()) != null) {
+                if (StringUtils.isEmpty(line) || line.startsWith("#")) {
+                    continue;
+                }
+                final String[] values = line.split(cvsSplitBy);
+                final String mappedName = values[0].trim();
+                final int numLicenseNames = values.length - 1;
+                final List<License> licenses = new ArrayList<>();
+                for (int i = 0; i < numLicenseNames; i++) {
+                    final String spdxIdentifier = values[i + 1].trim();
+                    final License license = getLicenseBySpdxIdentifier(spdxIdentifier);
+                    if (license != null) {
+                        licenses.add(license);
+                    } else {
+                        log.info("readNameMappings: SPDX identifier not found: " + spdxIdentifier);
+                    }
+                }
+                nameMappings.put(mappedName, licenses);
+            }
+        }
+    }
+
+    private class LicenseSaxHandler extends AbstractSaxHandler {
+
         private static final String ELEMENT_LICENSES = "licenses";
         private static final String ELEMENT_LICENSE = "license";
         private static final String ELEMENT_SPDX_IDENTIFIER = "spdxIdentifier";

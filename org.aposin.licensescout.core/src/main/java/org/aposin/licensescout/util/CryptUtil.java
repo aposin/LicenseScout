@@ -53,8 +53,7 @@ public class CryptUtil {
     /**
      * Calculates a message digest from an input stream.
      * 
-     * @param is
-     *            an input stream
+     * @param is an input stream
      * @return a message digest
      * @throws IOException
      */
@@ -84,8 +83,7 @@ public class CryptUtil {
     }
 
     /**
-     * @param messageDigestAlgorithm
-     *            the messageDigestAlgorithm to set
+     * @param messageDigestAlgorithm the messageDigestAlgorithm to set
      */
     public static final void setMessageDigestAlgorithm(final String messageDigestAlgorithm) {
         CryptUtil.messageDigestAlgorithm = messageDigestAlgorithm;
