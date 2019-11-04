@@ -31,6 +31,8 @@ public class BuildInfo {
     private final String licenseReportTxtUrl;
 
     /**
+     * Constructor.
+     * 
      * @param name
      * @param version
      * @param date 

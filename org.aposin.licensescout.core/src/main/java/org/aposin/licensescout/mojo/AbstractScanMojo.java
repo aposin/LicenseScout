@@ -59,8 +59,6 @@ import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseCheckedList;
 import org.aposin.licensescout.license.LicenseStoreData;
 import org.aposin.licensescout.license.LicenseUtil;
-import org.aposin.licensescout.model.Alarm;
-import org.aposin.licensescout.model.AlarmCause;
 import org.aposin.licensescout.model.Notices;
 import org.aposin.licensescout.model.Providers;
 import org.aposin.licensescout.util.CryptUtil;
@@ -362,6 +360,17 @@ public abstract class AbstractScanMojo extends AbstractMojo {
         for (final Output output : outputs) {
             final File outputFile = new File(outputDirectory, output.getFilename());
             log.info("using " + output.getType() + " output file: " + outputFile.getAbsolutePath());
+            final File templateFile = output.getTemplate();
+            if (templateFile != null) {
+                if (templateFile.isFile() && templateFile.canRead()) {
+                    log.info("using template: " + templateFile.getAbsolutePath());
+                } else {
+                    log.warn("not using template because it is not a file or it cannot be read: "
+                            + templateFile.getAbsolutePath());
+                    // unset so that furthers steps only need to check for null
+                    output.setTemplate(null);
+                }
+            }
         }
     }
 
@@ -494,6 +503,7 @@ public abstract class AbstractScanMojo extends AbstractMojo {
             final OutputFileType outputFileType = output.getType();
             final IReportExporter exporter = getReportExporter(outputFileType);
             reportConfiguration.setOutputFile(outputFile);
+            reportConfiguration.setTemplateFile(output.getTemplate());
             exporter.export(outputResult, reportConfiguration);
             log.info("written output for " + outputFileType + " to "
                     + reportConfiguration.getOutputFile().getAbsolutePath());
