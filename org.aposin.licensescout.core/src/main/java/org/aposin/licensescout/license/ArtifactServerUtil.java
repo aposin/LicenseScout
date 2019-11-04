@@ -33,8 +33,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 /**
  * Utility methods related to accessing a server that is caching Maven central.
  * 
- * <p>The instance of this class checks if the server is reachable under the
- * configured URL.</p>
+ * <p>The instance of this class checks if the server is reachable under the configured URL.</p>
  */
 public class ArtifactServerUtil {
 
@@ -59,12 +58,10 @@ public class ArtifactServerUtil {
     }
 
     /**
-     * Checks if the artifact server is accessible with the base URL configured in
-     * the constructor of this class.
+     * Checks if the artifact server is accessible with the base URL configured in the constructor of this class.
      * 
-     * @param log a logger
-     * @return true if the artifact server is accessible under the configured base
-     *         URL, false otherwise
+     * @param log a logger 
+     * @return true if the artifact server is accessible under the configured base URL, false otherwise
      */
     private boolean checkAccess() {
         // we check the presence of

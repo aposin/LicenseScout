@@ -38,8 +38,7 @@ public class JarUtil {
     }
 
     /**
-     * Tries to obtains meta information for a MANIFEST.MF that is available as a
-     * file.
+     * Tries to obtains meta information for a MANIFEST.MF that is available as a file.
      * 
      * <p>The method tries to extract the following information from the manifest:</p>
      * <ul>
@@ -78,8 +77,7 @@ public class JarUtil {
      * <li>a license URL, extracted from the main attribute "Bundle-License"</li>
      * <li>a vendor name, extracted from the main attribute "Bundle-Vendor"</li>
      * </ul>
-     * <p>This method is intended for packed JARs available as file, i.e. as part of an
-     * unpacked JAR.</p>
+     * <p>This method is intended for packed JARs available as file, i.e. as part of an unpacked JAR.</p>
      * 
      * @param file a JAR file
      * @param log a logger
@@ -110,8 +108,7 @@ public class JarUtil {
      * <li>a license URL, extracted from the main attribute "Bundle-License"</li>
      * <li>a vendor name, extracted from the main attribute "Bundle-Vendor"</li>
      * </ul>
-     * <p>This method is intended for packed JARs available from inside another packed
-     * JAR.</p>
+     * <p>This method is intended for packed JARs available from inside another packed JAR.</p>
      * 
      * @param inputStream a JAR file
      * @param log a logger
@@ -150,8 +147,7 @@ public class JarUtil {
     /**
      * Tries to find a version number from a manifest.
      * 
-     * <p>The method considers the following main attributes of the manifest, in the
-     * order listed:</p>
+     * <p>The method considers the following main attributes of the manifest, in the order listed:</p>
      * <ol>
      * <li>Bundle-Version</li>
      * <li>Implementation-Version</li>
@@ -190,8 +186,7 @@ public class JarUtil {
     /**
      * Tries to find a license URL from a manifest.
      * 
-     * <p>The method considers the following main attributes of the manifest, in the
-     * order listed:</p>
+     * <p>The method considers the following main attributes of the manifest, in the order listed:</p>
      * <ol>
      * <li>Bundle-License</li>
      * </ol>
@@ -211,8 +206,7 @@ public class JarUtil {
     /**
      * Tries to find a vendor name from a manifest.
      * 
-     * <p>The method considers the following main attributes of the manifest, in the
-     * order listed:</p>
+     * <p>The method considers the following main attributes of the manifest, in the order listed:</p>
      * <ol>
      * <li>Bundle-Vendor</li>
      * </ol>
