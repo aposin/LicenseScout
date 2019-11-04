@@ -15,13 +15,6 @@
  */
 package org.aposin.licensescout.exporter;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,23 +23,27 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
 import org.aposin.licensescout.archive.Archive;
 import org.aposin.licensescout.configuration.OutputFileType;
 import org.aposin.licensescout.license.License;
-import org.aposin.licensescout.license.LicenseUtil;
 import org.aposin.licensescout.model.Notice;
 import org.aposin.licensescout.model.Provider;
 
 /**
- * The Exporter creates a HTML report listing all archives including license information.
+ * The Exporter creates a text report listing all archives including license
+ * information.
  * 
- * <p>This implementation uses Velocity templates to generate the output. The template used here is at
- * <code>templates/license_report.vm</code>.</p>
+ * <p>This implementation uses Velocity templates to generate the
+ * output.
+ * The default template used (if none is configured by the user) is at
+ * <code>templates/license_report_txt_default.vm</code>.</p>
  */
-public class TxtExporter implements IReportExporter {
+public class TxtExporter extends AbstractVelocityExporter {
 
-    private static final Charset OUTPUT_FILE_ENCODING = StandardCharsets.UTF_8;
+    private static final String DEFAULT_TEMPLATES_LICENSE_REPORT_VM = "templates/license_report_txt_default.vm";
 
     private static final IReportExporter INSTANCE = new TxtExporter();
 
@@ -71,104 +68,26 @@ public class TxtExporter implements IReportExporter {
      * {@inheritDoc}
      */
     @Override
-    public void export(final OutputResult outputResult, final ReportConfiguration reportConfiguration)
-            throws Exception {
-        final String nl = System.lineSeparator();
-        final File outputFile = reportConfiguration.getOutputFile();
-        final List<Archive> archiveFiles = outputResult.getFinderResult().getArchiveFiles();
-        try (Writer osWriter = new OutputStreamWriter(new FileOutputStream(outputFile), OUTPUT_FILE_ENCODING);
-                final BufferedWriter bw = new BufferedWriter(osWriter);) {
-
-            Collections.sort(archiveFiles);
-
-            final List<Provider> usedProviders = collectProviders(archiveFiles);
-
-            final List<Notice> usedNotices = collectNotices(archiveFiles);
-
-            final Map<License, List<Archive>> usedLicensesMap = collectLicenses(archiveFiles);
-            final List<License> usedLicenses = getSortedLicenses(usedLicensesMap);
-
-            final StringBuilder sb = new StringBuilder();
-            final String header = "License Report" + nl + nl
-                    + " Copyright (c) 2018 Association for the promotion of open-source insurance software " + nl
-                    + "and for the establishment of open interface standards in the insurance industry. " + nl
-                    + "All Rights Reserved." + nl + nl
-                    + "This product is licensed to you under the Apache License, Version 2.0 (the \"License\"). " + nl
-                    + "You may not use this product except in compliance with the License. " + nl + "" + nl
-                    + "In the following sections you can find " + nl + "- List of used/linked software projects" + nl
-                    + "- Notices to the used artifacts" + nl
-                    + "- List of used artifacts with license info and vendor plugin names" + nl + "- License texts" + nl
-                    + nl;
-            sb.append(header);
-
-            sb.append(nl).append(nl);
-
-            appendSeparatorLine(sb);
-            sb.append(nl);
-
-            sb.append("This project contains software from the following providers:").append(nl);
-            for (Provider provider : usedProviders) {
-                sb.append("* ").append(provider.getName());
-                if (!StringUtils.isEmpty(provider.getUrl())) {
-                    sb.append(" (").append(provider.getUrl()).append(")");
-                }
-                sb.append(nl);
-            }
-
-            sb.append(nl).append(nl);
-
-            appendSeparatorLine(sb);
-            sb.append("Notices").append(nl);
-            appendSeparatorLine(sb);
-            sb.append(nl);
-
-            for (Notice notice : usedNotices) {
-                sb.append(notice.getText()).append(nl);
-                sb.append(nl).append(nl);
-            }
-
-            appendSeparatorLine(sb);
-            sb.append("Artifacts by Licenses").append(nl);
-            appendSeparatorLine(sb);
-            sb.append(nl).append(nl);
-
-            for (final Map.Entry<License, List<Archive>> entry : usedLicensesMap.entrySet()) {
-                final License license = entry.getKey();
-                final List<Archive> archives = entry.getValue();
-                sb.append(LicenseUtil.getLicenseNameWithVersion(license));
-                sb.append(nl).append(nl);
-                for (final Archive archive : archives) {
-                    sb.append("* ").append(archive.getFileName());
-                    final Provider provider = archive.getProvider();
-                    if (provider != null) {
-                        sb.append(" / ").append(provider.getName());
-                    }
-                    sb.append(nl);
-                }
-                sb.append(nl).append(nl);
-            }
-
-            appendSeparatorLine(sb);
-            sb.append("License texts").append(nl);
-            appendSeparatorLine(sb);
-            sb.append(nl).append(nl);
-
-            for (final License license : usedLicenses) {
-                sb.append(LicenseUtil.getLicenseNameWithVersion(license));
-                sb.append(nl).append(nl);
-                sb.append(license.getText());
-                sb.append(nl).append(nl);
-            }
-
-            sb.append(nl).append(nl);
-
-            bw.write(sb.toString());
-        }
+    protected Template getDefaultTemplate() {
+        return Velocity.getTemplate(DEFAULT_TEMPLATES_LICENSE_REPORT_VM);
     }
 
-    private void appendSeparatorLine(final StringBuilder sb) {
-        sb.append("====================================================================");
-        sb.append(System.lineSeparator());
+    /**
+     *
+     */
+    @Override
+    protected void additionalSetup(final VelocityContext context, final OutputResult outputResult) {
+        final List<Archive> archiveFiles = outputResult.getFinderResult().getArchiveFiles();
+
+        final List<Provider> usedProviders = collectProviders(archiveFiles);
+        final List<Notice> usedNotices = collectNotices(archiveFiles);
+        final Map<License, List<Archive>> usedLicensesMap = collectLicenses(archiveFiles);
+        final List<License> usedLicenses = getSortedLicenses(usedLicensesMap);
+
+        context.put("usedProviders", usedProviders);
+        context.put("usedNotices", usedNotices);
+        context.put("usedLicensesMap", usedLicensesMap);
+        context.put("usedLicenses", usedLicenses);
     }
 
     /**

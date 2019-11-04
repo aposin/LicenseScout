@@ -70,24 +70,31 @@ public class TxtExporterTest {
         exporter.export(outputResult, reportConfiguration);
 
         final String resultContent = IOUtils.toString(new FileReader(outputFile));
-        final String nl = System.lineSeparator();
-        final String referenceContent = "License Report" + nl + nl
-                + " Copyright (c) 2018 Association for the promotion of open-source insurance software " + nl
-                + "and for the establishment of open interface standards in the insurance industry. " + nl
-                + "All Rights Reserved." + nl + nl
-                + "This product is licensed to you under the Apache License, Version 2.0 (the \"License\"). " + nl
-                + "You may not use this product except in compliance with the License. " + nl + nl
-                + "In the following sections you can find " + nl + "- List of used/linked software projects" + nl
-                + "- Notices to the used artifacts" + nl
-                + "- List of used artifacts with license info and vendor plugin names" + nl + "- License texts" + nl
-                + nl + nl + nl + "====================================================================" + nl + nl
-                + "This project contains software from the following providers:" + nl + nl + nl
-                + "====================================================================" + nl + "Notices" + nl
-                + "====================================================================" + nl + nl
-                + "====================================================================" + nl + "Artifacts by Licenses"
-                + nl + "====================================================================" + nl + nl + nl
-                + "====================================================================" + nl + "License texts" + nl
-                + "====================================================================" + nl + nl + nl + nl + nl;
+        final String nl = "\n";
+        final String referenceContent = nl + "License Report" + //
+                nl + nl + // 
+                "In the following sections you can find " + nl + //
+                "- List of used/linked software projects" + nl + // 
+                "- Notices to the used artifacts" + nl + //
+                "- List of used artifacts with license info and vendor plugin names" + nl + //
+                "- License texts" + nl + //
+                nl + nl + nl + //
+                "====================================================================" + nl + //
+                nl + //
+                "This project contains software from the following providers:" + nl + //
+                nl + //
+                "====================================================================" + nl + //
+                "Notices" + nl + //
+                "====================================================================" + nl + //
+                nl + nl + //
+                "====================================================================" + nl + //
+                "Artifacts by Licenses" + nl + //
+                "====================================================================" + nl + //
+                nl + nl + nl + nl + //
+                "====================================================================" + nl + //
+                "License texts" + nl + //
+                "====================================================================" + nl + //
+                nl + nl;
         Assert.assertEquals("TXT output file contents", referenceContent, resultContent);
     }
 

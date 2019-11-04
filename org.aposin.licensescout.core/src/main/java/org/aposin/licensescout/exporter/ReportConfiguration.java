@@ -31,6 +31,7 @@ public class ReportConfiguration {
     private boolean showPathColumn;
     private boolean showDocumentationUrl;
     private File outputFile;
+    private File templateFile;
 
     /**
      * @return the totalArchiveCount
@@ -100,6 +101,20 @@ public class ReportConfiguration {
      */
     public final void setOutputFile(final File outputFile) {
         this.outputFile = outputFile;
+    }
+
+    /**
+     * @return the templateFile
+     */
+    public final File getTemplateFile() {
+        return templateFile;
+    }
+
+    /**
+     * @param templateFile the templateFile to set
+     */
+    public final void setTemplateFile(final File templateFile) {
+        this.templateFile = templateFile;
     }
 
 }
