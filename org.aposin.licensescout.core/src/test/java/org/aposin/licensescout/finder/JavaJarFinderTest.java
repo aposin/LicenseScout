@@ -38,13 +38,18 @@ public class JavaJarFinderTest {
         final Logger logger = Logger.getGlobal();
         final ILFLog log = new JavaUtilLog(logger);
         LicenseStoreData licenseStoreData = null;
+        final RunParameters runParameters = createRunParameters();
+        final JavaJarFinder finder = new JavaJarFinder(licenseStoreData, runParameters, log);
+        Assert.assertFalse("isPomResolutionUsed()", finder.isPomResolutionUsed());
+    }
+
+    private RunParameters createRunParameters() {
         final String serverBaseUrl = "https://repo.maven.apache.org/maven2_unaccessible/";
         final int timeout = 400;
         final RunParameters runParameters = new RunParameters();
         runParameters.setNexusCentralBaseUrl(serverBaseUrl);
         runParameters.setConnectTimeout(timeout);
-        final JavaJarFinder finder = new JavaJarFinder(licenseStoreData, runParameters, log);
-        Assert.assertFalse("isPomResolutionUsed()", finder.isPomResolutionUsed());
+        return runParameters;
     }
 
 }
