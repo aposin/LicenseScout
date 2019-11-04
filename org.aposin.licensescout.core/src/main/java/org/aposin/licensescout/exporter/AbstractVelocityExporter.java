@@ -52,7 +52,7 @@ public abstract class AbstractVelocityExporter implements IReportExporter {
     public final void export(final OutputResult outputResult, final ReportConfiguration reportConfiguration)
             throws Exception {
         try (final FileWriter fileWriter = new FileWriter(reportConfiguration.getOutputFile());
-                final BufferedWriter bw = new BufferedWriter(fileWriter);) {
+                final BufferedWriter bw = new BufferedWriter(fileWriter)) {
 
             Velocity.setProperty(RuntimeConstants.RESOURCE_LOADER, "file,classpath");
             Velocity.setProperty("file.resource.loader.class", FileResourceLoader.class.getName());
@@ -68,7 +68,7 @@ public abstract class AbstractVelocityExporter implements IReportExporter {
             final VelocityContext context = createVelocityContext(outputResult, reportConfiguration);
             final Template template = getTemplate(reportConfiguration);
 
-            try (final StringWriter sw = new StringWriter();) {
+            try (final StringWriter sw = new StringWriter()) {
                 if (template != null) {
                     template.merge(context, sw);
                 }
@@ -116,10 +116,15 @@ public abstract class AbstractVelocityExporter implements IReportExporter {
     }
 
     /**
-     * @param context
-     * @param outputResult
+     * Do additional setup of {@link VelocityContext}.
+     * 
+     * <p>This is a template method that can be used to put additional data collected from the outputResult to the
+     * {@link VelocityContext}. Default is to do nothing.</p>
+     * 
+     * @param context the velocity context that can be modified
+     * @param outputResult results from the license scan
      */
-    protected void additionalSetup(VelocityContext context, OutputResult outputResult) {
+    protected void additionalSetup(final VelocityContext context, final OutputResult outputResult) {
         // EMPTY
     }
 
