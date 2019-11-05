@@ -43,7 +43,7 @@ public class JavascriptNpmFinderTest extends BaseFinderTest {
      */
     @Test
     public void testScanNpmEmptyDirectory() throws Exception {
-        final JavascriptNpmFinder finder = createFinder();
+        final AbstractFinder finder = createFinder();
         final File scanDirectory = new File("src/test/resources/scans/empty");
         final int expectedArchiveCount = 0;
         final FinderResult finderResult = doScan(finder, scanDirectory);
@@ -56,7 +56,7 @@ public class JavascriptNpmFinderTest extends BaseFinderTest {
      */
     @Test
     public void testScanNpmLicenseFileApache() throws Exception {
-        final JavascriptNpmFinder finder = createFinder();
+        final AbstractFinder finder = createFinder();
         final File scanDirectory = new File("src/test/resources/scans/npm-license-file-apache");
         final FinderResult finderResult = doScan(finder, scanDirectory);
         assertSingleArchive(finderResult, scanDirectory, true);
@@ -68,7 +68,7 @@ public class JavascriptNpmFinderTest extends BaseFinderTest {
      */
     @Test
     public void testScanNpmLicenseFileMit() throws Exception {
-        final JavascriptNpmFinder finder = createFinder();
+        final AbstractFinder finder = createFinder();
         finder.debug = true;
         final File scanDirectory = new File("src/test/resources/scans/npm-license-file-mit");
         final FinderResult finderResult = doScan(finder, scanDirectory);
@@ -81,7 +81,7 @@ public class JavascriptNpmFinderTest extends BaseFinderTest {
      */
     @Test
     public void testScanNpmLicenseFileUnknown() throws Exception {
-        final JavascriptNpmFinder finder = createFinder();
+        final AbstractFinder finder = createFinder();
         finder.debug = true;
         final File scanDirectory = new File("src/test/resources/scans/npm-license-file-unknown");
         final FinderResult finderResult = doScan(finder, scanDirectory);
@@ -94,7 +94,7 @@ public class JavascriptNpmFinderTest extends BaseFinderTest {
      */
     @Test
     public void testScanNpmLicensePackageJson() throws Exception {
-        final JavascriptNpmFinder finder = createFinder();
+        final AbstractFinder finder = createFinder();
         finder.debug = true;
         final File scanDirectory = new File("src/test/resources/scans/npm-license-package-json");
         final FinderResult finderResult = doScan(finder, scanDirectory);
@@ -107,7 +107,7 @@ public class JavascriptNpmFinderTest extends BaseFinderTest {
      */
     @Test
     public void testScanNpmLicensePackageJsonMit() throws Exception {
-        final JavascriptNpmFinder finder = createFinder();
+        final AbstractFinder finder = createFinder();
         finder.debug = true;
         final File scanDirectory = new File("src/test/resources/scans/npm-license-package-json-mit");
         final FinderResult finderResult = doScan(finder, scanDirectory);
@@ -121,7 +121,7 @@ public class JavascriptNpmFinderTest extends BaseFinderTest {
      */
     @Test
     public void testScanNpmNoLicense() throws Exception {
-        final JavascriptNpmFinder finder = createFinder();
+        final AbstractFinder finder = createFinder();
         final File scanDirectory = new File("src/test/resources/scans/npm-no-license");
         final int expectedArchiveCount = 1;
         final FinderResult finderResult = doScan(finder, scanDirectory);
@@ -129,7 +129,11 @@ public class JavascriptNpmFinderTest extends BaseFinderTest {
         assertSingleArchive(finderResult, scanDirectory, false);
     }
 
-    private JavascriptNpmFinder createFinder() throws Exception {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected AbstractFinder createFinder() {
         final LicenseStoreData licenseStoreData = getLicenseStoreData();
         final List<String> npmExcludedDirectoryNames = Arrays.asList("@test");
         return new JavascriptNpmFinder(licenseStoreData, getLog(), npmExcludedDirectoryNames);
@@ -144,9 +148,8 @@ public class JavascriptNpmFinderTest extends BaseFinderTest {
      *            expected names)
      */
     private void assertSingleArchive(final FinderResult finderResult, final File scanDirectory,
-            final boolean expectLicense) {
-        final License expectedLicense = expectLicense ? getLicenseStoreData().getLicenseBySpdxIdentifier("Apache-2.0")
-                : null;
+                                     final boolean expectLicense) {
+        final License expectedLicense = getExpectedLicense(expectLicense);
         assertSingleArchive(finderResult, scanDirectory, expectedLicense);
     }
 
@@ -159,7 +162,7 @@ public class JavascriptNpmFinderTest extends BaseFinderTest {
      *            expected names)
      */
     private void assertSingleArchive(final FinderResult finderResult, final File scanDirectory,
-            final Object expectedLicense) {
+                                     final Object expectedLicense) {
         final String expectedFileName = "lib1";
         final String expectedPath = "/lib1/3.2.0";
         String expectedVersion = "3.2.0";

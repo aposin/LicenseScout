@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.aposin.licensescout.archive.Archive;
 import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.configuration.RunParameters;
@@ -36,10 +34,15 @@ import org.aposin.licensescout.util.JavaUtilLog;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
 /**
  * Test case for {@link JavaJarFinder}.
+ * 
+ * <p>The test cases in this class (mainly) test the method {@link JavaJarFinder#findLicenses()} with different scan directories and check if the artifacts in these
+ * directories are found in the returned {@link FinderResult}.</p>
+ * 
+ * <p>For tests that test packed JAR files, these JAR files are created during runtime from directories with the unpacked contents of the JAR. In case 
+ * of packed JARs with an inner JAR, first the inner JAR is created, then the outer one.</p>
  */
 public class JavaJarFinderTest extends BaseFinderTest {
 
@@ -47,8 +50,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
     private static final int EXPECTED_MESSAGE_DIGEST_STRING_LENGTH = 64;
 
     /**
-     * Test method for
-     * {@link org.aposin.licensescout.license.ArtifactServerUtil#ArtifactServerUtil(java.lang.String, int, org.aposin.licensescout.util.ILFLog)}.
+     * Test method for {@link JavaJarFinder#isPomResolutionUsed())}.
      */
     @Test
     public void testPomResolutionUsed() {
@@ -61,8 +63,11 @@ public class JavaJarFinderTest extends BaseFinderTest {
     }
 
     /**
-     * @throws Exception 
+     * Test method for {@link JavaJarFinder#findLicenses())}.
      * 
+     * <p>Uses scan directory 'src/test/resources/scans/empty'.</p>
+     * 
+     * @throws Exception 
      */
     @Test
     public void testScanEmptyDirectory() throws Exception {
@@ -75,8 +80,12 @@ public class JavaJarFinderTest extends BaseFinderTest {
     }
 
     /**
-     * @throws Exception 
+     * Test method for {@link JavaJarFinder#findLicenses())}.
      * 
+     * <p>Tests with a packed JAR and a license file.</p>
+     * <p>Uses scan directory 'src/test/resources/scans/java-packed-license-file'.</p>
+     * 
+     * @throws Exception 
      */
     @Test
     public void testScanJavaPackedLicenseFile() throws Exception {
@@ -88,8 +97,12 @@ public class JavaJarFinderTest extends BaseFinderTest {
     }
 
     /**
-     * @throws Exception 
+     * Test method for {@link JavaJarFinder#findLicenses())}.
      * 
+     * <p>Tests with a packed JAR and license information in the POM.</p>
+     * <p>Uses scan directory 'src/test/resources/scans/java-packed-license-included-pom'.</p>
+     * 
+     * @throws Exception 
      */
     @Test
     public void testScanJavaPackedLicenseIncludedPom() throws Exception {
@@ -101,8 +114,12 @@ public class JavaJarFinderTest extends BaseFinderTest {
     }
 
     /**
-     * @throws Exception 
+     * Test method for {@link JavaJarFinder#findLicenses())}.
      * 
+     * <p>Tests with a packed JAR and license information in the MANIFEST.MF file.</p>
+     * <p>Uses scan directory 'src/test/resources/scans/java-packed-license-manifest'.</p>
+     * 
+     * @throws Exception 
      */
     @Test
     public void testScanJavaPackedLicenseManifest() throws Exception {
@@ -114,8 +131,12 @@ public class JavaJarFinderTest extends BaseFinderTest {
     }
 
     /**
-     * @throws Exception 
+     * Test method for {@link JavaJarFinder#findLicenses())}.
      * 
+     * <p>Tests with a packed JAR and no license information.</p>
+     * <p>Uses scan directory 'src/test/resources/scans/java-packed-license-none'.</p>
+     * 
+     * @throws Exception 
      */
     @Test
     public void testScanJavaPackedLicenseNone() throws Exception {
@@ -127,8 +148,13 @@ public class JavaJarFinderTest extends BaseFinderTest {
     }
 
     /**
-     * @throws Exception 
+     * Test method for {@link JavaJarFinder#findLicenses())}.
      * 
+     * <p>Tests with a packed JAR without license information and
+     * an inner packed JAR with a license file.</p>
+     * <p>Uses scan directory 'src/test/resources/scans/java-packed-with-inner-license-file'.</p>
+     * 
+     * @throws Exception 
      */
     @Test
     public void testScanJavaPackedWithInnerLicenseFile() throws Exception {
@@ -146,8 +172,13 @@ public class JavaJarFinderTest extends BaseFinderTest {
     }
 
     /**
-     * @throws Exception 
+     * Test method for {@link JavaJarFinder#findLicenses())}.
      * 
+     * <p>Tests with a packed JAR without license information and
+     * an inner packed JAR with license information in the POM.</p>
+     * <p>Uses scan directory 'src/test/resources/scans/java-packed-with-inner-license-included-pom'.</p>
+     * 
+     * @throws Exception 
      */
     @Test
     public void testScanJavaPackedWithInnerLicenseIncludedPom() throws Exception {
@@ -165,8 +196,13 @@ public class JavaJarFinderTest extends BaseFinderTest {
     }
 
     /**
-     * @throws Exception 
+     * Test method for {@link JavaJarFinder#findLicenses())}.
      * 
+     * <p>Tests with a packed JAR without license information and
+     * an inner packed JAR with license information in the MANIFEST.MF file.</p>
+     * <p>Uses scan directory 'src/test/resources/scans/java-packed-with-inner-license-manifest'.</p>
+     * 
+     * @throws Exception 
      */
     @Test
     public void testScanJavaPackedWithInnerLicenseManifest() throws Exception {
@@ -184,8 +220,13 @@ public class JavaJarFinderTest extends BaseFinderTest {
     }
 
     /**
-     * @throws Exception 
+     * Test method for {@link JavaJarFinder#findLicenses())}.
      * 
+     * <p>Tests with a packed JAR without license information and
+     * an inner packed JAR without license information.</p>
+     * <p>Uses scan directory 'src/test/resources/scans/java-packed-with-inner-license-none'.</p>
+     * 
+     * @throws Exception 
      */
     @Test
     public void testScanJavaPackedWithInnerLicenseNone() throws Exception {
@@ -203,8 +244,12 @@ public class JavaJarFinderTest extends BaseFinderTest {
     }
 
     /**
-     * @throws Exception 
+     * Test method for {@link JavaJarFinder#findLicenses())}.
      * 
+     * <p>Tests with an unpacked JAR and a license file.</p>
+     * <p>Uses scan directory 'src/test/resources/scans/java-unpacked-license-file'.</p>
+     * 
+     * @throws Exception 
      */
     @Test
     public void testScanJavaUnpackedLicenseFile() throws Exception {
@@ -214,8 +259,12 @@ public class JavaJarFinderTest extends BaseFinderTest {
     }
 
     /**
-     * @throws Exception 
+     * Test method for {@link JavaJarFinder#findLicenses())}.
      * 
+     * <p>Tests with an unpacked JAR and license information in the POM.</p>
+     * <p>Uses scan directory 'src/test/resources/scans/java-unpacked-license-included-pom'.</p>
+     * 
+     * @throws Exception 
      */
     @Test
     public void testScanJavaUnpackedLicenseIncludedPom() throws Exception {
@@ -225,8 +274,12 @@ public class JavaJarFinderTest extends BaseFinderTest {
     }
 
     /**
-     * @throws Exception 
+     * Test method for {@link JavaJarFinder#findLicenses())}.
      * 
+     * <p>Tests with an unpacked JAR and license information in the MANIFEST.MF file.</p>
+     * <p>Uses scan directory 'src/test/resources/scans/java-unpacked-license-manifest'.</p>
+     * 
+     * @throws Exception 
      */
     @Ignore(value = "ignored due to a bug in JavaJarFinder (the test is correct)")
     @Test
@@ -237,8 +290,12 @@ public class JavaJarFinderTest extends BaseFinderTest {
     }
 
     /**
-     * @throws Exception 
+     * Test method for {@link JavaJarFinder#findLicenses())}.
      * 
+     * <p>Tests with an unpacked JAR and no license information.</p>
+     * <p>Uses scan directory 'src/test/resources/scans/java-unpacked-license-none'.</p>
+     * 
+     * @throws Exception 
      */
     @Test
     public void testScanJavaUnpackedLicenseNone() throws Exception {
@@ -248,8 +305,13 @@ public class JavaJarFinderTest extends BaseFinderTest {
     }
 
     /**
-     * @throws Exception 
+     * Test method for {@link JavaJarFinder#findLicenses())}.
      * 
+     * <p>Tests with an unpacked JAR without license information and
+     * an inner packed JAR with a license file.</p>
+     * <p>Uses scan directory 'src/test/resources/scans/java-unpacked-with-inner-license-file'.</p>
+     * 
+     * @throws Exception 
      */
     @Test
     public void testScanJavaUnpackedWithInnerLicenseFile() throws Exception {
@@ -263,8 +325,13 @@ public class JavaJarFinderTest extends BaseFinderTest {
     }
 
     /**
-     * @throws Exception 
+     * Test method for {@link JavaJarFinder#findLicenses())}.
      * 
+     * <p>Tests with an unpacked JAR without license information and
+     * an inner packed JAR with license information in the POM.</p>
+     * <p>Uses scan directory 'src/test/resources/scans/java-unpacked-with-inner-license-included-pom'.</p>
+     * 
+     * @throws Exception 
      */
     @Test
     public void testScanJavaUnpackedWithInnerLicenseIncludedPom() throws Exception {
@@ -278,8 +345,13 @@ public class JavaJarFinderTest extends BaseFinderTest {
     }
 
     /**
-     * @throws Exception 
+     * Test method for {@link JavaJarFinder#findLicenses())}.
      * 
+     * <p>Tests with an unpacked JAR without license information and
+     * an inner packed JAR with license information in the MANIFEST.MF file.</p>
+     * <p>Uses scan directory 'src/test/resources/scans/java-unpacked-with-inner-license-manifest'.</p>
+     * 
+     * @throws Exception 
      */
     @Test
     public void testScanJavaUnpackedWithInnerLicenseManifest() throws Exception {
@@ -293,8 +365,13 @@ public class JavaJarFinderTest extends BaseFinderTest {
     }
 
     /**
-     * @throws Exception 
+     * Test method for {@link JavaJarFinder#findLicenses())}.
      * 
+     * <p>Tests with an unpacked JAR without license information and
+     * an inner packed JAR without license information.</p>
+     * <p>Uses scan directory 'src/test/resources/scans/java-unpacked-with-inner-license-none'.</p>
+     * 
+     * @throws Exception 
      */
     @Test
     public void testScanJavaUnpackedWithInnerLicenseNone() throws Exception {
@@ -308,8 +385,13 @@ public class JavaJarFinderTest extends BaseFinderTest {
     }
 
     /**
-     * @throws Exception 
+     * Test method for {@link JavaJarFinder#findLicenses())}.
      * 
+     * <p>Tests with an unpacked JAR without license information and
+     * an inner special archive ('ckeditor') with a license file.</p>
+     * <p>Uses scan directory 'src/test/resources/scans/java-unpacked-with-inner-special'.</p>
+     * 
+     * @throws Exception 
      */
     @Test
     public void testScanJavaUnpackedWithInnerSpecial() throws Exception {
@@ -318,7 +400,11 @@ public class JavaJarFinderTest extends BaseFinderTest {
         assertArchiveWithInnerSpecial(finderResult, scanDirectory, false, true, 1);
     }
 
-    private JavaJarFinder createFinder() throws Exception {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected JavaJarFinder createFinder() {
         final LicenseStoreData licenseStoreData = getLicenseStoreData();
         final RunParameters runParameters = createRunParameters();
         return new JavaJarFinder(licenseStoreData, runParameters, getLog());
@@ -333,6 +419,13 @@ public class JavaJarFinderTest extends BaseFinderTest {
         return runParameters;
     }
 
+    /**
+     * Creates the 'outer' JAR file as 'lib1.jar'.
+     *  
+     * @param source directory that should be packaged
+     * @param destDirectory
+     * @throws IOException
+     */
     private void createJarLib1(final File source, final File destDirectory) throws IOException {
         destDirectory.mkdirs();
         final File destFile = new File(destDirectory, "lib1.jar");
@@ -340,6 +433,13 @@ public class JavaJarFinderTest extends BaseFinderTest {
         CreateJarFile.createJarArchiveZip(destFile, files, source.toPath());
     }
 
+    /**
+     * Creates the 'inner' JAR file as 'lib2.jar'.
+     * 
+     * @param source the directory that should be packaged
+     * @param destDirectory
+     * @throws IOException
+     */
     private void createJarLib2(final File source, final File destDirectory) throws IOException {
         destDirectory.mkdirs();
         final File destFile = new File(destDirectory, "lib2.jar");
@@ -348,21 +448,8 @@ public class JavaJarFinderTest extends BaseFinderTest {
     }
 
     /**
-     * @param scanDirectory
-     * @return
-     * @throws IOException
-     * @throws SAXException
-     * @throws ParserConfigurationException
-     * @throws Exception
-     */
-    private FinderResult doScan(final File scanDirectory)
-            throws IOException, SAXException, ParserConfigurationException, Exception {
-        final JavaJarFinder finder = createFinder();
-        final FinderResult finderResult = doScan(finder, scanDirectory);
-        return finderResult;
-    }
-
-    /**
+     * Checks an archive with no inner JAR.
+     * 
      * @param finderResult
      * @param scanDirectory
      * @param isJar
@@ -385,6 +472,8 @@ public class JavaJarFinderTest extends BaseFinderTest {
     }
 
     /**
+     * Checks an archive with an inner JAR (standard case: inner JAR is lib2.jar).
+     * 
      * @param finderResult
      * @param scanDirectory
      * @param isJarOuter
@@ -404,6 +493,8 @@ public class JavaJarFinderTest extends BaseFinderTest {
     }
 
     /**
+     * Checks an archive with an inner 'special archive'.
+     * 
      * @param finderResult
      * @param scanDirectory
      * @param isJarOuter
@@ -421,6 +512,8 @@ public class JavaJarFinderTest extends BaseFinderTest {
     }
 
     /**
+     * Checks an archive with an inner JAR.
+     * 
      * @param finderResult
      * @param scanDirectory
      * @param isJarOuter
@@ -455,6 +548,19 @@ public class JavaJarFinderTest extends BaseFinderTest {
                 expectedLicenseCandidateFilesCountInner);
     }
 
+    /**
+     * Checks an archive.
+     * 
+     * @param archive
+     * @param messagePrefix
+     * @param expectedFileName
+     * @param expectedPath
+     * @param expectedVersion
+     * @param expectedVendor
+     * @param expectedLicense
+     * @param expectMessageDigest
+     * @param expectedLicenseCandidateFilesCount
+     */
     private void assertArchive(final Archive archive, final String messagePrefix, final String expectedFileName,
                                final String expectedPath, final String expectedVersion, final String expectedVendor,
                                final License expectedLicense, final boolean expectMessageDigest,
@@ -465,6 +571,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
         assertEquals(messagePrefix + "version", expectedVersion, archive.getVersion());
         assertEquals(messagePrefix + "vendor", expectedVendor, archive.getVendor());
         assertEquals(messagePrefix + "detectionStatus", null, archive.getDetectionStatus());
+        assertEquals(messagePrefix + "legalStatus", null, archive.getLegalStatus());
         assertEquals(messagePrefix + "detectedLicenses", null, archive.getDetectedLicenses());
         if (expectMessageDigest) {
             assertEquals(messagePrefix + "message digest string length", EXPECTED_MESSAGE_DIGEST_STRING_LENGTH,
@@ -483,13 +590,6 @@ public class JavaJarFinderTest extends BaseFinderTest {
             assertEquals(messagePrefix + "licenses size", 1, licenses.size());
             assertEquals(messagePrefix + "licenses[0]", true, licenses.contains(expectedLicense));
         }
-    }
-
-    private License getExpectedLicense(final boolean expectLicense) {
-        final License expectedLicenseInner = expectLicense
-                ? getLicenseStoreData().getLicenseBySpdxIdentifier("Apache-2.0")
-                : null;
-        return expectedLicenseInner;
     }
 
     private File getFile(final String relativePath) {
