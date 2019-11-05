@@ -131,6 +131,7 @@ public class JavaJarFinder extends AbstractFinder {
                 version = getVersionNotNull(version);
                 final Archive foundArchive = new Archive(JAVA, entryName, version, filePath);
                 foundArchive.setVendor(vendor);
+                // TODO: fetch license header
                 archiveFiles.add(foundArchive);
                 parseUnpackedJarArchive(foundArchive, file, filePath);
             } else {

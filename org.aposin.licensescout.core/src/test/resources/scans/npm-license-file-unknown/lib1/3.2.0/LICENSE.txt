@@ -1,0 +1,3 @@
+Copyright (C) <date> Hugo Ball
+
+Permission is hereby granted, ...
