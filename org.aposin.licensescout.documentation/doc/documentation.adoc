@@ -108,7 +108,7 @@ LicenseScout is configured as a Maven plugin. Below you can see a typical config
 <plugin>
     <groupId>org.aposin.licensescout</groupId>
     <artifactId>licensescout-maven-plugin</artifactId>
-    <version>1.1.4</version>
+    <version>1.3.1-SNAPSHOT</version>
     <executions>
         <execution>
             <id>find-licenses</id>
@@ -361,7 +361,7 @@ Example:
 </configuration>
 ----
 
-It is recommended to configure the values for `username` and `password` via `settings.xml`.
+It is recommended to configure the values for `username` and `password` via `settings.xml` so that they do not appear in the normal project POMs that are under version control and are easily visible to everybody.
 
 
 === Configuration files
@@ -675,7 +675,7 @@ In builds that use this configuration project it is downloaded and unpacked to a
                     <artifactItem>
                         <groupId>org.aposin.licensescout</groupId>
                         <artifactId>org.aposin.licensescout.configuration.sample</artifactId>
-                        <version>1.0.0-SNAPSHOT</version>
+                        <version>1.3.1-SNAPSHOT</version>
                         <classifier>configuration</classifier>
                         <type>zip</type>
                         <overWrite>true</overWrite>
