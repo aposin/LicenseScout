@@ -47,7 +47,8 @@ public class JavascriptNpmFinderTest extends BaseFinderTest {
         final File scanDirectory = new File("src/test/resources/scans/empty");
         final int expectedArchiveCount = 0;
         final FinderResult finderResult = doScan(finder, scanDirectory);
-        assertResultsBase(finderResult, scanDirectory, expectedArchiveCount);
+        assertScanDirectory(finderResult, scanDirectory);
+        assertArchiveFileCount(finderResult, expectedArchiveCount);
     }
 
     /**
@@ -125,7 +126,8 @@ public class JavascriptNpmFinderTest extends BaseFinderTest {
         final File scanDirectory = new File("src/test/resources/scans/npm-no-license");
         final int expectedArchiveCount = 1;
         final FinderResult finderResult = doScan(finder, scanDirectory);
-        assertResultsBase(finderResult, scanDirectory, expectedArchiveCount);
+        assertScanDirectory(finderResult, scanDirectory);
+        assertArchiveFileCount(finderResult, expectedArchiveCount);
         assertSingleArchive(finderResult, scanDirectory, false);
     }
 
@@ -163,10 +165,11 @@ public class JavascriptNpmFinderTest extends BaseFinderTest {
      */
     private void assertSingleArchive(final FinderResult finderResult, final File scanDirectory,
                                      final Object expectedLicense) {
+        assertScanDirectory(finderResult, scanDirectory);
+        assertArchiveFileCount(finderResult, 1);
         final String expectedFileName = "lib1";
         final String expectedPath = "/lib1/3.2.0";
         String expectedVersion = "3.2.0";
-        assertResultsBase(finderResult, scanDirectory, 1);
         final Archive archive = finderResult.getArchiveFiles().get(0);
         assertEquals("archiveType", ArchiveType.JAVASCRIPT, archive.getArchiveType());
         assertEquals("fileName", expectedFileName, archive.getFileName());

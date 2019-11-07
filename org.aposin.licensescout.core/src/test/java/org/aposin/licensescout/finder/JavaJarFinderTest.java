@@ -76,7 +76,8 @@ public class JavaJarFinderTest extends BaseFinderTest {
         final File scanDirectory = getFile("empty");
         final int expectedArchiveCount = 0;
         final FinderResult finderResult = doScan(finder, scanDirectory);
-        assertResultsBase(finderResult, scanDirectory, expectedArchiveCount);
+        assertScanDirectory(finderResult, scanDirectory);
+        assertArchiveFileCount(finderResult, expectedArchiveCount);
     }
 
     /**
@@ -429,8 +430,8 @@ public class JavaJarFinderTest extends BaseFinderTest {
     private void createJarLib1(final File source, final File destDirectory) throws IOException {
         destDirectory.mkdirs();
         final File destFile = new File(destDirectory, "lib1.jar");
-        final List<File> files = CreateJarFile.collectFiles(source);
-        CreateJarFile.createJarArchiveZip(destFile, files, source.toPath());
+        final List<File> files = CreateJarFileHelper.collectFiles(source);
+        CreateJarFileHelper.createJarArchiveZip(destFile, files, source.toPath());
     }
 
     /**
@@ -443,8 +444,8 @@ public class JavaJarFinderTest extends BaseFinderTest {
     private void createJarLib2(final File source, final File destDirectory) throws IOException {
         destDirectory.mkdirs();
         final File destFile = new File(destDirectory, "lib2.jar");
-        final List<File> files = CreateJarFile.collectFiles(source);
-        CreateJarFile.createJarArchiveZip(destFile, files, source.toPath());
+        final List<File> files = CreateJarFileHelper.collectFiles(source);
+        CreateJarFileHelper.createJarArchiveZip(destFile, files, source.toPath());
     }
 
     /**
@@ -461,10 +462,11 @@ public class JavaJarFinderTest extends BaseFinderTest {
      */
     private void assertSingleArchive(final FinderResult finderResult, final File scanDirectory, final boolean isJar,
                                      final boolean expectLicense, final int expectedLicenseCandidateFilesCount) {
+        assertScanDirectory(finderResult, scanDirectory);
+        assertArchiveFileCount(finderResult, 1);
         final License expectedLicense = getExpectedLicense(expectLicense);
         final String expectedFileName0 = isJar ? "lib1.jar" : "lib1";
         final String expectedPath0 = isJar ? "/lib1.jar" : "/lib1";
-        assertResultsBase(finderResult, scanDirectory, 1);
         final Archive archive0 = finderResult.getArchiveFiles().get(0);
         final String expectedVendor = "Unknown";
         assertArchive(archive0, "archive[0]: ", expectedFileName0, expectedPath0, "0.0.2", expectedVendor,
@@ -487,9 +489,9 @@ public class JavaJarFinderTest extends BaseFinderTest {
         final String expectedPathInner = (isJarOuter ? "/lib1.jar!" : "/lib1") + "/lib/lib2.jar";
         final String expectedVersionInner = "0.0.3";
         final String expectedVendorInner = "Unknown";
-        assertArchiveWithInner(finderResult, scanDirectory, isJarOuter, expectLicenseInner,
-                expectedLicenseCandidateFilesCountInner, expectedFileNameInner, expectedPathInner, expectedVersionInner,
-                expectedVendorInner, true);
+        assertScanDirectory(finderResult, scanDirectory);
+        assertArchiveWithInner(finderResult, isJarOuter, expectLicenseInner, expectedLicenseCandidateFilesCountInner,
+                expectedFileNameInner, expectedPathInner, expectedVersionInner, expectedVendorInner, true);
     }
 
     /**
@@ -506,16 +508,15 @@ public class JavaJarFinderTest extends BaseFinderTest {
                                                final int expectedLicenseCandidateFilesCountInner) {
         final String expectedFileNameInner = "ckeditor";
         final String expectedPathInner = (isJarOuter ? "/lib1.jar!" : "/lib1") + "/ckeditor";
-        assertArchiveWithInner(finderResult, scanDirectory, isJarOuter, expectLicenseInner,
-                expectedLicenseCandidateFilesCountInner, expectedFileNameInner, expectedPathInner, "0.0.0", null,
-                false);
+        assertScanDirectory(finderResult, scanDirectory);
+        assertArchiveWithInner(finderResult, isJarOuter, expectLicenseInner, expectedLicenseCandidateFilesCountInner,
+                expectedFileNameInner, expectedPathInner, "0.0.0", null, false);
     }
 
     /**
      * Checks an archive with an inner JAR.
      * 
      * @param finderResult
-     * @param scanDirectory
      * @param isJarOuter
      * @param expectLicenseInner
      * @param expectedLicenseCandidateFilesCountInner
@@ -525,14 +526,14 @@ public class JavaJarFinderTest extends BaseFinderTest {
      * @param expectedVendorInner
      * @param expectMessageDigestInner
      */
-    private void assertArchiveWithInner(final FinderResult finderResult, final File scanDirectory,
-                                        final boolean isJarOuter, final boolean expectLicenseInner,
+    private void assertArchiveWithInner(final FinderResult finderResult, final boolean isJarOuter,
+                                        final boolean expectLicenseInner,
                                         final int expectedLicenseCandidateFilesCountInner,
                                         final String expectedFileNameInner, final String expectedPathInner,
                                         final String expectedVersionInner, final String expectedVendorInner,
                                         final boolean expectMessageDigestInner) {
+        assertArchiveFileCount(finderResult, 2);
         final License expectedLicenseInner = getExpectedLicense(expectLicenseInner);
-        assertResultsBase(finderResult, scanDirectory, 2);
 
         // the outer
         final String expectedFileNameOuter = isJarOuter ? "lib1.jar" : "lib1";

@@ -111,16 +111,21 @@ public abstract class BaseFinderTest {
     }
 
     /**
-     * Checks the scan directory and the expected number of found archives.
-     * 
-     * @param finderResult a finder result
+     * Checks the parameter scanDirectory.
+     * @param finderResult
      * @param expectedScanDirectory
-     * @param expectedArchiveCount
      */
-    protected void assertResultsBase(final FinderResult finderResult, final File expectedScanDirectory,
-                                     final int expectedArchiveCount) {
+    protected void assertScanDirectory(final FinderResult finderResult, final File expectedScanDirectory) {
         Assert.assertEquals("scanDirectory", expectedScanDirectory, finderResult.getScanDirectory());
-        Assert.assertEquals("number of archive files", expectedArchiveCount, finderResult.getArchiveFiles().size());
+    }
+
+    /**
+     * Checks the number of archive files.
+     * @param finderResult
+     * @param expectedArchiveFileCount
+     */
+    protected void assertArchiveFileCount(final FinderResult finderResult, final int expectedArchiveFileCount) {
+        Assert.assertEquals("number of archive files", expectedArchiveFileCount, finderResult.getArchiveFiles().size());
     }
 
     /**

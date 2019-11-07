@@ -34,7 +34,7 @@ import org.apache.commons.io.IOUtils;
 /**
  * Utility methods for creating JAR files. 
  */
-public class CreateJarFile {
+public class CreateJarFileHelper {
 
     /**
      * Collects a list of files by walking a file tree hierarchically.
