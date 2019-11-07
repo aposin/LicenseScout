@@ -32,7 +32,6 @@ import org.aposin.licensescout.license.DetectionStatus;
 import org.aposin.licensescout.license.LegalStatus;
 import org.aposin.licensescout.license.License;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
