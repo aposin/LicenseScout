@@ -26,54 +26,8 @@ For detail information, see the [full documentation](org.aposin.licensescout.doc
 
 * Maven 3 installation
 
-### Usage
 
-Declare the Plugin and executions in the `pom.xml`:
-
-```xml
-<plugins>
-    <plugin>
-        <groupId>org.aposin.licensescout</groupId>
-        <artifactId>licensescout-maven-plugin</artifactId>
-        <version>1.1.4</version>
-        <executions>
-            <execution>
-                <id>find-licenses</id>
-                <phase>verify</phase>
-                <goals>
-                    <goal>scanJava</goal>
-                </goals>
-                <configuration>
-                    <scanDirectory>${project.build.directory}/products/my.product/win32/win32/x86/plugins/</scanDirectory>
-                    <outputDirectory>${licensescout.outputDirectory}</outputDirectory>
-                    <outputs>
-                        <output>
-                            <type>TXT</type>
-                            <filename>${licensescout.outputFilename.txt}</filename>
-                            <url>${licensereport.url.txt}</url>
-                        </output>
-                    </outputs>
-                    <licensesFilename>${licensescout-configuration.dir}/licenses.xml</licensesFilename>
-                    <providersFilename>${licensescout-configuration.dir}/providers.xml</providersFilename>
-                    <noticesFilename>${licensescout-configuration.dir}/notices.xml</noticesFilename>
-                    <checkedArchivesFilename>${licensescout-configuration.dir}/checkedarchives.csv</checkedArchivesFilename>
-                    <licenseUrlMappingsFilename>${licensescout-configuration.dir}/urlmappings.csv</licenseUrlMappingsFilename>
-                    <licenseNameMappingsFilename>${licensescout-configuration.dir}/namemappings.csv</licenseNameMappingsFilename>
-                    <globalFiltersFilename>${licensescout-configuration.dir}/globalfilters.csv</globalFiltersFilename>
-                    <filteredVendorNamesFilename>${licensescout-configuration.dir}/filteredvendornames.csv</filteredVendorNamesFilename>
-            </configuration>
-            </execution>
-        </executions>
-
-    </plugin>
-</plugin>
-```
-
-:information_source: For further information about how to configure the Plugin, please see the [full documentation](org.aposin.licensescout.core/doc/documentation.adoc).
-
-As an example output, the [NOTICE.txt](NOTICE.txt) in this repository is the result of LiceseScout running on itself.
-
-### Building
+### Run the quickstart example
 
 To build and run LicenseScout on itself in this repository:
 
@@ -82,7 +36,69 @@ cd org.aposin.licensescout.quickstart
 mvn clean install
 ```
 
+This does:
+* Compiles the LicenseScout Maven plug-in
+* Creates a LicenseScout configuration bundle
+* Runs the LicenseScout on its own dependencies and creates license reports for it
+
 The reports are written to the directory `org.aposin.licensescout.licensereport/target`.
+
+:information_source: For further information about how to configure the Plugin, please see the [full documentation](org.aposin.licensescout.core/doc/documentation.adoc).
+
+As an example output, the [NOTICE.txt](NOTICE.txt) in this repository is the result of LiceseScout running on itself.
+
+### Next steps
+
+#### Run LicenseScout on your own project
+
+Have a look at the `pom.xml` in `org.aposin.licensescout.licensereport`. It contains a typical configuration of how the LicenseScout is applied to a project.
+
+You may want to start by re-using this project and just alter the parameter `scanDirectory` (Note: the value may also be an absolute path that points anywhere in the file system).
+
+Alternatively, you can copy out the plugin configurations and take them over to your own project's POM.
+
+#### Create a project specific configuration
+
+The quickstart example you just executed uses a minimal configuration
+that is just sufficient to run the LicenseScout on its own dependencies.
+
+For you own project, you will need to maintain a configuration that is specific to your project. Take the project `org.aposin.licensescout.configuration.sample` as a starting point by creating a copy of it. If you cange the name of the project (recommended!) make sure you also adapt the group and artifact IDs that are used as configuration in the licensescout run (in `org.aposin.licensescout.licensereport/pom.xml`):
+
+```xml
+<plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-dependency-plugin</artifactId>
+	<executions>
+		<execution>
+			...
+			<configuration>
+				<artifactItems>
+					<artifactItem>
+						<groupId>your.new.groupId</groupId>
+						<artifactId>your.new.artifactId</artifactId>
+						<version>${org.aposin.licensescout.configuration.version}</version>
+						<classifier>configuration</classifier>
+						...
+					</artifactItem>
+				</artifactItems>
+				...
+			</configuration>
+		</execution>
+	</executions>
+</plugin>
+```
+
+Then, start adding the configurations you need:
+* License definitions
+* License notices
+* Vendor names (for filtering out own artifacts)
+* License name and URL mappings
+* Exceptions for certain artifacts (`checkedarchives.csv`)
+* Provider definitions
+
+See also the full documentation: it describes the format of the configuration files and how their information is processed.
+
+You may also want to create a customized version of the templates used for the license reports.
 
 ## Contributing
 
