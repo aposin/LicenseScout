@@ -61,7 +61,7 @@ public class JarUtil {
      */
     public static ArchiveMetaInformation getArchiveMetaInformationFromManifestFile(final File file, final ILFLog log)
             throws IOException {
-        try (final InputStream is = new FileInputStream(file);) {
+        try (final InputStream is = new FileInputStream(file)) {
             final Manifest manifest = new Manifest(is);
             return getArchiveMetaInformationFromManifestObject(manifest, log, file.getAbsolutePath());
         }
@@ -92,7 +92,7 @@ public class JarUtil {
     public static ArchiveMetaInformation getArchiveMetaInformationFromManifest(final File file, final ILFLog log)
             throws IOException {
         final String sourceForErrorText = file.getAbsolutePath();
-        try (final JarFile jarFile = new JarFile(file);) {
+        try (final JarFile jarFile = new JarFile(file)) {
             final Manifest manifest = jarFile.getManifest();
             return getArchiveMetaInformationFromManifestObject(manifest, log, sourceForErrorText);
         }
@@ -124,7 +124,7 @@ public class JarUtil {
                                                                                final ILFLog log)
             throws IOException {
         final String sourceForErrorText = "input stream";
-        try (final JarInputStream jarFile = new JarInputStream(inputStream);) {
+        try (final JarInputStream jarFile = new JarInputStream(inputStream)) {
             final Manifest manifest = jarFile.getManifest();
             return getArchiveMetaInformationFromManifestObject(manifest, log, sourceForErrorText);
         }
