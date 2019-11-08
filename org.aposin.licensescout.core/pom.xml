@@ -96,6 +96,32 @@
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>jacoco-file-check</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<phase>test</phase>
+						<configuration>
+							<rules>
+								<requireFilesExist>
+									<files>
+										<file>${project.build.directory}/jacoco.exec</file>
+									</files>
+									<message>Jacoco result file ('target/jacoco.exec') is missing!</message>
+								</requireFilesExist>
+							</rules>
+							<fail>true</fail>
+							<skip>${skipTests}</skip>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
 					<archive>
@@ -126,13 +152,6 @@
 				</executions>
 			</plugin>
 
-<!--
-NOTE: disabled because of CI build error 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-			</plugin>
- -->
 			<!-- groupId: org.jacoco -->
 			<plugin>
 				<groupId>org.jacoco</groupId>
