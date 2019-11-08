@@ -16,9 +16,9 @@
 package org.aposin.licensescout.database;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 import java.util.Set;
 
@@ -31,8 +31,19 @@ import org.aposin.licensescout.model.Provider;
 import org.aposin.licensescout.util.ILFLog;
 
 /**
- * Writes alarms to a database.
+ * Writes information on build, library data and licenses to a database.
  * 
+ * <p>This class writes data of one LicenseScout run to the following database tables:</p>
+ * <ul>
+ * <li>Builds: contains general information on the LicenseScout run</li>
+ * <li>LibraryData: contains information on the detected archives</li>
+ * <li>DetectedLicenses: contains information of the detected licenses</li>
+ * </ul>
+ * 
+ * <p>For information on the database structure see the file 'sql/licensescout.sql'.</p>
+ * 
+ * @see BuildInfo
+ * @see DatabaseConfiguration
  */
 public class DatabaseWriter {
 
@@ -42,23 +53,24 @@ public class DatabaseWriter {
 
     /**
      * Writes the information on one build execution to the database.
-     * @param buildInfo
-     * @param archives
-     * @param databaseConfiguration 
-     * @param log
+     * @param buildInfo contains general information on the LicenseScout run
+     * @param archives the list of detected archives
+     * @param databaseConfiguration the database configuration (URL, user name, ...)
+     * @param log the log
      */
     public static void writeToDatabase(final BuildInfo buildInfo, final List<Archive> archives,
                                        final DatabaseConfiguration databaseConfiguration, final ILFLog log) {
         // for debugging
-        DatabaseUtil.dumpDrivers(log);
-        try (final Connection connection = DatabaseUtil.getConnection(databaseConfiguration);
-                final Statement statement = connection.createStatement();) {
-            final int buildPK = insertBuild(buildInfo, statement);
+        if (log.isDebugEnabled()) {
+            DatabaseUtil.dumpDrivers(log);
+        }
+        try (final Connection connection = DatabaseUtil.getConnection(databaseConfiguration)) {
+            final int buildPK = insertBuild(buildInfo, connection);
             for (final Archive archive : archives) {
-                final int libraryPK = insertLibrary(buildPK, archive, statement);
+                final int libraryPK = insertLibrary(buildPK, archive, connection);
                 final List<License> detectedLicenses = archive.getDetectedLicenses();
                 for (final License detectedLicense : detectedLicenses) {
-                    insertDetectedLicense(libraryPK, detectedLicense, statement);
+                    insertDetectedLicense(libraryPK, detectedLicense, connection);
                 }
             }
         } catch (SQLException e) {
@@ -68,91 +80,81 @@ public class DatabaseWriter {
 
     /**
      * @param buildInfo
-     * @param statement
+     * @param connection
      * @throws SQLException
      */
-    private static int insertBuild(final BuildInfo buildInfo, final Statement statement) throws SQLException {
-        final StringBuilder sb = new StringBuilder();
+    private static int insertBuild(final BuildInfo buildInfo, final Connection connection) throws SQLException {
         // NOTE: Datetime is set by the DBMS
-        sb.append(
-                "INSERT INTO Builds (Buildname, Version, URL_Build, URL_Licensereport_CSV, URL_Licensereport_HTML, URL_Licensereport_TXT) VALUES ('");
-        sb.append(buildInfo.getName());
-        sb.append("','");
-        sb.append(buildInfo.getVersion());
-        sb.append("','");
-        sb.append(buildInfo.getBuildUrl());
-        sb.append("','");
-        sb.append(buildInfo.getLicenseReportCsvUrl());
-        sb.append("','");
-        sb.append(buildInfo.getLicenseReportHtmlUrl());
-        sb.append("','");
-        sb.append(buildInfo.getLicenseReportTxtUrl());
-        sb.append("')");
-        final String sql = sb.toString();
-        statement.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
-        try (final ResultSet keysResultSet = statement.getGeneratedKeys();) {
-            if (keysResultSet.next()) {
-                return keysResultSet.getInt("GENERATED_KEY");
+        try (final PreparedStatement statement = connection.prepareStatement(
+                "INSERT INTO Builds (Buildname, Version, URL_Build, URL_Licensereport_CSV, URL_Licensereport_HTML, URL_Licensereport_TXT) VALUES (?, ?, ?, ?, ?, ?)",
+                PreparedStatement.RETURN_GENERATED_KEYS)) {
+            statement.setString(1, convertNull(buildInfo.getName()));
+            statement.setString(2, convertNull(buildInfo.getVersion()));
+            statement.setString(3, convertNull(buildInfo.getBuildUrl()));
+            statement.setString(4, convertNull(buildInfo.getLicenseReportCsvUrl()));
+            statement.setString(5, convertNull(buildInfo.getLicenseReportHtmlUrl()));
+            statement.setString(6, convertNull(buildInfo.getLicenseReportTxtUrl()));
+            statement.executeUpdate();
+            try (final ResultSet keysResultSet = statement.getGeneratedKeys();) {
+                if (keysResultSet.next()) {
+                    return keysResultSet.getInt(1);
+                }
             }
+            return -1;
         }
-        return -1;
+    }
+
+    private static String convertNull(final String s) {
+        return s == null ? "(null)" : s;
     }
 
     /**
-     * @param statement
+     * @param buildPK
+     * @param archive
+     * @param connection
+     * @return
      * @throws SQLException
      */
-    private static int insertLibrary(final int buildPK, final Archive archive, final Statement statement)
+    private static int insertLibrary(final int buildPK, final Archive archive, final Connection connection)
             throws SQLException {
-        final StringBuilder sb = new StringBuilder();
-        sb.append(
-                "INSERT INTO LibraryData (FK_Build_Id, Selected_License, Filename, Provider, Version, Type, Message_Digest, Detection_Status, Legal_Status, Documentation_Link)");
-        sb.append("VALUES ('");
-        sb.append(buildPK);
-        sb.append("','");
-        sb.append(getLicenseName(archive));
-        sb.append("','");
-        sb.append(archive.getFileName());
-        sb.append("','");
-        sb.append(getProviderName(archive));
-        sb.append("','");
-        sb.append(getLibraryVersion(archive));
-        sb.append("','");
-        sb.append(archive.getArchiveType().name());
-        sb.append("','");
-        sb.append(archive.getMessageDigestString());
-        sb.append("','");
-        sb.append(archive.getDetectionStatus().name());
-        sb.append("','");
-        sb.append(archive.getLegalStatus().name());
-        sb.append("','");
-        sb.append(archive.getDocumentationUrl());
-        sb.append("')");
-        final String sql = sb.toString();
-        statement.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
-        try (final ResultSet keysResultSet = statement.getGeneratedKeys();) {
-            if (keysResultSet.next()) {
-                return keysResultSet.getInt("GENERATED_KEY");
+        try (final PreparedStatement statement = connection.prepareStatement(
+                "INSERT INTO LibraryData (FK_Build_Id, Selected_License, Filename, Provider, Version, Type, Message_Digest, Detection_Status, Legal_Status, Documentation_Link) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                PreparedStatement.RETURN_GENERATED_KEYS)) {
+            statement.setInt(1, buildPK);
+            statement.setString(2, getLicenseName(archive));
+            statement.setString(3, convertNull(archive.getFileName()));
+            statement.setString(4, getProviderName(archive));
+            statement.setString(5, getLibraryVersion(archive));
+            statement.setString(6, archive.getArchiveType().name());
+            statement.setString(7, archive.getMessageDigestString());
+            statement.setString(8, archive.getDetectionStatus().name());
+            statement.setString(9, archive.getLegalStatus().name());
+            statement.setString(10, convertNull(archive.getDocumentationUrl()));
+            statement.executeUpdate();
+            try (final ResultSet keysResultSet = statement.getGeneratedKeys();) {
+                if (keysResultSet.next()) {
+                    return keysResultSet.getInt(1);
+                }
             }
+            return -1;
         }
-        return -1;
     }
 
     /**
-     * @param statement
+     * @param libraryPK
+     * @param license
+     * @param connection
      * @throws SQLException
      */
-    private static void insertDetectedLicense(final int libraryPK, final License license, final Statement statement)
+    private static void insertDetectedLicense(final int libraryPK, final License license, final Connection connection)
             throws SQLException {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("INSERT INTO DetectedLicenses (FK_LibraryData_Id, License_Name)");
-        sb.append("VALUES ('");
-        sb.append(libraryPK);
-        sb.append("','");
-        sb.append(getLicenseName(license));
-        sb.append("')");
-        final String sql = sb.toString();
-        statement.executeUpdate(sql);
+        try (final PreparedStatement statement = connection
+                .prepareStatement("INSERT INTO DetectedLicenses (FK_LibraryData_Id, License_Name) VALUES (?, ?)")) {
+            statement.setInt(1, libraryPK);
+            statement.setString(2, getLicenseName(license));
+
+            statement.executeUpdate();
+        }
     }
 
     private static String getLicenseName(final Archive archive) {
