@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -107,11 +108,11 @@ public class LicenseCheckedList {
             throws IOException {
         String line = "";
         String cvsSplitBy = ",";
-
+        int lineNumber = 0;
         try (final BufferedReader br = new BufferedReader(new FileReader(filename))) {
 
             while ((line = br.readLine()) != null) {
-
+                lineNumber++;
                 // ignore lines commented out, empty lines and the header line
                 if (line.startsWith("#") || StringUtils.isEmpty(line) || line.startsWith("Type")) {
                     continue;
@@ -147,7 +148,8 @@ public class LicenseCheckedList {
                 }
                 final String documentationUrl = values[DOC_URL_INDEX].trim();
                 final String providerId = values[PROVIDER_INDEX].trim();
-                final Provider provider = getProviderFromId(providers, providerId, log);
+                final int lineNumberFinal = lineNumber;
+                final Provider provider = getProviderFromId(providers, providerId, log, ()-> filename.getName() + ": line " + lineNumberFinal);
                 final String noticeId = values[NOTICE_INDEX].trim();
                 final Notice notice = getNoticeFromId(notices, noticeId);
 
@@ -378,10 +380,14 @@ public class LicenseCheckedList {
         return notices.getNoticeByIdentifier(noticeId);
     }
 
-    private static Provider getProviderFromId(final Providers providers, final String providerId, final ILFLog log) {
+    private static Provider getProviderFromId(final Providers providers, final String providerId, final ILFLog log, final Supplier<String> context) {
         final Provider provider = providers.getProviderByIdentifier(providerId);
         if (provider == null) {
-            log.warn("Cannot find provider with ID: '" + providerId + "'");
+            String message = "Cannot find provider with ID: '" + providerId + "'";
+            if (context != null && !StringUtils.isEmpty( context.get())) {
+                message += " ("+ context.get() + ")";
+            }
+            log.warn(message);
         }
         return provider;
     }
@@ -677,7 +683,7 @@ public class LicenseCheckedList {
 	        @Override
 	        protected void processText(final String text) {
 	            final String identifier = text;
-	            provider = getProviderFromId(getProviders(), identifier, getLog());
+	            provider = getProviderFromId(getProviders(), identifier, getLog(), ()-> ArchiveSaxHandler.this.getLocationString());
 	        }
 	    }
 	}
