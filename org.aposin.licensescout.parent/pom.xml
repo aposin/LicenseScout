@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -16,47 +17,70 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+		<!-- ================================ -->
 		<!-- Dependencies version definitions -->
-		<commons-lang3.version>3.9</commons-lang3.version>
-		<velocity.version>2.1</velocity.version>
 		<commons-collections4.version>4.4</commons-collections4.version>
+		<commons-lang3.version>3.9</commons-lang3.version>
 		<commons-io.version>2.6</commons-io.version>
-		<maven-assembly-plugin.version>3.1.1</maven-assembly-plugin.version>
-		<maven-model.version>3.6.0</maven-model.version>
-		<maven-plugin-api.version>3.6.0</maven-plugin-api.version>
-		<maven-plugin-annotations.version>3.6.0</maven-plugin-annotations.version>
-		<maven-plugin-plugin.version>3.6.0</maven-plugin-plugin.version>
-		<plexus-utils.version>3.1.1</plexus-utils.version>
 		<junit.version>4.12</junit.version>
 		<json.version>20190722</json.version>
-
-		<!-- other dependencies versions -->
-
 		<mariadb-java-client.version>2.4.1</mariadb-java-client.version>
+		<maven-model.version>3.6.0</maven-model.version>
+		<maven-plugin-annotations.version>3.6.0</maven-plugin-annotations.version>
+		<maven-plugin-api.version>3.6.0</maven-plugin-api.version>
+		<plexus-utils.version>3.1.1</plexus-utils.version>
+		<velocity.version>2.1</velocity.version>
 
-		<!-- Maven plugin definitions -->
-		<maven-invoker-plugin.version>3.0.1</maven-invoker-plugin.version>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<!-- ================================ -->
+		<!-- Maven plugin version definitions -->
 
-		<build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
-		<maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
+		<!-- groupId: com.mycila -->
+		<license-maven-plugin.version>3.0</license-maven-plugin.version>
 
 		<!-- groupId: org.apache.maven.plugins -->
+		<maven-assembly-plugin.version>3.1.1</maven-assembly-plugin.version>
+		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+		<maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
 		<maven-deploy-plugin.version>2.8.1</maven-deploy-plugin.version>
+		<maven-failsafe-plugin.version>3.0.0-M3</maven-failsafe-plugin.version>
+		<maven-invoker-plugin.version>3.0.1</maven-invoker-plugin.version>
 		<maven-jar-plugin.version>2.4</maven-jar-plugin.version>
+		<maven-plugin-plugin.version>3.6.0</maven-plugin-plugin.version>
 		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+		<maven-source-plugin.version>3.2.0</maven-source-plugin.version>
+		<maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
+
+		<!-- groupId: org.codehaus.mojo -->
+		<build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
 		<versions-maven-plugin.version>2.7</versions-maven-plugin.version>
 
-		<jacoco.version>0.8.5</jacoco.version>
+		<!-- groupId: org.jacoco -->
+		<jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
 
-		<license-maven-plugin.version>3.0</license-maven-plugin.version>
+		<!-- ==================== -->
+		<!-- Compiler definitions -->
+
+		<java.version>11</java.version>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<maven.compiler.release>${java.version}</maven.compiler.release>
 	</properties>
 
 	<organization>
 		<name>Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)</name>
 		<url>http://www.aposin.org</url>
 	</organization>
+
+	<issueManagement>
+		<system>Github</system>
+		<url>https://github.com/aposin/LicenseScout/issues</url>
+	</issueManagement>
+
+	<scm>
+		<url>https://github.com/aposin/LicenseScout</url>
+		<connection>scm:git:git://github.com/aposin/LicenseScout.git</connection>
+		<developerConnection>scm:git:git@github.com:aposin/LicenseScout.git</developerConnection>
+	</scm>
 
 	<dependencyManagement>
 		<dependencies>
@@ -140,11 +164,23 @@
 
 		<pluginManagement>
 			<plugins>
+				<!-- groupId: com.mycila -->
+				<plugin>
+					<groupId>com.mycila</groupId>
+					<artifactId>license-maven-plugin</artifactId>
+					<version>${license-maven-plugin.version}</version>
+				</plugin>
+
 				<!-- groupId: org.apache.maven.plugins -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-assembly-plugin</artifactId>
 					<version>${maven-assembly-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>${maven-compiler-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -155,6 +191,11 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-deploy-plugin</artifactId>
 					<version>${maven-deploy-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<version>${maven-failsafe-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -176,6 +217,24 @@
 					<artifactId>maven-release-plugin</artifactId>
 					<version>${maven-release-plugin.version}</version>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>${maven-source-plugin.version}</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>jar-no-fork</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>${maven-surefire-plugin.version}</version>
+					<!-- <configuration> <argLine> -illegal-access=permit </argLine> </configuration> -->
+				</plugin>
 
 				<!-- groupId: org.codehaus.mojo -->
 				<plugin>
@@ -187,19 +246,6 @@
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>versions-maven-plugin</artifactId>
 					<version>${versions-maven-plugin.version}</version>
-				</plugin>
-
-				<!-- groupId: com.mycila -->
-				<plugin>
-					<groupId>com.mycila</groupId>
-					<artifactId>license-maven-plugin</artifactId>
-					<version>${license-maven-plugin.version}</version>
-				</plugin>
-
-				<plugin>
-					<groupId>org.jacoco</groupId>
-					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>${jacoco.version}</version>
 				</plugin>
 
 				<!-- groupId: org.eclipse.m2e -->
@@ -233,6 +279,13 @@
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
+				</plugin>
+
+				<!-- groupId: org.jacoco -->
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>${jacoco-maven-plugin.version}</version>
 				</plugin>
 
 			</plugins>

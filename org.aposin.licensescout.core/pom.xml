@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -6,7 +8,7 @@
 		<groupId>org.aposin.licensescout</groupId>
 		<artifactId>org.aposin.licensescout.parent</artifactId>
 		<version>1.3.1-SNAPSHOT</version>
-		<relativePath>../org.aposin.licensescout.parent</relativePath>
+		<relativePath>../org.aposin.licensescout.parent/</relativePath>
 	</parent>
 
 	<groupId>org.aposin.licensescout</groupId>
@@ -83,6 +85,15 @@
 
 	<build>
 		<plugins>
+			<!-- groupId: org.apache.maven.plugins -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>false</skip>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -92,6 +103,7 @@
 					</archive>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-plugin-plugin</artifactId>
@@ -114,14 +126,14 @@
 				</executions>
 			</plugin>
 
+<!--
+NOTE: disabled because of CI build error 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<configuration>
-					<skip>false</skip>
-				</configuration>
+				<artifactId>maven-source-plugin</artifactId>
 			</plugin>
-
+ -->
+			<!-- groupId: org.jacoco -->
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
@@ -142,6 +154,7 @@
 				</executions>
 			</plugin>
 
+			<!-- groupId: com.mycila -->
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
@@ -152,7 +165,7 @@
 						<owner>${project.organization.name}</owner>
 					</properties>
 					<includes>
-						<!-- include all sources-->
+						<!-- include all sources -->
 						<include>src/**</include>
 					</includes>
 					<excludes>
