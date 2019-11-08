@@ -31,8 +31,19 @@ import org.aposin.licensescout.model.Provider;
 import org.aposin.licensescout.util.ILFLog;
 
 /**
- * Writes build an library data to a database.
+ * Writes information on build, library data and licenses to a database.
  * 
+ * <p>This class writes data of one LicenseScout run to the following database tables:</p>
+ * <ul>
+ * <li>Builds: contains general information on the LicenseScout run</li>
+ * <li>LibraryData: contains information on the detected archives</li>
+ * <li>DetectedLicenses: contains information of the detected licenses</li>
+ * </ul>
+ * 
+ * <p>For information on the database structure see the file 'sql/licensescout.sql'.</p>
+ * 
+ * @see BuildInfo
+ * @see DatabaseConfiguration
  */
 public class DatabaseWriter {
 
@@ -42,15 +53,17 @@ public class DatabaseWriter {
 
     /**
      * Writes the information on one build execution to the database.
-     * @param buildInfo
-     * @param archives
-     * @param databaseConfiguration 
-     * @param log
+     * @param buildInfo contains general information on the LicenseScout run
+     * @param archives the list of detected archives
+     * @param databaseConfiguration the database configuration (URL, user name, ...)
+     * @param log the log
      */
     public static void writeToDatabase(final BuildInfo buildInfo, final List<Archive> archives,
                                        final DatabaseConfiguration databaseConfiguration, final ILFLog log) {
         // for debugging
-        DatabaseUtil.dumpDrivers(log);
+        if (log.isDebugEnabled()) {
+            DatabaseUtil.dumpDrivers(log);
+        }
         try (final Connection connection = DatabaseUtil.getConnection(databaseConfiguration)) {
             final int buildPK = insertBuild(buildInfo, connection);
             for (final Archive archive : archives) {
