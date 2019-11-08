@@ -291,12 +291,24 @@ public abstract class AbstractScanMojo extends AbstractMojo {
     private DatabaseConfiguration resultDatabaseConfiguration;
 
     /**
+     * Skips the execution.
+     */
+    @Parameter(defaultValue = "false", property = "skip", required = false)
+    protected boolean skip;
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public void execute() throws MojoExecutionException {
         final ILFLog log = new MavenLog(getLog());
 
+        if (skip)
+        {
+        	log.info("Not executing because skip is configured as true.");
+        	return;
+        }
+        
         final Providers providers = readProviders(log);
         final Notices notices = readNotices(log);
         final LicenseStoreData licenseStoreData = init(notices, log);

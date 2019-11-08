@@ -54,14 +54,15 @@ public abstract class AbstractVelocityExporter implements IReportExporter {
         try (final FileWriter fileWriter = new FileWriter(reportConfiguration.getOutputFile());
                 final BufferedWriter bw = new BufferedWriter(fileWriter)) {
 
-            Velocity.setProperty(RuntimeConstants.RESOURCE_LOADER, "file,classpath");
-            Velocity.setProperty("file.resource.loader.class", FileResourceLoader.class.getName());
+            Velocity.setProperty(RuntimeConstants.RESOURCE_LOADERS, "file,classpath");
+            Velocity.setProperty(RuntimeConstants.RESOURCE_LOADER + ".file.class", FileResourceLoader.class.getName());
             /*
              * NOTE: setting the path to empty is necessary because the default is "." (current
              * directory) and then using absolute path names will not work.
              */
-            Velocity.setProperty("file.resource.loader.path", "");
-            Velocity.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
+            Velocity.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, "");
+            Velocity.setProperty(RuntimeConstants.RESOURCE_LOADER + ".classpath.class",
+                    ClasspathResourceLoader.class.getName());
 
             Velocity.init();
 
