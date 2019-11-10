@@ -1,0 +1,112 @@
+= LicenseScout maintenance handbook
+
+:encoding: utf-8
+:lang: en
+:doctype: book
+:toc:
+:toclevels: 4
+
+
+This handbook describes project maintenance tasks for the LicenseScout project.
+
+
+== Doing releases
+
+=== Setup for releases
+
+You need a local Maven installation.
+
+You need basic knowledge of Maven. If you are new to Maven, check out this:
+https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html
+
+
+=== Customize settings file
+
+[source,xml]
+.Minimal settings.xml file
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+	<servers>
+		<server>
+			<id>ossrh</id>                                   <1>
+			<username>[SONATYPE ACCOUNT ID]</username>       <2>
+			<password>[SONATYPE ACCOUNT PASSWORD]</password> <3>
+		</server>
+	</servers>
+
+	<profiles>
+		<profile>
+			<id>ossrh</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<gpg.keyname>[PGP SIGNING KEY ID]</gpg.keyname> <4>
+			</properties>
+		</profile>
+	</profiles>
+
+</settings>
+----
+<1> this server ID is related to the definitions under `<distributionManagement>` in the parent POM
+and is referenced in the configuration of the `nexus-staging-maven-plugin`
+<2> replace the value with the username of your sonatype account
+<3> replace the value with the password of your sonatype account
+<4> replace the value with the ID of your GPG key that should be used for code signing
+
+=== Release project
+
+There is a special project that contains the parts of LicenseScout that should be released.
+It is an aggregator POM called `org.aposin.licensescout.release-aggrgator`.
+It references the following modules:
+
+* `org.aposin.licensescout.parent`
+* `org.aposin.licensescout.core`
+* `org.aposin.licensescout.configuration.sample`
+
+NOTE: The `release-aggregator` is configured in a way that it is not installed or deployed itself.
+
+=== Doing a snapshot release
+
+A Maven profile `snapshot-release` is used for this.
+
+To do a snapshot release take the following steps:
+
+* Make sure that the released projects (see list above) have SNAPSHOT version numbers.
+
+* Do the following on the command line:
+
+[source, bash]
+----
+> cd org.aposin.licensescout.release-aggrgator
+> mvn -s .../settings-licensescout-minimal.xml -Psnapshot-release clean deploy
+----
+
+IMPORTANT: The command will also work without the profile, but sources will not be included and the artifacts will not be signed.
+
+NOTE: No commits to the repository are needed, since the version numbers of the projects remain unchanged.
+
+
+=== Doing a (main) release manually
+
+A Maven profile `release` is used for this.
+
+To do a snapshot release take the following steps:
+
+* Make sure that the released projects (see list above) have release version numbers (no '-SNAPSHOT').
+
+* Do the following on the command line:
+
+[source, bash]
+----
+> cd org.aposin.licensescout.release-aggrgator
+> mvn -s .../settings-licensescout-minimal.xml -Prelease clean deploy
+----
+
+* Increase the version numbers and add '-SNAPSHOT' again
+* Commit, push and merge the changed version numbers
+

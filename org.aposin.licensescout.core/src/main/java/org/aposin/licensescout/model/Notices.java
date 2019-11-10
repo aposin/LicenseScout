@@ -36,7 +36,7 @@ import org.xml.sax.XMLReader;
 /**
  * Collection of notices.
  * 
- * <p>Initialisation:<p>
+ * <p>Initialisation:</p>
  * <ol>
  * <li>Create an instance</li>
  * <li>Call {@link #readNotices(File, boolean, ILFLog)} to read in the notices from a file</li>

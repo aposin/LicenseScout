@@ -861,7 +861,7 @@ public abstract class AbstractScanMojo extends AbstractMojo {
      * 
      * @param filename a filename of the file to read
      * @param log the logger
-     * @throws IOException if an error occured while reading from the file
+     * @throws IOException if an error occurred while reading from the file
      */
     protected static List<String> readFilteredVendorNamesFromFile(final String filename, final ILFLog log)
             throws IOException {

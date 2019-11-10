@@ -28,17 +28,10 @@
 		<url>http://www.aposin.org</url>
 	</organization>
 
-	<scm>
-		<url>https://github.com/aposin/LicenseScout</url>
-		<connection>scm:git:git://github.com/aposin/LicenseScout.git</connection>
-		<developerConnection>scm:git:git@github.com:aposin/LicenseScout.git</developerConnection>
-	</scm>
-
 	<modules>
 		<module>../org.aposin.licensescout.parent/</module>
 		<module>../org.aposin.licensescout.core/</module>
 		<module>../org.aposin.licensescout.configuration.sample/</module>
-		<!-- <module>../org.aposin.licensescout.documentation/</module> -->
 	</modules>
 
 	<build>
@@ -52,7 +45,7 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<!-- do not upload the aggregator itself -->
+				<!-- do not deploy the aggregator itself -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
 				<configuration>

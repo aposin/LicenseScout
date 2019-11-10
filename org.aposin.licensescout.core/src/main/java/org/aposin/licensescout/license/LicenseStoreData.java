@@ -44,7 +44,7 @@ import org.xml.sax.XMLReader;
 /**
  * Collection of licenses and mappings of names and URLs to licenses.
  * 
- * <p>Initialisation:<p>
+ * <p>Initialisation:</p>
  * <ol>
  * <li>Create an instance</li>
  * <li>Call {@link #readLicenses(File, Notices, boolean, ILFLog)} to read in the licenses from a file</li>
