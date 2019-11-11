@@ -76,13 +76,14 @@
 		<maven-jar-plugin.version>2.4</maven-jar-plugin.version>
 		<maven-plugin-plugin.version>3.6.0</maven-plugin-plugin.version>
 		<maven-project-info-reports-plugin.version>3.0.0</maven-project-info-reports-plugin.version>
-		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+		<maven-scm-plugin.version>1.11.2</maven-scm-plugin.version>
 		<maven-site-plugin.version>3.8.2</maven-site-plugin.version>
 		<maven-source-plugin.version>3.2.0</maven-source-plugin.version>
 		<maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
 
 		<!-- groupId: org.codehaus.mojo -->
 		<build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
+		<flatten-maven-plugin.version>1.1.0</flatten-maven-plugin.version>
 		<versions-maven-plugin.version>2.7</versions-maven-plugin.version>
 
 		<!-- groupId: org.jacoco -->
@@ -114,6 +115,7 @@
 		<url>https://github.com/aposin/LicenseScout</url>
 		<connection>scm:git:git://github.com/aposin/LicenseScout.git</connection>
 		<developerConnection>scm:git:git@github.com:aposin/LicenseScout.git</developerConnection>
+		<tag>HEAD</tag>
 	</scm>
 
 	<dependencyManagement>
@@ -277,9 +279,11 @@
 					<version>${maven-project-info-reports-plugin.version}</version>
 				</plugin>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-release-plugin</artifactId>
-					<version>${maven-release-plugin.version}</version>
+					<artifactId>maven-scm-plugin</artifactId>
+					<version>${maven-scm-plugin.version}</version>
+					<configuration>
+						<tag>${project.artifactId}-${project.version}</tag>
+					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -311,6 +315,33 @@
 					<artifactId>build-helper-maven-plugin</artifactId>
 					<version>${build-helper-maven-plugin.version}</version>
 				</plugin>
+
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>flatten-maven-plugin</artifactId>
+					<version>${flatten-maven-plugin.version}</version>
+					<configuration>
+						<updatePomFile>true</updatePomFile>
+						<flattenMode>ossrh</flattenMode>
+					</configuration>
+					<executions>
+						<execution>
+							<id>flatten</id>
+							<phase>process-resources</phase>
+							<goals>
+								<goal>flatten</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>flatten.clean</id>
+							<phase>clean</phase>
+							<goals>
+								<goal>clean</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>versions-maven-plugin</artifactId>
@@ -386,15 +417,6 @@
 
 			<build>
 				<plugins>
-					<!-- Disable maven-deploy-plugin, because we use the nexus staging plugin. -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-deploy-plugin</artifactId>
-						<configuration>
-							<skip>true</skip>
-						</configuration>
-					</plugin>
-
 					<!-- Build a source JAR. -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -407,10 +429,14 @@
 						<artifactId>maven-javadoc-plugin</artifactId>
 						<executions>
 							<execution>
+								<id>release-javadoc</id>
 								<goals>
 									<goal>jar</goal>
 								</goals>
 								<phase>package</phase>
+								<configuration>
+									<doclint>none</doclint>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>
@@ -425,6 +451,13 @@
 						<groupId>org.sonatype.plugins</groupId>
 						<artifactId>nexus-staging-maven-plugin</artifactId>
 					</plugin>
+
+					<!-- Do POM flattening -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>flatten-maven-plugin</artifactId>
+					</plugin>
+
 				</plugins>
 			</build>
 		</profile>

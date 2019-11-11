@@ -13,14 +13,16 @@
 
 	<groupId>org.aposin.licensescout</groupId>
 	<artifactId>org.aposin.licensescout.release-aggregator</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.3.${revision}</version>
 	<packaging>pom</packaging>
 
+	<name>LicenseScout Aggregator POM</name>
 	<description>Aggrgator POM for releases: contains all projects that should be released together</description>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+		<revision>1-SNAPSHOT</revision>
 	</properties>
 
 	<organization>

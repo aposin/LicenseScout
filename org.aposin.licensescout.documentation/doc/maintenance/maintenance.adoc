@@ -76,8 +76,6 @@ A Maven profile `snapshot-release` is used for this.
 
 To do a snapshot release take the following steps:
 
-* Make sure that the released projects (see list above) have SNAPSHOT version numbers.
-
 * Do the following on the command line:
 
 [source, bash]
@@ -95,18 +93,18 @@ NOTE: No commits to the repository are needed, since the version numbers of the 
 
 A Maven profile `release` is used for this.
 
-To do a snapshot release take the following steps:
-
-* Make sure that the released projects (see list above) have release version numbers (no '-SNAPSHOT').
+To do a release take the following steps:
 
 * Do the following on the command line:
 
 [source, bash]
 ----
 > cd org.aposin.licensescout.release-aggrgator
-> mvn -s .../settings-licensescout-minimal.xml -Prelease clean deploy
+> mvn -s .../settings-licensescout-minimal.xml -Prelease -Drevision=1.005 clean deploy
 ----
 
-* Increase the version numbers and add '-SNAPSHOT' again
-* Commit, push and merge the changed version numbers
+TODO: this is unfinished
+* mvn scm:tag
 
+NOTE: the release version number is composed of the part in the POM ('1.3.') and the property 'revision' provided on the command line (example: '1.005').
+This results in the actual version number (example: '1.3.1.005').
