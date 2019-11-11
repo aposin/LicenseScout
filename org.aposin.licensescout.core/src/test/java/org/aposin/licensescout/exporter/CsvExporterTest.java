@@ -15,26 +15,15 @@
  */
 package org.aposin.licensescout.exporter;
 
-import java.io.File;
-import java.io.FileReader;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.io.IOUtils;
-import org.aposin.licensescout.archive.Archive;
 import org.aposin.licensescout.configuration.OutputFileType;
-import org.aposin.licensescout.finder.FinderResult;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- *
+ * Test case for {@link CsvExporter}.
  */
-public class CsvExporterTest {
-
-    private IReportExporter exporter;
+public class CsvExporterTest extends AbstractExporterTest {
 
     /**
      * @throws java.lang.Exception
@@ -44,38 +33,52 @@ public class CsvExporterTest {
         exporter = CsvExporter.getInstance();
     }
 
-    /**
-     * Test method for {@link org.aposin.licensescout.exporter.CsvExporter#getOutputFileType()}.
-     */
-    @Test
-    public void testGetOutputFileType() {
-        Assert.assertEquals("outputFileType", OutputFileType.CSV, exporter.getOutputFileType());
+    protected OutputFileType getExpectedOutputFileType() {
+        return OutputFileType.CSV;
     }
 
     /**
      * Test method for {@link org.aposin.licensescout.exporter.CsvExporter#export(org.aposin.licensescout.exporter.OutputResult, org.aposin.licensescout.exporter.ReportConfiguration)}.
      */
     @Test
-    public void testExportEmptyArchiveList() throws Exception {
-        final OutputResult outputResult = new OutputResult();
+    public void testExportEmptyArchiveListWithoutDocumentationUrl() throws Exception {
         final String messageDigestAlgorithm = "ABC";
-        outputResult.setMessageDigestAlgorithm(messageDigestAlgorithm);
-        final File scanDirectory = new File(".");
-        final File outputFile = Paths.get("target", "output.csv").toFile();
-        final List<Archive> archiveFiles = new ArrayList<Archive>();
-        final FinderResult finderResult = new FinderResult(scanDirectory, archiveFiles);
-        outputResult.setFinderResult(finderResult);
-        outputResult.setPomResolutionUsed(true);
-        final ReportConfiguration reportConfiguration = new ReportConfiguration();
-        reportConfiguration.setOutputFile(outputFile);
-        exporter.export(outputResult, reportConfiguration);
-
-        final String resultContent = IOUtils.toString(new FileReader(outputFile));
-        final String nl = System.lineSeparator();
-        final String referenceContent = "\"Type\",\"Filename\",\"Version\",\"Message Digest (" + messageDigestAlgorithm
-                + ")\",\"Detection status\",\"Legal status\",\"Archive path\",\"License 1\",\"License 2\",\"License 3\",\"License 4\""
-                + nl;
+        final String resultContent = runExporterEmptyArchiveList(messageDigestAlgorithm, false);
+        final String referenceContent = getReferenceHeader(messageDigestAlgorithm, false);
         Assert.assertEquals("CSV output file contents", referenceContent, resultContent);
+    }
+
+    /**
+     * Test method for {@link org.aposin.licensescout.exporter.CsvExporter#export(org.aposin.licensescout.exporter.OutputResult, org.aposin.licensescout.exporter.ReportConfiguration)}.
+     */
+    @Test
+    public void testExportEmptyArchiveListWithDocumentationUrl() throws Exception {
+        final String messageDigestAlgorithm = "ABC";
+        final String resultContent = runExporterEmptyArchiveList(messageDigestAlgorithm, true);
+        final String referenceContent = getReferenceHeader(messageDigestAlgorithm, true);
+        Assert.assertEquals("CSV output file contents", referenceContent, resultContent);
+    }
+
+    /**
+     * Test method for {@link org.aposin.licensescout.exporter.CsvExporter#export(org.aposin.licensescout.exporter.OutputResult, org.aposin.licensescout.exporter.ReportConfiguration)}.
+     */
+    @Test
+    public void testExportWithArchiveListWithoutDocumentationUrl() throws Exception {
+        final String messageDigestAlgorithm = "ABC";
+        final String resultContent = runExporterWithArchiveList(messageDigestAlgorithm, false);
+        final String referenceContent = getReferenceHeader(messageDigestAlgorithm, false)
+                + "\"JAVA\",\"fileName01\",\"version01\",\"\",\"DETECTED\",\"CONFLICTING\",\"path01\",\"spdxIdentifier11\""
+                + getNl();
+        Assert.assertEquals("CSV output file contents", referenceContent, resultContent);
+    }
+
+    private String getReferenceHeader(final String messageDigestAlgorithm, final boolean withDocumentationUrl) {
+        final String nl = getNl();
+        final String referenceContent = "\"Type\",\"Filename\",\"Version\",\"Message Digest (" + messageDigestAlgorithm
+                + ")\",\"Detection status\",\"Legal status\",\"Archive path\","
+                + (withDocumentationUrl ? "\"Documentation\"," : "")
+                + "\"License 1\",\"License 2\",\"License 3\",\"License 4\"" + nl;
+        return referenceContent;
     }
 
 }

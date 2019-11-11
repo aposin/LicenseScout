@@ -15,21 +15,24 @@
  */
 package org.aposin.licensescout.exporter;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import org.aposin.licensescout.configuration.OutputFileType;
+import org.junit.Before;
 
 /**
- * Test suite for {@link IReportExporter} subclasses.
- *
- * @see LicenseUtil
+ * Test case for {@link HtmlExporter}.
  */
-@RunWith(Suite.class)
-@SuiteClasses({ //
-        CsvExporterTest.class, //
-        HtmlExporterTest.class, //
-        TxtExporterTest.class, //
-})
-public class AllExporterTests {
+public class HtmlExporterTest extends AbstractExporterTest {
+
+    /**
+     * @throws java.lang.Exception
+     */
+    @Before
+    public void setUp() throws Exception {
+        exporter = HtmlExporter.getInstance();
+    }
+
+    protected OutputFileType getExpectedOutputFileType() {
+        return OutputFileType.HTML;
+    }
 
 }

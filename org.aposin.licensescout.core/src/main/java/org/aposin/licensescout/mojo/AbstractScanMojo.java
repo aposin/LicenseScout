@@ -390,14 +390,17 @@ public abstract class AbstractScanMojo extends AbstractMojo {
     }
 
     private BuildInfo createBuildInfo() {
-        if (StringUtils.isEmpty(buildName)) {
-            getLog().warn("Parameter buildName not configured");
-        }
-        if (StringUtils.isEmpty(buildVersion)) {
-            getLog().warn("Parameter buildVersion not configured");
-        }
-        if (StringUtils.isEmpty(buildUrl)) {
-            getLog().warn("Parameter buildUrl not configured");
+        if (writeResultsToDatabase) {
+            // NOTE: these parameters are only used for writing information to the database
+            if (StringUtils.isEmpty(buildName)) {
+                getLog().warn("Parameter buildName not configured");
+            }
+            if (StringUtils.isEmpty(buildVersion)) {
+                getLog().warn("Parameter buildVersion not configured");
+            }
+            if (StringUtils.isEmpty(buildUrl)) {
+                getLog().warn("Parameter buildUrl not configured");
+            }
         }
         String licenseReportCsvUrl = null;
         String licenseReportHtmlUrl = null;
