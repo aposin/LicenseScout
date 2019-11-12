@@ -44,8 +44,6 @@ public abstract class BaseFinderTest {
         Handler consoleHandler = new ConsoleHandler();
         consoleHandler.setLevel(Level.FINEST);
         Logger.getGlobal().addHandler(consoleHandler);
-        // Handler[] handlers = Logger.getGlobal().getHandlers();
-        // handlers[0].setLevel(Level.FINEST);
     }
 
     @Before

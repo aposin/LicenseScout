@@ -469,7 +469,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
         final String expectedPath0 = isJar ? "/lib1.jar" : "/lib1";
         final Archive archive0 = finderResult.getArchiveFiles().get(0);
         final String expectedVendor = "Unknown";
-        assertArchive(archive0, "archive[0]: ", expectedFileName0, expectedPath0, "0.0.2", expectedVendor,
+        assertArchive(archive0, "archive: ", expectedFileName0, expectedPath0, "0.0.2", expectedVendor,
                 expectedLicense, isJar, expectedLicenseCandidateFilesCount);
     }
 
@@ -539,12 +539,12 @@ public class JavaJarFinderTest extends BaseFinderTest {
         final String expectedFileNameOuter = isJarOuter ? "lib1.jar" : "lib1";
         final String expectedPathOuter = isJarOuter ? "/lib1.jar" : "/lib1";
         final Archive archiveOuter = finderResult.getArchiveFiles().get(0);
-        assertArchive(archiveOuter, "archive[0] (outer): ", expectedFileNameOuter, expectedPathOuter, "0.0.2",
+        assertArchive(archiveOuter, "archive (outer): ", expectedFileNameOuter, expectedPathOuter, "0.0.2",
                 "Unknown", null, isJarOuter, 0);
 
         // the inner
         final Archive archiveInner = finderResult.getArchiveFiles().get(1);
-        assertArchive(archiveInner, "archive[1] (inner): ", expectedFileNameInner, expectedPathInner,
+        assertArchive(archiveInner, "archive (inner): ", expectedFileNameInner, expectedPathInner,
                 expectedVersionInner, expectedVendorInner, expectedLicenseInner, expectMessageDigestInner,
                 expectedLicenseCandidateFilesCountInner);
     }
@@ -589,7 +589,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
         } else {
             assertNotNull(messagePrefix + "licenses not present", licenses);
             assertEquals(messagePrefix + "licenses size", 1, licenses.size());
-            assertEquals(messagePrefix + "licenses[0]", true, licenses.contains(expectedLicense));
+            assertEquals(messagePrefix + "licenses", true, licenses.contains(expectedLicense));
         }
     }
 

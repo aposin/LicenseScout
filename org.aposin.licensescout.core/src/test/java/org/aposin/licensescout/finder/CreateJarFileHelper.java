@@ -48,7 +48,7 @@ public class CreateJarFileHelper {
      */
     public static List<File> collectFiles(final File startDirectory) throws IOException {
         final List<File> files = new ArrayList<>();
-        final SimpleFileVisitor<Path> visitor = new SimpleFileVisitor<Path>() {
+        final SimpleFileVisitor<Path> visitor = new SimpleFileVisitor<>() {
 
             public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
                 files.add(file.toFile());
@@ -74,8 +74,9 @@ public class CreateJarFileHelper {
         try (final FileOutputStream fileOutputstream = new FileOutputStream(archiveFile);
                 final ZipOutputStream out = new ZipOutputStream(fileOutputstream)) {
             for (final File tobePackaged : tobePackagedFiles) {
-                if (tobePackaged == null || !tobePackaged.exists() || tobePackaged.isDirectory())
+                if (tobePackaged == null || !tobePackaged.exists() || tobePackaged.isDirectory()) {
                     continue;
+                }
                 final String relativePath = basePath.relativize(tobePackaged.toPath()).toString().replace('\\', '/');
                 final ZipEntry entry = new ZipEntry(relativePath);
                 entry.setTime(tobePackaged.lastModified());
