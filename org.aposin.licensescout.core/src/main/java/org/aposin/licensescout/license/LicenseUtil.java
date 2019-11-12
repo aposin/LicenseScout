@@ -514,7 +514,7 @@ public class LicenseUtil {
      * 
      * @param npmLicenseName a license name
      * @param licenseStoreData 
-     * @return a list of licenses for the name
+     * @return a list of licenses for the name. An empty list if the license could not be mapped.
      */
     public static List<License> mapNpmLicenseName(final String npmLicenseName,
                                                   final LicenseStoreData licenseStoreData) {
