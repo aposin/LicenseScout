@@ -42,7 +42,8 @@ public class JarUtil {
      * 
      * <p>The method tries to extract the following information from the manifest:</p>
      * <ul>
-     * <li>a version number, extracted from the main attributes "Bundle-Version", "Implementation-Version", "Specification-Version" or "Major-Version"</li>
+     * <li>a version number, extracted from the main attributes "Bundle-Version",
+     * "Implementation-Version", "Specification-Version" or "Major-Version"</li>
      * <li>a license URL, extracted from the main attribute "Bundle-License"</li>
      * <li>a vendor name, extracted from the main attribute "Bundle-Vendor"</li>
      * </ul>
@@ -50,7 +51,9 @@ public class JarUtil {
      * 
      * @param file a manifest file
      * @param log a logger
-     * @return an object containing version, license URL and vendor name. The information in the object may be <code>null</code>. The object itself is never <code>null</code>.
+     * @return an object containing version, license URL and vendor name. The
+     *         information in the object may be <code>null</code>. The object itself
+     *         is never <code>null</code>.
      * @throws IOException
      * 
      * @see #getArchiveMetaInformationFromManifest(File, ILFLog)
@@ -58,12 +61,9 @@ public class JarUtil {
      */
     public static ArchiveMetaInformation getArchiveMetaInformationFromManifestFile(final File file, final ILFLog log)
             throws IOException {
-        final InputStream is = new FileInputStream(file);
-        try {
+        try (final InputStream is = new FileInputStream(file)) {
             final Manifest manifest = new Manifest(is);
             return getArchiveMetaInformationFromManifestObject(manifest, log, file.getAbsolutePath());
-        } finally {
-            is.close();
         }
     }
 
@@ -72,7 +72,8 @@ public class JarUtil {
      * 
      * <p>The method tries to extract the following information from the manifest:</p>
      * <ul>
-     * <li>a version number, extracted from the main attributes "Bundle-Version", "Implementation-Version", "Specification-Version" or "Major-Version"</li>
+     * <li>a version number, extracted from the main attributes "Bundle-Version",
+     * "Implementation-Version", "Specification-Version" or "Major-Version"</li>
      * <li>a license URL, extracted from the main attribute "Bundle-License"</li>
      * <li>a vendor name, extracted from the main attribute "Bundle-Vendor"</li>
      * </ul>
@@ -80,7 +81,9 @@ public class JarUtil {
      * 
      * @param file a JAR file
      * @param log a logger
-     * @return an object containing version, license URL and vendor name. The information in the object may be <code>null</code>. The object itself is never <code>null</code>.
+     * @return an object containing version, license URL and vendor name. The
+     *         information in the object may be <code>null</code>. The object itself
+     *         is never <code>null</code>.
      * @throws IOException
      * 
      * @see #getArchiveMetaInformationFromManifestFile(File, ILFLog)
@@ -88,13 +91,10 @@ public class JarUtil {
      */
     public static ArchiveMetaInformation getArchiveMetaInformationFromManifest(final File file, final ILFLog log)
             throws IOException {
-        final JarFile jarFile = new JarFile(file);
         final String sourceForErrorText = file.getAbsolutePath();
-        try {
+        try (final JarFile jarFile = new JarFile(file)) {
             final Manifest manifest = jarFile.getManifest();
             return getArchiveMetaInformationFromManifestObject(manifest, log, sourceForErrorText);
-        } finally {
-            jarFile.close();
         }
     }
 
@@ -103,15 +103,18 @@ public class JarUtil {
      * 
      * <p>The method tries to extract the following information from the manifest:</p>
      * <ul>
-     * <li>a version number, extracted from the main attributes "Bundle-Version", "Implementation-Version", "Specification-Version" or "Major-Version"</li>
+     * <li>a version number, extracted from the main attributes "Bundle-Version",
+     * "Implementation-Version", "Specification-Version" or "Major-Version"</li>
      * <li>a license URL, extracted from the main attribute "Bundle-License"</li>
      * <li>a vendor name, extracted from the main attribute "Bundle-Vendor"</li>
      * </ul>
-     * <p>This method is intended for packed JARs available from inside another packed JAR..</p>
+     * <p>This method is intended for packed JARs available from inside another packed JAR.</p>
      * 
      * @param inputStream a JAR file
      * @param log a logger
-     * @return an object containing version, license URL and vendor name. The information in the object may be <code>null</code>. The object itself is never <code>null</code>.
+     * @return an object containing version, license URL and vendor name. The
+     *         information in the object may be <code>null</code>. The object itself
+     *         is never <code>null</code>.
      * @throws IOException
      * 
      * @see #getArchiveMetaInformationFromManifestFile(File, ILFLog)
@@ -120,13 +123,10 @@ public class JarUtil {
     public static ArchiveMetaInformation getArchiveMetaInformationFromManifest(final InputStream inputStream,
                                                                                final ILFLog log)
             throws IOException {
-        final JarInputStream jarFile = new JarInputStream(inputStream);
         final String sourceForErrorText = "input stream";
-        try {
+        try (final JarInputStream jarFile = new JarInputStream(inputStream)) {
             final Manifest manifest = jarFile.getManifest();
             return getArchiveMetaInformationFromManifestObject(manifest, log, sourceForErrorText);
-        } finally {
-            jarFile.close();
         }
     }
 
@@ -154,8 +154,8 @@ public class JarUtil {
      * <li>Specification-Version</li>
      * <li>Major-Version</li>
      * </ol>
-     * <p> The first present is used. If none is present, <code>null</code> is returned.</p>
-      * 
+     * <p>The first present is used. If none is present, <code>null</code> is returned.</p>
+     * 
      * @param manifest a manifest from a JAR
      * @param log a logger
      * @return a string containing a version number or <code>null</code>
@@ -190,7 +190,7 @@ public class JarUtil {
      * <ol>
      * <li>Bundle-License</li>
      * </ol>
-     * <p> The first present is used. If none is present, <code>null</code> is returned.</p>
+     * <p>The first present is used. If none is present, <code>null</code> is returned.</p>
      * 
      * @param manifest a manifest from a JAR
      * @param log a logger
@@ -210,7 +210,7 @@ public class JarUtil {
      * <ol>
      * <li>Bundle-Vendor</li>
      * </ol>
-     * <p> The first present is used. If none is present, <code>null</code> is returned.</p>
+     * <p>The first present is used. If none is present, <code>null</code> is returned.</p>
      * 
      * @param manifest a manifest from a JAR
      * @param log a logger

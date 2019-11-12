@@ -31,9 +31,9 @@ import org.aposin.licensescout.util.ILFLog;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
- * Utility methods related to accessing a server that is caching maven central.
+ * Utility methods related to accessing a server that is caching Maven central.
  * 
- * <p>The instance of this class checks if the server is reachable under the configured URL. 
+ * <p>The instance of this class checks if the server is reachable under the configured URL.</p>
  */
 public class ArtifactServerUtil {
 
@@ -45,9 +45,9 @@ public class ArtifactServerUtil {
     /**
      * Constructor.
      * 
-     * @param mavenCentralBaseUrl the URL to a locally caching server of maven central
+     * @param mavenCentralBaseUrl the URL to a locally caching server of Maven central
      * @param connectTimeoutInMilliseconds the connect timeout
-     * @param log the logger 
+     * @param log the logger
      */
     public ArtifactServerUtil(final String mavenCentralBaseUrl, final int connectTimeoutInMilliseconds,
             final ILFLog log) {
@@ -60,7 +60,7 @@ public class ArtifactServerUtil {
     /**
      * Checks if the artifact server is accessible with the base URL configured in the constructor of this class.
      * 
-     * @param log a logger
+     * @param log a logger 
      * @return true if the artifact server is accessible under the configured base URL, false otherwise
      */
     private boolean checkAccess() {
@@ -75,8 +75,7 @@ public class ArtifactServerUtil {
             final URL url = new URL(urlString);
             final URLConnection urlConnection = url.openConnection();
             urlConnection.setConnectTimeout(connectTimeoutInMilliseconds);
-            InputStream is = urlConnection.getInputStream();
-            is.close();
+            try (InputStream is = urlConnection.getInputStream();) {}
             return true;
         } catch (IOException e) {
             log.warn("Cannot access artifact server at: " + urlString);
@@ -102,9 +101,9 @@ public class ArtifactServerUtil {
     /**
      * Adds licenses to an archive from information found in a Maven POM file.
      * 
-     * @param inputStream      input source of the POM file
-     * @param archive          the archive to add the licenses to
-     * @param filePath         path of the POM file (for information only)
+     * @param inputStream input source of the POM file
+     * @param archive the archive to add the licenses to
+     * @param filePath path of the POM file (for information only)
      * @param licenseStoreData the license data object
      * @return true if one or more licenses have been added, false otherwise
      */

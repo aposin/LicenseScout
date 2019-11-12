@@ -45,11 +45,8 @@ public class CryptUtil {
      * @throws IOException
      */
     public static byte[] calculateMessageDigest(final File file) throws IOException {
-        final FileInputStream fis = new FileInputStream(file);
-        try {
+        try (final FileInputStream fis = new FileInputStream(file)) {
             return calculateMessageDigest(fis);
-        } finally {
-            fis.close();
         }
     }
 

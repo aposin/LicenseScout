@@ -530,7 +530,7 @@ public class LicenseCheckedList {
 	        /** {@inheritDoc} */
 	        @Override
 	        protected void processText(final String text) {
-	            archiveType = ArchiveType.valueOf(ArchiveType.class, text);
+	            archiveType = Enum.valueOf(ArchiveType.class, text);
 	        }
 	    }
 	
