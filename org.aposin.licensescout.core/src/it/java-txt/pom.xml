@@ -90,9 +90,9 @@
 					<outputDirectory>${licensescout.outputDirectory}</outputDirectory>
 					<outputs>
 						<output>
-							<type>HTML</type>
-							<filename>${licensescout.outputFilename.html}</filename>
-							<url>${licensereport.url.html}</url>
+							<type>TXT</type>
+							<filename>${licensescout.outputFilename.txt}</filename>
+							<url>${licensereport.url.txt}</url>
 						</output>
 					</outputs>
 					<licensesFilename>${licensescout-configuration.dir}/licenses.xml</licensesFilename>

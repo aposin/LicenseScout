@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -13,8 +15,27 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<org.aposin.licensescout.version>1.3.1-SNAPSHOT</org.aposin.licensescout.version>
 		<licensescout-configuration.dir>${project.build.directory}/licensescout-configuration</licensescout-configuration.dir>
+
+		<!-- Configuration related to generated License Report Result Files -->
+		<licensescout.outputDirectory>${project.build.directory}</licensescout.outputDirectory>
+		<licensescout.outputFilename.html>licensereport.html</licensescout.outputFilename.html>
+		<licensescout.outputFilename.csv>licensereport.csv</licensescout.outputFilename.csv>
+		<licensescout.outputFilename.txt>licensereport.txt</licensescout.outputFilename.txt>
+		<licensereport.path.html>${licensescout.outputDirectory}/${licensescout.outputFilename.html}</licensereport.path.html>
+		<licensereport.path.csv>${licensescout.outputDirectory}/${licensescout.outputFilename.csv}</licensereport.path.csv>
+		<licensereport.path.txt>${licensescout.outputDirectory}/${licensescout.outputFilename.txt}</licensereport.path.txt>
+		<dependenciesDirectory>${project.build.directory}/licenseScoutDependencies</dependenciesDirectory>
 	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.aposin.licensescout</groupId>
+			<artifactId>licensescout-maven-plugin</artifactId>
+			<version>${org.aposin.licensescout.version}</version>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<plugins>
@@ -32,8 +53,8 @@
 							<artifactItems>
 								<artifactItem>
 									<groupId>@project.groupId@</groupId>
-									<artifactId>@project.artifactId@.configuration</artifactId>
-									<version>@project.version@</version>
+									<artifactId>org.aposin.licensescout.configuration.sample</artifactId>
+									<version>1.0.0-SNAPSHOT</version>
 									<classifier>configuration</classifier>
 									<type>zip</type>
 									<overWrite>true</overWrite>
@@ -44,6 +65,19 @@
 							<overWriteSnapshots>true</overWriteSnapshots>
 						</configuration>
 					</execution>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${dependenciesDirectory}</outputDirectory>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 
@@ -52,26 +86,27 @@
 				<artifactId>@project.artifactId@</artifactId>
 				<version>@project.version@</version>
 				<configuration>
-					<scanDirectory>M:\\ABSKERN\\V18.0.05a.09\\bin\\plugins</scanDirectory>
-					<outputDirectory>${project.build.directory}</outputDirectory>
-					<outputFileType>CSV</outputFileType>
-					<outputFilename>fremdlizenzen.csv</outputFilename>
+					<scanDirectory>${dependenciesDirectory}</scanDirectory>
+					<outputDirectory>${licensescout.outputDirectory}</outputDirectory>
+					<outputs>
+						<output>
+							<type>CSV</type>
+							<filename>${licensescout.outputFilename.csv}</filename>
+							<url>${licensereport.url.csv}</url>
+						</output>
+					</outputs>
+					<licensesFilename>${licensescout-configuration.dir}/licenses.xml</licensesFilename>
+					<providersFilename>${licensescout-configuration.dir}/providers.xml</providersFilename>
+					<noticesFilename>${licensescout-configuration.dir}/notices.xml</noticesFilename>
 					<checkedArchivesFilename>${licensescout-configuration.dir}/checkedarchives.csv</checkedArchivesFilename>
 					<licenseUrlMappingsFilename>${licensescout-configuration.dir}/urlmappings.csv</licenseUrlMappingsFilename>
+					<licenseNameMappingsFilename>${licensescout-configuration.dir}/namemappings.csv</licenseNameMappingsFilename>
 					<globalFiltersFilename>${licensescout-configuration.dir}/globalfilters.csv</globalFiltersFilename>
 					<filteredVendorNamesFilename>${licensescout-configuration.dir}/filteredvendornames.csv</filteredVendorNamesFilename>
-					<!-- cleanOutputActive>true</cleanOutputActive -->
-					<cleanOutputLicenseStates>
-						<cleanOutputLicenseState>NOT_ACCEPTED</cleanOutputLicenseState>
-						<cleanOutputLicenseState>CONFLICTING</cleanOutputLicenseState>
-					</cleanOutputLicenseStates>
-					<cleanOutputLicenseSpdxIdentifiers>
-						<cleanOutputLicenseSpdxIdentifier>WTFPL</cleanOutputLicenseSpdxIdentifier>
-					</cleanOutputLicenseSpdxIdentifiers>
 				</configuration>
 				<executions>
 					<execution>
-						<phase>process-resources</phase>
+						<phase>test</phase>
 						<goals>
 							<goal>scanJava</goal>
 						</goals>

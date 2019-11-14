@@ -26,16 +26,8 @@
 		<licensereport.path.html>${licensescout.outputDirectory}/${licensescout.outputFilename.html}</licensereport.path.html>
 		<licensereport.path.csv>${licensescout.outputDirectory}/${licensescout.outputFilename.csv}</licensereport.path.csv>
 		<licensereport.path.txt>${licensescout.outputDirectory}/${licensescout.outputFilename.txt}</licensereport.path.txt>
-		<dependenciesDirectory>${project.build.directory}/licenseScoutDependencies</dependenciesDirectory>
+		<licensescout.scanDirectory>${project.build.directory}</licensescout.scanDirectory>
 	</properties>
-
-	<dependencies>
-		<dependency>
-			<groupId>org.aposin.licensescout</groupId>
-			<artifactId>licensescout-maven-plugin</artifactId>
-			<version>${org.aposin.licensescout.version}</version>
-		</dependency>
-	</dependencies>
 
 	<build>
 		<plugins>
@@ -65,19 +57,6 @@
 							<overWriteSnapshots>true</overWriteSnapshots>
 						</configuration>
 					</execution>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${dependenciesDirectory}</outputDirectory>
-							<overWriteReleases>true</overWriteReleases>
-							<overWriteSnapshots>true</overWriteSnapshots>
-							<overWriteIfNewer>true</overWriteIfNewer>
-						</configuration>
-					</execution>
 				</executions>
 			</plugin>
 
@@ -86,13 +65,13 @@
 				<artifactId>@project.artifactId@</artifactId>
 				<version>@project.version@</version>
 				<configuration>
-					<scanDirectory>${dependenciesDirectory}</scanDirectory>
+					<scanDirectory>${licensescout.scanDirectory}</scanDirectory>
 					<outputDirectory>${licensescout.outputDirectory}</outputDirectory>
 					<outputs>
 						<output>
-							<type>HTML</type>
-							<filename>${licensescout.outputFilename.html}</filename>
-							<url>${licensereport.url.html}</url>
+							<type>TXT</type>
+							<filename>${licensescout.outputFilename.txt}</filename>
+							<url>${licensereport.url.txt}</url>
 						</output>
 					</outputs>
 					<licensesFilename>${licensescout-configuration.dir}/licenses.xml</licensesFilename>
@@ -108,7 +87,7 @@
 					<execution>
 						<phase>test</phase>
 						<goals>
-							<goal>scanJava</goal>
+							<goal>scanNpm</goal>
 						</goals>
 					</execution>
 				</executions>

@@ -13,5 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-File reportFile = new File( basedir, "target/licensereport.html" );
-assert reportFile.isFile();
+
+File buildLogFile = new File( basedir, "build.log" );
+
+Map<String, Boolean> searchStrings = new HashMap<>();
+searchStrings.put("licensescout:help", Boolean.FALSE);
+searchStrings.put("licensescout:scanJava", Boolean.FALSE);
+searchStrings.put("licensescout:scanNpm", Boolean.FALSE);
+
+buildLogFile.eachLine { line, count ->
+    // println "line $count: $line";
+    for(String searchString : searchStrings.keySet())
+    {
+        if (line.contains(searchString))
+            {
+                searchStrings.put(searchString, Boolean.TRUE);
+            }
+    }
+}
+for (Map.Entry entry : searchStrings.entrySet())
+{
+    assert entry.value : "line '" + entry.key + "' not found in build log"
+}
