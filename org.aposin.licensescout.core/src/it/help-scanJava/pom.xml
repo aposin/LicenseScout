@@ -24,6 +24,8 @@
 				<artifactId>@project.artifactId@</artifactId>
 				<version>@project.version@</version>
 				<configuration>
+					<detail>true</detail>
+					<goal>scanJava</goal>
 				</configuration>
 				<executions>
 					<execution>
