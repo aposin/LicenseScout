@@ -18,6 +18,7 @@ package org.aposin.licensescout.execution;
 import java.io.File;
 import java.util.List;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.configuration.DatabaseConfiguration;
 import org.aposin.licensescout.configuration.Output;
@@ -227,7 +228,11 @@ public class ExecutionParameters {
      */
     private List<String> npmExcludedDirectoryNames;
 
-    private ILFLog log;
+    /**
+     * NOTE: is not simply called 'log' because in this case {@link BeanUtils#copyProperties(Object, Object)} would use the value of AbstractMojo.getLog()
+     * to initialize this value, however, they have incompatible types and this leads to a runtime error.
+     */
+    private ILFLog lsLog;
 
     /**
      * @return the archiveType
@@ -666,15 +671,15 @@ public class ExecutionParameters {
     /**
      * @return the log
      */
-    public final ILFLog getLog() {
-        return log;
+    public final ILFLog getLsLog() {
+        return lsLog;
     }
 
     /**
-     * @param log the log to set
+     * @param lsLog the log to set
      */
-    public final void setLog(ILFLog log) {
-        this.log = log;
+    public final void setLsLog(ILFLog lsLog) {
+        this.lsLog = lsLog;
     }
 
 }

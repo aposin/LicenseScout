@@ -18,6 +18,10 @@ package org.aposin.licensescout.mojo;
 import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.finder.JavaJarFinder;
 
+/**
+ * Unit tests for {@link JavaScanMojo}.
+ *
+ */
 public class JavaScanMojoTest extends AbstractScanMojoTest {
 
     /**

@@ -29,11 +29,17 @@ import org.aposin.licensescout.license.LicenseStoreData;
  */
 public class FinderFactory {
 
+    private static final FinderFactory INSTANCE = new FinderFactory();
+
     /**
      * Private constructor to prevent instantiation.
      */
     private FinderFactory() {
         // DO NOTHING
+    }
+
+    public static FinderFactory getInstance() {
+        return INSTANCE;
     }
 
     /**
@@ -44,14 +50,14 @@ public class FinderFactory {
      * @return a finder instance
      * @throws LicenseScoutExecutionException if there is no finder class for the archive type
      */
-    public static AbstractFinder createFinder(final ExecutionParameters executionParameters,
-                                              final LicenseStoreData licenseStoreData,
-                                              final RunParameters runParameters) throws LicenseScoutExecutionException {
+    public AbstractFinder createFinder(final ExecutionParameters executionParameters,
+                                       final LicenseStoreData licenseStoreData, final RunParameters runParameters)
+            throws LicenseScoutExecutionException {
         final AbstractFinder finder;
         if (executionParameters.getArchiveType() == ArchiveType.JAVA) {
-            finder = new JavaJarFinder(licenseStoreData, runParameters, executionParameters.getLog());
+            finder = new JavaJarFinder(licenseStoreData, runParameters, executionParameters.getLsLog());
         } else if (executionParameters.getArchiveType() == ArchiveType.JAVASCRIPT) {
-            finder = new JavascriptNpmFinder(licenseStoreData, executionParameters.getLog(),
+            finder = new JavascriptNpmFinder(licenseStoreData, executionParameters.getLsLog(),
                     executionParameters.getNpmExcludedDirectoryNames());
         } else {
             throw new LicenseScoutExecutionException(

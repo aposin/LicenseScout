@@ -129,6 +129,7 @@ public abstract class AbstractExporterTest {
 
     /**
      * Test method for {@link IReportExporter#export(org.aposin.licensescout.exporter.OutputResult, org.aposin.licensescout.exporter.ReportConfiguration)}.
+     * @throws Exception 
      */
     @Test
     public void testExportEmptyArchiveListWithoutDocumentationUrl() throws Exception {
@@ -137,6 +138,7 @@ public abstract class AbstractExporterTest {
 
     /**
      * Test method for {@link IReportExporter#export(org.aposin.licensescout.exporter.OutputResult, org.aposin.licensescout.exporter.ReportConfiguration)}.
+     * @throws Exception 
      */
     @Test
     public void testExportWithArchiveListWithoutDocumentationUrl() throws Exception {
@@ -190,7 +192,7 @@ public abstract class AbstractExporterTest {
         outputResult.setPomResolutionUsed(false);
         final ReportConfiguration reportConfiguration = createReportConfiguration(showDocumentationUrl);
         getExporter().export(outputResult, reportConfiguration);
-    
+
         return readOutputFileToString();
     }
 
@@ -229,7 +231,9 @@ public abstract class AbstractExporterTest {
 
     private String readOutputFileToString() throws IOException {
         final File outputFile = getOutputFile();
-        return IOUtils.toString(new FileReader(outputFile));
+        try (final FileReader input = new FileReader(outputFile)) {
+            return IOUtils.toString(input);
+        }
     }
 
     /**

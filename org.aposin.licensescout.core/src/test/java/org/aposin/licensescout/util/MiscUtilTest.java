@@ -15,6 +15,9 @@
  */
 package org.aposin.licensescout.util;
 
+import java.io.File;
+
+import org.aposin.licensescout.core.test.util.TestUtil;
 import org.junit.Assert;
 import org.junit.Test;
 

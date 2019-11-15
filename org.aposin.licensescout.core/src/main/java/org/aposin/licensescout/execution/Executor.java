@@ -87,7 +87,7 @@ public class Executor {
     }
 
     protected final ILFLog getLog() {
-        return getExecutionParameters().getLog();
+        return getExecutionParameters().getLsLog();
     }
 
     /**
@@ -114,7 +114,7 @@ public class Executor {
         final RunParameters runParameters = new RunParameters();
         runParameters.setNexusCentralBaseUrl(getExecutionParameters().getNexusCentralBaseUrl());
         runParameters.setConnectTimeout(getExecutionParameters().getConnectTimeout());
-        final AbstractFinder finder = FinderFactory.createFinder(executionParameters, licenseStoreData, runParameters);
+        final AbstractFinder finder = FinderFactory.getInstance().createFinder(executionParameters, licenseStoreData, runParameters);
         getLog().info("Starting scan on " + getExecutionParameters().getScanDirectory().getAbsolutePath() + "...");
 
         try {
@@ -172,23 +172,11 @@ public class Executor {
     }
 
     private BuildInfo createBuildInfo() {
-        if (getExecutionParameters().isWriteResultsToDatabase()) {
-            // NOTE: these parameters are only used for writing information to the database
-            if (StringUtils.isEmpty(getExecutionParameters().getBuildName())) {
-                getLog().warn("Parameter buildName not configured");
-            }
-            if (StringUtils.isEmpty(getExecutionParameters().getBuildVersion())) {
-                getLog().warn("Parameter buildVersion not configured");
-            }
-            if (StringUtils.isEmpty(getExecutionParameters().getBuildUrl())) {
-                getLog().warn("Parameter buildUrl not configured");
-            }
-        }
+        checkBuildParameters();
         String licenseReportCsvUrl = null;
         String licenseReportHtmlUrl = null;
         String licenseReportTxtUrl = null;
         for (final Output output : getExecutionParameters().getOutputs()) {
-            // TODO: rework
             switch (output.getType()) {
                 case CSV:
                     licenseReportCsvUrl = output.getUrl();
@@ -215,6 +203,21 @@ public class Executor {
         // Note: date is used from the database
         return new BuildInfo(getExecutionParameters().getBuildName(), getExecutionParameters().getBuildVersion(), null,
                 getExecutionParameters().getBuildUrl(), licenseReportCsvUrl, licenseReportHtmlUrl, licenseReportTxtUrl);
+    }
+
+    private void checkBuildParameters() {
+        if (getExecutionParameters().isWriteResultsToDatabase()) {
+            // NOTE: these parameters are only used for writing information to the database
+            if (StringUtils.isEmpty(getExecutionParameters().getBuildName())) {
+                getLog().warn("Parameter buildName not configured");
+            }
+            if (StringUtils.isEmpty(getExecutionParameters().getBuildVersion())) {
+                getLog().warn("Parameter buildVersion not configured");
+            }
+            if (StringUtils.isEmpty(getExecutionParameters().getBuildUrl())) {
+                getLog().warn("Parameter buildUrl not configured");
+            }
+        }
     }
 
     private void writeArchiveSkeletonFile(final List<Archive> archives) throws LicenseScoutExecutionException {

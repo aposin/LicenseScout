@@ -282,7 +282,7 @@ public abstract class AbstractScanMojo extends AbstractMojo {
             throw new MojoExecutionException("Internal error occured: " + e.getLocalizedMessage(), e);
         }
         executionParameters.setArchiveType(getArchiveType());
-        executionParameters.setLog(log);
+        executionParameters.setLsLog(log);
 
         final Executor executor = new Executor(executionParameters);
         try {
@@ -299,14 +299,14 @@ public abstract class AbstractScanMojo extends AbstractMojo {
      */
     protected abstract ArchiveType getArchiveType();
 
+    // --------------getters -- NOTE: these are called by reflection from BeanUtils.copyProperties()
+
     /**
      * @return the showDocumentationUrl
      */
     public final boolean isShowDocumentationUrl() {
         return showDocumentationUrl;
     }
-
-    // --------------getters -- NOTE: these are called by reflection from BeanUtils.copyProperties()
 
     /**
      * @return the scanDirectory

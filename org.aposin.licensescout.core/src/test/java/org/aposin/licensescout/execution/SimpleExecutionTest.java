@@ -123,7 +123,7 @@ public class SimpleExecutionTest {
         executionParameters.setCleanOutputActive(false);
         // NOTE: exception occurs if the following is not set
         executionParameters.setCleanOutputLegalStates(new LegalStatus[0]);
-        executionParameters.setLog(TestUtil.createJavaUtilGlobalLog());
+        executionParameters.setLsLog(TestUtil.createJavaUtilGlobalLog());
         executionParameters.setNpmExcludedDirectoryNames(new ArrayList<>());
         return executionParameters;
     }

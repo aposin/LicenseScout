@@ -19,6 +19,10 @@ import org.aposin.licensescout.archive.ArchiveType;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Base class for unit tests of subclasses of {@link AbstractScanMojo}.
+ *
+ */
 public abstract class AbstractScanMojoTest {
 
     protected abstract Class<?> getExpectedFinderClass();

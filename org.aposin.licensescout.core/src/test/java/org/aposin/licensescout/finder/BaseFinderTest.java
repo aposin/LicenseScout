@@ -38,6 +38,10 @@ public abstract class BaseFinderTest {
     private ILFLog log;
     private LicenseStoreData licenseStoreData;
 
+    /**
+     * Initializes logging.
+     * @throws Exception
+     */
     @BeforeClass
     public static void setUpClass() throws Exception {
         Logger.getGlobal().setLevel(Level.FINEST);
@@ -46,6 +50,10 @@ public abstract class BaseFinderTest {
         Logger.getGlobal().addHandler(consoleHandler);
     }
 
+    /**
+     * Initializes the license store data object.
+     * @throws Exception
+     */
     @Before
     public void setUp() throws Exception {
         log = TestUtil.createJavaUtilGlobalLog();

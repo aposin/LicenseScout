@@ -58,13 +58,17 @@ public class FinderFactoryTest {
     public void testCreateFinder() throws Exception {
         final ExecutionParameters executionParameters = new ExecutionParameters();
         executionParameters.setArchiveType(archiveType);
-        executionParameters.setLog(TestUtil.createJavaUtilGlobalLog());
+        executionParameters.setLsLog(TestUtil.createJavaUtilGlobalLog());
         executionParameters.setNpmExcludedDirectoryNames(new ArrayList<>());
         final RunParameters runParameters = TestUtil.createRunParameters();
-        final AbstractFinder finder = FinderFactory.createFinder(executionParameters, null, runParameters);
+        final AbstractFinder finder = FinderFactory.getInstance().createFinder(executionParameters, null,
+                runParameters);
         Assert.assertEquals("class type returned by createFinder()", expectedFinderClass, finder.getClass());
     }
 
+    /**
+     * @return the parameters
+     */
     @Parameters(name = "{index}: ArchiveType {0}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][] { //
