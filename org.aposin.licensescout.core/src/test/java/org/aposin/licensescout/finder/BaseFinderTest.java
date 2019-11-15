@@ -21,10 +21,10 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.aposin.licensescout.core.test.util.TestUtil;
 import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseStoreData;
 import org.aposin.licensescout.util.ILFLog;
-import org.aposin.licensescout.util.JavaUtilLog;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -48,7 +48,7 @@ public abstract class BaseFinderTest {
 
     @Before
     public void setUp() throws Exception {
-        log = new JavaUtilLog(Logger.getGlobal());
+        log = TestUtil.createJavaUtilGlobalLog();
         licenseStoreData = createLicenseStoreData();
     }
 

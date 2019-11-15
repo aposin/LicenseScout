@@ -15,40 +15,11 @@
  */
 package org.aposin.licensescout.mojo;
 
-import java.io.File;
-import java.util.logging.Logger;
-
 import org.aposin.licensescout.archive.ArchiveType;
-import org.aposin.licensescout.configuration.RunParameters;
-import org.aposin.licensescout.finder.AbstractFinder;
-import org.aposin.licensescout.util.ILFLog;
-import org.aposin.licensescout.util.JavaUtilLog;
 import org.junit.Assert;
 import org.junit.Test;
 
 public abstract class AbstractScanMojoTest {
-
-    /**
-     * Test case for the method {@link AbstractScanMojo#createFinder(org.aposin.licensescout.license.LicenseStoreData, ILFLog)}.
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testCreateFinder() throws Exception {
-        final AbstractScanMojo scanMojo = createMojo();
-        final RunParameters runParameters = createRunParameters();
-        final AbstractFinder finder = scanMojo.createFinder(null, runParameters, getLog());
-        Assert.assertEquals("class type returned by createFinder()", getExpectedFinderClass(), finder.getClass());
-    }
-
-    private RunParameters createRunParameters() {
-        final String serverBaseUrl = "https://repo.maven.apache.org/maven2_unaccessible/";
-        final int timeout = 400;
-        final RunParameters runParameters = new RunParameters();
-        runParameters.setNexusCentralBaseUrl(serverBaseUrl);
-        runParameters.setConnectTimeout(timeout);
-        return runParameters;
-    }
 
     protected abstract Class<?> getExpectedFinderClass();
 
@@ -67,29 +38,5 @@ public abstract class AbstractScanMojoTest {
     protected abstract AbstractScanMojo createMojo();
 
     protected abstract ArchiveType getExpectedArchiveType();
-
-    /**
-     * Test case for the method {@link AbstractScanMojo#createDirectoryIfNotExists(File)}.
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testCreateDirectoryIfNotExists() throws Exception {
-        final AbstractScanMojo scanMojo = createMojo();
-        File directory = new File("./testdir");
-        directory.delete();
-        scanMojo.createDirectoryIfNotExists(directory);
-        Assert.assertEquals(
-                "createDirectoryIfNotExists(): expected directory not existing after creating or is not a directory",
-                true, directory.exists() && directory.isDirectory());
-    }
-
-    /**
-     * Obtains a logger.
-     * @return a logger
-     */
-    protected static ILFLog getLog() {
-        return new JavaUtilLog(Logger.getGlobal());
-    }
 
 }

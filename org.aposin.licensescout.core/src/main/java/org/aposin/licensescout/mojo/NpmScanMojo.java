@@ -21,11 +21,6 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.aposin.licensescout.archive.ArchiveType;
-import org.aposin.licensescout.configuration.RunParameters;
-import org.aposin.licensescout.finder.AbstractFinder;
-import org.aposin.licensescout.finder.JavascriptNpmFinder;
-import org.aposin.licensescout.license.LicenseStoreData;
-import org.aposin.licensescout.util.ILFLog;
 
 /**
  * Scans NPM package directory for licenses.
@@ -49,29 +44,10 @@ public class NpmScanMojo extends AbstractScanMojo {
     }
 
     /**
-     * @param log the logger
+     * @return the npmExcludedDirectoryNames
      */
-    @Override
-    protected void logNpmExcludedDirectoryNames(final ILFLog log) {
-        if (npmExcludedDirectoryNames.isEmpty()) {
-            log.info("No directory name to exclude in NPM scan configured.");
-        } else {
-            for (final String excludedDirectoryName : npmExcludedDirectoryNames) {
-                log.info("Using directory name to exclude in NPM scan: " + excludedDirectoryName);
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected AbstractFinder createFinder(final LicenseStoreData licenseStoreData, final RunParameters runParameters,
-                                          final ILFLog log) {
-        final AbstractFinder javascriptFinder = new JavascriptNpmFinder(licenseStoreData, log,
-                npmExcludedDirectoryNames);
-        javascriptFinder.setScanDirectory(scanDirectory);
-        return javascriptFinder;
+    public final List<String> getNpmExcludedDirectoryNames() {
+        return npmExcludedDirectoryNames;
     }
 
 }

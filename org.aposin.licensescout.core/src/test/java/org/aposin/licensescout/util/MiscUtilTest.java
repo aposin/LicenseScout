@@ -55,4 +55,20 @@ public class MiscUtilTest {
                 MiscUtil.getLSMessageDigestFromHexString(MESSAGE_DIGEST_STRING).getBytes());
     }
 
+    /**
+     * Test case for the method {@link MiscUtil#createDirectoryIfNotExists(File)}.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testCreateDirectoryIfNotExists() throws Exception {
+        final File directory = new File("target/testdir");
+        directory.delete();
+        final ILFLog log = TestUtil.createNullLog();
+        MiscUtil.createDirectoryIfNotExists(directory, log);
+        Assert.assertEquals(
+                "createDirectoryIfNotExists(): expected directory not existing after creating or is not a directory",
+                true, directory.exists() && directory.isDirectory());
+    }
+
 }

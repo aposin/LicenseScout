@@ -18,11 +18,6 @@ package org.aposin.licensescout.mojo;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.aposin.licensescout.archive.ArchiveType;
-import org.aposin.licensescout.configuration.RunParameters;
-import org.aposin.licensescout.finder.AbstractFinder;
-import org.aposin.licensescout.finder.JavaJarFinder;
-import org.aposin.licensescout.license.LicenseStoreData;
-import org.aposin.licensescout.util.ILFLog;
 
 /**
  * Scans Java installation directory for licenses.
@@ -37,17 +32,6 @@ public class JavaScanMojo extends AbstractScanMojo {
     @Override
     protected ArchiveType getArchiveType() {
         return ArchiveType.JAVA;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected AbstractFinder createFinder(final LicenseStoreData licenseStoreData, final RunParameters runParameters,
-                                          final ILFLog log) {
-        final AbstractFinder javaFinder = new JavaJarFinder(licenseStoreData, runParameters, log);
-        javaFinder.setScanDirectory(scanDirectory);
-        return javaFinder;
     }
 
 }

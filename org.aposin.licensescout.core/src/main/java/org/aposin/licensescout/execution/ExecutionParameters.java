@@ -13,129 +13,107 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aposin.licensescout.mojo;
+package org.aposin.licensescout.execution;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Parameter;
 import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.configuration.DatabaseConfiguration;
 import org.aposin.licensescout.configuration.Output;
-import org.aposin.licensescout.execution.ExecutionParameters;
-import org.aposin.licensescout.execution.Executor;
-import org.aposin.licensescout.finder.LicenseScoutExecutionException;
 import org.aposin.licensescout.license.LegalStatus;
 import org.aposin.licensescout.util.ILFLog;
-import org.aposin.licensescout.util.MavenLog;
 
 /**
- * Scans directory for licenses (either JAVA Jars or NPM packages).
+ * Parameter object containing all information for a LicenseScout execution.
  *
+ * @see Executor
  */
-public abstract class AbstractScanMojo extends AbstractMojo {
+public class ExecutionParameters {
+
+    private ArchiveType archiveType;
 
     /**
      * Directory to scan for archives.
      */
-    @Parameter(property = "scanDirectory", required = false)
     private File scanDirectory;
 
     /**
      * Location of the output file (will be combined with output filename).
      */
-    @Parameter(defaultValue = "${project.build.directory}", property = "outputDirectory", required = false)
     private File outputDirectory;
 
     /**
      * Specification of output types and filenames.
      */
-    @Parameter(property = "outputs", required = false)
     private List<Output> outputs;
 
     /**
      * Name of the file to read known licenses from.
      */
-    @Parameter(property = "licensesFilename", required = false)
     private File licensesFilename;
 
     /**
      * Name of the file to read known providers from.
      */
-    @Parameter(property = "providersFilename", required = false)
     private File providersFilename;
 
     /**
      * Name of the file to read license notices from.
      */
-    @Parameter(property = "noticesFilename", required = false)
     private File noticesFilename;
 
     /**
      * Name of the file to read checked archives from.
      */
-    @Parameter(defaultValue = "checkedarchives.csv", property = "checkedArchivesFilename", required = false)
     private File checkedArchivesFilename;
 
     /**
      * Name of the file to read license URL mappings from.
      */
-    @Parameter(defaultValue = "urlmappings.csv", property = "licenseUrlMappingsFilename", required = false)
     private String licenseUrlMappingsFilename;
 
     /**
      * Name of the file to read license name mappings from.
      */
-    @Parameter(defaultValue = "namemappings.csv", property = "licenseNameMappingsFilename", required = false)
     private String licenseNameMappingsFilename;
 
     /**
      * Name of the file to read global filter patterns from.
      */
-    @Parameter(defaultValue = "globalFilters.csv", property = "globalFiltersFilename", required = false)
     private String globalFiltersFilename;
 
     /**
      * Name of the file to read of vendor names to filter out from.
      * This is alternative to filteredVendorNames. If both are given, the entries are merged.
      */
-    @Parameter(property = "filteredVendorNamesFilename", required = false)
     private String filteredVendorNamesFilename;
 
     /**
      * If cleaning the output should be active.
      */
-    @Parameter(defaultValue = "false", property = "cleanOutputActive", required = false)
     private boolean cleanOutputActive;
 
     /**
      * List of legal states that should be filtered out if cleanOutput is active.
      */
-    @Parameter(property = "cleanOutputLegalStates", required = false)
     private LegalStatus[] cleanOutputLegalStates;
 
     /**
      * List of licenses that should be filtered out if cleanOutput is active, given by their SPDX identifier.
      */
-    @Parameter(property = "cleanOutputLicenseSpdxIdentifiers", required = false)
     private String[] cleanOutputLicenseSpdxIdentifiers;
 
     /**
      * List of vendor names to filter out.
      * This is alternative to filteredVendorNamesFilename. If both are given, the entries are merged.
      */
-    @Parameter(property = "filteredVendorNames", required = false)
     private List<String> filteredVendorNames;
 
     /**
      * Base URL for fetching Maven central artifacts from a server.
      * This can be Maven central itself (like the default value) or a mirror of maven central on a Nexus or other artifact server.
      */
-    @Parameter(defaultValue = "https://repo.maven.apache.org/maven2/", property = "nexusCentralBaseUrl", required = false)
     private String nexusCentralBaseUrl;
 
     /**
@@ -144,19 +122,16 @@ public abstract class AbstractScanMojo extends AbstractMojo {
      * {@link #nexusCentralBaseUrl}) to retrieve parent POMs. The value is in
      * milliseconds
      */
-    @Parameter(defaultValue = "1000", property = "connectTimeout", required = false)
     private int connectTimeout;
 
     /**
      * Whether the license XML file should be validated while reading in.
      */
-    @Parameter(defaultValue = "false", property = "validateLicenseXml", required = false)
     private boolean validateLicenseXml;
 
     /**
      * Whether the license XML file should be validated while reading in.
      */
-    @Parameter(defaultValue = "true", property = "showDocumentationUrl", required = false)
     private boolean showDocumentationUrl;
 
     /**
@@ -166,7 +141,6 @@ public abstract class AbstractScanMojo extends AbstractMojo {
      * 
      * @see #archiveXmlSkeletonFile
      */
-    @Parameter(defaultValue = "false", property = "writeArchiveXmlSkeleton", required = false)
     private boolean writeArchiveXmlSkeleton;
 
     /**
@@ -176,7 +150,6 @@ public abstract class AbstractScanMojo extends AbstractMojo {
      * 
      * @see #writeArchiveXmlSkeleton
      */
-    @Parameter(defaultValue = "archiveSkeleton.xml", property = "archiveXmlSkeletonFile", required = false)
     private File archiveXmlSkeletonFile;
 
     /**
@@ -185,7 +158,6 @@ public abstract class AbstractScanMojo extends AbstractMojo {
      * <p>If enabled, the file is written to {@link #archiveXmlSkeletonFile}.</p>
      * @see #archiveCsvSkeletonFile
      */
-    @Parameter(defaultValue = "false", property = "writeArchiveCsvSkeleton", required = false)
     private boolean writeArchiveCsvSkeleton;
 
     /**
@@ -195,7 +167,6 @@ public abstract class AbstractScanMojo extends AbstractMojo {
      * 
      * @see #writeArchiveCsvSkeleton
      */
-    @Parameter(defaultValue = "archiveSkeleton.csv", property = "archiveCsvSkeletonFile", required = false)
     private File archiveCsvSkeletonFile;
 
     /**
@@ -204,7 +175,6 @@ public abstract class AbstractScanMojo extends AbstractMojo {
      * <p>Only used if {@link #writeResultsToDatabase} is true. </p>
      * 
      */
-    @Parameter(property = "buildName", required = false)
     private String buildName;
 
     /**
@@ -213,7 +183,6 @@ public abstract class AbstractScanMojo extends AbstractMojo {
      * <p>Only used if {@link #writeResultsToDatabase} is true. </p>
      * 
      */
-    @Parameter(property = "buildVersion", required = false)
     private String buildVersion;
 
     /**
@@ -222,7 +191,6 @@ public abstract class AbstractScanMojo extends AbstractMojo {
      * <p>Only used if {@link #writeResultsToDatabase} is true. </p>
      * 
      */
-    @Parameter(property = "buildUrl", required = false)
     private String buildUrl;
 
     /**
@@ -232,7 +200,6 @@ public abstract class AbstractScanMojo extends AbstractMojo {
      * 
      * @see #resultDatabaseConfiguration
      */
-    @Parameter(defaultValue = "false", property = "writeResultsToDatabase", required = false)
     private boolean writeResultsToDatabase;
 
     /**
@@ -244,7 +211,6 @@ public abstract class AbstractScanMojo extends AbstractMojo {
      * @see #writeResultsToDatabase
      * @see #resultDatabaseConfiguration
      */
-    @Parameter(defaultValue = "false", property = "writeResultsToDatabaseForSnapshotBuilds", required = false)
     private boolean writeResultsToDatabaseForSnapshotBuilds;
 
     /**
@@ -254,65 +220,41 @@ public abstract class AbstractScanMojo extends AbstractMojo {
      * 
      * @see #writeResultsToDatabase
      */
-    @Parameter(property = "resultDatabaseConfiguration", required = false)
     private DatabaseConfiguration resultDatabaseConfiguration;
 
     /**
-     * Skips the execution.
+     * NPM only.
      */
-    @Parameter(defaultValue = "false", property = "skip", required = false)
-    protected boolean skip;
+    private List<String> npmExcludedDirectoryNames;
+
+    private ILFLog log;
 
     /**
-     * {@inheritDoc}
+     * @return the archiveType
      */
-    @Override
-    public void execute() throws MojoExecutionException {
-        final ILFLog log = new MavenLog(getLog());
-
-        if (skip) {
-            log.info("Not executing because skip is configured as true.");
-            return;
-        }
-
-        final ExecutionParameters executionParameters = new ExecutionParameters();
-        try {
-            BeanUtils.copyProperties(executionParameters, this);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new MojoExecutionException("Internal error occured: " + e.getLocalizedMessage(), e);
-        }
-        executionParameters.setArchiveType(getArchiveType());
-        executionParameters.setLog(log);
-
-        final Executor executor = new Executor(executionParameters);
-        try {
-            executor.execute();
-        } catch (LicenseScoutExecutionException e) {
-            throw new MojoExecutionException("Internal error occured: " + e.getLocalizedMessage(), e);
-        }
+    public final ArchiveType getArchiveType() {
+        return archiveType;
     }
 
     /**
-     * Obtains the archive type handled by this MOJO.
-     * 
-     * @return an archive type
+     * @param archiveType the archiveType to set
      */
-    protected abstract ArchiveType getArchiveType();
-
-    /**
-     * @return the showDocumentationUrl
-     */
-    public final boolean isShowDocumentationUrl() {
-        return showDocumentationUrl;
+    public final void setArchiveType(ArchiveType archiveType) {
+        this.archiveType = archiveType;
     }
-
-    // --------------getters -- NOTE: these are called by reflection from BeanUtils.copyProperties()
 
     /**
      * @return the scanDirectory
      */
     public final File getScanDirectory() {
         return scanDirectory;
+    }
+
+    /**
+     * @param scanDirectory the scanDirectory to set
+     */
+    public final void setScanDirectory(File scanDirectory) {
+        this.scanDirectory = scanDirectory;
     }
 
     /**
@@ -323,10 +265,24 @@ public abstract class AbstractScanMojo extends AbstractMojo {
     }
 
     /**
+     * @param outputDirectory the outputDirectory to set
+     */
+    public final void setOutputDirectory(File outputDirectory) {
+        this.outputDirectory = outputDirectory;
+    }
+
+    /**
      * @return the outputs
      */
     public final List<Output> getOutputs() {
         return outputs;
+    }
+
+    /**
+     * @param outputs the outputs to set
+     */
+    public final void setOutputs(List<Output> outputs) {
+        this.outputs = outputs;
     }
 
     /**
@@ -337,10 +293,24 @@ public abstract class AbstractScanMojo extends AbstractMojo {
     }
 
     /**
+     * @param licensesFilename the licensesFilename to set
+     */
+    public final void setLicensesFilename(File licensesFilename) {
+        this.licensesFilename = licensesFilename;
+    }
+
+    /**
      * @return the providersFilename
      */
     public final File getProvidersFilename() {
         return providersFilename;
+    }
+
+    /**
+     * @param providersFilename the providersFilename to set
+     */
+    public final void setProvidersFilename(File providersFilename) {
+        this.providersFilename = providersFilename;
     }
 
     /**
@@ -351,10 +321,24 @@ public abstract class AbstractScanMojo extends AbstractMojo {
     }
 
     /**
+     * @param noticesFilename the noticesFilename to set
+     */
+    public final void setNoticesFilename(File noticesFilename) {
+        this.noticesFilename = noticesFilename;
+    }
+
+    /**
      * @return the checkedArchivesFilename
      */
     public final File getCheckedArchivesFilename() {
         return checkedArchivesFilename;
+    }
+
+    /**
+     * @param checkedArchivesFilename the checkedArchivesFilename to set
+     */
+    public final void setCheckedArchivesFilename(File checkedArchivesFilename) {
+        this.checkedArchivesFilename = checkedArchivesFilename;
     }
 
     /**
@@ -365,10 +349,24 @@ public abstract class AbstractScanMojo extends AbstractMojo {
     }
 
     /**
+     * @param licenseUrlMappingsFilename the licenseUrlMappingsFilename to set
+     */
+    public final void setLicenseUrlMappingsFilename(String licenseUrlMappingsFilename) {
+        this.licenseUrlMappingsFilename = licenseUrlMappingsFilename;
+    }
+
+    /**
      * @return the licenseNameMappingsFilename
      */
     public final String getLicenseNameMappingsFilename() {
         return licenseNameMappingsFilename;
+    }
+
+    /**
+     * @param licenseNameMappingsFilename the licenseNameMappingsFilename to set
+     */
+    public final void setLicenseNameMappingsFilename(String licenseNameMappingsFilename) {
+        this.licenseNameMappingsFilename = licenseNameMappingsFilename;
     }
 
     /**
@@ -379,10 +377,24 @@ public abstract class AbstractScanMojo extends AbstractMojo {
     }
 
     /**
+     * @param globalFiltersFilename the globalFiltersFilename to set
+     */
+    public final void setGlobalFiltersFilename(String globalFiltersFilename) {
+        this.globalFiltersFilename = globalFiltersFilename;
+    }
+
+    /**
      * @return the filteredVendorNamesFilename
      */
     public final String getFilteredVendorNamesFilename() {
         return filteredVendorNamesFilename;
+    }
+
+    /**
+     * @param filteredVendorNamesFilename the filteredVendorNamesFilename to set
+     */
+    public final void setFilteredVendorNamesFilename(String filteredVendorNamesFilename) {
+        this.filteredVendorNamesFilename = filteredVendorNamesFilename;
     }
 
     /**
@@ -393,10 +405,24 @@ public abstract class AbstractScanMojo extends AbstractMojo {
     }
 
     /**
+     * @param cleanOutputActive the cleanOutputActive to set
+     */
+    public final void setCleanOutputActive(boolean cleanOutputActive) {
+        this.cleanOutputActive = cleanOutputActive;
+    }
+
+    /**
      * @return the cleanOutputLegalStates
      */
     public final LegalStatus[] getCleanOutputLegalStates() {
         return cleanOutputLegalStates;
+    }
+
+    /**
+     * @param cleanOutputLegalStates the cleanOutputLegalStates to set
+     */
+    public final void setCleanOutputLegalStates(LegalStatus[] cleanOutputLegalStates) {
+        this.cleanOutputLegalStates = cleanOutputLegalStates;
     }
 
     /**
@@ -407,10 +433,24 @@ public abstract class AbstractScanMojo extends AbstractMojo {
     }
 
     /**
+     * @param cleanOutputLicenseSpdxIdentifiers the cleanOutputLicenseSpdxIdentifiers to set
+     */
+    public final void setCleanOutputLicenseSpdxIdentifiers(String[] cleanOutputLicenseSpdxIdentifiers) {
+        this.cleanOutputLicenseSpdxIdentifiers = cleanOutputLicenseSpdxIdentifiers;
+    }
+
+    /**
      * @return the filteredVendorNames
      */
     public final List<String> getFilteredVendorNames() {
         return filteredVendorNames;
+    }
+
+    /**
+     * @param filteredVendorNames the filteredVendorNames to set
+     */
+    public final void setFilteredVendorNames(List<String> filteredVendorNames) {
+        this.filteredVendorNames = filteredVendorNames;
     }
 
     /**
@@ -421,10 +461,24 @@ public abstract class AbstractScanMojo extends AbstractMojo {
     }
 
     /**
+     * @param nexusCentralBaseUrl the nexusCentralBaseUrl to set
+     */
+    public final void setNexusCentralBaseUrl(String nexusCentralBaseUrl) {
+        this.nexusCentralBaseUrl = nexusCentralBaseUrl;
+    }
+
+    /**
      * @return the connectTimeout
      */
     public final int getConnectTimeout() {
         return connectTimeout;
+    }
+
+    /**
+     * @param connectTimeout the connectTimeout to set
+     */
+    public final void setConnectTimeout(int connectTimeout) {
+        this.connectTimeout = connectTimeout;
     }
 
     /**
@@ -435,10 +489,38 @@ public abstract class AbstractScanMojo extends AbstractMojo {
     }
 
     /**
+     * @param validateLicenseXml the validateLicenseXml to set
+     */
+    public final void setValidateLicenseXml(boolean validateLicenseXml) {
+        this.validateLicenseXml = validateLicenseXml;
+    }
+
+    /**
+     * @return the showDocumentationUrl
+     */
+    public final boolean isShowDocumentationUrl() {
+        return showDocumentationUrl;
+    }
+
+    /**
+     * @param showDocumentationUrl the showDocumentationUrl to set
+     */
+    public final void setShowDocumentationUrl(boolean showDocumentationUrl) {
+        this.showDocumentationUrl = showDocumentationUrl;
+    }
+
+    /**
      * @return the writeArchiveXmlSkeleton
      */
     public final boolean isWriteArchiveXmlSkeleton() {
         return writeArchiveXmlSkeleton;
+    }
+
+    /**
+     * @param writeArchiveXmlSkeleton the writeArchiveXmlSkeleton to set
+     */
+    public final void setWriteArchiveXmlSkeleton(boolean writeArchiveXmlSkeleton) {
+        this.writeArchiveXmlSkeleton = writeArchiveXmlSkeleton;
     }
 
     /**
@@ -449,10 +531,24 @@ public abstract class AbstractScanMojo extends AbstractMojo {
     }
 
     /**
+     * @param archiveXmlSkeletonFile the archiveXmlSkeletonFile to set
+     */
+    public final void setArchiveXmlSkeletonFile(File archiveXmlSkeletonFile) {
+        this.archiveXmlSkeletonFile = archiveXmlSkeletonFile;
+    }
+
+    /**
      * @return the writeArchiveCsvSkeleton
      */
     public final boolean isWriteArchiveCsvSkeleton() {
         return writeArchiveCsvSkeleton;
+    }
+
+    /**
+     * @param writeArchiveCsvSkeleton the writeArchiveCsvSkeleton to set
+     */
+    public final void setWriteArchiveCsvSkeleton(boolean writeArchiveCsvSkeleton) {
+        this.writeArchiveCsvSkeleton = writeArchiveCsvSkeleton;
     }
 
     /**
@@ -463,10 +559,24 @@ public abstract class AbstractScanMojo extends AbstractMojo {
     }
 
     /**
+     * @param archiveCsvSkeletonFile the archiveCsvSkeletonFile to set
+     */
+    public final void setArchiveCsvSkeletonFile(File archiveCsvSkeletonFile) {
+        this.archiveCsvSkeletonFile = archiveCsvSkeletonFile;
+    }
+
+    /**
      * @return the buildName
      */
     public final String getBuildName() {
         return buildName;
+    }
+
+    /**
+     * @param buildName the buildName to set
+     */
+    public final void setBuildName(String buildName) {
+        this.buildName = buildName;
     }
 
     /**
@@ -477,10 +587,24 @@ public abstract class AbstractScanMojo extends AbstractMojo {
     }
 
     /**
+     * @param buildVersion the buildVersion to set
+     */
+    public final void setBuildVersion(String buildVersion) {
+        this.buildVersion = buildVersion;
+    }
+
+    /**
      * @return the buildUrl
      */
     public final String getBuildUrl() {
         return buildUrl;
+    }
+
+    /**
+     * @param buildUrl the buildUrl to set
+     */
+    public final void setBuildUrl(String buildUrl) {
+        this.buildUrl = buildUrl;
     }
 
     /**
@@ -491,6 +615,13 @@ public abstract class AbstractScanMojo extends AbstractMojo {
     }
 
     /**
+     * @param writeResultsToDatabase the writeResultsToDatabase to set
+     */
+    public final void setWriteResultsToDatabase(boolean writeResultsToDatabase) {
+        this.writeResultsToDatabase = writeResultsToDatabase;
+    }
+
+    /**
      * @return the writeResultsToDatabaseForSnapshotBuilds
      */
     public final boolean isWriteResultsToDatabaseForSnapshotBuilds() {
@@ -498,10 +629,52 @@ public abstract class AbstractScanMojo extends AbstractMojo {
     }
 
     /**
+     * @param writeResultsToDatabaseForSnapshotBuilds the writeResultsToDatabaseForSnapshotBuilds to set
+     */
+    public final void setWriteResultsToDatabaseForSnapshotBuilds(boolean writeResultsToDatabaseForSnapshotBuilds) {
+        this.writeResultsToDatabaseForSnapshotBuilds = writeResultsToDatabaseForSnapshotBuilds;
+    }
+
+    /**
      * @return the resultDatabaseConfiguration
      */
     public final DatabaseConfiguration getResultDatabaseConfiguration() {
         return resultDatabaseConfiguration;
+    }
+
+    /**
+     * @param resultDatabaseConfiguration the resultDatabaseConfiguration to set
+     */
+    public final void setResultDatabaseConfiguration(DatabaseConfiguration resultDatabaseConfiguration) {
+        this.resultDatabaseConfiguration = resultDatabaseConfiguration;
+    }
+
+    /**
+     * @return the npmExcludedDirectoryNames
+     */
+    public final List<String> getNpmExcludedDirectoryNames() {
+        return npmExcludedDirectoryNames;
+    }
+
+    /**
+     * @param npmExcludedDirectoryNames the npmExcludedDirectoryNames to set
+     */
+    public final void setNpmExcludedDirectoryNames(List<String> npmExcludedDirectoryNames) {
+        this.npmExcludedDirectoryNames = npmExcludedDirectoryNames;
+    }
+
+    /**
+     * @return the log
+     */
+    public final ILFLog getLog() {
+        return log;
+    }
+
+    /**
+     * @param log the log to set
+     */
+    public final void setLog(ILFLog log) {
+        this.log = log;
     }
 
 }
