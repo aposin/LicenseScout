@@ -15,80 +15,83 @@
  */
 package org.aposin.licensescout.exporter;
 
-import java.io.File;
-import java.io.FileReader;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.io.IOUtils;
-import org.aposin.licensescout.archive.Archive;
 import org.aposin.licensescout.configuration.OutputFileType;
-import org.aposin.licensescout.finder.FinderResult;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * Test case for {@link TxtExporter}.
  */
-public class TxtExporterTest extends AbstractExporterTest {
+public class TxtExporterTest extends AbstractStringCompareExporterTest {
 
     /**
-     * @throws java.lang.Exception
+     * {@inheritDoc}
      */
-    @Before
-    public void setUp() throws Exception {
-        exporter = TxtExporter.getInstance();
+    @Override
+    protected IReportExporter createExporter() {
+        return TxtExporter.getInstance();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected OutputFileType getExpectedOutputFileType() {
         return OutputFileType.TXT;
     }
 
     /**
-     * Test method for {@link org.aposin.licensescout.exporter.TxtExporter#export(org.aposin.licensescout.exporter.OutputResult, org.aposin.licensescout.exporter.ReportConfiguration)}.
+     * {@inheritDoc}
      */
-    @Test
-    public void testExportEmptyArchiveList() throws Exception {
-        final OutputResult outputResult = new OutputResult();
-        final File scanDirectory = new File(".");
-        final File outputFile = Paths.get("target", "output.txt").toFile();
-        final List<Archive> archiveFiles = new ArrayList<Archive>();
-        final FinderResult finderResult = new FinderResult(scanDirectory, archiveFiles);
-        outputResult.setFinderResult(finderResult);
-        outputResult.setPomResolutionUsed(false);
-        final ReportConfiguration reportConfiguration = new ReportConfiguration();
-        reportConfiguration.setOutputFile(outputFile);
-        getExporter().export(outputResult, reportConfiguration);
+    @Override
+    protected String getOutputFilename() {
+        return "licensereport.txt";
+    }
 
-        final String resultContent = IOUtils.toString(new FileReader(outputFile));
+    @Override
+    protected String getReferenceContent(final TestVariant testVariant) {
         final String nl = "\n";
-        final String referenceContent = nl + "License Report" + //
-                nl + nl + // 
-                "In the following sections you can find " + nl + //
-                "- List of used/linked software projects" + nl + // 
-                "- Notices to the used artifacts" + nl + //
-                "- List of used artifacts with license info and vendor plugin names" + nl + //
-                "- License texts" + nl + //
-                nl + nl + nl + //
-                "====================================================================" + nl + //
-                nl + //
-                "This project contains software from the following providers:" + nl + //
-                nl + //
-                "====================================================================" + nl + //
-                "Notices" + nl + //
-                "====================================================================" + nl + //
-                nl + nl + //
-                "====================================================================" + nl + //
-                "Artifacts by Licenses" + nl + //
-                "====================================================================" + nl + //
-                nl + nl + nl + nl + //
-                "====================================================================" + nl + //
-                "License texts" + nl + //
-                "====================================================================" + nl + //
-                nl + nl;
-        Assert.assertEquals("TXT output file contents", referenceContent, resultContent);
+        final StringBuffer referenceContent = new StringBuffer();
+        referenceContent.append(nl + "License Report");
+        referenceContent.append(nl + nl);
+        referenceContent.append("In the following sections you can find " + nl);
+        referenceContent.append("- List of used/linked software projects" + nl);
+        referenceContent.append("- Notices to the used artifacts" + nl);
+        referenceContent.append("- List of used artifacts with license info and vendor plugin names" + nl);
+        referenceContent.append("- License texts" + nl);
+        referenceContent.append(nl + nl + nl);
+        referenceContent.append("====================================================================" + nl);
+        referenceContent.append(nl);
+        referenceContent.append("This project contains software from the following providers:" + nl);
+        referenceContent.append(nl);
+        referenceContent.append("====================================================================" + nl);
+        referenceContent.append("Notices" + nl);
+        referenceContent.append("====================================================================" + nl);
+        referenceContent.append(nl + nl);
+        referenceContent.append("====================================================================" + nl);
+        referenceContent.append("Artifacts by Licenses" + nl);
+        referenceContent.append("====================================================================" + nl);
+        referenceContent.append(nl);
+        if (testVariant.isWithArchives()) {
+            referenceContent.append("name11 Version version" + nl);
+            referenceContent.append(nl);
+            referenceContent.append(nl);
+            referenceContent.append("* fileName01" + nl);
+            referenceContent.append(nl);
+            referenceContent.append(nl);
+            referenceContent.append(nl);
+        }
+        referenceContent.append(nl + nl + nl);
+
+        referenceContent.append("====================================================================" + nl);
+        referenceContent.append("License texts" + nl);
+        referenceContent.append("====================================================================" + nl);
+        referenceContent.append(nl + nl);
+        if (testVariant.isWithArchives()) {
+            referenceContent.append("name11 Version version" + nl);
+            referenceContent.append(nl + nl);
+            referenceContent.append("text" + nl);
+            referenceContent.append(nl);
+        }
+        return referenceContent.toString();
     }
 
 }

@@ -15,8 +15,12 @@
  */
 package org.aposin.licensescout.exporter;
 
+import java.nio.charset.StandardCharsets;
+
 import org.aposin.licensescout.configuration.OutputFileType;
-import org.junit.Before;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.junit.Assert;
 
 /**
  * Test case for {@link HtmlExporter}.
@@ -24,15 +28,36 @@ import org.junit.Before;
 public class HtmlExporterTest extends AbstractExporterTest {
 
     /**
-     * @throws java.lang.Exception
+     * {@inheritDoc}
      */
-    @Before
-    public void setUp() throws Exception {
-        exporter = HtmlExporter.getInstance();
+    @Override
+    protected IReportExporter createExporter() {
+        return HtmlExporter.getInstance();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected OutputFileType getExpectedOutputFileType() {
         return OutputFileType.HTML;
     }
 
+    @Override
+    protected void assertResultContent(TestVariant testVariant, final String resultContent) {
+        final Document doc = Jsoup.parse(resultContent);
+        Assert.assertEquals("Encoding", StandardCharsets.UTF_8, doc.charset());
+        Assert.assertNotNull("Detection statistics table present", doc.getElementById("detection_statistics_table"));
+        Assert.assertNotNull("Legal statistics table present", doc.getElementById("legal_statistics_table"));
+        Assert.assertNotNull("Genral statistics table present", doc.getElementById("general_statistics_table"));
+        Assert.assertNotNull("Main table present", doc.getElementById("license_table"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getOutputFilename() {
+        return "licensereport.html";
+    }
 }

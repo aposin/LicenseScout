@@ -16,7 +16,6 @@
 package org.aposin.licensescout.exporter;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -32,6 +31,7 @@ import org.aposin.licensescout.license.DetectionStatus;
 import org.aposin.licensescout.license.LegalStatus;
 import org.aposin.licensescout.license.License;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -39,7 +39,72 @@ import org.junit.Test;
  */
 public abstract class AbstractExporterTest {
 
-    protected IReportExporter exporter;
+    /**
+     * Variant of the test case.
+     */
+    protected enum TestVariant {
+        /**
+         * 
+         */
+        EMPTY_WITHOUT_DOCUMENTATION_URL(false, false),
+        /**
+         * 
+         */
+        EMPTY_WITH_DOCUMENTATION_URL(false, true),
+        /**
+         * 
+         */
+        ARCHIVE_WITHOUT_DOCUMENTATION_URL(true, false),
+        /**
+         * 
+         */
+        ARCHIVE_WITH_DOCUMENTATION_URL(true, true);
+
+        private final boolean withArchives;
+        private final boolean withDocumentationUrl;
+
+        /**
+         * Constructor.
+         * @param withArchives
+         * @param withDocumentationUrl
+         */
+        private TestVariant(boolean withArchives, boolean withDocumentationUrl) {
+            this.withDocumentationUrl = withDocumentationUrl;
+            this.withArchives = withArchives;
+        }
+
+        /**
+         * @return the withDocumentationUrl
+         */
+        public final boolean isWithDocumentationUrl() {
+            return withDocumentationUrl;
+        }
+
+        /**
+         * @return the withArchives
+         */
+        public final boolean isWithArchives() {
+            return withArchives;
+        }
+
+    }
+
+    private IReportExporter exporter;
+
+    /**
+     * Creates the exporter instance.
+     * @throws java.lang.Exception
+     */
+    @Before
+    public void setUp() throws Exception {
+        exporter = createExporter();
+    }
+
+    /**
+     * Creates the exporter instance.
+     * @return the exporter instance
+     */
+    protected abstract IReportExporter createExporter();
 
     /**
      * @return the exporter
@@ -49,32 +114,53 @@ public abstract class AbstractExporterTest {
     }
 
     /**
-     * Test method for {@link org.aposin.licensescout.exporter.CsvExporter#getOutputFileType()}.
+     * Test method for {@link IReportExporter#getOutputFileType()}.
      */
     @Test
     public void testGetOutputFileType() {
         Assert.assertEquals("outputFileType", getExpectedOutputFileType(), getExporter().getOutputFileType());
     }
 
+    /**
+     * Obtains the expected output file type.
+     * @return the expected output file type
+     */
     protected abstract OutputFileType getExpectedOutputFileType();
 
-    protected String runExporterEmptyArchiveList(final String messageDigestAlgorithm,
-                                                 final boolean showDocumentationUrl)
-            throws Exception, IOException, FileNotFoundException {
-        final List<Archive> archiveFiles = new ArrayList<Archive>();
-        return runExporter(messageDigestAlgorithm, archiveFiles, showDocumentationUrl);
+    /**
+     * Test method for {@link IReportExporter#export(org.aposin.licensescout.exporter.OutputResult, org.aposin.licensescout.exporter.ReportConfiguration)}.
+     */
+    @Test
+    public void testExportEmptyArchiveListWithoutDocumentationUrl() throws Exception {
+        assertExport(TestVariant.EMPTY_WITHOUT_DOCUMENTATION_URL);
     }
 
-    protected String runExporterWithArchiveList(final String messageDigestAlgorithm, final boolean showDocumentationUrl)
-            throws Exception, IOException, FileNotFoundException {
-        final List<Archive> archiveFiles = createArchiveList();
-        return runExporter(messageDigestAlgorithm, archiveFiles, showDocumentationUrl);
+    /**
+     * Test method for {@link IReportExporter#export(org.aposin.licensescout.exporter.OutputResult, org.aposin.licensescout.exporter.ReportConfiguration)}.
+     */
+    @Test
+    public void testExportWithArchiveListWithoutDocumentationUrl() throws Exception {
+        assertExport(TestVariant.ARCHIVE_WITHOUT_DOCUMENTATION_URL);
     }
 
-    protected List<Archive> createArchiveList() {
+    /**
+     * Execute report generation and verify the resulting report content.
+     * 
+     * @param testVariant
+     * @throws Exception
+     */
+    protected void assertExport(final TestVariant testVariant) throws Exception {
+        final List<Archive> archiveFiles = createArchiveList(testVariant);
+        final String resultContent = runExporter(archiveFiles, testVariant.isWithDocumentationUrl());
+        assertResultContent(testVariant, resultContent);
+    }
+
+    private List<Archive> createArchiveList(TestVariant testVariant) {
         final List<Archive> archiveFiles = new ArrayList<>();
-        final Archive archive = createArchive();
-        archiveFiles.add(archive);
+        if (testVariant.isWithArchives()) {
+            final Archive archive = createArchive();
+            archiveFiles.add(archive);
+        }
         return archiveFiles;
     }
 
@@ -85,26 +171,79 @@ public abstract class AbstractExporterTest {
         License license = new License("spdxIdentifier11", "name11", LegalStatus.UNKNOWN, "author", "version",
                 "urlPublic", "text", null);
         archive.addLicense(license, "licensepath");
+        archive.setDocumentationUrl("docUrl01");
         return archive;
     }
 
-    private String runExporter(final String messageDigestAlgorithm, final List<Archive> archiveFiles,
-                               final boolean showDocumentationUrl)
-            throws Exception, IOException, FileNotFoundException {
+    private String runExporter(final List<Archive> archiveFiles, final boolean showDocumentationUrl)
+            throws Exception, IOException {
+        final FinderResult finderResult = createFinderResult(archiveFiles);
         final OutputResult outputResult = new OutputResult();
-        outputResult.setMessageDigestAlgorithm(messageDigestAlgorithm);
-        final File scanDirectory = new File(".");
-        final File outputFile = Paths.get("target", "output.out").toFile();
-        final FinderResult finderResult = new FinderResult(scanDirectory, archiveFiles);
+        outputResult.setMessageDigestAlgorithm(getMessageDigestAlgorithm());
+        outputResult.setDetectionStatusStatistics(new DetectionStatusStatistics());
+        outputResult.setLegalStatusStatistics(new LegalStatusStatistics());
+        final GeneralStatistics generalStatistics = new GeneralStatistics();
+        generalStatistics.setCandidateLicenseFileCount(1001);
+        generalStatistics.setTotalArchiveCount(201);
+        outputResult.setGeneralStatistics(generalStatistics);
         outputResult.setFinderResult(finderResult);
-        final ReportConfiguration reportConfiguration = new ReportConfiguration();
-        reportConfiguration.setOutputFile(outputFile);
-        reportConfiguration.setShowDocumentationUrl(showDocumentationUrl);
+        outputResult.setPomResolutionUsed(false);
+        final ReportConfiguration reportConfiguration = createReportConfiguration(showDocumentationUrl);
         getExporter().export(outputResult, reportConfiguration);
+    
+        return readOutputFileToString();
+    }
 
+    private FinderResult createFinderResult(final List<Archive> archiveFiles) {
+        final File scanDirectory = new File(".");
+        return new FinderResult(scanDirectory, archiveFiles);
+    }
+
+    private ReportConfiguration createReportConfiguration(final boolean showDocumentationUrl) {
+        final ReportConfiguration reportConfiguration = new ReportConfiguration();
+        reportConfiguration.setOutputFile(getOutputFile());
+        reportConfiguration.setShowDocumentationUrl(showDocumentationUrl);
+        reportConfiguration.setShowLicenseCandidateFilesColumn(false);
+        reportConfiguration.setShowMessageDigestColumn(true);
+        reportConfiguration.setShowPathColumn(true);
+        return reportConfiguration;
+    }
+
+    private File getOutputFile() {
+        return Paths.get("target", getOutputFilename()).toFile();
+    }
+
+    /**
+     * Obtains the filename for the report to write to and read from in the test case.
+     * @return the filename for the report
+     */
+    protected abstract String getOutputFilename();
+
+    /**
+     * Verify the result content of the report.
+     * 
+     * @param testVariant
+     * @param resultContent
+     */
+    protected abstract void assertResultContent(TestVariant testVariant, String resultContent);
+
+    private String readOutputFileToString() throws IOException {
+        final File outputFile = getOutputFile();
         return IOUtils.toString(new FileReader(outputFile));
     }
 
+    /**
+     * Obtains the name of the message digest algorithm.
+     * @return the name of the message digest algorithm
+     */
+    protected static String getMessageDigestAlgorithm() {
+        return "ABC";
+    }
+
+    /**
+     * Obtains the system character newline sequence.
+     * @return the system newline character sequence
+     */
     protected static final String getNl() {
         return System.lineSeparator();
     }

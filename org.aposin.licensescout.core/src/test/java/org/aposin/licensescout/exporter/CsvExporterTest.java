@@ -16,63 +16,73 @@
 package org.aposin.licensescout.exporter;
 
 import org.aposin.licensescout.configuration.OutputFileType;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
  * Test case for {@link CsvExporter}.
  */
-public class CsvExporterTest extends AbstractExporterTest {
+public class CsvExporterTest extends AbstractStringCompareExporterTest {
 
     /**
-     * @throws java.lang.Exception
+     * {@inheritDoc}
      */
-    @Before
-    public void setUp() throws Exception {
-        exporter = CsvExporter.getInstance();
+    @Override
+    protected IReportExporter createExporter() {
+        return CsvExporter.getInstance();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected OutputFileType getExpectedOutputFileType() {
         return OutputFileType.CSV;
     }
 
     /**
-     * Test method for {@link org.aposin.licensescout.exporter.CsvExporter#export(org.aposin.licensescout.exporter.OutputResult, org.aposin.licensescout.exporter.ReportConfiguration)}.
-     */
-    @Test
-    public void testExportEmptyArchiveListWithoutDocumentationUrl() throws Exception {
-        final String messageDigestAlgorithm = "ABC";
-        final String resultContent = runExporterEmptyArchiveList(messageDigestAlgorithm, false);
-        final String referenceContent = getReferenceHeader(messageDigestAlgorithm, false);
-        Assert.assertEquals("CSV output file contents", referenceContent, resultContent);
-    }
-
-    /**
-     * Test method for {@link org.aposin.licensescout.exporter.CsvExporter#export(org.aposin.licensescout.exporter.OutputResult, org.aposin.licensescout.exporter.ReportConfiguration)}.
+     * Test method for {@link IReportExporter#export(org.aposin.licensescout.exporter.OutputResult, org.aposin.licensescout.exporter.ReportConfiguration)}.
      */
     @Test
     public void testExportEmptyArchiveListWithDocumentationUrl() throws Exception {
-        final String messageDigestAlgorithm = "ABC";
-        final String resultContent = runExporterEmptyArchiveList(messageDigestAlgorithm, true);
-        final String referenceContent = getReferenceHeader(messageDigestAlgorithm, true);
-        Assert.assertEquals("CSV output file contents", referenceContent, resultContent);
+        assertExport(TestVariant.EMPTY_WITH_DOCUMENTATION_URL);
     }
 
     /**
-     * Test method for {@link org.aposin.licensescout.exporter.CsvExporter#export(org.aposin.licensescout.exporter.OutputResult, org.aposin.licensescout.exporter.ReportConfiguration)}.
+     * Test method for {@link IReportExporter#export(org.aposin.licensescout.exporter.OutputResult, org.aposin.licensescout.exporter.ReportConfiguration)}.
      */
     @Test
-    public void testExportWithArchiveListWithoutDocumentationUrl() throws Exception {
-        final String messageDigestAlgorithm = "ABC";
-        final String resultContent = runExporterWithArchiveList(messageDigestAlgorithm, false);
-        final String referenceContent = getReferenceHeader(messageDigestAlgorithm, false)
-                + "\"JAVA\",\"fileName01\",\"version01\",\"\",\"DETECTED\",\"CONFLICTING\",\"path01\",\"spdxIdentifier11\""
-                + getNl();
-        Assert.assertEquals("CSV output file contents", referenceContent, resultContent);
+    public void testExportWithArchiveListWithDocumentationUrl() throws Exception {
+        assertExport(TestVariant.ARCHIVE_WITH_DOCUMENTATION_URL);
     }
 
-    private String getReferenceHeader(final String messageDigestAlgorithm, final boolean withDocumentationUrl) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getOutputFilename() {
+        return "licensereport.csv";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getReferenceContent(final TestVariant testVariant) {
+        final StringBuffer refContent = new StringBuffer();
+        refContent.append(getReferenceHeader(testVariant.isWithDocumentationUrl()));
+        if (testVariant.isWithArchives()) {
+            refContent.append("\"JAVA\",\"fileName01\",\"version01\",\"\",\"DETECTED\",\"CONFLICTING\",\"path01\",");
+            if (testVariant.isWithDocumentationUrl()) {
+                refContent.append("\"docUrl01\",");
+            }
+            refContent.append("\"spdxIdentifier11\"");
+            refContent.append(getNl());
+        }
+        return refContent.toString();
+    }
+
+    private String getReferenceHeader(final boolean withDocumentationUrl) {
+        final String messageDigestAlgorithm = getMessageDigestAlgorithm();
         final String nl = getNl();
         final String referenceContent = "\"Type\",\"Filename\",\"Version\",\"Message Digest (" + messageDigestAlgorithm
                 + ")\",\"Detection status\",\"Legal status\",\"Archive path\","

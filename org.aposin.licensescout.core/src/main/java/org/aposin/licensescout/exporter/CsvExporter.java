@@ -74,18 +74,15 @@ public class CsvExporter implements IReportExporter {
     public void export(final OutputResult outputResult, final ReportConfiguration reportConfiguration)
             throws Exception {
         final List<Archive> archiveFiles = outputResult.getFinderResult().getArchiveFiles();
-        final FileWriter fileWriter = new FileWriter(reportConfiguration.getOutputFile());
-        final BufferedWriter bw = new BufferedWriter(fileWriter);
+        try (final FileWriter fileWriter = new FileWriter(reportConfiguration.getOutputFile());
+                final BufferedWriter bw = new BufferedWriter(fileWriter)) {
 
-        try {
             writeHeader(outputResult, bw, reportConfiguration);
             Collections.sort(archiveFiles);
 
             for (final Archive archive : archiveFiles) {
                 write(archive, bw, reportConfiguration);
             }
-        } finally {
-            bw.close();
         }
     }
 
