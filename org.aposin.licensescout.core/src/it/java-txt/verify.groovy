@@ -13,5 +13,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-File reportFile = new File( basedir, "target/licensereport.html" );
+File reportFile = new File( basedir, "target/licensereport.txt" );
 assert reportFile.isFile();

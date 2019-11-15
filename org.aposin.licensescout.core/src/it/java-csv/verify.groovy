@@ -13,6 +13,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-File touchFile = new File( basedir, "target/touch.txt" );
-
-assert touchFile.isFile()
+File reportFile = new File( basedir, "target/licensereport.csv" );
+assert reportFile.isFile();

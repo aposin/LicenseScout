@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -7,29 +9,30 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>Help Test for License Scout Maven Plugin</name>
+	<name>Simple Test for License Scout Maven Plugin</name>
 
 	<url>https://aposin.org/</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<licensescout-configuration.dir>${project.build.directory}/licensescout-configuration</licensescout-configuration.dir>
 	</properties>
 
 	<build>
 		<plugins>
+
 			<plugin>
 				<groupId>@project.groupId@</groupId>
 				<artifactId>@project.artifactId@</artifactId>
 				<version>@project.version@</version>
 				<configuration>
-					<detail>true</detail>
-					<goal>scanJava</goal>
+					<skip>true</skip>
 				</configuration>
 				<executions>
 					<execution>
 						<phase>process-resources</phase>
 						<goals>
-							<goal>help</goal>
+							<goal>scanJava</goal>
 						</goals>
 					</execution>
 				</executions>
