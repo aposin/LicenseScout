@@ -42,6 +42,7 @@ import org.aposin.licensescout.archive.ArchiveIdentifierVersion;
 import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.archive.NameMatchingType;
 import org.aposin.licensescout.archive.PatternType;
+import org.aposin.licensescout.model.LSMessageDigest;
 import org.aposin.licensescout.model.Notice;
 import org.aposin.licensescout.model.Notices;
 import org.aposin.licensescout.model.Provider;
@@ -149,7 +150,8 @@ public class LicenseCheckedList {
                 final String documentationUrl = values[DOC_URL_INDEX].trim();
                 final String providerId = values[PROVIDER_INDEX].trim();
                 final int lineNumberFinal = lineNumber;
-                final Provider provider = getProviderFromId(providers, providerId, log, ()-> filename.getName() + ": line " + lineNumberFinal);
+                final Provider provider = getProviderFromId(providers, providerId, log,
+                        () -> filename.getName() + ": line " + lineNumberFinal);
                 final String noticeId = values[NOTICE_INDEX].trim();
                 final Notice notice = getNoticeFromId(notices, noticeId);
 
@@ -254,7 +256,7 @@ public class LicenseCheckedList {
      * @return a list of licenses, maybe empty
      */
     public LicenseResult getManualLicense(final ArchiveType archiveType, final String archiveName,
-                                          final byte[] messageDigest) {
+                                          final LSMessageDigest messageDigest) {
         final ArchiveIdentifier archiveIdentifier = new ArchiveIdentifierMessageDigest(archiveType, archiveName,
                 messageDigest);
         return getManualArchiveLicenses(archiveIdentifier);
@@ -380,12 +382,13 @@ public class LicenseCheckedList {
         return notices.getNoticeByIdentifier(noticeId);
     }
 
-    private static Provider getProviderFromId(final Providers providers, final String providerId, final ILFLog log, final Supplier<String> context) {
+    private static Provider getProviderFromId(final Providers providers, final String providerId, final ILFLog log,
+                                              final Supplier<String> context) {
         final Provider provider = providers.getProviderByIdentifier(providerId);
         if (provider == null) {
             String message = "Cannot find provider with ID: '" + providerId + "'";
-            if (context != null && !StringUtils.isEmpty( context.get())) {
-                message += " ("+ context.get() + ")";
+            if (context != null && !StringUtils.isEmpty(context.get())) {
+                message += " (" + context.get() + ")";
             }
             log.warn(message);
         }

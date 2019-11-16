@@ -36,6 +36,7 @@ import org.aposin.licensescout.license.ArtifactServerUtil;
 import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseStoreData;
 import org.aposin.licensescout.license.LicenseUtil;
+import org.aposin.licensescout.model.LSMessageDigest;
 import org.aposin.licensescout.util.ArchiveMetaInformation;
 import org.aposin.licensescout.util.CryptUtil;
 import org.aposin.licensescout.util.ILFLog;
@@ -289,7 +290,7 @@ public class JavaJarFinder extends AbstractFinder {
                                   final Archive archive)
             throws IOException {
         if (finderHandler.isFile(entry)) {
-            final byte[] md = finderHandler.calculateMessageDigest(entryContainer);
+            final LSMessageDigest md = finderHandler.calculateMessageDigest(entryContainer);
             archive.setMessageDigest(md);
         }
     }
@@ -298,7 +299,7 @@ public class JavaJarFinder extends AbstractFinder {
                                   final FileSystemEntryContainer entryContainer, final Archive archive)
             throws IOException {
         if (finderHandler.isFile(entryContainer.getFile())) {
-            final byte[] md = CryptUtil.calculateMessageDigest(entryContainer.getFile());
+            final LSMessageDigest md = CryptUtil.calculateMessageDigest(entryContainer.getFile());
             archive.setMessageDigest(md);
         }
     }
@@ -307,7 +308,7 @@ public class JavaJarFinder extends AbstractFinder {
                                   final JarEntry entry, final JarEntryContainer entryContainer, final Archive archive)
             throws IOException {
         if (finderHandler.isFile(entry)) {
-            final byte[] md = finderHandler.calculateMessageDigest(entryContainer);
+            final LSMessageDigest md = finderHandler.calculateMessageDigest(entryContainer);
             archive.setMessageDigest(md);
         }
     }
@@ -481,7 +482,7 @@ public class JavaJarFinder extends AbstractFinder {
 
         public ArchiveMetaInformation getArchiveMetaInformationFromManifest(C entryContainer) throws IOException;
 
-        public byte[] calculateMessageDigest(C entryContainer) throws IOException;
+        public LSMessageDigest calculateMessageDigest(C entryContainer) throws IOException;
 
     }
 
@@ -572,7 +573,7 @@ public class JavaJarFinder extends AbstractFinder {
          * {@inheritDoc}
          */
         @Override
-        public byte[] calculateMessageDigest(FileSystemEntryContainer entryContainer) throws IOException {
+        public LSMessageDigest calculateMessageDigest(FileSystemEntryContainer entryContainer) throws IOException {
             return CryptUtil.calculateMessageDigest(entryContainer.getFile());
         }
 
@@ -641,7 +642,7 @@ public class JavaJarFinder extends AbstractFinder {
          * {@inheritDoc}
          */
         @Override
-        public byte[] calculateMessageDigest(final JarEntryContainer entryContainer) throws IOException {
+        public LSMessageDigest calculateMessageDigest(final JarEntryContainer entryContainer) throws IOException {
             return CryptUtil.calculateMessageDigest(entryContainer.getInputStream());
         }
 

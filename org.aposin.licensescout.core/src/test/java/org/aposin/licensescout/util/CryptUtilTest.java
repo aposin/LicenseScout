@@ -37,8 +37,7 @@ public class CryptUtilTest {
     @Test
     public void testCalculateMessageDigest() throws IOException {
         final File file = new File("src/test/resources/licensetexts/apache2/LICENSE-2.0-without-newlines.txt");
-        final byte[] result = CryptUtil.calculateMessageDigest(file);
-        System.out.println("result hexstring: " + MiscUtil.getHexString(result));
+        final byte[] result = CryptUtil.calculateMessageDigest(file).getBytes();
         final String referenceString = EXPECTED_MESSAGE_DIGEST_STRING;
         final byte[] reference = getByteArrayFromHexString(referenceString);
         Assert.assertArrayEquals(reference, result);

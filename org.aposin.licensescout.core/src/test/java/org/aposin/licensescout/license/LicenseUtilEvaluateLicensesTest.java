@@ -105,7 +105,7 @@ public class LicenseUtilEvaluateLicensesTest {
     public void testEvaluateLicensesManualDetectedWithMessageDigest() throws Exception {
         final Archive archive = new Archive(ArchiveType.JAVA, "testarchive2", "", "path");
         archive.setMessageDigest(
-                MiscUtil.getByteArrayFromHexString("D11CDFDDC6F3CF3B48560004AA50795222F4ED8A44983651BBC9302A96AD4F46"));
+                MiscUtil.getLSMessageDigestFromHexString("D11CDFDDC6F3CF3B48560004AA50795222F4ED8A44983651BBC9302A96AD4F46"));
         final String[] originalDetectedLicenseIdentifiers = new String[0];
         final DetectionStatus expectedDetectionStatus = DetectionStatus.MANUAL_DETECTED;
         final LegalStatus expectedLegalStatus = LegalStatus.ACCEPTED;
@@ -139,7 +139,7 @@ public class LicenseUtilEvaluateLicensesTest {
     public void testEvaluateLicensesManualSelectedWithMessageDigest() throws Exception {
         final Archive archive = new Archive(ArchiveType.JAVA, "testarchive4", "", "path");
         archive.setMessageDigest(
-                MiscUtil.getByteArrayFromHexString("D11CDFDDC6F3CF3B48560004AA50795222F4ED8A44983651BBC9302A96AD4F46"));
+                MiscUtil.getLSMessageDigestFromHexString("D11CDFDDC6F3CF3B48560004AA50795222F4ED8A44983651BBC9302A96AD4F46"));
         final String[] originalDetectedLicenseIdentifiers = new String[] { "Apache-2.0", "LGPL-2.1" };
         final DetectionStatus expectedDetectionStatus = DetectionStatus.MANUAL_SELECTED;
         final LegalStatus expectedLegalStatus = LegalStatus.ACCEPTED;

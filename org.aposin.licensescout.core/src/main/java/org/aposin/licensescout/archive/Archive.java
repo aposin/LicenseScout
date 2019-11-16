@@ -16,7 +16,6 @@
 package org.aposin.licensescout.archive;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -27,6 +26,7 @@ import org.aposin.licensescout.license.DetectionStatus;
 import org.aposin.licensescout.license.LegalStatus;
 import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.model.Author;
+import org.aposin.licensescout.model.LSMessageDigest;
 import org.aposin.licensescout.model.LicenseText;
 import org.aposin.licensescout.model.Notice;
 import org.aposin.licensescout.model.Provider;
@@ -53,7 +53,7 @@ public class Archive implements Comparable<Archive> {
 
     private LegalStatus legalStatus;
 
-    private byte[] messageDigest;
+    private LSMessageDigest messageDigest;
 
     private final List<String> licenseCandidateFiles = new ArrayList<>();
 
@@ -195,14 +195,14 @@ public class Archive implements Comparable<Archive> {
     /**
      * @return the messageDigest
      */
-    public final byte[] getMessageDigest() {
+    public final LSMessageDigest getMessageDigest() {
         return messageDigest;
     }
 
     /**
      * @param messageDigest the messageDigest to set
      */
-    public final void setMessageDigest(final byte[] messageDigest) {
+    public final void setMessageDigest(final LSMessageDigest messageDigest) {
         this.messageDigest = messageDigest;
     }
 
@@ -211,7 +211,7 @@ public class Archive implements Comparable<Archive> {
      */
     public final String getMessageDigestString() {
         if (messageDigest != null) {
-            return MiscUtil.getHexString(messageDigest);
+            return MiscUtil.getHexString(messageDigest.getBytes());
         } else {
             return "";
         }
@@ -361,7 +361,7 @@ public class Archive implements Comparable<Archive> {
         builder.append(", legalStatus=");
         builder.append(legalStatus);
         builder.append(", messageDigest=");
-        builder.append(Arrays.toString(messageDigest));
+        builder.append(messageDigest);
         builder.append("]");
         return builder.toString();
     }
