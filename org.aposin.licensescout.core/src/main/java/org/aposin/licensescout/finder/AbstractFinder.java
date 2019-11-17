@@ -47,7 +47,7 @@ public abstract class AbstractFinder {
     /**
      * List of archives found during the scanning.
      */
-    protected final List<Archive> archiveFiles = new ArrayList<>();
+    private final List<Archive> archiveFiles = new ArrayList<>();
 
     /**
      * If set to true, the list of found archives including their licenses is dumped to the log with level DEBUG after the scanning run.
@@ -100,6 +100,14 @@ public abstract class AbstractFinder {
      */
     protected final File getScanDirectory() {
         return scanDirectory;
+    }
+
+    /**
+     * Adds an archive to the list of found archives.
+     * @param foundArchive an archive
+     */
+    protected void addToArchiveFiles(final Archive foundArchive) {
+        archiveFiles.add(foundArchive);
     }
 
     /**
@@ -161,8 +169,7 @@ public abstract class AbstractFinder {
         }
     }
 
-    protected void addLicenses(final Archive archive, final Collection<License> licenses, final File file,
-                               final String filePath) {
+    protected void addLicenses(final Archive archive, final Collection<License> licenses, final String filePath) {
         if (licenses != null) {
             for (final License license : licenses) {
                 if (license != null) {

@@ -16,7 +16,9 @@
 package org.aposin.licensescout.util;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,17 +32,19 @@ public class CryptUtilTest {
     private static final String EXPECTED_MESSAGE_DIGEST_STRING = "83A2CA29DBAA80C0D6B6369448D0EDC0ACF30CA6E35C86F1E4C43A4915179F0D";
 
     /**
-     * Test for {@link CryptUtil#calculateMessageDigest(File)}.
+     * Test for {@link CryptUtil#calculateMessageDigest(InputStream)}.
      * 
      * @throws IOException
      */
     @Test
     public void testCalculateMessageDigest() throws IOException {
         final File file = new File("src/test/resources/licensetexts/apache2/LICENSE-2.0-without-newlines.txt");
-        final byte[] result = CryptUtil.calculateMessageDigest(file).getBytes();
-        final String referenceString = EXPECTED_MESSAGE_DIGEST_STRING;
-        final byte[] reference = getByteArrayFromHexString(referenceString);
-        Assert.assertArrayEquals(reference, result);
+        try (final FileInputStream fis = new FileInputStream(file)) {
+            final byte[] result = CryptUtil.calculateMessageDigest(fis).getBytes();
+            final String referenceString = EXPECTED_MESSAGE_DIGEST_STRING;
+            final byte[] reference = getByteArrayFromHexString(referenceString);
+            Assert.assertArrayEquals(reference, result);
+        }
     }
 
     private byte[] getByteArrayFromHexString(final String hexString) {
