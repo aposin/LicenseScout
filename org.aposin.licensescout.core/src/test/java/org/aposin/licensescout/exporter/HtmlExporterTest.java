@@ -16,11 +16,16 @@
 package org.aposin.licensescout.exporter;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 
 import org.aposin.licensescout.configuration.OutputFileType;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Attributes;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Test case for {@link HtmlExporter}.
@@ -43,10 +48,47 @@ public class HtmlExporterTest extends AbstractExporterTest {
         return OutputFileType.HTML;
     }
 
+    /**
+     * Test method for {@link IReportExporter#export(OutputResult, ReportConfiguration)}.
+     * @throws Exception 
+     */
+    @Test
+    public void testExportWithArchiveListCustomTemplateUtf8() throws Exception {
+        assertExport(TestVariant.ARCHIVE_WITHOUT_DOCUMENTATION_URL_UTF_8, TemplateVariant.HTML_UTF_8);
+    }
+
+    /**
+     * Test method for {@link IReportExporter#export(OutputResult, ReportConfiguration)}.
+     * @throws Exception 
+     */
+    @Test
+    public void testExportWithArchiveListCustomTemplateUtf16BE() throws Exception {
+        assertExport(TestVariant.ARCHIVE_WITHOUT_DOCUMENTATION_URL_UTF_8, TemplateVariant.HTML_UTF_16BE);
+    }
+
+    /**
+     * Test method for {@link IReportExporter#export(OutputResult, ReportConfiguration)}.
+     * @throws Exception 
+     */
+    @Test
+    public void testExportWithArchiveListCustomTemplateUtf16LE() throws Exception {
+        assertExport(TestVariant.ARCHIVE_WITHOUT_DOCUMENTATION_URL_UTF_8, TemplateVariant.HTML_UTF_16LE);
+    }
+
     @Override
     protected void assertResultContent(TestVariant testVariant, final String resultContent) {
         final Document doc = Jsoup.parse(resultContent);
-        Assert.assertEquals("Encoding", StandardCharsets.UTF_8, doc.charset());
+        final Elements metaElements = doc.getElementsByTag("meta");
+        final Iterator<Element> iter = metaElements.iterator();
+        while (iter.hasNext()) {
+            final Element element = iter.next();
+            final Attributes attributes = element.attributes();
+            if (attributes.get("http-equiv") != null) {
+                final String contentAttribute = attributes.get("content");
+                final String expected = "charset=" + testVariant.getOutputCharset().name();
+                Assert.assertTrue("Encoding", contentAttribute.endsWith(expected));
+            }
+        }
         Assert.assertNotNull("Detection statistics table present", doc.getElementById("detection_statistics_table"));
         Assert.assertNotNull("Legal statistics table present", doc.getElementById("legal_statistics_table"));
         Assert.assertNotNull("Genral statistics table present", doc.getElementById("general_statistics_table"));
@@ -60,4 +102,5 @@ public class HtmlExporterTest extends AbstractExporterTest {
     protected String getOutputFilename() {
         return "licensereport.html";
     }
+
 }

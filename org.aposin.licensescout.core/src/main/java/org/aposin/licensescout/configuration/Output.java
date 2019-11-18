@@ -58,6 +58,26 @@ public class Output {
     private File template;
 
     /**
+     * Encoding of the output file.
+     * 
+     * <p>A JAVA encoding name to use for reading the template file.
+     * If not configured, the value of 'project.build.sourceEncoding' is used.
+     * If this is not configured, too, the platform specific default encoding is used.</p>
+     */
+    @Parameter(property = "templateEncoding", required = false, defaultValue = "${project.build.sourceEncoding}")
+    private String templateEncoding;
+
+    /**
+     * Encoding of the output file.
+     * 
+     * <p>A JAVA encoding name to use for the output file.
+     * If not configured, the value of 'project.reporting.outputEncoding' is used.
+     * If this is not configured, too, the platform specific default encoding is used.</p>
+     */
+    @Parameter(property = "encoding", required = false, defaultValue = "${project.reporting.outputEncoding}")
+    private String outputEncoding;
+
+    /**
      * @return the type
      */
     public final OutputFileType getType() {
@@ -111,6 +131,34 @@ public class Output {
      */
     public final void setTemplate(final File template) {
         this.template = template;
+    }
+
+    /**
+     * @return the templateEncoding
+     */
+    public final String getTemplateEncoding() {
+        return templateEncoding;
+    }
+
+    /**
+     * @param templateEncoding the templateEncoding to set
+     */
+    public final void setTemplateEncoding(String templateEncoding) {
+        this.templateEncoding = templateEncoding;
+    }
+
+    /**
+     * @return the outputEncoding
+     */
+    public final String getOutputEncoding() {
+        return outputEncoding;
+    }
+
+    /**
+     * @param outputEncoding the outputEncoding to set
+     */
+    public final void setOutputEncoding(String outputEncoding) {
+        this.outputEncoding = outputEncoding;
     }
 
 }

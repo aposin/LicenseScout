@@ -19,6 +19,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -73,8 +74,9 @@ public class CsvExporter implements IReportExporter {
     @Override
     public void export(final OutputResult outputResult, final ReportConfiguration reportConfiguration)
             throws Exception {
+        final Charset charset = ExporterUtil.getOutputCharset(reportConfiguration);
         final List<Archive> archiveFiles = outputResult.getFinderResult().getArchiveFiles();
-        try (final FileWriter fileWriter = new FileWriter(reportConfiguration.getOutputFile());
+        try (final FileWriter fileWriter = new FileWriter(reportConfiguration.getOutputFile(), charset);
                 final BufferedWriter bw = new BufferedWriter(fileWriter)) {
 
             writeHeader(outputResult, bw, reportConfiguration);

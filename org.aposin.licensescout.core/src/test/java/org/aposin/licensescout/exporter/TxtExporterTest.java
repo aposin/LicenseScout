@@ -16,6 +16,7 @@
 package org.aposin.licensescout.exporter;
 
 import org.aposin.licensescout.configuration.OutputFileType;
+import org.junit.Test;
 
 /**
  * Test case for {@link TxtExporter}.
@@ -36,6 +37,33 @@ public class TxtExporterTest extends AbstractStringCompareExporterTest {
     @Override
     protected OutputFileType getExpectedOutputFileType() {
         return OutputFileType.TXT;
+    }
+
+    /**
+     * Test method for {@link IReportExporter#export(OutputResult, ReportConfiguration)}.
+     * @throws Exception 
+     */
+    @Test
+    public void testExportWithArchiveListCustomTemplateUtf8() throws Exception {
+        assertExport(TestVariant.ARCHIVE_WITHOUT_DOCUMENTATION_URL_UTF_8, TemplateVariant.TXT_UTF_8);
+    }
+
+    /**
+     * Test method for {@link IReportExporter#export(OutputResult, ReportConfiguration)}.
+     * @throws Exception 
+     */
+    @Test
+    public void testExportWithArchiveListCustomTemplateUtf16BE() throws Exception {
+        assertExport(TestVariant.ARCHIVE_WITHOUT_DOCUMENTATION_URL_UTF_8, TemplateVariant.TXT_UTF_16BE);
+    }
+
+    /**
+     * Test method for {@link IReportExporter#export(OutputResult, ReportConfiguration)}.
+     * @throws Exception 
+     */
+    @Test
+    public void testExportWithArchiveListCustomTemplateUtf16LE() throws Exception {
+        assertExport(TestVariant.ARCHIVE_WITHOUT_DOCUMENTATION_URL_UTF_8, TemplateVariant.TXT_UTF_16LE);
     }
 
     /**

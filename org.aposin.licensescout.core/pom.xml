@@ -187,6 +187,9 @@
 						<exclude>**/*.xml</exclude>
 						<exlucde>**/*.txt</exlucde>
 						<exclude>**/*.csv</exclude>
+						<!-- check fails on files with UTF-16 encoding because it uses UTF-8 
+							encoding (which is the case for all other files) -->
+						<exclude>**/*UTF-16*.vm</exclude>
 					</excludes>
 				</configuration>
 			</plugin>

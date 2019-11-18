@@ -45,7 +45,7 @@ public class CsvExporterTest extends AbstractStringCompareExporterTest {
      */
     @Test
     public void testExportEmptyArchiveListWithDocumentationUrl() throws Exception {
-        assertExport(TestVariant.EMPTY_WITH_DOCUMENTATION_URL);
+        assertExport(TestVariant.EMPTY_WITH_DOCUMENTATION_URL_UTF_8, TemplateVariant.DEFAULT);
     }
 
     /**
@@ -54,7 +54,7 @@ public class CsvExporterTest extends AbstractStringCompareExporterTest {
      */
     @Test
     public void testExportWithArchiveListWithDocumentationUrl() throws Exception {
-        assertExport(TestVariant.ARCHIVE_WITH_DOCUMENTATION_URL);
+        assertExport(TestVariant.ARCHIVE_WITH_DOCUMENTATION_URL_UTF_8, TemplateVariant.DEFAULT);
     }
 
     /**

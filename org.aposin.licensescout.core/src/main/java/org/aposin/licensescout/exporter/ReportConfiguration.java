@@ -32,6 +32,8 @@ public class ReportConfiguration {
     private boolean showDocumentationUrl;
     private File outputFile;
     private File templateFile;
+    private String templateEncoding;
+    private String outputEncoding;
 
     /**
      * @return the totalArchiveCount
@@ -115,6 +117,34 @@ public class ReportConfiguration {
      */
     public final void setTemplateFile(final File templateFile) {
         this.templateFile = templateFile;
+    }
+
+    /**
+     * @return the templateEncoding
+     */
+    public final String getTemplateEncoding() {
+        return templateEncoding;
+    }
+
+    /**
+     * @param templateEncoding the templateEncoding to set
+     */
+    public final void setTemplateEncoding(String templateEncoding) {
+        this.templateEncoding = templateEncoding;
+    }
+
+    /**
+     * @return the encoding
+     */
+    public final String getOutputEncoding() {
+        return outputEncoding;
+    }
+
+    /**
+     * @param encoding the encoding to set
+     */
+    public final void setOutputEncoding(String encoding) {
+        this.outputEncoding = encoding;
     }
 
 }

@@ -45,6 +45,8 @@ public class TxtExporter extends AbstractVelocityExporter {
 
     private static final String DEFAULT_TEMPLATES_LICENSE_REPORT_VM = "templates/license_report_txt_default.vm";
 
+    private static final String DEFAULT_TEMPLATE_ENCODING = "UTF-8";
+
     private static final IReportExporter INSTANCE = new TxtExporter();
 
     /**
@@ -69,7 +71,7 @@ public class TxtExporter extends AbstractVelocityExporter {
      */
     @Override
     protected Template getDefaultTemplate() {
-        return Velocity.getTemplate(DEFAULT_TEMPLATES_LICENSE_REPORT_VM);
+        return Velocity.getTemplate(DEFAULT_TEMPLATES_LICENSE_REPORT_VM, DEFAULT_TEMPLATE_ENCODING);
     }
 
     /**
