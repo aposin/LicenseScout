@@ -15,8 +15,9 @@
  */
 package org.aposin.licensescout.archive;
 
-import java.util.Arrays;
+import java.util.Objects;
 
+import org.aposin.licensescout.model.LSMessageDigest;
 import org.aposin.licensescout.util.MiscUtil;
 
 /**
@@ -28,7 +29,7 @@ import org.aposin.licensescout.util.MiscUtil;
  */
 public class ArchiveIdentifierMessageDigest extends ArchiveIdentifier {
 
-    private final byte[] messageDigest;
+    private final LSMessageDigest messageDigest;
 
     /**
      * Constructor.
@@ -37,7 +38,8 @@ public class ArchiveIdentifierMessageDigest extends ArchiveIdentifier {
      * @param name
      * @param messageDigest a message digest as byte array
      */
-    public ArchiveIdentifierMessageDigest(final ArchiveType archiveType, final String name, final byte[] messageDigest) {
+    public ArchiveIdentifierMessageDigest(final ArchiveType archiveType, final String name,
+            final LSMessageDigest messageDigest) {
         super(archiveType, NameMatchingType.EXACT, name);
         this.messageDigest = messageDigest;
     }
@@ -51,13 +53,13 @@ public class ArchiveIdentifierMessageDigest extends ArchiveIdentifier {
      */
     public ArchiveIdentifierMessageDigest(final ArchiveType archiveType, final String name,
             final String messageDigestHexString) {
-        this(archiveType, name, MiscUtil.getByteArrayFromHexString(messageDigestHexString));
+        this(archiveType, name, MiscUtil.getLSMessageDigestFromHexString(messageDigestHexString));
     }
 
     /**
      * @return the messageDigest
      */
-    public final byte[] getMessageDigest() {
+    public final LSMessageDigest getMessageDigest() {
         return messageDigest;
     }
 
@@ -67,10 +69,8 @@ public class ArchiveIdentifierMessageDigest extends ArchiveIdentifier {
     @Override
     public int hashCode() {
         final int prime = 31;
-        int result = 1;
-        result = prime * result + ((getArchiveType() == null) ? 0 : getArchiveType().hashCode());
-        result = prime * result + Arrays.hashCode(messageDigest);
-        result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
+        int result = super.hashCode();
+        result = prime * result + Objects.hash(messageDigest);
         return result;
     }
 
@@ -82,27 +82,14 @@ public class ArchiveIdentifierMessageDigest extends ArchiveIdentifier {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
+        if (!super.equals(obj)) {
             return false;
         }
         if (getClass() != obj.getClass()) {
             return false;
         }
         ArchiveIdentifierMessageDigest other = (ArchiveIdentifierMessageDigest) obj;
-        if (getArchiveType() != other.getArchiveType()) {
-            return false;
-        }
-        if (!Arrays.equals(messageDigest, other.messageDigest)) {
-            return false;
-        }
-        if (getName() == null) {
-            if (other.getName() != null) {
-                return false;
-            }
-        } else if (!getName().equals(other.getName())) {
-            return false;
-        }
-        return true;
+        return Objects.equals(messageDigest, other.messageDigest);
     }
 
 }

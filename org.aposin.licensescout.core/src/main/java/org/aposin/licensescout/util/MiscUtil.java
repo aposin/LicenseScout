@@ -17,6 +17,8 @@ package org.aposin.licensescout.util;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.aposin.licensescout.model.LSMessageDigest;
+
 /**
  * Miscellaneous utility methods.
  * 
@@ -41,10 +43,20 @@ public class MiscUtil {
     /**
      * Obtains a byte array from a hex string.
      * 
-     * @param str a byte array
-     * @return a hex string
+     * @param str a hex string
+     * @return a byte array
      */
     public static final byte[] getByteArrayFromHexString(final String str) {
         return DatatypeConverter.parseHexBinary(str);
+    }
+
+    /**
+     * Obtains a message digest object from a hex string.
+     * 
+     * @param str a byte array
+     * @return a message digest object
+     */
+    public static final LSMessageDigest getLSMessageDigestFromHexString(final String str) {
+        return new LSMessageDigest(getByteArrayFromHexString(str));
     }
 }

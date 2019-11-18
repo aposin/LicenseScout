@@ -22,13 +22,15 @@ import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 
+import org.apache.commons.io.input.MessageDigestCalculatingInputStream;
+import org.aposin.licensescout.model.LSMessageDigest;
+
 /**
  * Utility methods for calculating message digests.
  * 
  */
 public class CryptUtil {
 
-    private static final int READ_BUFFER_SIZE = 4096;
     private static final String DEFAULT_MD_ALGORITHM = "SHA-256";
 
     private static String messageDigestAlgorithm = DEFAULT_MD_ALGORITHM;
@@ -44,7 +46,7 @@ public class CryptUtil {
      * @return the message digest
      * @throws IOException
      */
-    public static byte[] calculateMessageDigest(final File file) throws IOException {
+    public static LSMessageDigest calculateMessageDigest(final File file) throws IOException {
         try (final FileInputStream fis = new FileInputStream(file)) {
             return calculateMessageDigest(fis);
         }
@@ -57,14 +59,12 @@ public class CryptUtil {
      * @return a message digest
      * @throws IOException
      */
-    public static byte[] calculateMessageDigest(InputStream is) throws IOException {
+    public static LSMessageDigest calculateMessageDigest(final InputStream is) throws IOException {
         final MessageDigest md = getMessageDigestInstance();
-        final byte[] buffer = new byte[READ_BUFFER_SIZE];
-        int read;
-        while ((read = is.read(buffer)) != -1) {
-            md.update(buffer, 0, read);
+        try (final MessageDigestCalculatingInputStream stream = new MessageDigestCalculatingInputStream(is, md)) {
+            stream.consume();
+            return new LSMessageDigest(md.digest());
         }
-        return md.digest();
     }
 
     private static MessageDigest getMessageDigestInstance() {
