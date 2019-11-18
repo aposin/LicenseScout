@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Set;
 
@@ -81,13 +82,14 @@ public class DatabaseWriter {
     /**
      * @param buildInfo
      * @param connection
+     * @return the primary key value of the inserted row
      * @throws SQLException
      */
     private static int insertBuild(final BuildInfo buildInfo, final Connection connection) throws SQLException {
         // NOTE: Datetime is set by the DBMS
         try (final PreparedStatement statement = connection.prepareStatement(
                 "INSERT INTO Builds (Buildname, Version, URL_Build, URL_Licensereport_CSV, URL_Licensereport_HTML, URL_Licensereport_TXT) VALUES (?, ?, ?, ?, ?, ?)",
-                PreparedStatement.RETURN_GENERATED_KEYS)) {
+                Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, convertNull(buildInfo.getName()));
             statement.setString(2, convertNull(buildInfo.getVersion()));
             statement.setString(3, convertNull(buildInfo.getBuildUrl()));
@@ -112,14 +114,14 @@ public class DatabaseWriter {
      * @param buildPK
      * @param archive
      * @param connection
-     * @return
+     * @return the primary key value of the inserted row
      * @throws SQLException
      */
     private static int insertLibrary(final int buildPK, final Archive archive, final Connection connection)
             throws SQLException {
         try (final PreparedStatement statement = connection.prepareStatement(
                 "INSERT INTO LibraryData (FK_Build_Id, Selected_License, Filename, Provider, Version, Type, Message_Digest, Detection_Status, Legal_Status, Documentation_Link) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                PreparedStatement.RETURN_GENERATED_KEYS)) {
+                Statement.RETURN_GENERATED_KEYS)) {
             statement.setInt(1, buildPK);
             statement.setString(2, getLicenseName(archive));
             statement.setString(3, convertNull(archive.getFileName()));

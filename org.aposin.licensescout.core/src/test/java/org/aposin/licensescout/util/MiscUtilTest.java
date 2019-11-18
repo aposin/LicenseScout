@@ -15,6 +15,9 @@
  */
 package org.aposin.licensescout.util;
 
+import java.io.File;
+
+import org.aposin.licensescout.core.test.util.TestUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -53,6 +56,22 @@ public class MiscUtilTest {
     public void testGetBytes() {
         Assert.assertArrayEquals("byte array", MESSAGE_DIGEST_BYTE_ARRAY,
                 MiscUtil.getLSMessageDigestFromHexString(MESSAGE_DIGEST_STRING).getBytes());
+    }
+
+    /**
+     * Test case for the method {@link MiscUtil#createDirectoryIfNotExists(File)}.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testCreateDirectoryIfNotExists() throws Exception {
+        final File directory = new File("target/testdir");
+        directory.delete();
+        final ILFLog log = TestUtil.createNullLog();
+        MiscUtil.createDirectoryIfNotExists(directory, log);
+        Assert.assertEquals(
+                "createDirectoryIfNotExists(): expected directory not existing after creating or is not a directory",
+                true, directory.exists() && directory.isDirectory());
     }
 
 }

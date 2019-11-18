@@ -75,7 +75,9 @@ public class ArtifactServerUtil {
             final URL url = new URL(urlString);
             final URLConnection urlConnection = url.openConnection();
             urlConnection.setConnectTimeout(connectTimeoutInMilliseconds);
-            try (InputStream is = urlConnection.getInputStream();) {}
+            try (InputStream is = urlConnection.getInputStream();) {
+                // DO NOTHING - we only test for an exception
+            }
             return true;
         } catch (IOException e) {
             log.warn("Cannot access artifact server at: " + urlString);

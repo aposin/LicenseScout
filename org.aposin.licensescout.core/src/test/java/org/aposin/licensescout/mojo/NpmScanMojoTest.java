@@ -20,6 +20,10 @@ import java.util.ArrayList;
 import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.finder.JavascriptNpmFinder;
 
+/**
+ * Unit tests for {@link NpmScanMojo}.
+ *
+ */
 public class NpmScanMojoTest extends AbstractScanMojoTest {
 
     /**

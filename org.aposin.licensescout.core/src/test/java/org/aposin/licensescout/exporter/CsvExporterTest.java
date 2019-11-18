@@ -41,6 +41,7 @@ public class CsvExporterTest extends AbstractStringCompareExporterTest {
 
     /**
      * Test method for {@link IReportExporter#export(org.aposin.licensescout.exporter.OutputResult, org.aposin.licensescout.exporter.ReportConfiguration)}.
+     * @throws Exception 
      */
     @Test
     public void testExportEmptyArchiveListWithDocumentationUrl() throws Exception {
@@ -49,6 +50,7 @@ public class CsvExporterTest extends AbstractStringCompareExporterTest {
 
     /**
      * Test method for {@link IReportExporter#export(org.aposin.licensescout.exporter.OutputResult, org.aposin.licensescout.exporter.ReportConfiguration)}.
+     * @throws Exception 
      */
     @Test
     public void testExportWithArchiveListWithDocumentationUrl() throws Exception {

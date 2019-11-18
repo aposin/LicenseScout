@@ -15,6 +15,8 @@
  */
 package org.aposin.licensescout.util;
 
+import java.io.File;
+
 import javax.xml.bind.DatatypeConverter;
 
 import org.aposin.licensescout.model.LSMessageDigest;
@@ -59,4 +61,16 @@ public class MiscUtil {
     public static final LSMessageDigest getLSMessageDigestFromHexString(final String str) {
         return new LSMessageDigest(getByteArrayFromHexString(str));
     }
+
+    /**
+     * @param directory
+     * @param log 
+     */
+    public static void createDirectoryIfNotExists(final File directory, final ILFLog log) {
+        if (!directory.exists()) {
+            directory.mkdirs();
+            log.info("created directory " + directory.getAbsoluteFile());
+        }
+    }
+
 }

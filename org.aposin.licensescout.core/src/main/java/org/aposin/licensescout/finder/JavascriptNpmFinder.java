@@ -182,12 +182,13 @@ public class JavascriptNpmFinder extends AbstractFinder {
                 final String entryName = entry.getName();
                 final String newFilePath = filePath + "/" + entryName;
                 final File file = new File(parent, entryName);
-                final FileInputStream is = new FileInputStream(entry);
-                if (isCandidateLicenseFile(entryName)) {
-                    archive.addLicenseCandidateFile(newFilePath);
+                try (final FileInputStream is = new FileInputStream(entry)) {
+                    if (isCandidateLicenseFile(entryName)) {
+                        archive.addLicenseCandidateFile(newFilePath);
+                    }
+                    final Collection<License> licenses = checkFileForLicenses(is, entryName, getLicenseStoreData());
+                    addLicenses(archive, licenses, file, newFilePath);
                 }
-                final Collection<License> licenses = checkFileForLicenses(is, entryName, getLicenseStoreData());
-                addLicenses(archive, licenses, file, newFilePath);
             }
         }
     }
