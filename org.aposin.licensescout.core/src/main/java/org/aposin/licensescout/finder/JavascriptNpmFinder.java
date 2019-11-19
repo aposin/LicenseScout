@@ -114,6 +114,7 @@ public class JavascriptNpmFinder extends AbstractFinder {
         final ArchiveIdentifierVersion archiveIdentifier = JsonUtil.getNPMArchiveDescription(packageJsonFile);
         final Archive foundArchive = new Archive(JAVASCRIPT, archiveIdentifier.getName(),
                 archiveIdentifier.getVersion(), filePath);
+        addToArchiveFiles(foundArchive);
         getLog().debug("adding archive for: " + filePath);
         final String vendorName = JsonUtil.getNPMArchiveVendorName(packageJsonFile);
         foundArchive.setVendor(vendorName);
@@ -125,7 +126,6 @@ public class JavascriptNpmFinder extends AbstractFinder {
             getLog().debug("No author information found");
         }
         foundArchive.setAuthor(author);
-        archiveFiles.add(foundArchive);
         final String npmArchiveLicenseName = JsonUtil.getNPMArchiveLicenseName(packageJsonFile);
         getLog().debug("license name: " + npmArchiveLicenseName);
         final List<License> licenses = LicenseUtil.mapNpmLicenseName(npmArchiveLicenseName, getLicenseStoreData());
@@ -181,13 +181,12 @@ public class JavascriptNpmFinder extends AbstractFinder {
             if (entry.isFile()) {
                 final String entryName = entry.getName();
                 final String newFilePath = filePath + "/" + entryName;
-                final File file = new File(parent, entryName);
                 try (final FileInputStream is = new FileInputStream(entry)) {
                     if (isCandidateLicenseFile(entryName)) {
                         archive.addLicenseCandidateFile(newFilePath);
                     }
                     final Collection<License> licenses = checkFileForLicenses(is, entryName, getLicenseStoreData());
-                    addLicenses(archive, licenses, file, newFilePath);
+                    addLicenses(archive, licenses, newFilePath);
                 }
             }
         }
