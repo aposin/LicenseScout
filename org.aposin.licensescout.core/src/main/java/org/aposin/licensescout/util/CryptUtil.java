@@ -40,19 +40,6 @@ public class CryptUtil {
     }
 
     /**
-     * Calculates a message digest over the binary content of a file.
-     * 
-     * @param file
-     * @return the message digest
-     * @throws IOException
-     */
-    public static LSMessageDigest calculateMessageDigest(final File file) throws IOException {
-        try (final FileInputStream fis = new FileInputStream(file)) {
-            return calculateMessageDigest(fis);
-        }
-    }
-
-    /**
      * Calculates a message digest from an input stream.
      * 
      * @param is an input stream

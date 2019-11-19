@@ -121,19 +121,12 @@ public class JavaJarFinder extends AbstractFinder {
             if (isArchiveDirectory(file)) {
                 getLog().debug("parseFile(): recognized as archive directory");
                 final File manifestFile = getManifestFile(file);
-                String version = null;
-                String vendor = null;
+                ArchiveMetaInformation archiveMetaInformation = null;
                 if (manifestFile != null) {
-                    final ArchiveMetaInformation archiveMetaInformation = JarUtil
-                            .getArchiveMetaInformationFromManifestFile(manifestFile, getLog());
-                    version = archiveMetaInformation.getVersion();
-                    vendor = archiveMetaInformation.getVendor();
+                    archiveMetaInformation = JarUtil.getArchiveMetaInformationFromManifestFile(manifestFile, getLog());
                 }
-                version = getVersionNotNull(version);
-                final Archive foundArchive = new Archive(JAVA, entryName, version, filePath);
-                foundArchive.setVendor(vendor);
+                final Archive foundArchive = createAndAddArchive(entryName, archiveMetaInformation, filePath);
                 // TODO: fetch license header
-                archiveFiles.add(foundArchive);
                 parseUnpackedJarArchive(foundArchive, file, filePath);
             } else {
                 getLog().debug("parseFile(): recognized as normal directory");
@@ -148,11 +141,7 @@ public class JavaJarFinder extends AbstractFinder {
                 getLog().debug("parseFile(): recognized as archive file");
                 final ArchiveMetaInformation archiveMetaInformation = finderHandler
                         .getArchiveMetaInformationFromManifest(entryContainer);
-                String version = archiveMetaInformation.getVersion();
-                version = getVersionNotNull(version);
-                final Archive foundArchive = new Archive(JAVA, entryName, version, filePath);
-                foundArchive.setVendor(archiveMetaInformation.getVendor());
-                archiveFiles.add(foundArchive);
+                final Archive foundArchive = createAndAddArchive(entryName, archiveMetaInformation, filePath);
                 addMessageDigest(finderHandler, entryContainer, foundArchive);
                 final String newFilePath = filePath + "!";
                 try (final FileInputStream archiveFileInputStream = new FileInputStream(file)) {
@@ -177,48 +166,51 @@ public class JavaJarFinder extends AbstractFinder {
             getLog().debug("parseUnpackedJarArchive(): processing " + newFilePath);
             if (isSpecialArchive(entryName)) {
                 getLog().debug("parseUnpackedJarArchive(): recognized as special archive");
-                final Archive foundArchive = new Archive(JAVA, entryName, "0.0.0", newFilePath);
-                archiveFiles.add(foundArchive);
-                parseUnpackedJarArchive(foundArchive, entryContainer.getFile(), newFilePath);
-                continue;
-            }
-            if (finderHandler.isDirectory(entry)) {
-                getLog().debug("parseUnpackedJarArchive(): recognized as directory");
-                if (finderHandler.isUseDirectoryRecursion()) {
-                    parseUnpackedJarArchive(archive, entryContainer.getFile(), newFilePath);
-                }
-            } else { // is file
-                if (isArchiveName(entryName)) {
-                    getLog().debug("parseUnpackedJarArchive(): recognized as archive file");
-                    final ArchiveMetaInformation archiveMetaInformation = finderHandler
-                            .getArchiveMetaInformationFromManifest(entryContainer);
-                    String version = archiveMetaInformation.getVersion();
-                    version = getVersionNotNull(version);
-                    final Archive foundArchive = new Archive(JAVA, entryName, version, newFilePath);
-                    foundArchive.setVendor(archiveMetaInformation.getVendor());
-                    archiveFiles.add(foundArchive);
-                    addMessageDigest(finderHandler, entry, entryContainer, foundArchive);
-                    final String newFilePath2 = newFilePath + "!";
-                    addLicenseFromManifest(foundArchive, archiveMetaInformation, newFilePath2);
-                    try (final FileInputStream archiveInputStream = new FileInputStream(entryContainer.getFile())) {
-                        parsePackedJarArchive(foundArchive, archiveInputStream, entry, newFilePath2);
+                handleSpecialArchive(entryName, entryContainer, newFilePath);
+            } else {
+                if (finderHandler.isDirectory(entry)) {
+                    getLog().debug("parseUnpackedJarArchive(): recognized as directory");
+                    if (finderHandler.isUseDirectoryRecursion()) {
+                        parseUnpackedJarArchive(archive, entryContainer.getFile(), newFilePath);
                     }
-                } else {
-                    getLog().debug("parseUnpackedJarArchive(): recognized as normal file");
-                    if (isCandidateLicenseFile(entryName)) {
-                        archive.addLicenseCandidateFile(newFilePath);
-                    }
-                    try (final InputStream inputStream = entryContainer.getInputStream()) {
-                        final Collection<License> licenses = checkFileForLicenses(inputStream, entryName,
-                                getLicenseStoreData());
-                        addLicenses(archive, licenses, entry, newFilePath);
-                    }
-                    if (isPomFile(entryName)) {
-                        addLicensesFromPom(entryContainer, archive, newFilePath, getLog());
+                } else { // is file
+                    if (isArchiveName(entryName)) {
+                        getLog().debug("parseUnpackedJarArchive(): recognized as archive file");
+                        final ArchiveMetaInformation archiveMetaInformation = finderHandler
+                                .getArchiveMetaInformationFromManifest(entryContainer);
+                        final Archive foundArchive = createAndAddArchive(entryName, archiveMetaInformation,
+                                newFilePath);
+                        addMessageDigest(finderHandler, entryContainer, foundArchive);
+                        final String newFilePath2 = newFilePath + "!";
+                        addLicenseFromManifest(foundArchive, archiveMetaInformation, newFilePath2);
+                        try (final FileInputStream archiveInputStream = new FileInputStream(entryContainer.getFile())) {
+                            parsePackedJarArchive(foundArchive, archiveInputStream, entry, newFilePath2);
+                        }
+                    } else {
+                        getLog().debug("parseUnpackedJarArchive(): recognized as normal file");
+                        if (isCandidateLicenseFile(entryName)) {
+                            archive.addLicenseCandidateFile(newFilePath);
+                        }
+                        try (final InputStream inputStream = entryContainer.getInputStream()) {
+                            final Collection<License> licenses = checkFileForLicenses(inputStream, entryName,
+                                    getLicenseStoreData());
+                            addLicenses(archive, licenses, newFilePath);
+                        }
+                        if (isPomFile(entryName)) {
+                            addLicensesFromPom(entryContainer, archive, newFilePath);
+                        }
                     }
                 }
             }
         }
+    }
+
+    private void handleSpecialArchive(final String entryName, final FileSystemEntryContainer entryContainer,
+                                      final String newFilePath)
+            throws Exception {
+        final String version = "0.0.0";
+        final Archive foundArchive = createAndAddArchive(entryName, version, newFilePath);
+        parseUnpackedJarArchive(foundArchive, entryContainer.getFile(), newFilePath);
     }
 
     private void parsePackedJarArchive(final Archive archive, final InputStream fileInputStream, final File parent,
@@ -242,12 +234,12 @@ public class JavaJarFinder extends AbstractFinder {
                     if (finderHandler.isFile(entry)) {
                         version = archiveMetaInformation.getVersion();
                     }
-                    version = getVersionNotNull(version);
                     final String simpleName = getSimpleName(entryName);
-                    final Archive foundArchive = new Archive(JAVA, simpleName, version, newFilePath);
+                    final Archive foundArchive = createAndAddArchive(simpleName, version, newFilePath);
                     foundArchive.setVendor(archiveMetaInformation.getVendor());
-                    archiveFiles.add(foundArchive);
-                    addMessageDigest(finderHandler, entry, entryContainer, foundArchive);
+                    if (finderHandler.isFile(entry)) {
+                        addMessageDigest(finderHandler, entryContainer, foundArchive);
+                    }
                     addLicenseFromManifest(foundArchive, archiveMetaInformation, newFilePath2);
                     parsePackedJarArchive(foundArchive, entryContainer.getInputStream(), file, newFilePath2);
                 } else {
@@ -255,13 +247,12 @@ public class JavaJarFinder extends AbstractFinder {
                         if (isCandidateLicenseFile(entryName)) {
                             archive.addLicenseCandidateFile(newFilePath);
                         }
-                        final File file = new File(parent, entryName);
                         final Collection<License> licenses = checkFileForLicenses(jarInputStream, entryName,
                                 getLicenseStoreData());
-                        addLicenses(archive, licenses, file, newFilePath);
+                        addLicenses(archive, licenses, newFilePath);
                         final JarEntryContainer entryContainer = finderHandler.createEntryContainer(jarInputStream);
                         if (isPomFile(entryName)) {
-                            addLicensesFromPom(entryContainer, archive, newFilePath, getLog());
+                            addLicensesFromPom(entryContainer, archive, newFilePath);
                         }
                     }
                 }
@@ -269,9 +260,28 @@ public class JavaJarFinder extends AbstractFinder {
         }
     }
 
-    private void addLicensesFromPom(final EntryContainer entryContainer, final Archive archive, final String filePath,
-                                    final ILFLog log)
-            throws Exception {
+    private Archive createAndAddArchive(final String fileName, final ArchiveMetaInformation archiveMetaInformation,
+                                        final String filePath) {
+        String version = null;
+        String vendor = null;
+        if (archiveMetaInformation != null) {
+            version = archiveMetaInformation.getVersion();
+            vendor = archiveMetaInformation.getVendor();
+        }
+        final Archive foundArchive = createAndAddArchive(fileName, version, filePath);
+        foundArchive.setVendor(vendor);
+        return foundArchive;
+    }
+
+    private Archive createAndAddArchive(final String fileName, final String versionParam, final String filePath) {
+        final String version = getVersionNotNull(versionParam);
+        final Archive foundArchive = new Archive(JAVA, fileName, version, filePath);
+        addToArchiveFiles(foundArchive);
+        return foundArchive;
+    }
+
+    private void addLicensesFromPom(final EntryContainer entryContainer, final Archive archive, final String filePath)
+            throws IOException {
         try (final InputStream inputStream = entryContainer.getInputStream()) {
             artifactServerUtil.addLicensesFromPom(inputStream, archive, filePath, getLicenseStoreData());
         }
@@ -285,32 +295,11 @@ public class JavaJarFinder extends AbstractFinder {
         return entryName;
     }
 
-    private void addMessageDigest(final FinderHandler<File, FileSystemEntryContainer, File> finderHandler,
-                                  final File entry, final FileSystemEntryContainer entryContainer,
-                                  final Archive archive)
+    private <C extends EntryContainer> void addMessageDigest(final FinderHandler<?, C, ?> finderHandler,
+                                                             final C entryContainer, final Archive archive)
             throws IOException {
-        if (finderHandler.isFile(entry)) {
-            final LSMessageDigest md = finderHandler.calculateMessageDigest(entryContainer);
-            archive.setMessageDigest(md);
-        }
-    }
-
-    private void addMessageDigest(final FinderHandler<File, FileSystemEntryContainer, File> finderHandler,
-                                  final FileSystemEntryContainer entryContainer, final Archive archive)
-            throws IOException {
-        if (finderHandler.isFile(entryContainer.getFile())) {
-            final LSMessageDigest md = CryptUtil.calculateMessageDigest(entryContainer.getFile());
-            archive.setMessageDigest(md);
-        }
-    }
-
-    private void addMessageDigest(final FinderHandler<JarEntry, JarEntryContainer, JarInputStream> finderHandler,
-                                  final JarEntry entry, final JarEntryContainer entryContainer, final Archive archive)
-            throws IOException {
-        if (finderHandler.isFile(entry)) {
-            final LSMessageDigest md = finderHandler.calculateMessageDigest(entryContainer);
-            archive.setMessageDigest(md);
-        }
+        final LSMessageDigest md = finderHandler.calculateMessageDigest(entryContainer);
+        archive.setMessageDigest(md);
     }
 
     private String getVersionNotNull(String version) {
@@ -403,6 +392,15 @@ public class JavaJarFinder extends AbstractFinder {
         return artifactServerUtil.isCachedCheckAccess();
     }
 
+    /**
+     * Representation of a file or file entry (in a JAR file).
+     * 
+     * <p>This is used to handle files from traversing the file system and entries from reading
+     * a JAR file in the same abstract way.</p>
+     * 
+     * @see FileSystemEntryContainer
+     * @see JarEntryContainer
+     */
     @FunctionalInterface
     private static interface EntryContainer {
 
@@ -415,12 +413,20 @@ public class JavaJarFinder extends AbstractFinder {
         public InputStream getInputStream() throws IOException;
     }
 
+    /**
+     * Represents a file from the file system.
+     * 
+     * <p>Holds a reference to the file object.</p>
+     *
+     * @see JarEntryContainer
+     */
     private static class FileSystemEntryContainer implements EntryContainer {
 
         private final File file;
 
         /**
-         * @param file
+         * Constructor.
+         * @param file a file
          */
         public FileSystemEntryContainer(final File file) {
             this.file = file;
@@ -443,11 +449,19 @@ public class JavaJarFinder extends AbstractFinder {
 
     }
 
+    /**
+     * Represents an entry from a JAR file.
+     * 
+     * <p>Holds the content of the entry in a byte array.</p>
+     * 
+     * @see FileSystemEntryContainer
+     */
     private static class JarEntryContainer implements EntryContainer {
 
         private final byte[] contents;
 
         /**
+         * Constructor.
          * @param contents
          */
         public JarEntryContainer(final byte[] contents) {
@@ -496,7 +510,7 @@ public class JavaJarFinder extends AbstractFinder {
          * 
          * @param log the logger
          */
-        public AbstractFinderHandler(final ILFLog log) {
+        protected AbstractFinderHandler(final ILFLog log) {
             this.log = log;
         }
 
@@ -505,6 +519,16 @@ public class JavaJarFinder extends AbstractFinder {
          */
         protected final ILFLog getLog() {
             return log;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public LSMessageDigest calculateMessageDigest(final C entryContainer) throws IOException {
+            try (final InputStream inputStream = entryContainer.getInputStream()) {
+                return CryptUtil.calculateMessageDigest(inputStream);
+            }
         }
 
     }
@@ -569,14 +593,6 @@ public class JavaJarFinder extends AbstractFinder {
             return JarUtil.getArchiveMetaInformationFromManifest(entryContainer.getFile(), getLog());
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public LSMessageDigest calculateMessageDigest(FileSystemEntryContainer entryContainer) throws IOException {
-            return CryptUtil.calculateMessageDigest(entryContainer.getFile());
-        }
-
     }
 
     private static class JarFinderHandler extends AbstractFinderHandler<JarEntry, JarEntryContainer, JarInputStream> {
@@ -636,14 +652,6 @@ public class JavaJarFinder extends AbstractFinder {
         public ArchiveMetaInformation getArchiveMetaInformationFromManifest(final JarEntryContainer entryContainer)
                 throws IOException {
             return JarUtil.getArchiveMetaInformationFromManifest(entryContainer.getInputStream(), getLog());
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public LSMessageDigest calculateMessageDigest(final JarEntryContainer entryContainer) throws IOException {
-            return CryptUtil.calculateMessageDigest(entryContainer.getInputStream());
         }
 
     }
