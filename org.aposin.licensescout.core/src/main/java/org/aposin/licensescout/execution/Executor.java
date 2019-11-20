@@ -114,7 +114,8 @@ public class Executor {
         final RunParameters runParameters = new RunParameters();
         runParameters.setNexusCentralBaseUrl(getExecutionParameters().getNexusCentralBaseUrl());
         runParameters.setConnectTimeout(getExecutionParameters().getConnectTimeout());
-        final AbstractFinder finder = FinderFactory.getInstance().createFinder(executionParameters, licenseStoreData, runParameters);
+        final AbstractFinder finder = FinderFactory.getInstance().createFinder(executionParameters, licenseStoreData,
+                runParameters);
         getLog().info("Starting scan on " + getExecutionParameters().getScanDirectory().getAbsolutePath() + "...");
 
         try {
@@ -308,6 +309,8 @@ public class Executor {
             final IReportExporter exporter = getReportExporter(outputFileType);
             reportConfiguration.setOutputFile(outputFile);
             reportConfiguration.setTemplateFile(output.getTemplate());
+            reportConfiguration.setTemplateEncoding(output.getTemplateEncoding());
+            reportConfiguration.setOutputEncoding(output.getOutputEncoding());
             exporter.export(outputResult, reportConfiguration);
             log.info("written output for " + outputFileType + " to "
                     + reportConfiguration.getOutputFile().getAbsolutePath());

@@ -16,8 +16,10 @@
 package org.aposin.licensescout.exporter;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -51,7 +53,9 @@ public abstract class AbstractVelocityExporter implements IReportExporter {
     @Override
     public final void export(final OutputResult outputResult, final ReportConfiguration reportConfiguration)
             throws Exception {
-        try (final FileWriter fileWriter = new FileWriter(reportConfiguration.getOutputFile());
+        final File outputFile = reportConfiguration.getOutputFile();
+        final Charset charset = ExporterUtil.getOutputCharset(reportConfiguration);
+        try (final FileWriter fileWriter = new FileWriter(outputFile, charset);
                 final BufferedWriter bw = new BufferedWriter(fileWriter)) {
 
             Velocity.setProperty(RuntimeConstants.RESOURCE_LOADERS, "file,classpath");
@@ -94,6 +98,7 @@ public abstract class AbstractVelocityExporter implements IReportExporter {
 
         final List<License> distinctLicenses = collectDistinctLicenses(archiveFiles);
         context.put("distinctLicenses", distinctLicenses);
+        context.put("encoding", ExporterUtil.getOutputCharset(reportConfiguration).name());
 
         additionalSetup(context, outputResult);
         return context;
@@ -136,7 +141,8 @@ public abstract class AbstractVelocityExporter implements IReportExporter {
      */
     protected Template getTemplate(final ReportConfiguration reportConfiguration) {
         if (reportConfiguration.getTemplateFile() != null) {
-            return Velocity.getTemplate(reportConfiguration.getTemplateFile().getAbsolutePath());
+            final String templateEncoding = ExporterUtil.getTemplateCharset(reportConfiguration).name();
+            return Velocity.getTemplate(reportConfiguration.getTemplateFile().getAbsolutePath(), templateEncoding);
         } else {
             return getDefaultTemplate();
         }
@@ -147,7 +153,6 @@ public abstract class AbstractVelocityExporter implements IReportExporter {
      * 
      * <p>This method is called if no template is set in the configuration for the
      * output type.</p>
-     * 
      * @return the velocity template to use
      */
     protected abstract Template getDefaultTemplate();

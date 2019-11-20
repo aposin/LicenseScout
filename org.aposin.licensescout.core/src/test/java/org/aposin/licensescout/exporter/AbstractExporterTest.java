@@ -18,6 +18,8 @@ package org.aposin.licensescout.exporter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,31 +48,42 @@ public abstract class AbstractExporterTest {
         /**
          * 
          */
-        EMPTY_WITHOUT_DOCUMENTATION_URL(false, false),
+        EMPTY_WITHOUT_DOCUMENTATION_URL_UTF_8(false, false, StandardCharsets.UTF_8),
         /**
          * 
          */
-        EMPTY_WITH_DOCUMENTATION_URL(false, true),
+        EMPTY_WITH_DOCUMENTATION_URL_UTF_8(false, true, StandardCharsets.UTF_8),
         /**
          * 
          */
-        ARCHIVE_WITHOUT_DOCUMENTATION_URL(true, false),
+        ARCHIVE_WITHOUT_DOCUMENTATION_URL_UTF_8(true, false, StandardCharsets.UTF_8),
         /**
          * 
          */
-        ARCHIVE_WITH_DOCUMENTATION_URL(true, true);
+        ARCHIVE_WITH_DOCUMENTATION_URL_UTF_8(true, true, StandardCharsets.UTF_8),
+        /**
+         * 
+         */
+        ARCHIVE_WITH_DOCUMENTATION_URL_UTF_16LE(true, true, StandardCharsets.UTF_16LE),
+        /**
+         * 
+         */
+        ARCHIVE_WITH_DOCUMENTATION_URL_UTF_16BE(true, true, StandardCharsets.UTF_16BE);
 
         private final boolean withArchives;
         private final boolean withDocumentationUrl;
+        private final Charset outputCharset;
 
         /**
          * Constructor.
          * @param withArchives
          * @param withDocumentationUrl
+         * @param outputCharset the output encoding
          */
-        private TestVariant(boolean withArchives, boolean withDocumentationUrl) {
+        private TestVariant(boolean withArchives, boolean withDocumentationUrl, final Charset outputCharset) {
             this.withDocumentationUrl = withDocumentationUrl;
             this.withArchives = withArchives;
+            this.outputCharset = outputCharset;
         }
 
         /**
@@ -85,6 +98,76 @@ public abstract class AbstractExporterTest {
          */
         public final boolean isWithArchives() {
             return withArchives;
+        }
+
+        /**
+         * @return the charset
+         */
+        public final Charset getOutputCharset() {
+            return outputCharset;
+        }
+
+    }
+
+    /**
+     * Variant of the test case regarding report template.
+     */
+    protected enum TemplateVariant {
+        /**
+         * 
+         */
+        DEFAULT(null, null),
+        /**
+         * 
+         */
+        TXT_UTF_8("license_report_txt_UTF-8.vm", StandardCharsets.UTF_8),
+        /**
+         * 
+         */
+        TXT_UTF_16BE("license_report_txt_UTF-16BE.vm", StandardCharsets.UTF_16BE),
+        /**
+         * 
+         */
+        TXT_UTF_16LE("license_report_txt_UTF-16LE.vm", StandardCharsets.UTF_16LE),
+        /**
+         * 
+         */
+        HTML_UTF_8("license_report_html_UTF-8.vm", StandardCharsets.UTF_8),
+        /**
+         * 
+         */
+        HTML_UTF_16BE("license_report_html_UTF-16BE.vm", StandardCharsets.UTF_16BE),
+        /**
+         * 
+         */
+        HTML_UTF_16LE("license_report_html_UTF-16LE.vm", StandardCharsets.UTF_16LE);
+
+        private final String templatePath;
+        private final Charset templateCharset;
+
+        /**
+         * Constructor.
+         * @param templateFilename 
+         * @param templateCharset 
+         */
+        private TemplateVariant(final String templateFilename, final Charset templateCharset) {
+            this.templatePath = (templateFilename == null) ? null : "src/test/resources/templates/" + templateFilename;
+            this.templateCharset = templateCharset;
+
+        }
+
+        /**
+         * @return the templatePath
+         */
+        public final String getTemplatePath() {
+            return templatePath;
+        }
+
+        /**
+         * @return the templateCharset
+         */
+        public final Charset getTemplateCharset() {
+            return templateCharset;
         }
 
     }
@@ -133,7 +216,7 @@ public abstract class AbstractExporterTest {
      */
     @Test
     public void testExportEmptyArchiveListWithoutDocumentationUrl() throws Exception {
-        assertExport(TestVariant.EMPTY_WITHOUT_DOCUMENTATION_URL);
+        assertExport(TestVariant.EMPTY_WITHOUT_DOCUMENTATION_URL_UTF_8, TemplateVariant.DEFAULT);
     }
 
     /**
@@ -142,18 +225,35 @@ public abstract class AbstractExporterTest {
      */
     @Test
     public void testExportWithArchiveListWithoutDocumentationUrl() throws Exception {
-        assertExport(TestVariant.ARCHIVE_WITHOUT_DOCUMENTATION_URL);
+        assertExport(TestVariant.ARCHIVE_WITHOUT_DOCUMENTATION_URL_UTF_8, TemplateVariant.DEFAULT);
+    }
+
+    /**
+     * Test method for {@link IReportExporter#export(org.aposin.licensescout.exporter.OutputResult, org.aposin.licensescout.exporter.ReportConfiguration)}.
+     * @throws Exception 
+     */
+    @Test
+    public void testExportWithArchiveListWithDocumentationUrlOutputUtf16LE() throws Exception {
+        assertExport(TestVariant.ARCHIVE_WITH_DOCUMENTATION_URL_UTF_16LE, TemplateVariant.DEFAULT);
+    }
+
+    /**
+     * Test method for {@link IReportExporter#export(org.aposin.licensescout.exporter.OutputResult, org.aposin.licensescout.exporter.ReportConfiguration)}.
+     * @throws Exception 
+     */
+    @Test
+    public void testExportWithArchiveListWithDocumentationUrlOutputUtf16BE() throws Exception {
+        assertExport(TestVariant.ARCHIVE_WITH_DOCUMENTATION_URL_UTF_16BE, TemplateVariant.DEFAULT);
     }
 
     /**
      * Execute report generation and verify the resulting report content.
      * 
      * @param testVariant
-     * @throws Exception
+     * @param templateVariant 
      */
-    protected void assertExport(final TestVariant testVariant) throws Exception {
-        final List<Archive> archiveFiles = createArchiveList(testVariant);
-        final String resultContent = runExporter(archiveFiles, testVariant.isWithDocumentationUrl());
+    protected void assertExport(final TestVariant testVariant, TemplateVariant templateVariant) throws Exception {
+        final String resultContent = runExporter(testVariant, templateVariant);
         assertResultContent(testVariant, resultContent);
     }
 
@@ -177,8 +277,16 @@ public abstract class AbstractExporterTest {
         return archive;
     }
 
-    private String runExporter(final List<Archive> archiveFiles, final boolean showDocumentationUrl)
+    /**
+     * @param testVariant
+     * @param templateVariant
+     * @return the content of the resulting report file as a string
+     * @throws Exception
+     * @throws IOException
+     */
+    private String runExporter(final TestVariant testVariant, final TemplateVariant templateVariant)
             throws Exception, IOException {
+        final List<Archive> archiveFiles = createArchiveList(testVariant);
         final FinderResult finderResult = createFinderResult(archiveFiles);
         final OutputResult outputResult = new OutputResult();
         outputResult.setMessageDigestAlgorithm(getMessageDigestAlgorithm());
@@ -190,10 +298,9 @@ public abstract class AbstractExporterTest {
         outputResult.setGeneralStatistics(generalStatistics);
         outputResult.setFinderResult(finderResult);
         outputResult.setPomResolutionUsed(false);
-        final ReportConfiguration reportConfiguration = createReportConfiguration(showDocumentationUrl);
+        final ReportConfiguration reportConfiguration = createReportConfiguration(testVariant, templateVariant);
         getExporter().export(outputResult, reportConfiguration);
-
-        return readOutputFileToString();
+        return readOutputFileToString(testVariant.getOutputCharset());
     }
 
     private FinderResult createFinderResult(final List<Archive> archiveFiles) {
@@ -201,13 +308,27 @@ public abstract class AbstractExporterTest {
         return new FinderResult(scanDirectory, archiveFiles);
     }
 
-    private ReportConfiguration createReportConfiguration(final boolean showDocumentationUrl) {
+    /**
+     * @param testVariant
+     * @param templateVariant
+     * @return a report configuration
+     */
+    private ReportConfiguration createReportConfiguration(final TestVariant testVariant,
+                                                          final TemplateVariant templateVariant) {
         final ReportConfiguration reportConfiguration = new ReportConfiguration();
+        final String templatePath = templateVariant.getTemplatePath();
+        if (templatePath != null) {
+            reportConfiguration.setTemplateFile(new File(templatePath));
+        }
+        if (templateVariant.getTemplateCharset() != null) {
+            reportConfiguration.setTemplateEncoding(templateVariant.getTemplateCharset().name());
+        }
         reportConfiguration.setOutputFile(getOutputFile());
-        reportConfiguration.setShowDocumentationUrl(showDocumentationUrl);
+        reportConfiguration.setShowDocumentationUrl(testVariant.isWithDocumentationUrl());
         reportConfiguration.setShowLicenseCandidateFilesColumn(false);
         reportConfiguration.setShowMessageDigestColumn(true);
         reportConfiguration.setShowPathColumn(true);
+        reportConfiguration.setOutputEncoding(testVariant.getOutputCharset().name());
         return reportConfiguration;
     }
 
@@ -229,9 +350,14 @@ public abstract class AbstractExporterTest {
      */
     protected abstract void assertResultContent(TestVariant testVariant, String resultContent);
 
-    private String readOutputFileToString() throws IOException {
+    /**
+     * @param charset
+     * @return the content of the output file as string
+     * @throws IOException
+     */
+    private String readOutputFileToString(final Charset charset) throws IOException {
         final File outputFile = getOutputFile();
-        try (final FileReader input = new FileReader(outputFile)) {
+        try (final FileReader input = new FileReader(outputFile, charset)) {
             return IOUtils.toString(input);
         }
     }
