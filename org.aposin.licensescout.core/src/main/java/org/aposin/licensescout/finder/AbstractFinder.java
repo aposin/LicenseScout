@@ -107,6 +107,7 @@ public abstract class AbstractFinder {
      * @param foundArchive an archive
      */
     protected void addToArchiveFiles(final Archive foundArchive) {
+        getLog().debug("adding archive for: " + foundArchive.getPath());
         archiveFiles.add(foundArchive);
     }
 

@@ -32,7 +32,6 @@ import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseStoreData;
 import org.aposin.licensescout.util.ILFLog;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -281,7 +280,6 @@ public class JavaJarFinderTest extends BaseFinderTest {
      * 
      * @throws Exception 
      */
-    @Ignore(value = "ignored due to a bug in JavaJarFinder (the test is correct)")
     @Test
     public void testScanJavaUnpackedLicenseManifest() throws Exception {
         final File scanDirectory = getFile("java-unpacked-license-manifest");
