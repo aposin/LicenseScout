@@ -55,7 +55,7 @@ public class JavaJarFinder extends AbstractFinder {
         /**
          * In a directory in the file system that is not an archive.
          */
-        DIRECORY(),
+        DIRECTORY(),
         /**
          * In a directory in the file system that is an archive (i.e. in an unpacked archive).
          */
