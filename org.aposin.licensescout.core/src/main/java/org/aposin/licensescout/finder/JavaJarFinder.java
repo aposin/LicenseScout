@@ -51,6 +51,17 @@ import org.aposin.licensescout.util.JarUtil;
  */
 public class JavaJarFinder extends AbstractFinder {
 
+    protected enum ScanMode {
+        /**
+         * In a directory in the file system that is not an archive.
+         */
+        DIRECTORY(),
+        /**
+         * In a directory in the file system that is an archive (i.e. in an unpacked archive).
+         */
+        UNPACKED_ARCHIVE();
+    }
+
     private final List<String> specialArchiveNames = new ArrayList<>();
     private final FinderHandler<File, FileSystemEntryContainer, File> fileSystemFinderHandler;
     private final FinderHandler<JarEntry, JarEntryContainer, JarInputStream> jarFinderHandler;
@@ -126,28 +137,20 @@ public class JavaJarFinder extends AbstractFinder {
                     archiveMetaInformation = JarUtil.getArchiveMetaInformationFromManifestFile(manifestFile, getLog());
                 }
                 final Archive foundArchive = createAndAddArchive(entryName, archiveMetaInformation, filePath);
-                // TODO: fetch license header
+                addLicenseFromManifest(foundArchive, archiveMetaInformation, filePath);
                 parseUnpackedJarArchive(foundArchive, file, filePath);
             } else {
                 getLog().debug("parseFile(): recognized as normal directory");
                 final File[] children = file.listFiles();
                 for (final File child : children) {
-                    final String newFilePath = filePath + "/" + child.getName();
+                    final String newFilePath = filePath + '/' + child.getName();
                     parseFile(child, newFilePath);
                 }
             }
         } else { // is file
             if (isArchiveName(entryName)) {
                 getLog().debug("parseFile(): recognized as archive file");
-                final ArchiveMetaInformation archiveMetaInformation = finderHandler
-                        .getArchiveMetaInformationFromManifest(entryContainer);
-                final Archive foundArchive = createAndAddArchive(entryName, archiveMetaInformation, filePath);
-                addMessageDigest(finderHandler, entryContainer, foundArchive);
-                final String newFilePath = filePath + "!";
-                try (final FileInputStream archiveFileInputStream = new FileInputStream(file)) {
-                    addLicenseFromManifest(foundArchive, archiveMetaInformation, newFilePath);
-                    parsePackedJarArchive(foundArchive, archiveFileInputStream, file, newFilePath);
-                }
+                handleArchiveFile(entryName, entryContainer, filePath);
             } else {
                 getLog().debug("parseFile(): recognized as normal file - ignored");
             }
@@ -162,7 +165,7 @@ public class JavaJarFinder extends AbstractFinder {
         for (final File entry : entries) {
             final String entryName = finderHandler.getEntryName(entry);
             final FileSystemEntryContainer entryContainer = finderHandler.createEntryContainer(entry);
-            final String newFilePath = filePath + "/" + entryName;
+            final String newFilePath = filePath + '/' + entryName;
             getLog().debug("parseUnpackedJarArchive(): processing " + newFilePath);
             if (isSpecialArchive(entryName)) {
                 getLog().debug("parseUnpackedJarArchive(): recognized as special archive");
@@ -176,29 +179,10 @@ public class JavaJarFinder extends AbstractFinder {
                 } else { // is file
                     if (isArchiveName(entryName)) {
                         getLog().debug("parseUnpackedJarArchive(): recognized as archive file");
-                        final ArchiveMetaInformation archiveMetaInformation = finderHandler
-                                .getArchiveMetaInformationFromManifest(entryContainer);
-                        final Archive foundArchive = createAndAddArchive(entryName, archiveMetaInformation,
-                                newFilePath);
-                        addMessageDigest(finderHandler, entryContainer, foundArchive);
-                        final String newFilePath2 = newFilePath + "!";
-                        addLicenseFromManifest(foundArchive, archiveMetaInformation, newFilePath2);
-                        try (final FileInputStream archiveInputStream = new FileInputStream(entryContainer.getFile())) {
-                            parsePackedJarArchive(foundArchive, archiveInputStream, entry, newFilePath2);
-                        }
+                        handleArchiveFile(entryName, entryContainer, newFilePath);
                     } else {
                         getLog().debug("parseUnpackedJarArchive(): recognized as normal file");
-                        if (isCandidateLicenseFile(entryName)) {
-                            archive.addLicenseCandidateFile(newFilePath);
-                        }
-                        try (final InputStream inputStream = entryContainer.getInputStream()) {
-                            final Collection<License> licenses = checkFileForLicenses(inputStream, entryName,
-                                    getLicenseStoreData());
-                            addLicenses(archive, licenses, newFilePath);
-                        }
-                        if (isPomFile(entryName)) {
-                            addLicensesFromPom(entryContainer, archive, newFilePath);
-                        }
+                        handleArchiveNormalFile(archive, entryName, entryContainer, newFilePath);
                     }
                 }
             }
@@ -222,7 +206,7 @@ public class JavaJarFinder extends AbstractFinder {
             JarEntry entry;
             while ((entry = jarInputStream.getNextJarEntry()) != null) {
                 final String entryName = finderHandler.getEntryName(entry);
-                final String newFilePath = filePath + "/" + entryName;
+                final String newFilePath = filePath + '/' + entryName;
                 getLog().debug("parsePackedJarArchive(): processing " + newFilePath);
                 if (isArchiveName(entryName)) {
                     final String newFilePath2 = newFilePath + "!";
@@ -241,22 +225,46 @@ public class JavaJarFinder extends AbstractFinder {
                         addMessageDigest(finderHandler, entryContainer, foundArchive);
                     }
                     addLicenseFromManifest(foundArchive, archiveMetaInformation, newFilePath2);
-                    parsePackedJarArchive(foundArchive, entryContainer.getInputStream(), file, newFilePath2);
+                    try (final InputStream inputStream = entryContainer.getInputStream()) {
+                        parsePackedJarArchive(foundArchive, inputStream, file, newFilePath2);
+                    }
                 } else {
                     if (finderHandler.isFile(entry)) {
-                        if (isCandidateLicenseFile(entryName)) {
-                            archive.addLicenseCandidateFile(newFilePath);
-                        }
-                        final Collection<License> licenses = checkFileForLicenses(jarInputStream, entryName,
-                                getLicenseStoreData());
-                        addLicenses(archive, licenses, newFilePath);
                         final JarEntryContainer entryContainer = finderHandler.createEntryContainer(jarInputStream);
-                        if (isPomFile(entryName)) {
-                            addLicensesFromPom(entryContainer, archive, newFilePath);
-                        }
+                        handleArchiveNormalFile(archive, entryName, entryContainer, newFilePath);
                     }
                 }
             }
+        }
+    }
+
+    private void handleArchiveFile(final String entryName, final FileSystemEntryContainer entryContainer,
+                                   final String filePath)
+            throws IOException, Exception {
+        final FinderHandler<File, FileSystemEntryContainer, File> finderHandler = fileSystemFinderHandler;
+        final ArchiveMetaInformation archiveMetaInformation = finderHandler
+                .getArchiveMetaInformationFromManifest(entryContainer);
+        final Archive foundArchive = createAndAddArchive(entryName, archiveMetaInformation, filePath);
+        addMessageDigest(finderHandler, entryContainer, foundArchive);
+        final String newFilePath = filePath + "!";
+        addLicenseFromManifest(foundArchive, archiveMetaInformation, newFilePath);
+        try (final FileInputStream archiveFileInputStream = new FileInputStream(entryContainer.getFile())) {
+            parsePackedJarArchive(foundArchive, archiveFileInputStream, entryContainer.getFile(), newFilePath);
+        }
+    }
+
+    private void handleArchiveNormalFile(final Archive archive, final String entryName,
+                                         final EntryContainer entryContainer, final String filePath)
+            throws IOException {
+        if (isCandidateLicenseFile(entryName)) {
+            archive.addLicenseCandidateFile(filePath);
+        }
+        try (final InputStream inputStream = entryContainer.getInputStream()) {
+            final Collection<License> licenses = checkFileForLicenses(inputStream, entryName, getLicenseStoreData());
+            addLicenses(archive, licenses, filePath);
+        }
+        if (isPomFile(entryName)) {
+            addLicensesFromPom(entryContainer, archive, filePath);
         }
     }
 
@@ -609,7 +617,7 @@ public class JavaJarFinder extends AbstractFinder {
          */
         @Override
         public boolean isUseDirectoryRecursion() {
-            return true;
+            return false;
         }
 
         /**
@@ -651,7 +659,9 @@ public class JavaJarFinder extends AbstractFinder {
         @Override
         public ArchiveMetaInformation getArchiveMetaInformationFromManifest(final JarEntryContainer entryContainer)
                 throws IOException {
-            return JarUtil.getArchiveMetaInformationFromManifest(entryContainer.getInputStream(), getLog());
+            try (final InputStream inputStream = entryContainer.getInputStream()) {
+                return JarUtil.getArchiveMetaInformationFromManifest(inputStream, getLog());
+            }
         }
 
     }

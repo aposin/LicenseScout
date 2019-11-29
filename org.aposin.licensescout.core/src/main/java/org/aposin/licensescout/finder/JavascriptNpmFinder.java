@@ -112,10 +112,7 @@ public class JavascriptNpmFinder extends AbstractFinder {
         final File packageJsonFile = new File(file, "package.json");
         final String packageJsonFilePath = filePath + "/package.json";
         final ArchiveIdentifierVersion archiveIdentifier = JsonUtil.getNPMArchiveDescription(packageJsonFile);
-        final Archive foundArchive = new Archive(JAVASCRIPT, archiveIdentifier.getName(),
-                archiveIdentifier.getVersion(), filePath);
-        addToArchiveFiles(foundArchive);
-        getLog().debug("adding archive for: " + filePath);
+        final Archive foundArchive = createAndAddArchive(archiveIdentifier, filePath);
         final String vendorName = JsonUtil.getNPMArchiveVendorName(packageJsonFile);
         foundArchive.setVendor(vendorName);
         getLog().debug("vendor name: " + vendorName);
@@ -139,6 +136,13 @@ public class JavascriptNpmFinder extends AbstractFinder {
         }
         parseArchiveDirForLicenseText(foundArchive, file);
 
+        processLicenses(foundArchive);
+    }
+
+    /**
+     * @param foundArchive
+     */
+    private void processLicenses(final Archive foundArchive) {
         final boolean noLicenseInformationFound = foundArchive.getLicenses().isEmpty();
 
         // check for MIT license or no license and existing license text file
@@ -173,6 +177,13 @@ public class JavascriptNpmFinder extends AbstractFinder {
         }
     }
 
+    private Archive createAndAddArchive(final ArchiveIdentifierVersion archiveIdentifier, final String filePath) {
+        final Archive foundArchive = new Archive(JAVASCRIPT, archiveIdentifier.getName(),
+                archiveIdentifier.getVersion(), filePath);
+        addToArchiveFiles(foundArchive);
+        return foundArchive;
+    }
+
     private void parseArchiveDirForLicenseFile(final Archive archive, final File parent, final String filePath)
             throws IOException {
         getLog().debug("parseArchiveDir(): processing " + parent.getAbsolutePath());
@@ -180,11 +191,11 @@ public class JavascriptNpmFinder extends AbstractFinder {
         for (final File entry : entries) {
             if (entry.isFile()) {
                 final String entryName = entry.getName();
-                final String newFilePath = filePath + "/" + entryName;
+                final String newFilePath = filePath + '/' + entryName;
+                if (isCandidateLicenseFile(entryName)) {
+                    archive.addLicenseCandidateFile(newFilePath);
+                }
                 try (final FileInputStream is = new FileInputStream(entry)) {
-                    if (isCandidateLicenseFile(entryName)) {
-                        archive.addLicenseCandidateFile(newFilePath);
-                    }
                     final Collection<License> licenses = checkFileForLicenses(is, entryName, getLicenseStoreData());
                     addLicenses(archive, licenses, newFilePath);
                 }
