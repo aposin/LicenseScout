@@ -8,7 +8,7 @@
 <listAttribute key="M2_PROPERTIES">
 <listEntry value="allowSnapshots=true"/>
 </listAttribute>
-<stringAttribute key="M2_RUNTIME" value="EMBEDDED"/>
+<stringAttribute key="M2_RUNTIME" value="apache-maven-current"/>
 <booleanAttribute key="M2_SKIP_TESTS" value="false"/>
 <intAttribute key="M2_THREADS" value="1"/>
 <booleanAttribute key="M2_UPDATE_SNAPSHOTS" value="false"/>
