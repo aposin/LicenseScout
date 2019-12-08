@@ -1,0 +1,64 @@
+= LicenseScout
+
+:encoding: utf-8
+:lang: en
+:doctype: book
+:toc:
+:toclevels: 4
+
+LicenseScout is a tool to identify third-party artifacts (libraries) and their licenses, in Java as well as JavaScript projects. The goal is to get an overview over the used licenses, and the artifacts for which no license could be detected.
+
+Key features include:
+
+* Scanning Java and Javascript/NPM artifacts
+* Writing reports in different file formats
+* Writing results to a database
+* Defining licenses manually for certain artifacts
+* Exclude artifacts completely
+
+
+== Quick start
+
+* You need a working Maven 3 installation
+* check out all LicenseScout projects
+* `cd org.aposin.licensescout.quickstart`
+* `mvn clean install`
+* The reports are written to the directory `org.aposin.licensescout.licensereport/target`
+** HTML report: `licenses_org.aposin.licensescout.licensereport.html`
+** CSV report: `licenses_org.aposin.licensescout.licensereport.csv`
+** TXT report: `licenses_org.aposin.licensescout.licensereport.txt`
+
+== Projects overview
+
+.LicenseScout projects
+|===
+|artifactId |Purpose
+
+|`org.aposin.licensescout.parent`
+|Parent POM for all other LicenseScout projects
+
+|`org.aposin.licensescout.core`
+|Code for LicenseScout maven plugin
+
+|`org.aposin.licensescout.configuration.sample`
+|Sample configuration files
+
+|`org.aposin.licensescout.licensereport`
+|Sample for LicenseScout build integration, generates license reports for LicenseScout itself (using the sample configuration)
+
+|`org.aposin.licensescout.quickstart`
+|Compiles the Maven plugin, creates the sample configuration bundle and generates a license report for LicenseScout itself.
+
+|`org.aposin.licensescout.documentation`
+|Documentation and project logos for LicenseScout
+|===
+
+<<design.adoc#,Design>>
+
+<<configuration.adoc#,Configuration>>
+
+<<internals.adoc#,Internals>>
+
+<<miscellaneous.adoc#,Miscellaneous>>
+
+<<database.adoc#,Database>>

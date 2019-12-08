@@ -1,0 +1,66 @@
+//
+// Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+= Internals
+
+:encoding: utf-8
+:lang: en
+:doctype: book
+:toc:
+:toclevels: 4
+
+== Internals
+
+
+=== Scan for JAVA (goal: `scanJava`)
+The scanning process starts with the configured scan directory (parameter `scanDirectory`). The entries of this directory are examined.
+Directories are checked if they contain a subdirectory `META-INF` containing a file `MANIFEST.MF`. If so, they are assumed to be an unpacked JAR and processed further as an archive. Other directories are further processed recursively.
+Files with a filename that Ends with `.jar` are tried to open as a JAR file and processed further as a packed jar. Other files are ignored.
+In packed as well as in unpacked JARS the entries (JAR entries or file system entries, respectively) are processed further. JAR files are processed as packed JARS. Other encountered files are considered as license files as described below. Directories are processed further recursively.
+
+=== Scan for JAVASCRIPT (goal: `scanNpm`)
+The scanning process starts with the configured scan Directory (parameter `scanDirectory`). Entries of this directory are checked if they are a Directory and contain a file `package.json`. If so, the directory is assumed to be an NPM package and is processed further. Other directories are processed recursively. If the name of a Directory matches and entry of the excluded dir names, it is ignored. Plain files are ignored, too. For directories representing an NPM package its `package.json` is examined for name, version, vendor and license information. Then, the directory is scanned recursively for other files that  may contain license Information in text.
+
+=== License detection from text files
+Files are selected for automatic detection of licenses if their file name fulfills certain criteria. For Java, a filename meets the criteria if it ends with `txt`, `htm` or `html`, or if the filename contains `license`, `licence` or `notice` and does not end with `.class`. For Javascript the filename meets the criteria if it contains `license` or `readme`. All file name comparisons are done case-insensitive.
+
+Files selected for license detection are opened as text files and processed line by line. If the line contains a detection string (for the license name, see file `licenses.xml`) the associated list of licenses is taken as the current candidate license list. If there is a candidate license list, the current line is also scanned for a version number. If a version number is found, the candidate license list is checked for a license that matches the version number. If no license matches, the first element of the list is taken as a detected license and added to a set of overall detected licenses.
+If a detection string is found and there is already a candidate license list it is assumed that there will be no version number for the current candidate license list. Therefore, the default element of the current candidate list is used as a detected license. Then, the license list associated with the newly detected string becomes the new current candidate license list. All license lists that have been encountered are also stored in a set. If a new license list is found it is checked against the know processed lists. If a license list is found, it is assumed that it is already processed and will not be handled a second time.
+If no version number is detected in the three lines following the line where the license name was detected, it is assumed that there is no version number and the default element of the candidate list is used as a detected license.
+If the end of the file is met and there is still a candidate license list, also the default element of the list is used as a detected license.
+
+=== Special handling for MIT licenses
+
+MIT style licenses typically have the name of the author or organisation that is the license holder as part of the license text (this is required to be copied without modifications). To fulfill this requirement automatically, files containing `license` in their file name (case insensitive) are considered as full license texts. If an artifact has MIT as a detected license and a full license text is available, the standard MIT license object is replaced in this artifacts license list by a license object that contains the actual license text. This way, the actual license text is used in the license text report.
+
+=== License processing details
+
+
+Detection status is set according to the following rules:
+
+* If there are manually configured licenses and the list of automatically detected licenses is empty the status of the archive becomes `MANUALLY_DETECTED`.
+* If there are manually configured licenses and the list of automatically detected licenses is not empty the status of the archive becomes `MANUALLY_SELECTED`.
+* If there are no manually configured licenses and the list of automatically detected licenses contains more than one entry the status of the archive becomes `MULTIPLE_DETECTED`.
+* If there are no manually configured licenses and the list of automatically detected licenses contains one entry the status of the archive becomes `DETECTED`.
+* If there are no manually configured licenses and no automatically detected licenses the status of the archive becomes `NOT_DETECTED`.
+
+Legal status is set according to the following rules:
+
+* If one of the licenses (of an archive) has status `UNKNOWN`, the status of the archive becomes `UNKNOWN`.
+* If there are only licenses with status `ACCEPTED`, the status of the archive becomes `ACCEPTED`.
+* If there are only licenses with status `NOT_ACCEPTED`, the status of the archive becomes `NOT_ACCEPTED`.
+* If there are licenses with status `ACCEPTED` and licenses with status `NOT_ACCEPTED`, the status of the archive becomes `CONFLICTING`.
+

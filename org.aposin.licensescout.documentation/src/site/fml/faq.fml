@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
+<faqs id="FAQ" title="Frequently Asked Questions">
+  <part id="General">
+
+    <faq id="alternative-dbms">
+      <question>Can I use another DBMS than Mysql?</question>
+      <answer>
+        <p>
+          Yes. See the examples section: <a href="examples/alternative-dbms.html">Using an alternative DBMS</a>
+        </p>
+      </answer>
+    </faq>
+
+    <faq id="gradle-plugin">
+      <question>Is there a gradle plugin for the LicenseScout?</question>
+      <answer>
+        <p>
+        No, but we would appreciate a contribution that adds this feature.
+          Technically, you can re-use the core of the LicenseScout by parsing parameters, creating an instance of <code>ExecutionParameters</code> and then call
+          the <code>ExecutionEngine</code>. Have a look at what <code>AbstractScanMojo.execute()</code> does:
+          This is what you have to duplicate.
+        </p>
+      </answer>
+    </faq>
+
+    <faq id="scan-maven-dependencies">
+      <question>Can the LicenseScout scan Maven dependencies in the same way as the license-maven-plugin?</question>
+      <answer>
+        <p>
+          There is currently no mode in the LicenseScout that processes the Maven dependency tree directly. However, you can use the
+          maven-dependency-plugin to copy all dependencies to one directory and then run the LicenseScout on this directory.
+          Have a look at the example <a href="examples/scan-maven-dependencies.html">Scanning Maven dependencies</a>.
+        </p>
+      </answer>
+    </faq>
+
+  </part>
+</faqs>
+
