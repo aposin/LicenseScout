@@ -17,13 +17,14 @@ package org.aposin.licensescout.mojo;
 
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.aposin.licensescout.archive.ArchiveType;
 
 /**
  * Scans Java installation directory for licenses.
  *
  */
-@Mojo(name = "scanJava", defaultPhase = LifecyclePhase.PROCESS_SOURCES)
+@Mojo(name = "scanJava", defaultPhase = LifecyclePhase.VERIFY, requiresDependencyResolution = ResolutionScope.RUNTIME)
 public class JavaScanMojo extends AbstractScanMojo {
 
     /**

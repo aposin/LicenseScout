@@ -29,6 +29,11 @@ import org.aposin.licensescout.util.NullLog;
 public abstract class TestUtil {
 
     /**
+     * Determines the behaviour of {@link #createTestLog()}.
+     */
+    public static boolean DO_LOGGING = false;
+
+    /**
      * Creates run parameters for testing.
      * @return a run parameters instance
      */
@@ -55,6 +60,14 @@ public abstract class TestUtil {
      */
     public static ILFLog createNullLog() {
         return new NullLog();
+    }
+
+    /**
+     * Obtains a logger for testing depending on a flag.
+     * @return a logger
+     */
+    public static ILFLog createTestLog() {
+        return DO_LOGGING ? createJavaUtilGlobalLog() : createNullLog();
     }
 
 }

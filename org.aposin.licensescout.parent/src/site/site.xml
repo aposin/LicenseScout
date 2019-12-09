@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/DECORATION/1.8.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 http://maven.apache.org/xsd/decoration-1.8.0.xsd"
+	name="LicenseScout">
+
+	<skin>
+		<groupId>org.apache.maven.skins</groupId>
+		<artifactId>maven-fluido-skin</artifactId>
+		<version>1.8</version>
+	</skin>
+
+	<custom>
+		<fluidoSkin>
+			<gitHub>
+				<projectId>aposin/LicenseScout</projectId>
+				<ribbonOrientation>right</ribbonOrientation>
+				<ribbonColor>blue</ribbonColor>
+			</gitHub>
+		</fluidoSkin>
+	</custom>
+	<!-- <bannerLeft> <name>LicenseScout</name> <src>../../../org.aposin.licensescout.documentation/images/png/LS_logo_with_text_green.png</src> 
+		</bannerLeft> -->
+	<publishDate position="right" />
+	<version position="right" />
+
+	<body>
+		<links>
+			<item name="APOSIN" href="https://aposin.org/" />
+		</links>
+
+		<menu name="Overview">
+			<item name="Introduction" href="index.html" />
+			<item name="License"
+				href="https://www.apache.org/licenses/LICENSE-2.0" />
+			<item name="Sitemap" href="sitemap.html" />
+		</menu>
+
+		<menu ref="reports" />
+		<menu ref="modules" />
+
+		<menu name="APOSIN Projects" inherit="bottom">
+			<item name="Open Insurance Platform"
+				href="https://aposin.org/open-insurance-platform/" />
+			<item name="Mergeprocessor"
+				href="https://github.com/aposin/MergeProcessor" />
+			<item name="CalculusPrime PnC"
+				href="https://github.com/aposin/CalculusPrime-PnC" />
+		</menu>
+
+		<menu name="APOSIN" inherit="bottom">
+			<item name="About" href="https://aposin.org/about/" />
+			<item name="FAQ" href="https://aposin.org/faq" />
+			<item name="Projects" href="https://aposin.org/#projects" />
+		</menu>
+
+	</body>
+</project>

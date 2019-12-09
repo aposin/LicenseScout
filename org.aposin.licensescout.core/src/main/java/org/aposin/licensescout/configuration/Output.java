@@ -36,8 +36,10 @@ public class Output {
 
     /**
      * Name of the output file (will be combined with output directory).
+     * 
+     * <p>If the configured filename has no extension, the default extension of the {@link OutputFileType} is appended.<p>
      */
-    @Parameter(property = "filename", required = true)
+    @Parameter(property = "filename", required = false, defaultValue = "licensereport")
     private String filename;
 
     /**

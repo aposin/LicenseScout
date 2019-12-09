@@ -30,9 +30,49 @@
 			<email>matthias.pfisterer@allianz.at</email>
 			<url>https://github.com/pfistererm</url>
 			<organization>APOSIN</organization>
-			<organizationUrl>http://www.aposin.org/</organizationUrl>
+			<organizationUrl>https://www.aposin.org/</organizationUrl>
 			<roles>
 				<role>architect</role>
+				<role>developer</role>
+				<role>maintainer</role>
+			</roles>
+			<timezone>Europe/Berlin</timezone>
+		</developer>
+		<developer>
+			<id>d-gs</id>
+			<name>Daniel Gómez Sánchez</name>
+			<email>daniel.gomez-sanchez@allianz.at</email>
+			<url>https://github.com/d-gs</url>
+			<organization>APOSIN</organization>
+			<organizationUrl>https://www.aposin.org/</organizationUrl>
+			<roles>
+				<role>maintainer</role>
+				<role>developer</role>
+			</roles>
+			<timezone>Europe/Berlin</timezone>
+		</developer>
+		<developer>
+			<id>holzerma</id>
+			<name>Matthias Holzer</name>
+			<email>matthias.holzer@allianz.at</email>
+			<url>https://github.com/holzerma</url>
+			<organization>APOSIN</organization>
+			<organizationUrl>https://www.aposin.org/</organizationUrl>
+			<roles>
+				<role>project owner</role>
+				<role>maintainer</role>
+			</roles>
+			<timezone>Europe/Berlin</timezone>
+		</developer>
+		<developer>
+			<id>davu-all</id>
+			<name>Davide Ceraso</name>
+			<email>davide.ceraso@allianz.at</email>
+			<url>https://github.com/davu-all</url>
+			<organization>APOSIN</organization>
+			<organizationUrl>https://www.aposin.org/</organizationUrl>
+			<roles>
+				<role>maintainer</role>
 				<role>developer</role>
 			</roles>
 			<timezone>Europe/Berlin</timezone>
@@ -48,12 +88,15 @@
 		<commons-collections4.version>4.4</commons-collections4.version>
 		<commons-lang3.version>3.9</commons-lang3.version>
 		<commons-io.version>2.6</commons-io.version>
+		<doxia-sink-api.version>1.9</doxia-sink-api.version>
+		<jaxb-api.version>2.3.2</jaxb-api.version>
 		<junit.version>4.12</junit.version>
 		<json.version>20190722</json.version>
 		<mariadb-java-client.version>2.4.1</mariadb-java-client.version>
 		<maven-model.version>3.6.0</maven-model.version>
 		<maven-plugin-annotations.version>3.6.0</maven-plugin-annotations.version>
 		<maven-plugin-api.version>3.6.0</maven-plugin-api.version>
+		<maven-resolver.version>1.4.1</maven-resolver.version>
 		<plexus-utils.version>3.1.1</plexus-utils.version>
 		<velocity.version>2.1</velocity.version>
 
@@ -66,6 +109,9 @@
 		<!-- groupId: com.mycila -->
 		<license-maven-plugin.version>3.0</license-maven-plugin.version>
 
+		<!-- groupId: org.asciidoctor -->
+		<asciidoctor-maven-plugin.version>1.6.0</asciidoctor-maven-plugin.version>
+
 		<!-- groupId: org.apache.maven.plugins -->
 		<maven-assembly-plugin.version>3.1.1</maven-assembly-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -73,16 +119,20 @@
 		<maven-deploy-plugin.version>2.8.1</maven-deploy-plugin.version>
 		<maven-enforcer-plugin.version>3.0.0-M2</maven-enforcer-plugin.version>
 		<maven-failsafe-plugin.version>3.0.0-M3</maven-failsafe-plugin.version>
+		<maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
 		<maven-invoker-plugin.version>3.2.1</maven-invoker-plugin.version>
 		<maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
 		<maven-javadoc-plugin.version>3.1.1</maven-javadoc-plugin.version>
 		<maven-jar-plugin.version>2.4</maven-jar-plugin.version>
+		<maven-jxr-plugin.version>3.0.0</maven-jxr-plugin.version>
 		<maven-plugin-plugin.version>3.6.0</maven-plugin-plugin.version>
 		<maven-project-info-reports-plugin.version>3.0.0</maven-project-info-reports-plugin.version>
+		<maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
 		<maven-scm-plugin.version>1.11.2</maven-scm-plugin.version>
 		<maven-site-plugin.version>3.8.2</maven-site-plugin.version>
 		<maven-source-plugin.version>3.2.0</maven-source-plugin.version>
-		<maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
+		<maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
+		<maven-surefire-report-plugin.version>3.0.0-M4</maven-surefire-report-plugin.version>
 
 		<!-- groupId: org.codehaus.mojo -->
 		<build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
@@ -109,13 +159,15 @@
 		<url>http://www.aposin.org</url>
 	</organization>
 
+	<inceptionYear>2019</inceptionYear>
+
 	<issueManagement>
 		<system>Github</system>
 		<url>https://github.com/aposin/LicenseScout/issues</url>
 	</issueManagement>
 
 	<scm>
-		<url>https://github.com/aposin/LicenseScout</url>
+		<url>https://github.com/aposin/LicenseScout/tree/master</url>
 		<connection>scm:git:git://github.com/aposin/LicenseScout.git</connection>
 		<developerConnection>scm:git:git@github.com:aposin/LicenseScout.git</developerConnection>
 		<tag>HEAD</tag>
@@ -129,15 +181,30 @@
 				<version>${maven-model.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>org.apache.maven</groupId>
+				<artifactId>maven-plugin-api</artifactId>
+				<version>${maven-plugin-api.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>org.apache.maven.plugin-tools</groupId>
 				<artifactId>maven-plugin-annotations</artifactId>
 				<version>${maven-plugin-annotations.version}</version>
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.apache.maven</groupId>
-				<artifactId>maven-plugin-api</artifactId>
-				<version>${maven-plugin-api.version}</version>
+				<groupId>org.apache.maven.reporting</groupId>
+				<artifactId>maven-reporting-api</artifactId>
+				<version>3.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven.reporting</groupId>
+				<artifactId>maven-reporting-impl</artifactId>
+				<version>3.0.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven.shared</groupId>
+				<artifactId>maven-shared-utils</artifactId>
+				<version>3.2.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.plexus</groupId>
@@ -181,14 +248,44 @@
 				<version>${mariadb-java-client.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>javax.xml.bind</groupId>
-				<artifactId>jaxb-api</artifactId>
-				<version>2.3.1</version>
+				<groupId>jakarta.xml.bind</groupId>
+				<artifactId>jakarta.xml.bind-api</artifactId>
+				<version>${jaxb-api.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-beanutils</groupId>
 				<artifactId>commons-beanutils</artifactId>
 				<version>${commons-beanutils.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven.doxia</groupId>
+				<artifactId>doxia-sink-api</artifactId>
+				<version>${doxia-sink-api.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven.doxia</groupId>
+				<artifactId>doxia-core</artifactId>
+				<version>1.9</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven.doxia</groupId>
+				<artifactId>doxia-site-renderer</artifactId>
+				<version>1.9.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven.doxia</groupId>
+				<artifactId>doxia-decoration-model</artifactId>
+				<version>1.9.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven.resolver</groupId>
+				<artifactId>maven-resolver-api</artifactId>
+				<version>${maven-resolver.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven.resolver</groupId>
+				<artifactId>maven-resolver-impl</artifactId>
+				<version>${maven-resolver.version}</version>
 			</dependency>
 
 			<!-- Test dependencies -->
@@ -198,14 +295,21 @@
 				<version>${org.jsoup.version}</version>
 				<scope>test</scope>
 			</dependency>
+			<dependency>
+				<groupId>org.apache.maven</groupId>
+				<artifactId>maven-core</artifactId>
+				<version>3.6.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven.plugin-testing</groupId>
+				<artifactId>maven-plugin-testing-harness</artifactId>
+				<version>3.3.0</version>
+				<scope>test</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
 	<build>
-		<plugins>
-
-		</plugins>
-
 		<pluginManagement>
 			<plugins>
 				<!-- groupId: com.mycila -->
@@ -213,6 +317,26 @@
 					<groupId>com.mycila</groupId>
 					<artifactId>license-maven-plugin</artifactId>
 					<version>${license-maven-plugin.version}</version>
+					<configuration>
+						<aggregate>true</aggregate>
+						<header>LICENSE_header.txt</header>
+						<includes>
+							<!-- include all sources -->
+							<include>src/**</include>
+						</includes>
+						<excludes>
+							<exclude>**/*.xml</exclude>
+							<exlucde>**/*.txt</exlucde>
+							<exclude>**/*.csv</exclude>
+						</excludes>
+						<properties>
+							<year>2019</year>
+							<owner>${project.organization.name}</owner>
+						</properties>
+						<mapping>
+							<adoc>DOUBLESLASH_STYLE</adoc>
+						</mapping>
+					</configuration>
 				</plugin>
 
 				<!-- groupId: org.apache.maven.plugins -->
@@ -240,6 +364,29 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-enforcer-plugin</artifactId>
 					<version>${maven-enforcer-plugin.version}</version>
+					<executions>
+						<execution>
+							<!-- This execution is only activated (by referencing its ID) in submodules 
+								that use unit tests with 'maven-surefire-plugin'. -->
+							<id>jacoco-file-check</id>
+							<goals>
+								<goal>enforce</goal>
+							</goals>
+							<phase>test</phase>
+							<configuration>
+								<rules>
+									<requireFilesExist>
+										<files>
+											<file>${project.build.directory}/jacoco.exec</file>
+										</files>
+										<message>Jacoco result file ('target/jacoco.exec') is missing!</message>
+									</requireFilesExist>
+								</rules>
+								<fail>true</fail>
+								<skip>${skipTests}</skip>
+							</configuration>
+						</execution>
+					</executions>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -273,17 +420,39 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-invoker-plugin</artifactId>
 					<version>${maven-invoker-plugin.version}</version>
+					<configuration>
+						<projectsDirectory>src/it</projectsDirectory>
+						<pomIncludes>
+							<pomInclude>**/pom.xml</pomInclude>
+						</pomIncludes>
+						<postBuildHookScript>verify</postBuildHookScript>
+					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
 					<version>${maven-jar-plugin.version}</version>
+					<configuration>
+						<archive>
+							<addMavenDescriptor>true</addMavenDescriptor>
+						</archive>
+					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
 					<version>${maven-javadoc-plugin.version}</version>
+					<configuration>
+						<quiet>true</quiet>
+						<doclint>none</doclint>
+					</configuration>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jxr-plugin</artifactId>
+					<version>${maven-jxr-plugin.version}</version>
+				</plugin>
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-plugin-plugin</artifactId>
@@ -293,6 +462,15 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-project-info-reports-plugin</artifactId>
 					<version>${maven-project-info-reports-plugin.version}</version>
+					<configuration>
+						<dependencyDetailsEnabled>true</dependencyDetailsEnabled>
+						<dependencyLocationsEnabled>true</dependencyLocationsEnabled>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>${maven-resources-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-scm-plugin</artifactId>
@@ -305,6 +483,38 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
 					<version>${maven-site-plugin.version}</version>
+					<dependencies>
+						<dependency>
+							<groupId>org.asciidoctor</groupId>
+							<artifactId>asciidoctor-maven-plugin</artifactId>
+							<version>${asciidoctor-maven-plugin.version}</version>
+						</dependency>
+					</dependencies>
+					<configuration>
+						<stagingDirectory>C:\dev\tmp\licensescout-stage\a\b\c</stagingDirectory>
+						<generateReports>true</generateReports>
+						<generateSitemap>true</generateSitemap>
+
+						<asciidoc>
+							<!-- optional site-wide AsciiDoc attributes -->
+							<attributes>
+								<icons>font</icons>
+								<source-highlighter>coderay</source-highlighter>
+								<coderay-css>style</coderay-css>
+								<toclevels>4</toclevels>
+							</attributes>
+						</asciidoc>
+						<skipDeploy>true</skipDeploy>
+					</configuration>
+					<executions>
+						<!-- this is important to enable inheritance of site descriptors -->
+						<execution>
+							<id>attach-descriptor</id>
+							<goals>
+								<goal>attach-descriptor</goal>
+							</goals>
+						</execution>
+					</executions>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -323,6 +533,16 @@
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>${maven-surefire-plugin.version}</version>
 					<!-- <configuration> <argLine> -illegal-access=permit </argLine> </configuration> -->
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-report-plugin</artifactId>
+					<version>${maven-surefire-report-plugin.version}</version>
+					<configuration>
+						<aggregate>true</aggregate>
+						<!--also set this to link to generated source reports -->
+						<linkXRef>true</linkXRef>
+					</configuration>
 				</plugin>
 
 				<!-- groupId: org.codehaus.mojo -->
@@ -397,6 +617,10 @@
 			<id>ossrh</id>
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
+		<site>
+			<id>${project.artifactId}-site</id>
+			<url>file://${project.build.directory}/completesite</url>
+		</site>
 	</distributionManagement>
 
 	<profiles>
@@ -514,6 +738,84 @@
 						</executions>
 					</plugin>
 
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<!-- Modules to build in the CI build. -->
+			<id>ci-modules</id>
+
+			<modules>
+				<module>../org.aposin.licensescout.core</module>
+				<module>../licensescout-maven-utils</module>
+				<module>../licensescout-report-maven-plugin</module>
+			</modules>
+		</profile>
+
+		<profile>
+			<!-- Modules with site documentation. -->
+			<id>site-modules</id>
+
+			<modules>
+				<module>../org.aposin.licensescout.documentation</module>
+				<module>../org.aposin.licensescout.core</module>
+				<module>../licensescout-maven-utils</module>
+				<module>../licensescout-report-maven-plugin</module>
+			</modules>
+		</profile>
+
+		<profile>
+			<!-- Modules that are released. -->
+			<id>release-modules</id>
+
+			<modules>
+				<module>../org.aposin.licensescout.core/</module>
+				<module>../licensescout-maven-utils</module>
+				<module>../licensescout-report-maven-plugin/</module>
+				<module>../org.aposin.licensescout.configuration.sample/</module>
+			</modules>
+		</profile>
+
+		<profile>
+			<!-- Modules containing integration tests. -->
+			<id>it-modules</id>
+
+			<modules>
+				<module>../org.aposin.licensescout.core/</module>
+				<module>../licensescout-report-maven-plugin/</module>
+			</modules>
+		</profile>
+
+		<profile>
+			<!-- Modules that should be checked for license headers by com.mycila:license-maven-plugin -->
+			<id>license-header-modules</id>
+
+			<modules>
+				<module>../org.aposin.licensescout.core/</module>
+				<!-- <module>../licensescout-maven-plugin</module> -->
+				<module>../licensescout-maven-utils</module>
+				<module>../licensescout-report-maven-plugin/</module>
+				<module>../org.aposin.licensescout.documentation/</module>
+			</modules>
+		</profile>
+
+		<profile>
+			<!-- Profile for integration tests. -->
+			<id>run-its</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-invoker-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
 				</plugins>
 			</build>
 		</profile>

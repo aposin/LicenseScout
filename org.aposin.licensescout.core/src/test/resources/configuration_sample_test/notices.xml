@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<notices>
+	<!-- NOTE: to maintain overview, notices should be ordered by their identifier. -->
+	<notice id='EPL-1.0'>
+		<text>Notice for EPL 1</text>
+	</notice>
+	<notice id='EPL-2.0'>
+		<text>Notice for EPL 2</text>
+	</notice>
+	<notice id='MIT-1'>
+		<text>Notice for MIT 1</text>
+	</notice>
+	<notice id='MIT-2'>
+		<text>Notice for MIT 2</text>
+	</notice>
+	<notice id='Custom-1'>
+		<text>Custom Notice 1</text>
+	</notice>
+	<notice id='Custom-2'>
+		<text>Custom Notice 2</text>
+	</notice>
+</notices>

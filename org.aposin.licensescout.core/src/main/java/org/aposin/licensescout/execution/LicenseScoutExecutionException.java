@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aposin.licensescout.finder;
-
-import org.aposin.licensescout.execution.Executor;
+package org.aposin.licensescout.execution;
 
 /**
  * Checked exception during the main execution of the LicenseScout.

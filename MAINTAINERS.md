@@ -5,6 +5,7 @@ _Please keep the list sorted alphabetically by GitHub ID_
 
 | Github ID                                                    | Name                   | Email                            |
 |------------------------------------------------------------|------------------------|------------------------------------|
+| [@davu-all](https://github.com/davu-all)                   | Davide Ceraso          | <davide.ceraso@allianz.at>         |
 | [@do0p](https://github.com/do0p)                           | Dominik Brandl         | <dominik.brandl@allianz.at>        |
 | [@d-gs](https://github.com/d-gs)                           | Daniel Gómez Sánchez   | <daniel.gomez-sanchez@allianz.at>  |
 | [@holzerma](https://github.com/holzerma)                   | Matthias Holzer        | <matthias.holzer@allianz.at>       |

@@ -15,8 +15,8 @@
  */
 package org.aposin.licensescout.model;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +30,7 @@ import org.aposin.licensescout.util.sax.AbstractSaxHandler;
 import org.aposin.licensescout.util.sax.IElementHandler;
 import org.aposin.licensescout.util.sax.NopElementHandler;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -38,7 +39,7 @@ import org.xml.sax.XMLReader;
 
  * <ol>
  * <li>Create an instance</li>
- * <li>Call {@link #readProviders(File, boolean, ILFLog)} to read in the providers from a file</li>
+ * <li>Call {@link #readProviders(InputStream, boolean, ILFLog)} to read in the providers from a file</li>
  * </ol>
  */
 public class Providers {
@@ -79,14 +80,14 @@ public class Providers {
     /**
      * Reads providers from an XML file.
      * 
-     * @param file
+     * @param inputStream
      * @param validateXml true if the provider XML file should be validated, false otherwise
      * @param log the logger
      * @throws IOException
      * @throws SAXException 
      * @throws ParserConfigurationException 
      */
-    public void readProviders(final File file, boolean validateXml, final ILFLog log)
+    public void readProviders(final InputStream inputStream, boolean validateXml, final ILFLog log)
             throws IOException, ParserConfigurationException, SAXException {
 
         final SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -95,7 +96,7 @@ public class Providers {
         final SAXParser saxParser = spf.newSAXParser();
         final XMLReader xmlReader = saxParser.getXMLReader();
         xmlReader.setContentHandler(new ProviderSaxHandler(log));
-        xmlReader.parse(file.toURI().toString());
+        xmlReader.parse(new InputSource(inputStream));
     }
 
     private class ProviderSaxHandler extends AbstractSaxHandler {

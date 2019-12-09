@@ -22,7 +22,7 @@ import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.configuration.RunParameters;
 import org.aposin.licensescout.core.test.util.TestUtil;
 import org.aposin.licensescout.execution.ExecutionParameters;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.license.LicenseStoreData;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,7 +50,7 @@ public class FinderFactoryTest {
     }
 
     /**
-     * Test case for the method {@link FinderFactory#createFinder(org.aposin.licensescout.license.LicenseStoreData, ILFLog)}.
+     * Test case for the method {@link FinderFactory#createFinder(ExecutionParameters, LicenseStoreData, RunParameters)}.
      * 
      * @throws Exception
      */
@@ -58,7 +58,7 @@ public class FinderFactoryTest {
     public void testCreateFinder() throws Exception {
         final ExecutionParameters executionParameters = new ExecutionParameters();
         executionParameters.setArchiveType(archiveType);
-        executionParameters.setLsLog(TestUtil.createJavaUtilGlobalLog());
+        executionParameters.setLsLog(TestUtil.createTestLog());
         executionParameters.setNpmExcludedDirectoryNames(new ArrayList<>());
         final RunParameters runParameters = TestUtil.createRunParameters();
         final AbstractFinder finder = FinderFactory.getInstance().createFinder(executionParameters, null,

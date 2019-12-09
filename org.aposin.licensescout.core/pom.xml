@@ -28,6 +28,14 @@
 	</properties>
 
 	<dependencies>
+		<!-- Project internal dependencies -->
+		<dependency>
+			<groupId>org.aposin.licensescout</groupId>
+			<artifactId>licensescout-maven-utils</artifactId>
+			<version>1.3.${revision}</version>
+		</dependency>
+
+		<!-- External dependencies -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
@@ -41,8 +49,16 @@
 			<artifactId>maven-plugin-api</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-core</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.maven.plugin-tools</groupId>
 			<artifactId>maven-plugin-annotations</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity-engine-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>
@@ -65,16 +81,12 @@
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.velocity</groupId>
-			<artifactId>velocity-engine-core</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>commons-beanutils</groupId>
@@ -96,22 +108,6 @@
 				<executions>
 					<execution>
 						<id>jacoco-file-check</id>
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-						<phase>test</phase>
-						<configuration>
-							<rules>
-								<requireFilesExist>
-									<files>
-										<file>${project.build.directory}/jacoco.exec</file>
-									</files>
-									<message>Jacoco result file ('target/jacoco.exec') is missing!</message>
-								</requireFilesExist>
-							</rules>
-							<fail>true</fail>
-							<skip>${skipTests}</skip>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -119,11 +115,16 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<addMavenDescriptor>true</addMavenDescriptor>
-					</archive>
-				</configuration>
+				<executions>
+					<!-- Needed because other projects have test cases which derive from 
+						classes in this project. -->
+					<execution>
+						<id>create-test-jar</id>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 
 			<plugin>
@@ -134,18 +135,19 @@
 				</configuration>
 				<executions>
 					<execution>
-						<id>mojo-descriptor</id>
-						<goals>
-							<goal>descriptor</goal>
-						</goals>
-					</execution>
-					<execution>
 						<id>help-goal</id>
 						<goals>
 							<goal>helpmojo</goal>
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<!-- We need sources always to allow the 'maven-plugin-plugin' to read 
+				annotations. This is needed because classes are used as a type for a MOJO 
+				parameter. -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
 			</plugin>
 
 			<!-- groupId: org.jacoco -->
@@ -174,19 +176,7 @@
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
 				<configuration>
-					<header>LICENSE_header.txt</header>
-					<properties>
-						<year>2019</year>
-						<owner>${project.organization.name}</owner>
-					</properties>
-					<includes>
-						<!-- include all sources -->
-						<include>src/**</include>
-					</includes>
-					<excludes>
-						<exclude>**/*.xml</exclude>
-						<exlucde>**/*.txt</exlucde>
-						<exclude>**/*.csv</exclude>
+					<excludes combine.children="append">
 						<!-- check fails on files with UTF-16 encoding because it uses UTF-8 
 							encoding (which is the case for all other files) -->
 						<exclude>**/*UTF-16*.vm</exclude>
@@ -198,31 +188,53 @@
 
 	</build>
 
-	<profiles>
-		<profile>
-			<id>run-its</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-invoker-plugin</artifactId>
-						<configuration>
-							<projectsDirectory>src/it</projectsDirectory>
-							<pomIncludes>
-								<pomInclude>**/pom.xml</pomInclude>
-							</pomIncludes>
-							<postBuildHookScript>verify</postBuildHookScript>
-						</configuration>
-						<executions>
-							<execution>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<reportSets>
+					<reportSet><!-- by default, id = "default" -->
+						<reports><!-- select non-aggregate reports -->
+							<report>javadoc</report>
+							<report>test-javadoc</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-plugin-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jxr-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<!-- select non-aggregate reports -->
+							<report>report</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+		</plugins>
+	</reporting>
+
 </project>

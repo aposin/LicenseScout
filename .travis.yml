@@ -11,15 +11,13 @@ cache:
     - $HOME/.m2
 
 before_install:
-  - cd org.aposin.licensescout.core
-install:
-  - mvn -DskipTests=true -Dmaven.javadoc.skip=true package
+  - cd org.aposin.licensescout.parent
 
 script:
   - if [[ $TYPE == test ]]; then
-      mvn test;
+      mvn -Pci-modules clean install;
     elif [[ $TYPE == check ]]; then
-      mvn license:check;
+      mvn -Plicense-header-modules license:check;
     else
       echo "$TYPE type not recognized";
       exit 1;

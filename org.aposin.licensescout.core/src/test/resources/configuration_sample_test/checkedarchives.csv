@@ -1,0 +1,23 @@
+Type,Filename or Regex,Version or Message digest,Documentation URL,Provider,Notice,License 1,License 2, License 3
+JAVASCRIPT,testarchive1,0.0.4,,,,MIT,,
+JAVA,testarchive2,D11CDFDDC6F3CF3B48560004AA50795222F4ED8A44983651BBC9302A96AD4F46,,,,DOM4J,,
+JAVASCRIPT,testarchive3,0.0.4,,,,MIT,,
+JAVA,testarchive4,D11CDFDDC6F3CF3B48560004AA50795222F4ED8A44983651BBC9302A96AD4F46,,,,DOM4J,,
+#
+# This definition is needed for checking the LicenseScout itself
+# the license definition is based on information from https://repo1.maven.org/maven2/mysql/mysql-connector-java/6.0.3/mysql-connector-java-6.0.3.pom, retrieved 2019-01-14
+JAVA,mysql-connector-java-6.0.3.jar,A39C1374237E2707862933B3B606FF8F36C34B184AB49F4BEC272593BCF3CC78,,,,GPL-2.0,,
+#
+# This definition is needed for checking the LicenseScout itself
+# the license definition is based on information from http://central.maven.org/maven2/javax/inject/javax.inject/1/javax.inject-1.pom, retrieved 2019-01-14
+JAVA,javax.inject-1.jar,91C77044A50C481636C32D916FD89C9118A72195390452C81065080F957DE7FF,,,,Apache-2.0,,
+#
+# This definition is needed for checking the LicenseScout itself
+# the license definition is based on information from http://central.maven.org/maven2/javax/annotation/jsr250-api/1.0/jsr250-api-1.0.pom, retrieved 2019-01-14
+JAVA,jsr250-api-1.0.jar,A1A922D0D9B6D183ED3800DFAC01D1E1EB159F0E8C6F94736931C1DEF54A941F,,,,CDDL-1.0,,
+#
+# This definition is needed for checking the LicenseScout itself
+JAVA,javax.activation-api-1.2.0.jar,43FDEF0B5B6CEB31B0424B208B930C74AB58FAC2CEEB7B3F6FD3AEB8B5CA4393,,,,CDDL-1.1,,
+#
+# This definition is needed for checking the LicenseScout itself
+JAVA,jaxb-api-2.3.1.jar,88B955A0DF57880A26A74708BC34F74DCAF8EBF4E78843A28B50EAE945732B06,,,,CDDL-1.1,,
