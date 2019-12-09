@@ -28,15 +28,23 @@ Usually the generated license reports are attached as secondary artifacts to the
 If you have special needs regarding the attach you can disable the default attach and do it yourself using the `build-helper-maven-plugin` with the goal  https://www.mojohaus.org/build-helper-maven-plugin/attach-artifact-mojo.html[`build-helper:attach-artifact`].
 
 
-TODO
-.Example using Sqlserver
+.Attaching generated reports via build-helper-maven-plugin
 [source, xml]
 ----
 <properties>
   ...
-
-  <!-- LicenseScout database configuration -->
-  <licensescout.database.url>jdbc:sqlserver://localhost\abc</licensescout.database.url>
+	<build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
+  ...
+  
+  <!-- Configuration related to generated License Report Result Files -->
+  <licensescout.outputDirectory>${project.build.directory}</licensescout.outputDirectory>
+  <licensescout.outputFilename.csv>licensereport.csv</licensescout.outputFilename.csv>
+  <licensescout.outputFilename.html>licensereport.html</licensescout.outputFilename.html>
+  <licensescout.outputFilename.txt>licensereport.txt</licensescout.outputFilename.txt>
+  <licensereport.path.csv>${licensescout.outputDirectory}/${licensescout.outputFilename.csv}</licensereport.path.csv>
+  <licensereport.path.html>${licensescout.outputDirectory}/${licensescout.outputFilename.html}</licensereport.path.html>
+  <licensereport.path.txt>${licensescout.outputDirectory}/${licensescout.outputFilename.txt}</licensereport.path.txt>
+  <licensereport.classifier>myclassifier</licensereport.classifier>
 </properties>
 
 ...
@@ -44,19 +52,59 @@ TODO
   <groupId>org.aposin.licensescout</groupId>
   <artifactId>licensescout-maven-plugin</artifactId>
   <configuration>
+    <attachReports>false</attachReports>    <1>
     ...
-    <resultDatabaseConfiguration>
-      <jdbcUrl>${licensescout.database.url}</jdbcUrl>
-      ...
-    </resultDatabaseConfiguration>
+    <outputDirectory>${licensescout.outputDirectory}</outputDirectory>
+    <outputs>
+      <output>
+        <type>CSV</type>
+        <filename>${licensescout.outputFilename.csv}</filename>
+      </output>
+      <output>
+        <type>HTML</type>
+        <filename>${licensescout.outputFilename.html}</filename>
+      </output>
+      <output>
+        <type>TXT</type>
+        <filename>${licensescout.outputFilename.txt}</filename>
+      </output>
+    </outputs>
     ...
   </configuration>
-  <dependencies>
-    <dependency>
-      <groupId>com.microsoft.sqlserver</groupId>
-      <artifactId>mssql-jdbc</artifactId>
-      <version>7.4.1.jre11</version>
-    </dependency>
-  </dependencies>
+</plugin>
+
+<plugin>
+	<groupId>org.codehaus.mojo</groupId>
+	<artifactId>build-helper-maven-plugin</artifactId>
+	<version>${build-helper-maven-plugin.version}</version>
+    <executions>
+      <execution>
+        <id>attach-license-reports</id>
+        <goals>
+          <goal>attach-artifact</goal>
+        </goals>
+        <phase>verify</phase>
+        <configuration>
+          <artifacts>
+            <artifact>
+              <file>${licensereport.path.csv}</file>
+              <type>csv</type>
+              <classifier>${licensereport.classifier}</classifier>
+            </artifact>
+            <artifact>
+              <file>${licensereport.path.html}</file>
+              <type>html</type>
+              <classifier>${licensereport.classifier}</classifier>
+            </artifact>
+            <artifact>
+              <file>${licensereport.path.txt}</file>
+              <type>txt</type>
+              <classifier>${licensereport.classifier}</classifier>
+            </artifact>
+          </artifacts>
+        </configuration>
+      </execution>
+    </executions>
 </plugin>
 ----
+<1> disable the automatic attach

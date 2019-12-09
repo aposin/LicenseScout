@@ -45,41 +45,44 @@ the classifier `licensereport` and the following artifact types:
 
 [source,xml]
 ----
+<properties>
+  <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  <org.aposin.licensescout.version>1.3.1-SNAPSHOT</org.aposin.licensescout.version>
+  <org.aposin.licensescout.configuration.version>1.3.1-SNAPSHOT</org.aposin.licensescout.configuration.version>
+</properties>
+
 <plugin>
   <groupId>org.aposin.licensescout</groupId>
   <artifactId>licensescout-maven-plugin</artifactId>
-  <version>1.3.0</version>
+  <version>${org.aposin.licensescout.version}</version>
   <configuration>
-  <scanDirectory>${project.build.directory}/products/my.product/win32/win32/x86/plugins/</scanDirectory>
-  <outputs>
-    <output>
-    <type>HTML</type>
-    </output>
-    <output>
-    <type>CSV</type>
-    </output>
-    <output>
-    <type>TXT</type>
-    </output>
-  </outputs>
+    <scanDirectory>${project.build.directory}/products/my.product/win32/win32/x86/plugins/</scanDirectory>
+    <configurationBundle>
+      <groupId>org.aposin.licensescout</groupId>
+      <artifactId>org.aposin.licensescout.configuration.sample</artifactId>
+      <version>${org.aposin.licensescout.configuration.version}</version>
+      <classifier>configuration</classifier>
+      <type>zip</type>
+    </configurationBundle>
+    <outputs>
+      <output>
+        <type>HTML</type>
+      </output>
+      <output>
+        <type>CSV</type>
+      </output>
+      <output>
+        <type>TXT</type>
+      </output>
+    </outputs>
   </configuration>
   <executions>
-  <execution>
-    <goals>
-    <goal>scanJava</goal>
-    </goals>
-  </execution>
+    <execution>
+      <goals>
+        <goal>scanJava</goal>
+      </goals>
+    </execution>
   </executions>
-  <dependencies>
-  <dependency>
-    <groupId>org.aposin.licensescout</groupId>
-    <artifactId>org.aposin.licensescout.configuration.sample</artifactId>
-    <version>1.3.0</version>
-    <classifier>configuration</classifier>
-    <type>zip</type>
-    <scope>runtime</scope>
-  </dependency>
-  </dependencies>
 </plugin>
 ----
 
@@ -87,10 +90,16 @@ the classifier `licensereport` and the following artifact types:
 
 [source,xml]
 ----
+<properties>
+  <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  <org.aposin.licensescout.version>1.3.1-SNAPSHOT</org.aposin.licensescout.version>
+  <org.aposin.licensescout.configuration.version>1.3.1-SNAPSHOT</org.aposin.licensescout.configuration.version>
+</properties>
+
 <plugin>
   <groupId>org.aposin.licensescout</groupId>
   <artifactId>licensescout-maven-plugin</artifactId>
-  <version>1.3.0</version>
+  <version>${org.aposin.licensescout.version}</version>
   <executions>
   <execution>
     <id>find-licenses</id>
@@ -100,6 +109,13 @@ the classifier `licensereport` and the following artifact types:
       </goals>
       <configuration>
         <scanDirectory>${project.build.directory}/products/my.product/win32/win32/x86/plugins/</scanDirectory>
+        <configurationBundle>
+          <groupId>org.aposin.licensescout</groupId>
+          <artifactId>org.aposin.licensescout.configuration.sample</artifactId>
+          <version>${org.aposin.licensescout.configuration.version}</version>
+          <classifier>configuration</classifier>
+          <type>zip</type>
+        </configurationBundle>
         <outputs>
           <output>
             <type>HTML</type>
@@ -114,26 +130,8 @@ the classifier `licensereport` and the following artifact types:
             <url>${licensereport.url.txt}</url>
           </output>
         </outputs>
-        <licensesFilename>${licensescout-configuration.dir}/licenses.xml</licensesFilename>
-        <providersFilename>${licensescout-configuration.dir}/providers.xml</providersFilename>
-        <noticesFilename>${licensescout-configuration.dir}/notices.xml</noticesFilename>
-        <checkedArchivesFilename>${licensescout-configuration.dir}/checkedarchives.csv</checkedArchivesFilename>
-        <licenseUrlMappingsFilename>${licensescout-configuration.dir}/urlmappings.csv</licenseUrlMappingsFilename>
-        <licenseNameMappingsFilename>${licensescout-configuration.dir}/namemappings.csv</licenseNameMappingsFilename>
-        <globalFiltersFilename>${licensescout-configuration.dir}/globalfilters.csv</globalFiltersFilename>
-        <filteredVendorNamesFilename>${licensescout-configuration.dir}/filteredvendornames.csv</filteredVendorNamesFilename>
       </configuration>
     </execution>
   </executions>
-  <dependencies>
-    <dependency>
-      <groupId>org.aposin.licensescout</groupId>
-      <artifactId>org.aposin.licensescout.configuration.sample</artifactId>
-      <version>1.3.0</version>
-      <classifier>configuration</classifier>
-      <type>zip</type>
-      <scope>runtime</scope>
-    </dependency>
-  </dependencies>
 </plugin>
 ----

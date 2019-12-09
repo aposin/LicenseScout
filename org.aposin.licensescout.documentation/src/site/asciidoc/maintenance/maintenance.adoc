@@ -43,28 +43,28 @@ https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html
 ----
 <?xml version="1.0" encoding="UTF-8"?>
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
 
-	<servers>
-		<server>
-			<id>ossrh</id>                                   <1>
-			<username>[SONATYPE ACCOUNT ID]</username>       <2>
-			<password>[SONATYPE ACCOUNT PASSWORD]</password> <3>
-		</server>
-	</servers>
+  <servers>
+    <server>
+      <id>ossrh</id>                                   <1>
+      <username>[SONATYPE ACCOUNT ID]</username>       <2>
+      <password>[SONATYPE ACCOUNT PASSWORD]</password> <3>
+    </server>
+  </servers>
 
-	<profiles>
-		<profile>
-			<id>ossrh</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<properties>
-				<gpg.keyname>[PGP SIGNING KEY ID]</gpg.keyname> <4>
-			</properties>
-		</profile>
-	</profiles>
+  <profiles>
+    <profile>
+      <id>ossrh</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <gpg.keyname>[PGP SIGNING KEY ID]</gpg.keyname> <4>
+      </properties>
+    </profile>
+  </profiles>
 
 </settings>
 ----
@@ -81,6 +81,8 @@ It is highly recommended to use encrypted passwords in the `settings.xml` file a
 * https://blog.sonatype.com/2009/10/maven-tips-and-tricks-encrypting-passwords/
 
 === Release project
+
+//TODO: replaced by profile in parent
 
 There is a special project that contains the parts of LicenseScout that should be released.
 It is an aggregator POM called `org.aposin.licensescout.release-aggrgator`.
@@ -131,6 +133,49 @@ TODO: this is unfinished
 
 NOTE: the release version number is composed of the part in the POM ('1.3.') and the property 'revision' provided on the command line (example: '1.005').
 This results in the actual version number (example: '1.3.1.005').
+
+== Profiles overview
+
+.Profiles
+[cols="1m,2", options="header"]
+|===
+|Profile ID|Purpose
+|snapshot-release|Doing snapshot releases
+|release|Doing (main) releases
+|github-upload|Upload of binaries to Github
+|ci-modules|Modules used in the CI build
+|site-modules|Modules used for site generation
+|release-modules|Modules used for releases
+|it-modules|Modules used in integration testing
+|license-header-modules|Modules used in the license header check
+|clean-site-staging|Cleans the global site staging directory
+|run-its|Run integration tests
+|only-eclipse|Contains M2E definitions that lead to errors in normal reactor runs
+|===
+
+
+== Site generation
+
+Site generation is done in two steps:
+
+. Generating content and staging to a local irectory using the run configuration `org.aposin.licensescout.parent_multimodule_site_stage`.
+This does a `package site site:stage` with the profiles `site-modules,clean-site-staging`. Note `package` is necessary due to a Maven bug (https://jira.apache.org/jira/browse/MDEP-98)
+
+. Checkin from the staging directory to the `gh-pages` branch using he run configuration
+`org.aposin.licensescout.parent_site_publish` which does `scm-publish:publish-scm`.
+
+Note the definitions:
+[source, xml]
+----
+</properties>
+  ...
+  <github.owner>aposin</github.owner>
+  <siteStagingDirectory>C:\dev\tmp\licensescout-stage</siteStagingDirectory>
+  <siteBranch>gh-pages</siteBranch>
+</properties>
+----
+
+The generation uses site descriptor inheritance. To make this work, the parent POM does an `attachDescriptor`.
 
 == Maintaining Eclipse run configurations
 

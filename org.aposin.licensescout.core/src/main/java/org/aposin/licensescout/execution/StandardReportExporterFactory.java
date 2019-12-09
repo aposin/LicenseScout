@@ -25,17 +25,29 @@ import org.aposin.licensescout.exporter.IReportExporter;
 import org.aposin.licensescout.exporter.TxtExporter;
 
 /**
- * Engine that contains the main control flow of the LicenseScout.
+ * Factory for creating report exporter instances.
+ * 
+ * <p>Supports the following output file types:</p>
+ * <ul>
+ * <li>{@link OutputFileType#CSV}</li>
+ * <li>{@link OutputFileType#HTML}</li>
+ * <li>{@link OutputFileType#TXT}</li>
+ * </ul>
  *
  */
-public class StandardReportExporterFactory implements IReportExporterFactory  {
+public class StandardReportExporterFactory implements IReportExporterFactory {
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public List<OutputFileType> getSupportedOutputFileTypes()
-    {
-        return Arrays.asList(OutputFileType.CSV, OutputFileType.HTML,OutputFileType.TXT);
+    public List<OutputFileType> getSupportedOutputFileTypes() {
+        return Arrays.asList(OutputFileType.CSV, OutputFileType.HTML, OutputFileType.TXT);
     }
- 
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public IReportExporter getReportExporter(final OutputFileType outputFileType) {
         switch (outputFileType) {

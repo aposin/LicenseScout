@@ -58,7 +58,7 @@ public class ArtifactItem {
     private String classifier;
 
     /**
-     * Constructor sed by the Maven runtime system.
+     * Constructor used by the Maven runtime system.
      */
     public ArtifactItem() {
         // EMPTY

@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-= LicenseScout Cookbook
+= Usage
 
 :encoding: utf-8
 :lang: en
@@ -22,26 +22,17 @@
 :toc:
 :toclevels: 4
 
+You include `licensescout-maven-utils` as a Maven dependency.
 
-== Tweaking the set of artifacts that appear in the license report
+[source,xml]
+----
+  <dependencies>
+    <dependency>
+      <groupId>org.aposin.licensescout</groupId>
+      <artifactId>licensescout-maven-utils</artifactId>
+      <version>1.3.0</version>
+    </dependency>
+  </dependencies>
+----
 
-Usually, you want only third-party artifacts in your license report, but exclude your own artifacts.
-This can be achieved by two means:
-
-1. Vendor names to exclude
-2. Global filters
-
-=== Using Vendor names to exclude artifacts
-
-TODO
-
-=== Using global filters to exclude artifacts
-
-TODO
-
-
-
-
-=== Querying the database
-
-TODO: SQL examples
+For the programming interface see link:apidocs/index.html["JavaDoc"].

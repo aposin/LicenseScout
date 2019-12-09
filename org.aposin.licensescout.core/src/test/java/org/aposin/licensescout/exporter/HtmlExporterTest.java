@@ -15,7 +15,6 @@
  */
 package org.aposin.licensescout.exporter;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 import org.aposin.licensescout.configuration.OutputFileType;

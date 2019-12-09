@@ -23,11 +23,9 @@
 :toclevels: 4
 
 Usually, the best way to use the LicenseScout is to just configure it as a Maven Plug-in as described in the 
-section link:usage.html["Usage"]  and it will be downloaded automatically when executing Maven.
+section link:usage.html[Usage]  and it will be downloaded automatically when executing Maven.
 
 However, if for some reason you prefer to download it manually, you can use the following possibilities:
 
 * Maven central (releases): https://repo.maven.apache.org/maven2/org/aposin/licensescout/
 * Sonatype server (snapshots, releases): https://oss.sonatype.org/#nexus-search;quick~licensescout
-// TODO: Github?
-

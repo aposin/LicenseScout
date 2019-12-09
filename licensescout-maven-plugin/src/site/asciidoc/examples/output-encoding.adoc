@@ -48,7 +48,18 @@ For a list of encoding names supported n Java see https://docs.oracle.com/en/jav
       <groupId>org.aposin.licensescout</groupId>
       <artifactId>licensescout-maven-plugin</artifactId>
       <configuration>
-        ... <2>
+        ...
+        <outputs>
+          <output>
+            <type>HTML</type> <2>
+          </output>
+          <output>
+            <type>CSV</type> <2>
+          </output>
+          <output>
+            <type>TXT</type> <2>
+          </output>
+        </outputs>
       </configuration>
     </plugin>
   <plugins>
