@@ -1,0 +1,4 @@
+engines:
+ duplication:
+   exclude_paths:
+     - 'licensescout-report-maven-plugin/src/main/java/org/aposin/licensescout/report/mojo/*.java'

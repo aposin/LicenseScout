@@ -26,12 +26,13 @@
 				<version>@project.version@</version>
 				<configuration>
 					<skip>true</skip>
+					<scanDirectory>${project.build.directory}</scanDirectory>
 				</configuration>
 				<executions>
 					<execution>
 						<phase>process-resources</phase>
 						<goals>
-							<goal>scanJava</goal>
+							<goal>report</goal>
 						</goals>
 					</execution>
 				</executions>

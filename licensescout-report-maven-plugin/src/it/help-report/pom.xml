@@ -9,7 +9,7 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>Simple Test for License Scout Maven Plugin</name>
+	<name>Help Test for License Scout Report Maven Plugin</name>
 
 	<url>https://aposin.org/</url>
 
@@ -19,19 +19,19 @@
 
 	<build>
 		<plugins>
-
 			<plugin>
 				<groupId>@project.groupId@</groupId>
 				<artifactId>@project.artifactId@</artifactId>
 				<version>@project.version@</version>
 				<configuration>
-					<skip>true</skip>
+					<goal>report</goal>
+					<detail>true</detail>
 				</configuration>
 				<executions>
 					<execution>
 						<phase>process-resources</phase>
 						<goals>
-							<goal>scanJava</goal>
+							<goal>help</goal>
 						</goals>
 					</execution>
 				</executions>

@@ -1,0 +1,348 @@
+//
+// Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+= Controlling the execution
+
+:encoding: utf-8
+:lang: en
+:doctype: book
+:toc:
+:toclevels: 4
+
+
+In case of a multi module project it can be desirable to execute the LicenseScout in one module, but not in a
+different one. This can be achieved with using the parameter 'skip'.
+
+== Controlling execution using skip
+There are two common patterns how to do this. They are detailed in the sections below.
+
+=== Enabling execution globally, disabling locally
+
+.Parent POM
+[source, xml]
+----
+<groupId>org.myproject</groupId>
+<artifactId>parent</artifactId>
+<version>1.0.0-SNAPSHOT</version>
+<packaging>pom</packaging>
+
+<build>
+  <plugins>
+    ...
+    <plugin>
+      <groupId>org.aposin.licensescout</groupId>
+      <artifactId>licensescout-maven-plugin</artifactId>
+      <configuration>
+        ...
+        <!-- the default value, noted here only for clarity -->
+        <skip>false<skip>
+        ...
+      </configuration>
+    </plugin>
+  </plugins>
+</build>
+----
+
+.Submodule POM
+[source, xml]
+----
+<parent>
+  <groupId>org.myproject</groupId>
+  <artifactId>parent</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+</parent>
+
+<groupId>org.myproject</groupId>
+<artifactId>submodule1</artifactId>
+<version>1.0.0-SNAPSHOT</version>
+
+...
+<build>
+  <plugins>
+    ...
+    <plugin>
+      <groupId>org.aposin.licensescout</groupId>
+      <artifactId>licensescout-maven-plugin</artifactId>
+      <configuration>
+        <!-- execution disabled for this module -->
+        <skip>true<skip>
+      </configuration>
+    </plugin>
+  </plugins>
+</build>
+----
+
+=== Disabling execution globally, enabling locally
+
+.Parent POM
+[source, xml]
+----
+<groupId>org.myproject</groupId>
+<artifactId>parent</artifactId>
+<version>1.0.0-SNAPSHOT</version>
+<packaging>pom</packaging>
+
+<build>
+  <plugins>
+    ...
+    <plugin>
+      <groupId>org.aposin.licensescout</groupId>
+      <artifactId>licensescout-maven-plugin</artifactId>
+      <configuration>
+        ...
+        <!-- execution disabled globally -->
+        <skip>true<skip>
+        ...
+      </configuration>
+    </plugin>
+  </plugins>
+</build>
+----
+
+.Submodule POM
+[source, xml]
+----
+<parent>
+  <groupId>org.myproject</groupId>
+  <artifactId>parent</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+</parent>
+
+<groupId>org.myproject</groupId>
+<artifactId>submodule1</artifactId>
+<version>1.0.0-SNAPSHOT</version>
+
+...
+<build>
+  <plugins>
+    ...
+    <plugin>
+      <groupId>org.aposin.licensescout</groupId>
+      <artifactId>licensescout-maven-plugin</artifactId>
+      <configuration>
+        <!-- execution enabled for this module -->
+        <skip>false<skip>
+      </configuration>
+    </plugin>
+  </plugins>
+</build>
+----
+
+== Alternative solutions
+
+While usually using the skip parameter is the most clear way to configure execution, there are alternative solutions:
+
+* Using `pluginManagement` vs. `plugins`
+* Using executions with `phase` set to `none`
+
+=== Using pluginManagement
+
+`pluginManagement` can only be used to enable the execution in submodules, but not the other way round.
+
+.Parent POM
+[source, xml]
+----
+<groupId>org.myproject</groupId>
+<artifactId>parent</artifactId>
+<version>1.0.0-SNAPSHOT</version>
+<packaging>pom</packaging>
+
+<build>
+  <pluginManagement>
+    <plugins>
+      ...
+      <!-- not executed anywhere, because only in pluginManagement -->
+      <plugin>
+        <groupId>org.aposin.licensescout</groupId>
+        <artifactId>licensescout-maven-plugin</artifactId>
+        <configuration>
+          ...
+          <!-- all the configuration here -->
+          ...
+        </configuration>
+      </plugin>
+    </plugins>
+  </pluginManagement>
+</build>
+----
+
+.Submodule POM
+[source, xml]
+----
+<parent>
+  <groupId>org.myproject</groupId>
+  <artifactId>parent</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+</parent>
+
+<groupId>org.myproject</groupId>
+<artifactId>submodule1</artifactId>
+<version>1.0.0-SNAPSHOT</version>
+
+...
+<build>
+  <plugins>
+    ...
+    <!-- use the plugin in this module -->
+    <plugin>
+      <groupId>org.aposin.licensescout</groupId>
+      <artifactId>licensescout-maven-plugin</artifactId>
+    </plugin>
+  </plugins>
+</build>
+----
+
+=== Using Executions
+
+You can also use Maven executions to configure execution.
+
+==== Enabling execution globally, disabling locally
+
+.Parent POM
+[source, xml]
+----
+<groupId>org.myproject</groupId>
+<artifactId>parent</artifactId>
+<version>1.0.0-SNAPSHOT</version>
+<packaging>pom</packaging>
+
+<build>
+  <plugins>
+    ...
+    <plugin>
+      <groupId>org.aposin.licensescout</groupId>
+      <artifactId>licensescout-maven-plugin</artifactId>
+      <executions>
+        <execution>
+          <id>scan-licenses</id>   <1>
+          <phase>verify</phase>    <2>
+          <goals>
+            <goal>scanJava</goal>
+          </goals>
+          <configuration>
+            ...
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+----
+<1> this execution ID will be reused in submodules
+<2> normal execution
+
+.Submodule POM
+[source, xml]
+----
+<parent>
+  <groupId>org.myproject</groupId>
+  <artifactId>parent</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+</parent>
+
+<groupId>org.myproject</groupId>
+<artifactId>submodule1</artifactId>
+<version>1.0.0-SNAPSHOT</version>
+
+...
+<build>
+  <plugins>
+    ...
+    <plugin>
+      <groupId>org.aposin.licensescout</groupId>
+      <artifactId>licensescout-maven-plugin</artifactId>
+      <executions>
+        <execution>
+          <id>scan-licenses</id>   <1>
+          <phase>none</phase>      <2>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+----
+
+<1> the execution ID is the same as the one in the parent POM, so the local configuration modifies the one configured globally
+<2> setting the phase to `none` disables the execution
+
+==== Disabling execution globally, enabling locally
+
+.Parent POM
+[source, xml]
+----
+<groupId>org.myproject</groupId>
+<artifactId>parent</artifactId>
+<version>1.0.0-SNAPSHOT</version>
+<packaging>pom</packaging>
+
+<build>
+  <plugins>
+    ...
+    <plugin>
+      <groupId>org.aposin.licensescout</groupId>
+      <artifactId>licensescout-maven-plugin</artifactId>
+      <executions>
+        <execution>
+          <id>scan-licenses</id>   <1>
+          <phase>none</phase>    <2>
+          <goals>
+            <goal>scanJava</goal>
+          </goals>
+          <configuration>
+            ...
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+----
+<1> this execution ID will be reused in submodules
+<2> setting the phase to `none` disables the execution
+
+.Submodule POM
+[source, xml]
+----
+<parent>
+  <groupId>org.myproject</groupId>
+  <artifactId>parent</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+</parent>
+
+<groupId>org.myproject</groupId>
+<artifactId>submodule1</artifactId>
+<version>1.0.0-SNAPSHOT</version>
+
+...
+<build>
+  <plugins>
+    ...
+    <plugin>
+      <groupId>org.aposin.licensescout</groupId>
+      <artifactId>licensescout-maven-plugin</artifactId>
+      <executions>
+        <execution>
+          <id>scan-licenses</id>   <1>
+          <phase>verify</phase>      <2>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+----
+
+<1> the execution ID is the same as the one in the parent POM, so the local configuration modifies the one configured globally
+<2> setting the phase to `verify` enables the execution
