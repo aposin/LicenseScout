@@ -1,0 +1,81 @@
+//
+// Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+= Using custom output filenames
+
+:encoding: utf-8
+:lang: en
+:doctype: book
+:toc:
+:toclevels: 4
+
+
+You can change the filenames used for the generated report files by configuring them in the outputs
+The directory can be configured via the parameter `outputDirectory`.
+
+.Using custom output filenames
+[source, xml]
+----
+<groupId>org.myproject</groupId>
+<artifactId>submodule1</artifactId>
+<version>1.0.0-SNAPSHOT</version>
+
+<properties>
+  ...
+  <licensescout.outputDirectory>${project.build.directory}/licensereports</licensescout.outputDirectory>
+  <licensescout.outputFilename.html>licenses_${project.artifactId}.html</licensescout.outputFilename.html>
+  <licensescout.outputFilename.csv>licenses_${project.artifactId}.csv</licensescout.outputFilename.csv>
+  <licensescout.outputFilename.txt>licenses_${project.artifactId}.txt</licensescout.outputFilename.txt>
+  ....
+</properties>
+
+...
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.aposin.licensescout</groupId>
+      <artifactId>licensescout-maven-plugin</artifactId>
+      <configuration>
+        <outputDirectory>${licensescout.outputDirectory}</outputDirectory>
+        <outputs>
+          <output>
+            <type>HTML</type>
+            <filename>${licensescout.outputFilename.html}</filename>
+          </output>
+          <output>
+            <type>CSV</type>
+            <filename>${licensescout.outputFilename.csv}</filename>
+          </output>
+          <output>
+            <type>TXT</type>
+            <filename>${licensescout.outputFilename.txt}</filename>
+          </output>
+        </outputs>
+        ...
+      </configuration>
+    </plugin>
+  </plugins>
+</build>
+----
+
+This will generate the files:
+
+* `target/licensereports/licenses_submodule1.html`
+* `target/licensereports/licenses_submodule1.csv`
+* `target/licensereports/licenses_submodule1.txt`
+
+NOTE: The automatic attach of the generated reports as secondary artifacts
+will still work even with a custom output directory and custom filenames.

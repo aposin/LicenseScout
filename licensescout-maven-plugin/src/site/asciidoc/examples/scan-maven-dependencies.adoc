@@ -1,0 +1,98 @@
+//
+// Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+= Scanning Maven dependencies
+
+:encoding: utf-8
+:lang: en
+:doctype: book
+:toc:
+:toclevels: 4
+
+
+The LicenseScout cannot scan Maven dependencies directly. However, it is easy
+to do this with the help of the `maven-dependency-plugin`
+
+The following example shows how to:
+
+. Copy all dependencies to a local directory
+. Run the LicenseScout on that directory
+
+
+.Scanning Maven dependencies
+[source, xml]
+----
+<properties>
+  ...
+  <dependenciesDirectory>${project.build.directory}/mavenDependencies</dependenciesDirectory> <1>
+  ...
+</properties>
+
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-dependency-plugin</artifactId>
+      <executions>
+        <execution>
+          <id>copy-dependencies</id>
+          <phase>package</phase>   <2>
+          <goals>
+            <goal>copy-dependencies</goal>  <3>
+          </goals>
+          <configuration>
+            <outputDirectory>${dependenciesDirectory}</outputDirectory> <4>
+            <overWriteReleases>false</overWriteReleases>
+            <overWriteSnapshots>false</overWriteSnapshots>
+            <overWriteIfNewer>true</overWriteIfNewer>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
+
+    <plugin>
+      <groupId>org.aposin.licensescout</groupId>
+      <artifactId>licensescout-maven-plugin</artifactId>
+         <execution>
+          <id>scan-licenses</id>
+          <phase>verify</phase>   <5>
+          <goals>
+            <goal>scanJava</goal>
+          </goals>
+          <configuration>
+            <scanDirectory>${dependenciesDirectory}</scanDirectory> <6>
+            ...
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+----
+
+<1> the directory where the dependencies are collected
+<2> phase `package` is executed before `verify`
+<3> `copy-dependencies` copies all dependencies of the current module to the specified directory, including transitive dependencies.
+See https://maven.apache.org/plugins/maven-dependency-plugin/copy-dependencies-mojo.html[`dependency:copy-dependencies`]
+<4> the directory to write to
+<5> phase `verify` is executed after `package`
+<6> the LicenseScout scans the directories where the dependencies are collected
+
+WARN: Make sure the `maven-dependency-plugin` runs before the `licensescout-maven-plugin`.
+You can do this either by binding the execution of the `maven-dependency-plugin`
+to an earlier lifecycle phase than the execution of the `licensescout-maven-plugin`
+(recommended, since more stable). Alternatively, if they are bound to the same lifecycle phase make sure the configuration
+of the `maven-dependency-plugin` appears before the configuration of the `licensescout-maven-plugin` (in this case order in the POM makes the difference).
