@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<!-- This MOJO is in a separate project from licensescout-maven-plugin because 
+		of a dependency conflict: the HTML an TXT report exporters use Velocity templates 
+		in a recent version (2.1), while the report exporter used by this MOJO uses 
+		the DOXIA framework, which depends on an older version of Velocity templates 
+		(1.7). So the POM of this project excludes the dependency 'velocity-engine-core' 
+		and instead uses the transitive dependency 'velocity' from 'doxia-site-renderer'. -->
+	<parent>
+		<groupId>org.aposin.licensescout</groupId>
+		<artifactId>org.aposin.licensescout.parent</artifactId>
+		<version>1.3.1-SNAPSHOT</version>
+		<relativePath>../org.aposin.licensescout.parent/</relativePath>
+	</parent>
+
+	<groupId>org.aposin.licensescout</groupId>
+	<artifactId>licensescout-report-maven-plugin</artifactId>
+	<version>1.3.${revision}</version>
+	<packaging>maven-plugin</packaging>
+
+	<name>LicenseScout Maven Report Plugin</name>
+	<description>Finds license information and collects them to a license report integrated into a Maven site.</description>
+
+	<prerequisites>
+		<maven>3.3.0</maven>
+	</prerequisites>
+
+	<properties>
+		<revision>1-SNAPSHOT</revision>
+	</properties>
+
+	<dependencies>
+		<!-- Project internal dependencies -->
+		<dependency>
+			<groupId>org.aposin.licensescout</groupId>
+			<artifactId>licensescout-maven-plugin</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.velocity</groupId>
+					<artifactId>velocity-engine-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.aposin.licensescout</groupId>
+			<artifactId>licensescout-maven-plugin</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.velocity</groupId>
+					<artifactId>velocity-engine-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.aposin.licensescout</groupId>
+			<artifactId>licensescout-maven-utils</artifactId>
+			<version>1.3.${revision}</version>
+		</dependency>
+
+		<!-- External dependencies -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-model</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-plugin-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-core</artifactId>
+
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.plugin-tools</groupId>
+			<artifactId>maven-plugin-annotations</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.reporting</groupId>
+			<artifactId>maven-reporting-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.reporting</groupId>
+			<artifactId>maven-reporting-impl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-utils</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.maven.doxia</groupId>
+			<artifactId>doxia-sink-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.doxia</groupId>
+			<artifactId>doxia-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.doxia</groupId>
+			<artifactId>doxia-site-renderer</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.doxia</groupId>
+			<artifactId>doxia-decoration-model</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<defaultGoal>report</defaultGoal>
+		<plugins>
+			<!-- groupId: org.apache.maven.plugins -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>jacoco-file-check</id>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-plugin-plugin</artifactId>
+				<configuration>
+					<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+				</configuration>
+				<executions>
+					<execution>
+						<id>mojo-descriptor</id>
+						<goals>
+							<goal>descriptor</goal>
+						</goals>
+					</execution>
+					<!-- disabled due to unclear error message "helpmojo failed: The source 
+						must not be a directory" <execution> <id>help-goal</id> <goals> <goal>helpmojo</goal> 
+						</goals> </execution> -->
+				</executions>
+			</plugin>
+
+			<!-- groupId: org.jacoco -->
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<!-- attached to Maven test phase -->
+					<execution>
+						<id>report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- groupId: com.mycila -->
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<configuration>
+					<header>LICENSE_header.txt</header>
+					<includes>
+						<!-- include all sources -->
+						<include>src/**</include>
+					</includes>
+					<excludes>
+						<exclude>**/*.xml</exclude>
+						<exlucde>**/*.txt</exlucde>
+						<exclude>**/*.csv</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+
+		</plugins>
+
+	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<reportSets>
+					<reportSet><!-- by default, id = "default" -->
+						<reports><!-- select non-aggregate reports -->
+							<report>javadoc</report>
+							<report>test-javadoc</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+			<!-- disabled due to unclear error message "helpmojo failed: The source 
+				must not be a directory" <plugin> <groupId>org.apache.maven.plugins</groupId> 
+				<artifactId>maven-plugin-plugin</artifactId> </plugin> -->
+			<plugin>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jxr-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<!-- select non-aggregate reports -->
+							<report>report</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+		</plugins>
+	</reporting>
+
+</project>

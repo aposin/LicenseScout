@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.aposin.licensescout.test</groupId>
+	<artifactId>org.aposin.licensescout.test.licensescout</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>Simple Test for License Scout Report Maven Plugin</name>
+
+	<url>https://aposin.org/</url>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<dependenciesDirectory>${project.build.directory}/licenseScoutDependencies</dependenciesDirectory>
+	</properties>
+
+	<!-- Needed so that dependencies:copy-dependencies copies the dependencies 
+		of the tested plugin. -->
+	<dependencies>
+		<dependency>
+			<groupId>@project.groupId@</groupId>
+			<artifactId>@project.artifactId@</artifactId>
+			<version>@project.version@</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-project-info-reports-plugin</artifactId>
+					<version>3.0.0</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>3.8.2</version>
+				</plugin>
+
+			</plugins>
+		</pluginManagement>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>pre-site</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${dependenciesDirectory}</outputDirectory>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>@project.groupId@</groupId>
+				<artifactId>@project.artifactId@</artifactId>
+				<version>@project.version@</version>
+				<configuration>
+					<scanDirectory>${dependenciesDirectory}</scanDirectory>
+					<configurationBundle>
+						<groupId>@project.groupId@</groupId>
+						<artifactId>org.aposin.licensescout.configuration.sample</artifactId>
+						<version>@project.version@</version>
+						<classifier>configuration</classifier>
+						<type>zip</type>
+					</configurationBundle>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</reporting>
+
+</project>

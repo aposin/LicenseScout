@@ -1,0 +1,102 @@
+//
+// Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+= Reading configuration files from the file system
+
+:encoding: utf-8
+:lang: en
+:doctype: book
+:toc:
+:toclevels: 4
+
+
+TODO
+
+.Example TODO
+[source, xml]
+----
+<properties>
+  ...
+
+  <!-- LicenseScout configuration -->
+  <licensescout-configuration.dir>${project.build.directory}/licensescout-configuration</licensescout-configuration.dir> <1>
+</properties>
+
+...
+
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-dependency-plugin</artifactId>
+      <executions>
+        <execution>
+          <id>unpack-licensescout-configuration</id>
+          <phase>generate-resources</phase>
+          <goals>
+            <goal>unpack</goal>
+          </goals>
+          <configuration>
+            <artifactItems>
+              <artifactItem>
+                <groupId>org.aposin.licensescout</groupId>
+                <artifactId>org.aposin.licensescout.configuration.sample</artifactId>
+                <version>${org.aposin.licensescout.configuration.version}</version>
+                <classifier>configuration</classifier>
+                <type>zip</type>
+                <overWrite>true</overWrite>
+                <outputDirectory>${licensescout-configuration.dir}</outputDirectory> <2>
+              </artifactItem>
+            </artifactItems>
+            <overWriteReleases>false</overWriteReleases>
+            <overWriteSnapshots>true</overWriteSnapshots>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
+
+    <plugin>
+      <groupId>org.aposin.licensescout</groupId>
+      <artifactId>licensescout-maven-plugin</artifactId>
+      <configuration>
+        ...
+        <licensesFilename>${licensescout-configuration.dir}/licenses.xml</licensesFilename> <3>
+        <providersFilename>${licensescout-configuration.dir}/providers.xml</providersFilename> <3>
+        <noticesFilename>${licensescout-configuration.dir}/notices.xml</noticesFilename> <3>
+        <checkedArchivesFilename>${licensescout-configuration.dir}/checkedarchives.csv</checkedArchivesFilename> <3>
+        <licenseUrlMappingsFilename>${licensescout-configuration.dir}/urlmappings.csv</licenseUrlMappingsFilename> <3>
+        <licenseNameMappingsFilename>${licensescout-configuration.dir}/namemappings.csv</licenseNameMappingsFilename> <3>
+        <globalFiltersFilename>${licensescout-configuration.dir}/globalfilters.csv</globalFiltersFilename> <3>
+        <filteredVendorNamesFilename>${licensescout-configuration.dir}/filteredvendornames.csv</filteredVendorNamesFilename> <3>
+        ...
+      </configuration>
+    </plugin>
+  </plugins>
+</build>
+----
+<1> the directory the configuration files are unpacked to 
+<2> unpacking to this directory
+<3> the unpacked files are referenced
+
+[NOTE]
+====
+The action of unpacking configuration files from an artifact can be replaced by another action that could:
+
+* checkout from a repository
+* download from a server
+* retrieve via rsync
+* retrieve information from a database
+====

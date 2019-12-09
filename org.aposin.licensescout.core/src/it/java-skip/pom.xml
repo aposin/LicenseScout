@@ -15,7 +15,6 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<licensescout-configuration.dir>${project.build.directory}/licensescout-configuration</licensescout-configuration.dir>
 	</properties>
 
 	<build>

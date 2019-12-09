@@ -1,0 +1,69 @@
+//
+// Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+= Using custom report templates
+
+:encoding: utf-8
+:lang: en
+:doctype: book
+:toc:
+:toclevels: 4
+
+
+For HTML and TXT reports it is possible to use a custom output template.
+
+If you want to do this, best start by making a copy of the built-in report templates
+and modify them for your needs.
+
+See TODO the documentation for a list of variables that are available in templates.
+
+.Example using custom templates
+[source, xml]
+----
+<properties>
+  ...
+
+  <!-- LicenseScout configuration -->
+  <licensescout.database.url>jdbc:sqlserver://localhost\abc</licensescout.database.url>
+</properties>
+
+...
+<plugin>
+  <groupId>org.aposin.licensescout</groupId>
+  <artifactId>licensescout-maven-plugin</artifactId>
+  <configuration>
+    ...
+    <resultDatabaseConfiguration>
+      <jdbcUrl>${licensescout.database.url}</jdbcUrl>
+      ...
+    </resultDatabaseConfiguration>
+    ...
+  </configuration>
+  <dependencies>
+    <dependency>
+      <groupId>com.microsoft.sqlserver</groupId>
+      <artifactId>mssql-jdbc</artifactId>
+      <version>7.4.1.jre11</version>
+    </dependency>
+  </dependencies>
+</plugin>
+----
+
+NOTE: The receipt above works if your JDBC driver does declare its driver class
+as a Java Service Provider for `java.sql.Driver` (most contemporary JDBC drivers do so).
+If you have an old-style JDBC driver that requires a call to `Class.forName()` to register
+its driver class using it is
+currently only possible by changing the source code of the LicenseScout.
