@@ -552,6 +552,40 @@ My fancy open source project
 
 Empty lines and lines starting with `#` are ignored.
 
+=== Report templates
+
+For the TXT and HTML license reports the Velocity template engine is used.
+Default report templates are included in the LicenseScout. If a different appearance is desired,
+custom templates can be created and configured.
+
+The tables below list the variables in the Velocity context that can be used in templates.
+
+.Common variables in the Velocity context
+[cols="1m,1m", options="header"]
+|===
+|Name|Type
+|archiveFiles|List<Archive>
+|sourcePath|String
+|detectionStatusStatistics|IDetectionStatusStatistics
+|legalStatusStatistics|ILegalStatusStatistics
+|generalStatistics|GeneralStatistics
+|messageDigestAlgorithm|String
+|reportConfiguration|ReportConfiguration
+|pomResolutionUsed|Boolean
+|distinctLicenses|List<License>
+|encoding|String
+|===
+
+.Txt exporter additional variables in the Velocity context
+[cols="1m,1m", options="header"]
+|===
+|Name|Type
+|usedProviders|List<Provider>
+|usedNotices|List<Notice>
+|usedLicensesMap|Map<License, List<Archive>>
+|usedLicenses|List<License>
+|===
+
 === Sample Configuration Project
 
 The recommended way of maintaining the configuration files of LicenseScout is to bundle them in a Maven artifact. This approach is described here.
