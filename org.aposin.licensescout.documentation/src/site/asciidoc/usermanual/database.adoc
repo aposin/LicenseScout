@@ -1,0 +1,39 @@
+//
+// Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+= Database
+
+:encoding: utf-8
+:lang: en
+:doctype: book
+:toc:
+:toclevels: 4
+
+
+== Setting up LicenseScout database
+
+The file `org.aposin.licensescout.core/sql/licensescout.sql` contains an SQL script that creates the tables in the database needed for storing the LicenseScout results.
+//TODO: the database unit test PR contains different sql  files for different DBMSs
+
+== Database driver
+
+The LicenseScout uses the JDBC driver of MariaDB (++https://mariadb.org/++).
+This JDBC driver is compatible with the MySQL database engine. The version of the MariaDB driver used (2.4.1) is compatible with
+MySQL server 5.5.3 and later (see ++https://mariadb.com/kb/en/library/about-mariadb-connector-j/++).
+
+This JDBC driver is used because the standard JDBC driver of MySQL is licensed under the GNU General public license, which is incompatible with the Apache 2.0 license used for the LicenseScout.
+
+It is also possible too run LicenseScout with an alernatve DBMS. See the usage examples on how to do this.

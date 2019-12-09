@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/DECORATION/1.8.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 http://maven.apache.org/xsd/decoration-1.8.0.xsd"
+	name="LicenseScoutDoc">
+
+	<body>
+		<menu ref="parent" inherit="top" />
+
+		<menu name="Overview">
+			<item name="Introduction" href="index.html" />
+			<item name="FAQ" href="faq.html" />
+			<item name="License"
+				href="https://www.apache.org/licenses/LICENSE-2.0" />
+			<item name="Sitemap" href="sitemap.html" />
+		</menu>
+
+		<menu name="Documentation">
+			<item name="User Manual" href="documentation.html">
+				<item name="Design" href="usermanual/design.html" />
+				<item name="Configuration" href="usermanual/configuration.html" />
+				<item name="Internals" href="usermanual/internals.html" />
+				<item name="Database" href="usermanual/database.html" />
+				<item name="Miscellaneous" href="usermanual/miscellaneous.html" />
+			</item>
+			<item name="Cookbook" href="cookbook/cookbook.html" />
+			<item name="Maintenance manual"
+				href="maintenance/maintenance.html" />
+		</menu>
+
+		<menu ref="reports" />
+		<menu ref="modules" />
+
+	</body>
+</project>
