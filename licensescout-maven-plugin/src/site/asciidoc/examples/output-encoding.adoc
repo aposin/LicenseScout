@@ -1,0 +1,94 @@
+//
+// Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+= Configuring the output encoding of the license reports
+
+:encoding: utf-8
+:lang: en
+:doctype: book
+:toc:
+:toclevels: 4
+
+
+The output encoding of the generated report files is determined by (first tking precedence over the other):
+
+. an encoding configured per report in the `outputs` section
+. the globally configured report output encoding
+. the system specific default encoding of JAVA (usually UTF-8)
+
+For a list of encoding names supported n Java see https://docs.oracle.com/en/java/javase/11/intl/supported-encodings.html[Java Encoding names]
+
+== Using global report encoding
+
+.Example using global report encoding
+[source, xml]
+----
+<properties>
+  <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>  <1>
+</properties>
+
+...
+
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.aposin.licensescout</groupId>
+      <artifactId>licensescout-maven-plugin</artifactId>
+      <configuration>
+        ... <2>
+      </configuration>
+    </plugin>
+  <plugins>
+<build>
+----
+<1> the output encoding for all reports
+<2> no further configuration necessary
+
+== Using encoding per output file
+
+.Example using encoding per output file
+[source, xml]
+----
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.aposin.licensescout</groupId>
+      <artifactId>licensescout-maven-plugin</artifactId>
+      <configuration>
+        ...
+        <outputs>
+          <output>
+            <type>HTML</type>
+            <encoding>UTF-8</encoding>  <1>
+          </output>
+          <output>
+            <type>CSV</type>
+            <encoding>Cp1250</encoding>  <2>
+          </output>
+          <output>
+            <type>TXT</type>
+            <encoding>ISO8859_15</encoding>  <3>
+          </output>
+        </outputs>
+        ...
+      </configuration>
+    </plugin>
+  <plugins>
+<build>
+----
+<1> output file specific encoding
+<2> output file specific encoding
+<3> output file specific encoding

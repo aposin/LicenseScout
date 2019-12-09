@@ -1,0 +1,105 @@
+//
+// Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+= Using a different DBMS
+
+:encoding: utf-8
+:lang: en
+:doctype: book
+:toc:
+:toclevels: 4
+
+
+It is possible to use another DBMS than MySQL/MariaDB that is configured by default.
+This can be done in the following way:
+
+1. Add a dependency for the JDBC driver of your DBMS to the `licensescout-maven-plugin`
+2. Use a matching JDBC URL
+
+NOTE: The receipt above works if your JDBC driver does declare its driver class
+as a Java Service Provider for `java.sql.Driver` (most contemporary JDBC drivers do so).
+If you have an old-style JDBC driver that requires a call to `Class.forName()` to register
+its driver class using it is
+currently only possible by changing the source code of the LicenseScout.
+
+== Using H2 DB
+
+.Example using H2
+[source, xml]
+----
+<properties>
+  ...
+
+  <!-- LicenseScout database configuration -->
+  <licensescout.database.url>h2:ssl://localhost:8085/~/sample;DATABASE_TO_LOWER=TRUE</licensescout.database.url>
+</properties>
+
+...
+<plugin>
+  <groupId>org.aposin.licensescout</groupId>
+  <artifactId>licensescout-maven-plugin</artifactId>
+  <configuration>
+    ...
+    <resultDatabaseConfiguration>
+      <jdbcUrl>${licensescout.database.url}</jdbcUrl>
+      ...
+    </resultDatabaseConfiguration>
+    ...
+  </configuration>
+  <dependencies>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>1.4.200</version>
+    </dependency>
+  </dependencies>
+</plugin>
+----
+
+== Using Sqlserver
+
+.Example using Sqlserver
+[source, xml]
+----
+<properties>
+  ...
+
+  <!-- LicenseScout database configuration -->
+  <licensescout.database.url>jdbc:sqlserver://localhost\abc</licensescout.database.url>
+</properties>
+
+...
+<plugin>
+  <groupId>org.aposin.licensescout</groupId>
+  <artifactId>licensescout-maven-plugin</artifactId>
+  <configuration>
+    ...
+    <resultDatabaseConfiguration>
+      <jdbcUrl>${licensescout.database.url}</jdbcUrl>
+      ...
+    </resultDatabaseConfiguration>
+    ...
+  </configuration>
+  <dependencies>
+    <dependency>
+      <groupId>com.microsoft.sqlserver</groupId>
+      <artifactId>mssql-jdbc</artifactId>
+      <version>7.4.1.jre11</version>
+    </dependency>
+  </dependencies>
+</plugin>
+----
+
