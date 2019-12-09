@@ -15,23 +15,43 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<licensescout.scanDirectory>${project.basedir}</licensescout.scanDirectory>
 	</properties>
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+				</executions>
+			</plugin>
 
 			<plugin>
 				<groupId>@project.groupId@</groupId>
 				<artifactId>@project.artifactId@</artifactId>
 				<version>@project.version@</version>
 				<configuration>
-					<skip>true</skip>
+					<scanDirectory>${licensescout.scanDirectory}</scanDirectory>
+					<outputs>
+						<output>
+							<type>TXT</type>
+						</output>
+					</outputs>
+					<configurationBundle>
+						<groupId>@project.groupId@</groupId>
+						<artifactId>org.aposin.licensescout.configuration.sample</artifactId>
+						<version>@project.version@</version>
+						<classifier>configuration</classifier>
+						<type>zip</type>
+					</configurationBundle>
 				</configuration>
 				<executions>
 					<execution>
-						<phase>process-resources</phase>
+						<phase>test</phase>
 						<goals>
-							<goal>scanJava</goal>
+							<goal>scanNpm</goal>
 						</goals>
 					</execution>
 				</executions>
