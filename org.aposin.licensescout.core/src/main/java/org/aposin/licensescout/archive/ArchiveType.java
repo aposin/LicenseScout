@@ -19,6 +19,7 @@ package org.aposin.licensescout.archive;
  * Type of an archive.
  * 
  * @see ArchiveIdentifier
+ * @see Archive
  *
  */
 public enum ArchiveType {

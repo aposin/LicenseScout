@@ -41,7 +41,8 @@ public abstract class ArchiveIdentifier {
      * Constructor.
      * 
      * @param archiveType type of the archive
-     * @param name
+     * @param nameMatchingType the matching type
+     * @param name the name of the archive
      */
     protected ArchiveIdentifier(final ArchiveType archiveType, final NameMatchingType nameMatchingType,
             final String name) {

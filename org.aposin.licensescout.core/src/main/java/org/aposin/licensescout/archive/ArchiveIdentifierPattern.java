@@ -15,6 +15,7 @@
  */
 package org.aposin.licensescout.archive;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
@@ -65,38 +66,24 @@ public class ArchiveIdentifierPattern extends ArchiveIdentifier {
     @Override
     public int hashCode() {
         final int prime = 31;
-        int result = 1;
-        result = prime * result + ((getArchiveType() == null) ? 0 : getArchiveType().hashCode());
-        result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
+        int result = super.hashCode();
+        result = prime * result + Objects.hash(pattern.pattern(), patternType);
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
+        if (!super.equals(obj)) {
             return false;
         }
         if (getClass() != obj.getClass()) {
             return false;
         }
         ArchiveIdentifierPattern other = (ArchiveIdentifierPattern) obj;
-        if (getArchiveType() != other.getArchiveType()) {
-            return false;
-        }
-        if (getName() == null) {
-            if (other.getName() != null) {
-                return false;
-            }
-        } else if (!getName().equals(other.getName())) {
-            return false;
-        }
-        return true;
+        return Objects.equals(pattern.pattern(), other.pattern.pattern()) && patternType == other.patternType;
     }
 
 }
