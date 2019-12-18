@@ -16,6 +16,7 @@
 package org.aposin.licensescout.finder;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -56,7 +57,7 @@ public abstract class BaseFinderTest {
      */
     @Before
     public void setUp() throws Exception {
-        log = TestUtil.createJavaUtilGlobalLog();
+        log = TestUtil.createTestLog();
         licenseStoreData = createLicenseStoreData();
     }
 
@@ -75,9 +76,12 @@ public abstract class BaseFinderTest {
      */
     private LicenseStoreData createLicenseStoreData() throws Exception {
         final LicenseStoreData licenseStoreData = new LicenseStoreData();
-        licenseStoreData.readLicenses(new File("src/test/resources/scans/licenses.xml"), null, false, getLog());
+        final File file = new File("src/test/resources/scans/licenses.xml");
+     try (   final FileInputStream inputStream = new FileInputStream(file))
+     {
+        licenseStoreData.readLicenses(inputStream, null, false, getLog());
         return licenseStoreData;
-    }
+    }}
 
     protected final LicenseStoreData getLicenseStoreData() {
         return licenseStoreData;

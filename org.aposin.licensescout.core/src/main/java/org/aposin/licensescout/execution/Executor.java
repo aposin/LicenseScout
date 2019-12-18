@@ -17,8 +17,9 @@ package org.aposin.licensescout.execution;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -30,27 +31,24 @@ import org.apache.commons.lang3.StringUtils;
 import org.aposin.licensescout.archive.Archive;
 import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.configuration.BuildInfo;
+import org.aposin.licensescout.configuration.ConfigFileHandler;
 import org.aposin.licensescout.configuration.DatabaseConfiguration;
 import org.aposin.licensescout.configuration.Output;
 import org.aposin.licensescout.configuration.OutputFileType;
 import org.aposin.licensescout.configuration.RunParameters;
 import org.aposin.licensescout.database.DatabaseWriter;
-import org.aposin.licensescout.exporter.CsvExporter;
 import org.aposin.licensescout.exporter.GeneralStatistics;
-import org.aposin.licensescout.exporter.HtmlExporter;
 import org.aposin.licensescout.exporter.IDetectionStatusStatistics;
 import org.aposin.licensescout.exporter.ILegalStatusStatistics;
 import org.aposin.licensescout.exporter.IReportExporter;
 import org.aposin.licensescout.exporter.OutputResult;
 import org.aposin.licensescout.exporter.ReportConfiguration;
-import org.aposin.licensescout.exporter.TxtExporter;
 import org.aposin.licensescout.filter.CleanArchiveListFilter;
 import org.aposin.licensescout.filter.IArchiveListFilter;
 import org.aposin.licensescout.filter.VendorArchiveListFilter;
 import org.aposin.licensescout.finder.AbstractFinder;
 import org.aposin.licensescout.finder.FinderFactory;
 import org.aposin.licensescout.finder.FinderResult;
-import org.aposin.licensescout.finder.LicenseScoutExecutionException;
 import org.aposin.licensescout.license.GlobalFilters;
 import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseCheckedList;
@@ -61,6 +59,7 @@ import org.aposin.licensescout.model.Providers;
 import org.aposin.licensescout.util.CryptUtil;
 import org.aposin.licensescout.util.ILFLog;
 import org.aposin.licensescout.util.MiscUtil;
+import org.aposin.licensescout.util.OutputFileHelper;
 import org.xml.sax.SAXException;
 
 /**
@@ -70,13 +69,16 @@ import org.xml.sax.SAXException;
 public class Executor {
 
     private final ExecutionParameters executionParameters;
+    private final ConfigFileHandler configFileHandler;
 
     /**
      * Constructor.
      * @param executionParameters 
+     * @param configFileHandler 
      */
-    public Executor(final ExecutionParameters executionParameters) {
+    public Executor(final ExecutionParameters executionParameters, final ConfigFileHandler configFileHandler) {
         this.executionParameters = executionParameters;
+        this.configFileHandler = configFileHandler;
     }
 
     /**
@@ -86,18 +88,50 @@ public class Executor {
         return executionParameters;
     }
 
+    /**
+     * @return the configFileHandler
+     */
+    protected final ConfigFileHandler getConfigFileHandler() {
+        return configFileHandler;
+    }
+
     protected final ILFLog getLog() {
         return getExecutionParameters().getLsLog();
     }
 
     /**
      * Main execution of the LicenseScout.
-     * @throws LicenseScoutExecutionException
+     * 
+     * <p>This executes:</p>
+     * <ol>
+     * <li>Reads configuration files:
+     * <ol type="a">
+     * <li>Reads providers file</li>
+     * <li>Reads notices file</li>
+     * <li>Reads licenses file</li>
+     * <li>Reads URL mappings file</li>
+     * <li>Reads name mappings file</li>
+     * <li>Reads global filters file</li>
+     * <li>Reads checked archives file</li>
+     * <li>Reads filtered vendor names file</li>
+     * </ol>
+     * </li>
+     * 
+     * <li>Checks parameters</li>
+     * <li></li>
+     * <li></li>
+     * <li></li>
+     * <li></li>
+     * <li></li>
+     * </ol>
+     * 
+     * @throws LicenseScoutExecutionException if an unrecoverable condition occurs during the execution or
+     * if another exception is caught
      */
     public void execute() throws LicenseScoutExecutionException {
 
-        final Providers providers = readProviders(getLog());
-        final Notices notices = readNotices(getLog());
+        final Providers providers = readProviders(getConfigFileHandler(), getLog());
+        final Notices notices = readNotices(getConfigFileHandler(), getLog());
         final LicenseStoreData licenseStoreData = init(notices, getLog());
 
         final GlobalFilters globalFilters = readGlobalFilters(getLog());
@@ -156,7 +190,8 @@ public class Executor {
     private void prepareOutput(final ILFLog log) {
         MiscUtil.createDirectoryIfNotExists(getExecutionParameters().getOutputDirectory(), getLog());
         for (final Output output : getExecutionParameters().getOutputs()) {
-            final File outputFile = new File(getExecutionParameters().getOutputDirectory(), output.getFilename());
+            final File outputFile = new File(getExecutionParameters().getOutputDirectory(),
+                    OutputFileHelper.getOutputFilename(output));
             log.info("using " + output.getType() + " output file: " + outputFile.getAbsolutePath());
             final File templateFile = output.getTemplate();
             if (templateFile != null) {
@@ -304,7 +339,8 @@ public class Executor {
                           final ReportConfiguration reportConfiguration)
             throws Exception {
         for (final Output output : getExecutionParameters().getOutputs()) {
-            final File outputFile = new File(getExecutionParameters().getOutputDirectory(), output.getFilename());
+            final File outputFile = new File(getExecutionParameters().getOutputDirectory(),
+                    OutputFileHelper.getOutputFilename(output));
             final OutputFileType outputFileType = output.getType();
             final IReportExporter exporter = getReportExporter(outputFileType);
             reportConfiguration.setOutputFile(outputFile);
@@ -409,16 +445,19 @@ public class Executor {
     }
 
     protected IReportExporter getReportExporter(final OutputFileType outputFileType) {
-        switch (outputFileType) {
-            case CSV:
-                return CsvExporter.getInstance();
-            case HTML:
-                return HtmlExporter.getInstance();
-            case TXT:
-                return TxtExporter.getInstance();
-            default:
-                throw new UnsupportedOperationException("Unhandled OutputFileType: " + outputFileType);
+        final List<IReportExporterFactory> reportExporterFactories = new ArrayList<>();
+        if (getExecutionParameters().getExporterFactories() != null) {
+            reportExporterFactories.addAll(getExecutionParameters().getExporterFactories());
         }
+        if (reportExporterFactories.isEmpty()) {
+            throw new UnsupportedOperationException("No Report exporter factories available");
+        }
+        for (IReportExporterFactory factory : reportExporterFactories) {
+            if (factory.getSupportedOutputFileTypes().contains(outputFileType)) {
+                return factory.getReportExporter(outputFileType);
+            }
+        }
+        throw new UnsupportedOperationException("Unhandled OutputFileType: " + outputFileType);
     }
 
     /**
@@ -428,22 +467,12 @@ public class Executor {
      */
     protected void readLicenseUrlMappings(final LicenseStoreData licenseStoreData, final ILFLog log)
             throws LicenseScoutExecutionException {
-        final String licenseUrlMappingsFilename = getExecutionParameters().getLicenseUrlMappingsFilename();
-        if (licenseUrlMappingsFilename != null) {
-            final File file = new File(licenseUrlMappingsFilename);
-            if (file.exists() && file.canRead()) {
-                log.info("reading license URL mappings from " + licenseUrlMappingsFilename);
-                try {
-                    licenseStoreData.readUrlMappings(licenseUrlMappingsFilename, log);
-                } catch (IOException e) {
-                    throw new LicenseScoutExecutionException("cannot read license URL mappings", e);
-                }
-            } else {
-                log.error("not reading license URL mappings because the file does not exist or is not readable: "
-                        + licenseUrlMappingsFilename);
+        try (final InputStream inputStream = getConfigFileHandler().getLicenseUrlMappingsInputStream()) {
+            if (inputStream != null) {
+                licenseStoreData.readUrlMappings(inputStream, log);
             }
-        } else {
-            log.info("not reading license URL mappings (not configured)");
+        } catch (IOException e) {
+            throw new LicenseScoutExecutionException("cannot read license URL mappings", e);
         }
     }
 
@@ -454,22 +483,12 @@ public class Executor {
      */
     protected void readLicenseNameMappings(final LicenseStoreData licenseStoreData, final ILFLog log)
             throws LicenseScoutExecutionException {
-        final String licenseNameMappingsFilename = getExecutionParameters().getLicenseNameMappingsFilename();
-        if (licenseNameMappingsFilename != null) {
-            final File file = new File(licenseNameMappingsFilename);
-            if (file.exists() && file.canRead()) {
-                log.info("reading license name mappings from " + licenseNameMappingsFilename);
-                try {
-                    licenseStoreData.readNameMappings(licenseNameMappingsFilename, log);
-                } catch (IOException e) {
-                    throw new LicenseScoutExecutionException("cannot read license name mappings", e);
-                }
-            } else {
-                log.error("not reading license name mappings because the file does not exist or is not readable: "
-                        + licenseNameMappingsFilename);
+        try (final InputStream inputStream = getConfigFileHandler().getLicenseNameMappingsInputStream()) {
+            if (inputStream != null) {
+                licenseStoreData.readNameMappings(inputStream, log);
             }
-        } else {
-            log.info("not reading license name mappings (not configured)");
+        } catch (IOException e) {
+            throw new LicenseScoutExecutionException("cannot read license name mappings", e);
         }
     }
 
@@ -480,22 +499,12 @@ public class Executor {
      */
     protected GlobalFilters readGlobalFilters(final ILFLog log) throws LicenseScoutExecutionException {
         final GlobalFilters globalFilters = new GlobalFilters();
-        final String globalFiltersFilename = getExecutionParameters().getGlobalFiltersFilename();
-        if (globalFiltersFilename != null) {
-            final File file = new File(globalFiltersFilename);
-            if (file.exists() && file.canRead()) {
-                log.info("reading global filters from " + globalFiltersFilename);
-                try {
-                    globalFilters.read(globalFiltersFilename);
-                } catch (IOException e) {
-                    throw new LicenseScoutExecutionException("cannot read global filters", e);
-                }
-            } else {
-                log.error("not reading global filters because the file does not exist or is not readable: "
-                        + globalFiltersFilename);
+        try (final InputStream inputStream = getConfigFileHandler().getGlobalFiltersInputStream()) {
+            if (inputStream != null) {
+                globalFilters.read(inputStream);
             }
-        } else {
-            log.info("not reading global filters (not configured)");
+        } catch (IOException e) {
+            throw new LicenseScoutExecutionException("cannot read global filters", e);
         }
         return globalFilters;
     }
@@ -507,26 +516,18 @@ public class Executor {
      */
     protected LicenseStoreData readLicenses(final Notices notices, final ILFLog log)
             throws LicenseScoutExecutionException {
-        final File licensesFilename = getExecutionParameters().getLicensesFilename();
-        if (licensesFilename != null) {
-            if (licensesFilename.exists() && licensesFilename.canRead()) {
-                log.info("reading licenses from " + licensesFilename);
-                try {
-                    final LicenseStoreData licenseStoreData = new LicenseStoreData();
-                    licenseStoreData.readLicenses(licensesFilename, notices,
-                            getExecutionParameters().isValidateLicenseXml(), log);
-                    return licenseStoreData;
-                } catch (IOException | ParserConfigurationException | SAXException e) {
-                    throw new LicenseScoutExecutionException("cannot read licenses", e);
-                }
-            } else {
-                log.error(
-                        "not reading licenses because the file does not exist or is not readable: " + licensesFilename);
+        try (final InputStream inputStream = getConfigFileHandler().getLicensesInputStream()) {
+            if (inputStream != null) {
+                final LicenseStoreData licenseStoreData = new LicenseStoreData();
+                licenseStoreData.readLicenses(inputStream, notices, getExecutionParameters().isValidateLicenseXml(),
+                        log);
+                return licenseStoreData;
             }
-        } else {
-            log.info("not reading licenses (not configured)");
+        } catch (IOException | ParserConfigurationException | SAXException e) {
+            throw new LicenseScoutExecutionException("cannot read licenses", e);
         }
         return null;
+
     }
 
     /**
@@ -536,52 +537,37 @@ public class Executor {
      * @return a providers data object
      * @throws LicenseScoutExecutionException
      */
-    protected Providers readProviders(final ILFLog log) throws LicenseScoutExecutionException {
-        final File providersFilename = getExecutionParameters().getProvidersFilename();
-        if (providersFilename != null) {
-            if (providersFilename.exists() && providersFilename.canRead()) {
-                log.info("reading providers from " + providersFilename);
-                try {
-                    final Providers providers = new Providers();
-                    providers.readProviders(providersFilename, getExecutionParameters().isValidateLicenseXml(), log);
-                    return providers;
-                } catch (IOException | ParserConfigurationException | SAXException e) {
-                    throw new LicenseScoutExecutionException("cannot read providers", e);
-                }
-            } else {
-                log.error("not reading providers because the file does not exist or is not readable: "
-                        + providersFilename);
+    protected Providers readProviders(final ConfigFileHandler configFileHandler, final ILFLog log)
+            throws LicenseScoutExecutionException {
+        try (InputStream inputStream = configFileHandler.getProvidersInputStream()) {
+            if (inputStream != null) {
+                final Providers providers = new Providers();
+                providers.readProviders(inputStream, getExecutionParameters().isValidateLicenseXml(), log);
+                return providers;
             }
-        } else {
-            log.info("not reading providers (not configured)");
+        } catch (IOException | ParserConfigurationException | SAXException e) {
+            throw new LicenseScoutExecutionException("cannot read providers", e);
         }
         return null;
     }
 
     /**
      * Reads notices.
-     * 
+     * @param configFileHandler 
      * @param log the logger
      * @return a notices data object
      * @throws LicenseScoutExecutionException
      */
-    protected Notices readNotices(final ILFLog log) throws LicenseScoutExecutionException {
-        final File noticesFilename = getExecutionParameters().getNoticesFilename();
-        if (noticesFilename != null) {
-            if (noticesFilename.exists() && noticesFilename.canRead()) {
-                log.info("reading notices from " + noticesFilename);
-                try {
-                    final Notices notices = new Notices();
-                    notices.readNotices(noticesFilename, getExecutionParameters().isValidateLicenseXml(), log);
-                    return notices;
-                } catch (IOException | ParserConfigurationException | SAXException e) {
-                    throw new LicenseScoutExecutionException("cannot read notices", e);
-                }
-            } else {
-                log.error("not reading notices because the file does not exist or is not readable: " + noticesFilename);
+    protected Notices readNotices(final ConfigFileHandler configFileHandler, final ILFLog log)
+            throws LicenseScoutExecutionException {
+        try (InputStream inputStream = configFileHandler.getNoticesInputStream()) {
+            if (inputStream != null) {
+                final Notices notices = new Notices();
+                notices.readNotices(inputStream, getExecutionParameters().isValidateLicenseXml(), log);
+                return notices;
             }
-        } else {
-            log.info("not reading notices (not configured)");
+        } catch (IOException | ParserConfigurationException | SAXException e) {
+            throw new LicenseScoutExecutionException("cannot read notices", e);
         }
         return null;
     }
@@ -596,21 +582,12 @@ public class Executor {
                                                      final Providers providers, final ILFLog log)
             throws LicenseScoutExecutionException {
         final LicenseCheckedList checkedArchives = new LicenseCheckedList();
-        final File checkedArchivesFilename = getExecutionParameters().getCheckedArchivesFilename();
-        if (checkedArchivesFilename != null) {
-            if (checkedArchivesFilename.exists() && checkedArchivesFilename.canRead()) {
-                log.info("reading checked archives list from " + checkedArchivesFilename);
-                try {
-                    checkedArchives.readCsv(checkedArchivesFilename, licenseStoreData, providers, notices, log);
-                } catch (IOException e) {
-                    throw new LicenseScoutExecutionException("cannot read check archives list", e);
-                }
-            } else {
-                log.error("not reading checked archives list because the file does not exist or is not readable: "
-                        + checkedArchivesFilename);
+        try (final InputStream inputStream = getConfigFileHandler().getCheckedArchivesInputStream()) {
+            if (inputStream != null) {
+                checkedArchives.readCsv(inputStream, licenseStoreData, providers, notices, log);
             }
-        } else {
-            log.info("not reading checked archives list (not configured)");
+        } catch (IOException e) {
+            throw new LicenseScoutExecutionException("cannot read check archives list", e);
         }
         return checkedArchives;
     }
@@ -626,24 +603,13 @@ public class Executor {
             resultFilteredVendorNames.add(vendorName);
             log.info("Using vendor name to filter (from maven configuration): '" + vendorName + "'");
         }
-        final String filteredVendorNamesFilename = getExecutionParameters().getFilteredVendorNamesFilename();
-        if (filteredVendorNamesFilename != null) {
-            final File file = new File(filteredVendorNamesFilename);
-            if (file.exists() && file.canRead()) {
-                log.info("reading vendor names to filter out from " + filteredVendorNamesFilename);
-                try {
-                    final List<String> tmpResultList = readFilteredVendorNamesFromFile(filteredVendorNamesFilename,
-                            log);
-                    resultFilteredVendorNames.addAll(tmpResultList);
-                } catch (IOException e) {
-                    throw new LicenseScoutExecutionException("cannot read filtered vendor names list", e);
-                }
-            } else {
-                log.error("not reading vendor names to filter out because the file does not exist or is not readable: "
-                        + filteredVendorNamesFilename);
+        try (final InputStream inputStream = getConfigFileHandler().getFilteredVendorNamesInputStream()) {
+            if (inputStream != null) {
+                final List<String> tmpResultList = readFilteredVendorNamesFromFile(inputStream, log);
+                resultFilteredVendorNames.addAll(tmpResultList);
             }
-        } else {
-            log.info("not reading vendor names to filter out from file (not configured)");
+        } catch (IOException e) {
+            throw new LicenseScoutExecutionException("cannot read filtered vendor names list", e);
         }
         return resultFilteredVendorNames;
     }
@@ -651,16 +617,16 @@ public class Executor {
     /**
      * Reads a CSV file containing vendor names to filter out.
      * 
-     * @param filename a filename of the file to read
+     * @param inputStream an input stream
      * @param log the logger
      * @throws IOException if an error occurred while reading from the file
      */
-    protected static List<String> readFilteredVendorNamesFromFile(final String filename, final ILFLog log)
+    protected static List<String> readFilteredVendorNamesFromFile(final InputStream inputStream, final ILFLog log)
             throws IOException {
         final List<String> resultList = new ArrayList<>();
         String line = "";
 
-        try (final BufferedReader br = new BufferedReader(new FileReader(filename))) {
+        try (final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
             while ((line = br.readLine()) != null) {
 
                 // ignore lines commented out

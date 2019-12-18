@@ -21,6 +21,8 @@ import org.apache.maven.plugin.logging.Log;
  * Wrapper around the Maven plugin logger.
  * 
  */
+// TODO: move to project licensescout-maven-utils
+// (but first maven plugins have to be separated from core, otherwise circular dependencies)
 public class MavenLog implements ILFLog {
 
     private final Log log;

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<providers>
+	<!-- NOTE: to maintain overview, licenses should be ordered by their identifier. -->
+	<provider id='EclipseFoundation'>
+		<name>Eclipse Foundation</name>
+		<url>https://www.eclipse.org/</url>
+	</provider>
+</providers>

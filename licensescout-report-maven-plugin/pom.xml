@@ -80,7 +80,6 @@
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-core</artifactId>
-
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.plugin-tools</groupId>
@@ -156,14 +155,11 @@
 				</configuration>
 				<executions>
 					<execution>
-						<id>mojo-descriptor</id>
+						<id>help-goal</id>
 						<goals>
-							<goal>descriptor</goal>
+							<goal>helpmojo</goal>
 						</goals>
 					</execution>
-					<!-- disabled due to unclear error message "helpmojo failed: The source 
-						must not be a directory" <execution> <id>help-goal</id> <goals> <goal>helpmojo</goal> 
-						</goals> </execution> -->
 				</executions>
 			</plugin>
 

@@ -473,6 +473,7 @@ public class JavaJarFinder extends AbstractFinder {
          * @param contents
          */
         public JarEntryContainer(final byte[] contents) {
+            // TODO: if (contents.lngth==0) throw new IllegalArgumentException(...)
             this.contents = contents;
         }
 

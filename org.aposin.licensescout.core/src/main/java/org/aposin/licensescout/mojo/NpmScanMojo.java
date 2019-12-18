@@ -20,17 +20,20 @@ import java.util.List;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.aposin.licensescout.archive.ArchiveType;
 
 /**
  * Scans NPM package directory for licenses.
  *
  */
-@Mojo(name = "scanNpm", defaultPhase = LifecyclePhase.PROCESS_SOURCES)
+@Mojo(name = "scanNpm", defaultPhase = LifecyclePhase.VERIFY, requiresDependencyResolution = ResolutionScope.RUNTIME)
 public class NpmScanMojo extends AbstractScanMojo {
 
     /**
      * List of directory names that are ignored in the scan of NPM directories.
+     * 
+     * @since 1.2
      */
     @Parameter(property = "npmExcludedDirectoryNames", required = false)
     protected List<String> npmExcludedDirectoryNames;

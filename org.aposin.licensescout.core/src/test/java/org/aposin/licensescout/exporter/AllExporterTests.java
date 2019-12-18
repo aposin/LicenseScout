@@ -22,7 +22,6 @@ import org.junit.runners.Suite.SuiteClasses;
 /**
  * Test suite for {@link IReportExporter} subclasses.
  *
- * @see LicenseUtil
  */
 @RunWith(Suite.class)
 @SuiteClasses({ //

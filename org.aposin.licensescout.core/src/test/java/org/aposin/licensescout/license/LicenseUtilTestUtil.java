@@ -16,7 +16,9 @@
 package org.aposin.licensescout.license;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -45,7 +47,9 @@ public class LicenseUtilTestUtil {
     public static LicenseStoreData createLicenseStoreData() throws Exception {
         final LicenseStoreData licenseStoreData = new LicenseStoreData();
         final File licensesFile = new File(LICENSES_PATH);
-        licenseStoreData.readLicenses(licensesFile, new Notices(), false, new NullLog());
+        try (final InputStream inputStream = new FileInputStream(licensesFile)) {
+            licenseStoreData.readLicenses(inputStream, new Notices(), false, new NullLog());
+        }
         return licenseStoreData;
     }
 
@@ -58,8 +62,9 @@ public class LicenseUtilTestUtil {
             throws IOException {
         final LicenseCheckedList checkedArchives = new LicenseCheckedList();
         final File checkedArchivesPathname = new File(CHECKEDARCHIVES_PATH);
-        checkedArchives.readCsv(checkedArchivesPathname, licenseStoreData, new Providers(), new Notices(),
-                new NullLog());
+        try (final InputStream inputStream = new FileInputStream(checkedArchivesPathname)) {
+            checkedArchives.readCsv(inputStream, licenseStoreData, new Providers(), new Notices(), new NullLog());
+        }
         return checkedArchives;
     }
 

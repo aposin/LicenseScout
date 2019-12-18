@@ -53,7 +53,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
      */
     @Test
     public void testPomResolutionUsed() {
-        final ILFLog log = TestUtil.createJavaUtilGlobalLog();
+        final ILFLog log = TestUtil.createTestLog();
         LicenseStoreData licenseStoreData = null;
         final RunParameters runParameters = TestUtil.createRunParameters();
         final JavaJarFinder finder = new JavaJarFinder(licenseStoreData, runParameters, log);

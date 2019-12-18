@@ -15,6 +15,7 @@
  */
 package org.aposin.licensescout.configuration;
 
+import org.aposin.licensescout.execution.IReportExporterFactory;
 import org.aposin.licensescout.exporter.IReportExporter;
 
 /**
@@ -23,6 +24,7 @@ import org.aposin.licensescout.exporter.IReportExporter;
  * <p>Reports of the license scout can be generated in different formats. This enumeration specifies the output format type.</p>
  * 
  * @see Output
+ * @see IReportExporterFactory#getReportExporter(OutputFileType)
  * @see IReportExporter#getOutputFileType()
  */
 public enum OutputFileType {
@@ -30,13 +32,48 @@ public enum OutputFileType {
     /**
      * Complete report as HTML file. 
      */
-    HTML,
+    HTML("htm", "html"),
     /**
      * Only list of archives as CSV file.
      */
-    CSV,
+    CSV("csv", "csv"),
     /**
      * Text report for official license documentation.
      */
-    TXT;
+    TXT("txt", "txt"),
+    /**
+     * Output via the DOXIA framework.
+     */
+    DOXIA("html", "html"),
+    /**
+     * An unsupported type - only for test cases.
+     */
+    UNSUPPORTED(null, null);
+
+    private final String artifactType;
+    private final String defaultExtension;
+
+    /**
+     * @param artifactType
+     * @param defaultExtension 
+     */
+    private OutputFileType(final String artifactType, final String defaultExtension) {
+        this.artifactType = artifactType;
+        this.defaultExtension = defaultExtension;
+    }
+
+    /**
+     * @return the artifactType
+     */
+    public final String getArtifactType() {
+        return artifactType;
+    }
+
+    /**
+     * @return the defaultExtension
+     */
+    public final String getDefaultExtension() {
+        return defaultExtension;
+    }
+
 }

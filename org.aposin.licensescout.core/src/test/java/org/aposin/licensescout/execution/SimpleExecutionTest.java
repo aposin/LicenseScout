@@ -17,12 +17,15 @@ package org.aposin.licensescout.execution;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.aposin.licensescout.archive.ArchiveType;
+import org.aposin.licensescout.configuration.ConfigFileHandler;
+import org.aposin.licensescout.configuration.ConfigFileParameters;
+import org.aposin.licensescout.configuration.FilesystemConfigFileHandler;
 import org.aposin.licensescout.configuration.Output;
 import org.aposin.licensescout.configuration.OutputFileType;
 import org.aposin.licensescout.core.test.util.TestUtil;
-import org.aposin.licensescout.finder.LicenseScoutExecutionException;
 import org.aposin.licensescout.license.LegalStatus;
 import org.junit.Test;
 
@@ -102,12 +105,14 @@ public class SimpleExecutionTest {
     }
 
     private void assertExecution(final ExecutionParameters executionParameters) throws LicenseScoutExecutionException {
-        final Executor executor = new Executor(executionParameters);
+        final ConfigFileHandler configFileHandler = new FilesystemConfigFileHandler(new ConfigFileParameters(),
+                TestUtil.createTestLog());
+        final Executor executor = new Executor(executionParameters, configFileHandler);
         executor.execute();
     }
 
     private ExecutionParameters createExecutionParametersNoOutputs(final ArchiveType archiveType,
-                                                                     final File scanDirectory) {
+                                                                   final File scanDirectory) {
         final ArrayList<Output> outputs = new ArrayList<>();
         return createExecutionParameters(archiveType, scanDirectory, outputs);
     }
@@ -123,8 +128,9 @@ public class SimpleExecutionTest {
         executionParameters.setCleanOutputActive(false);
         // NOTE: exception occurs if the following is not set
         executionParameters.setCleanOutputLegalStates(new LegalStatus[0]);
-        executionParameters.setLsLog(TestUtil.createJavaUtilGlobalLog());
+        executionParameters.setLsLog(TestUtil.createTestLog());
         executionParameters.setNpmExcludedDirectoryNames(new ArrayList<>());
+        executionParameters.setExporterFactories(Arrays.asList(new StandardReportExporterFactory()));
         return executionParameters;
     }
 
