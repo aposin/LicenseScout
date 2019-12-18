@@ -59,7 +59,7 @@ public class MiscUtilTest {
     }
 
     /**
-     * Test case for the method {@link MiscUtil#createDirectoryIfNotExists(File)}.
+     * Test case for the method {@link MiscUtil#createDirectoryIfNotExists(File, ILFLog)}.
      * 
      * @throws Exception
      */
@@ -67,7 +67,7 @@ public class MiscUtilTest {
     public void testCreateDirectoryIfNotExists() throws Exception {
         final File directory = new File("target/testdir");
         directory.delete();
-        final ILFLog log = TestUtil.createNullLog();
+        final ILFLog log = TestUtil.createTestLog();
         MiscUtil.createDirectoryIfNotExists(directory, log);
         Assert.assertEquals(
                 "createDirectoryIfNotExists(): expected directory not existing after creating or is not a directory",

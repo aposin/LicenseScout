@@ -18,6 +18,7 @@ package org.aposin.licensescout.finder;
 import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.configuration.RunParameters;
 import org.aposin.licensescout.execution.ExecutionParameters;
+import org.aposin.licensescout.execution.LicenseScoutExecutionException;
 import org.aposin.licensescout.license.LicenseStoreData;
 
 /**

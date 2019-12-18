@@ -15,8 +15,8 @@
  */
 package org.aposin.licensescout.model;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +30,7 @@ import org.aposin.licensescout.util.sax.AbstractSaxHandler;
 import org.aposin.licensescout.util.sax.IElementHandler;
 import org.aposin.licensescout.util.sax.NopElementHandler;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -39,7 +40,7 @@ import org.xml.sax.XMLReader;
  * <p>Initialisation:</p>
  * <ol>
  * <li>Create an instance</li>
- * <li>Call {@link #readNotices(File, boolean, ILFLog)} to read in the notices from a file</li>
+ * <li>Call {@link #readNotices(InputStream, boolean, ILFLog)} to read in the notices from a file</li>
  * </ol>
  */
 public class Notices {
@@ -80,14 +81,14 @@ public class Notices {
     /**
      * Reads known notices from an XML file.
      * 
-     * @param file
+     * @param inputStream
      * @param validateXml true if the notices XML file should be validated, false otherwise
      * @param log the logger
      * @throws IOException
      * @throws SAXException 
      * @throws ParserConfigurationException 
      */
-    public void readNotices(final File file, boolean validateXml, final ILFLog log)
+    public void readNotices(final InputStream inputStream, boolean validateXml, final ILFLog log)
             throws IOException, ParserConfigurationException, SAXException {
 
         final SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -96,7 +97,7 @@ public class Notices {
         final SAXParser saxParser = spf.newSAXParser();
         final XMLReader xmlReader = saxParser.getXMLReader();
         xmlReader.setContentHandler(new NoticeSaxHandler(log));
-        xmlReader.parse(file.toURI().toString());
+        xmlReader.parse(new InputSource(inputStream));
     }
 
     private class NoticeSaxHandler extends AbstractSaxHandler {

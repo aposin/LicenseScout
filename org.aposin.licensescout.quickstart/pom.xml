@@ -12,6 +12,7 @@
 
 	<modules>
 		<module>../org.aposin.licensescout.parent</module>
+		<module>../licensescout-maven-utils</module>
 		<module>../org.aposin.licensescout.core</module>
 		<module>../org.aposin.licensescout.configuration.sample</module>
 		<module>../org.aposin.licensescout.licensereport</module>

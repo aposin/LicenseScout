@@ -20,10 +20,12 @@ package org.aposin.licensescout.util;
  * 
  * <p>This is basically a wrapper around the Maven log facility, so that the same code can also be run as a standalone application.
  * The logging has four levels: DEBUG, INFO, WARNING and ERROR.</p>
- * <p>There are two implementations: {@link MavenLog} is based on the maven Log interface. {@link JavaUtilLog} is based on java.util logging.</p>
+ * <p>There are two implementations: <code>MavenLog</code is based on the maven Log interface. {@link JavaUtilLog} is based on java.util logging.</p>
+ * <p>There is also an implementation {@link NullLog} that is used for test cases to sink all logging.</p>
  * 
- * @see MavenLog
+ * @see "MavenLog"
  * @see JavaUtilLog
+ * @see NullLog
  */
 public interface ILFLog {
 
