@@ -24,13 +24,6 @@ import org.aposin.licensescout.util.ILFLog;
 import org.aposin.licensescout.util.JavaUtilLog;
 import org.aposin.licensescout.util.NullLog;
 
-//import java.util.logging.Logger;
-//
-//import org.aposin.licensescout.configuration.RunParameters;
-//import org.aposin.licensescout.util.ILFLog;
-//import org.aposin.licensescout.util.JavaUtilLog;
-//import org.aposin.licensescout.util.NullLog;
-
 /**
  * Utility methods for unit tests.
  *
