@@ -38,6 +38,7 @@
 
 		<menu name="Documentation">
 			<item name="JavaDoc" href="apidocs/index.html" />
+			<item name="Source Xref" href="xref/index.html" />
 		</menu>
 
 		<menu ref="reports" />

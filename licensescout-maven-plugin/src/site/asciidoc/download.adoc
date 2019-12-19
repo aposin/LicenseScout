@@ -29,5 +29,4 @@ However, if for some reason you prefer to download it manually, you can use the 
 
 * Maven central (releases): https://repo.maven.apache.org/maven2/org/aposin/licensescout/
 * Sonatype server (snapshots, releases): https://oss.sonatype.org/#nexus-search;quick~licensescout
-// TODO: Github?
 

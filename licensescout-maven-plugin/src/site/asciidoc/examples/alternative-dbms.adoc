@@ -26,8 +26,8 @@
 It is possible to use another DBMS than MySQL/MariaDB that is configured by default.
 This can be done in the following way:
 
-1. Add a dependency for the JDBC driver of your DBMS to the `licensescout-maven-plugin`
-2. Use a matching JDBC URL
+. Add a dependency for the JDBC driver of your DBMS to the `licensescout-maven-plugin`
+. Use a matching JDBC URL
 
 NOTE: The receipt above works if your JDBC driver does declare its driver class
 as a Java Service Provider for `java.sql.Driver` (most contemporary JDBC drivers do so).

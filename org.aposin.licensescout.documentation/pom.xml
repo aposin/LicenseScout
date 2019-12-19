@@ -12,13 +12,20 @@
 	</parent>
 
 	<groupId>org.aposin.licensescout</groupId>
-	<artifactId>documentation</artifactId>
+	<artifactId>licensescout-documentation</artifactId>
 	<version>1.3.${revision}</version>
 	<packaging>pom</packaging>
 
 	<name>LicenseScout Documentation</name>
 	<description>Contains documentation for the LicenseScout:
 	User Guide, Cookbook, Maintenance handbook</description>
+
+	<distributionManagement>
+		<site>
+			<id>${project.artifactId}-site</id>
+			<url>scm:git:ssh://git@github.com/${github.owner}/LicenseScout.git/${project.artifactId}</url>
+		</site>
+	</distributionManagement>
 
 	<properties>
 		<revision>1-SNAPSHOT</revision>
@@ -27,9 +34,9 @@
 	<reporting>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
 			</plugin>
-
 		</plugins>
 	</reporting>
 

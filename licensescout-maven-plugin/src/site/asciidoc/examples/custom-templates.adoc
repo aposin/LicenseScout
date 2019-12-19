@@ -27,8 +27,13 @@ For HTML and TXT reports it is possible to use a custom output template.
 
 If you want to do this, best start by making a copy of the built-in report templates
 and modify them for your needs.
+The built-in templates can be found in `licensescout-core/src/main/resources/templates`.
+The template engine used is Velocity in version 2.1. For general information on it see:
 
-See TODO the documentation for a list of variables that are available in templates.
+* Velocity project: https://velocity.apache.org/
+* User guide for version 2.1: https://velocity.apache.org/engine/2.1/user-guide.html
+
+For a list of variables that are available in templates see <<../../licensescout-documentation/usermanual/configuration.adoc#report-templates>>
 
 .Example using custom templates
 [source, xml]
@@ -37,7 +42,7 @@ See TODO the documentation for a list of variables that are available in templat
   ...
 
   <!-- LicenseScout configuration -->
-  <licensescout.database.url>jdbc:sqlserver://localhost\abc</licensescout.database.url>
+  <licensescout.templates.dir>src/templates</licensescout.templates.dir>
 </properties>
 
 ...
@@ -46,24 +51,26 @@ See TODO the documentation for a list of variables that are available in templat
   <artifactId>licensescout-maven-plugin</artifactId>
   <configuration>
     ...
-    <resultDatabaseConfiguration>
-      <jdbcUrl>${licensescout.database.url}</jdbcUrl>
-      ...
-    </resultDatabaseConfiguration>
+    <outputs>
+        <output>
+            <type>HTML</type>
+            <template>${licensescout.templates.dir}/custom_template_html.vm</filename> <1>
+            <templateEncoding>UTF-8</templateEncoding>                                 <2>
+        </output>
+        <output>
+            <type>TXT</type>
+            <template>${licensescout.templates.dir}/custom_template_txt.vm</filename>  <3>
+            <templateEncoding>UTF-8</templateEncoding>                                 <4>
+        </output>
+    </outputs>
     ...
   </configuration>
-  <dependencies>
-    <dependency>
-      <groupId>com.microsoft.sqlserver</groupId>
-      <artifactId>mssql-jdbc</artifactId>
-      <version>7.4.1.jre11</version>
-    </dependency>
-  </dependencies>
 </plugin>
 ----
+<1> file path to the custom template for HTML reports
+<2> encoding of the custom template for HTML reports (only necessary if different from `project.build.sourceEncoding`)
+<3> file path to the custom template for TXT reports
+<4> encoding of the custom template for TXT reports (only necessary if different from `project.build.sourceEncoding`)
 
-NOTE: The receipt above works if your JDBC driver does declare its driver class
-as a Java Service Provider for `java.sql.Driver` (most contemporary JDBC drivers do so).
-If you have an old-style JDBC driver that requires a call to `Class.forName()` to register
-its driver class using it is
-currently only possible by changing the source code of the LicenseScout.
+NOTE: It is currently not possible to configure custom templates as part
+of a configuration bundle.

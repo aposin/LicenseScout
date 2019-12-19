@@ -23,25 +23,36 @@ import org.aposin.licensescout.execution.IReportExporterFactory;
 import org.aposin.licensescout.exporter.IReportExporter;
 
 /**
- * Engine that contains the main control flow of the LicenseScout.
- *
+ * Factory for creating report exporter instances.
+ * 
+ * <p>Supports the following output file types:</p>
+ * <ul>
+ * <li>{@link OutputFileType#DOXIA}</li>
+ * </ul>
  */
 public class DoxiaReportExporterFactory implements IReportExporterFactory {
 
     private ISinkProvider sinkProvider;
 
     /**
-     * @param sinkProvider
+     * Constructor.
+     * @param sinkProvider a provider for DOXIA Sink instances
      */
     public DoxiaReportExporterFactory(ISinkProvider sinkProvider) {
         this.sinkProvider = sinkProvider;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<OutputFileType> getSupportedOutputFileTypes() {
         return Arrays.asList(OutputFileType.DOXIA);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public IReportExporter getReportExporter(final OutputFileType outputFileType) {
         switch (outputFileType) {

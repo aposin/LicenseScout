@@ -13,8 +13,7 @@
 
 	<groupId>org.aposin.licensescout</groupId>
 	<artifactId>licensescout-maven-utils</artifactId>
-	<version>1.3.1-SNAPSHOT</version>
-	<!-- <version>1.3.${revision}</version> -->
+	<version>1.3.${revision}</version>
 	<packaging>jar</packaging>
 
 	<name>LicenseScout Maven Utilities</name>
@@ -22,9 +21,15 @@
 	Isolated because they are used by multiple maven plug-in implementations,
 	but should not be in the core to keep core free from Maven runtime system dependencies.</description>
 
+	<distributionManagement>
+		<site>
+			<id>${project.artifactId}-site</id>
+			<url>scm:git:ssh://git@github.com/${github.owner}/LicenseScout.git/${project.artifactId}</url>
+		</site>
+	</distributionManagement>
+
 	<properties>
 		<revision>1-SNAPSHOT</revision>
-		<org.eclipse.aether.version>1.1.0</org.eclipse.aether.version>
 	</properties>
 
 	<dependencies>
@@ -156,10 +161,6 @@
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<reportSets>
 					<reportSet><!-- by default, id = "default" -->
@@ -170,7 +171,6 @@
 					</reportSet>
 				</reportSets>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jxr-plugin</artifactId>
@@ -178,19 +178,31 @@
 					<reportSet><!-- by default, id = "default" -->
 						<reports><!-- select non-aggregate reports -->
 							<report>jxr</report>
-							<!-- <report>test-jxr</report> -->
+							<report>test-jxr</report>
 						</reports>
 					</reportSet>
 				</reportSets>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<!-- select non-aggregate reports -->
+							<report>report</report>
+						</reports>
+					</reportSet>
+				</reportSets>
 			</plugin>
-
 		</plugins>
 	</reporting>
 

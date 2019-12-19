@@ -269,18 +269,18 @@ Example:
 ...
 
 <configuration>
-	...
-	<writeResultsToDatabase>${licensescout.writeResultsToDatabase}</writeResultsToDatabase>
-	<writeResultsToDatabaseForSnapshotBuilds>false</writeResultsToDatabaseForSnapshotBuilds>
-	<resultDatabaseConfiguration>
-		<jdbcUrl>${licensescout.database.url}</jdbcUrl>
-		<username>${licensescout.database.username}</username>
-		<password>${licensescout.database.password}</password>
-	</resultDatabaseConfiguration>
-	<buildName>${licensescout.buildName}</buildName>
-	<buildVersion>${licensescout.buildVersion}</buildVersion>
-	<buildUrl>${licensescout.buildUrl}</buildUrl>
-	...
+  ...
+  <writeResultsToDatabase>${licensescout.writeResultsToDatabase}</writeResultsToDatabase>
+  <writeResultsToDatabaseForSnapshotBuilds>false</writeResultsToDatabaseForSnapshotBuilds>
+  <resultDatabaseConfiguration>
+    <jdbcUrl>${licensescout.database.url}</jdbcUrl>
+    <username>${licensescout.database.username}</username>
+    <password>${licensescout.database.password}</password>
+  </resultDatabaseConfiguration>
+  <buildName>${licensescout.buildName}</buildName>
+  <buildVersion>${licensescout.buildVersion}</buildVersion>
+  <buildUrl>${licensescout.buildUrl}</buildUrl>
+  ...
 </configuration>
 ----
 
@@ -321,56 +321,56 @@ Example of the file:
 ----
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <licenses>
-	<license id='AFL-1.1'>
-		<spdxIdentifier>AFL-1.1</spdxIdentifier>
-		<name>Academic Free License</name>
-		<legalStatus>ACCEPTED</legalStatus>
-		<author>Lawrence E. Rosen</author>
-		<version>1.1</version>
-		<publicUrl>https://spdx.org/licenses/AFL-1.1.html</publicUrl>
-	</license>
-	<license id='AFL-1.2'>
-		<spdxIdentifier>AFL-1.2</spdxIdentifier>
-		<name>Academic Free License</name>
-		<legalStatus>ACCEPTED</legalStatus>
-		<author>Lawrence E. Rosen</author>
-		<version>1.2</version>
-		<publicUrl>https://spdx.org/licenses/AFL-1.2.html</publicUrl>
-	</license>
-	<license id='AFL-2.0'>
-		<spdxIdentifier>AFL-2.0</spdxIdentifier>
-		<name>Academic Free License</name>
-		<legalStatus>ACCEPTED</legalStatus>
-		<author>Lawrence E. Rosen</author>
-		<version>2.0</version>
-		<publicUrl>https://spdx.org/licenses/AFL-2.0.html</publicUrl>
-	</license>
-	<license id='AFL-2.1'>
-		<spdxIdentifier>AFL-2.1</spdxIdentifier>
-		<name>Academic Free License</name>
-		<legalStatus>ACCEPTED</legalStatus>
-		<author>Lawrence E. Rosen</author>
-		<version>2.1</version>
-		<publicUrl>https://spdx.org/licenses/AFL-2.1.html</publicUrl>
-	</license>
-	<license id='AFL-3.0'>
-		<spdxIdentifier>AFL-3.0</spdxIdentifier>
-		<name>Academic Free License</name>
-		<legalStatus>ACCEPTED</legalStatus>
-		<author>Lawrence E. Rosen</author>
-		<version>3.0</version>
-		<publicUrl>https://spdx.org/licenses/AFL-3.0.html</publicUrl>
-		<notice>AFL-Notice-3.0</notice>
-	</license>
-	<licenseSet>
-		<license idref='AFL-1.1' />
-		<license idref='AFL-1.2' />
-		<license idref='AFL-2.0' />
-		<license idref='AFL-2.1' />
-		<license idref='AFL-3.0' />
-		<detectionString>ACADEMIC FREE LICENSE</detectionString>
-	</licenseSet>
-	...
+  <license id='AFL-1.1'>
+    <spdxIdentifier>AFL-1.1</spdxIdentifier>
+    <name>Academic Free License</name>
+    <legalStatus>ACCEPTED</legalStatus>
+    <author>Lawrence E. Rosen</author>
+    <version>1.1</version>
+    <publicUrl>https://spdx.org/licenses/AFL-1.1.html</publicUrl>
+  </license>
+  <license id='AFL-1.2'>
+    <spdxIdentifier>AFL-1.2</spdxIdentifier>
+    <name>Academic Free License</name>
+    <legalStatus>ACCEPTED</legalStatus>
+    <author>Lawrence E. Rosen</author>
+    <version>1.2</version>
+    <publicUrl>https://spdx.org/licenses/AFL-1.2.html</publicUrl>
+  </license>
+  <license id='AFL-2.0'>
+    <spdxIdentifier>AFL-2.0</spdxIdentifier>
+    <name>Academic Free License</name>
+    <legalStatus>ACCEPTED</legalStatus>
+    <author>Lawrence E. Rosen</author>
+    <version>2.0</version>
+    <publicUrl>https://spdx.org/licenses/AFL-2.0.html</publicUrl>
+  </license>
+  <license id='AFL-2.1'>
+    <spdxIdentifier>AFL-2.1</spdxIdentifier>
+    <name>Academic Free License</name>
+    <legalStatus>ACCEPTED</legalStatus>
+    <author>Lawrence E. Rosen</author>
+    <version>2.1</version>
+    <publicUrl>https://spdx.org/licenses/AFL-2.1.html</publicUrl>
+  </license>
+  <license id='AFL-3.0'>
+    <spdxIdentifier>AFL-3.0</spdxIdentifier>
+    <name>Academic Free License</name>
+    <legalStatus>ACCEPTED</legalStatus>
+    <author>Lawrence E. Rosen</author>
+    <version>3.0</version>
+    <publicUrl>https://spdx.org/licenses/AFL-3.0.html</publicUrl>
+    <notice>AFL-Notice-3.0</notice>
+  </license>
+  <licenseSet>
+    <license idref='AFL-1.1' />
+    <license idref='AFL-1.2' />
+    <license idref='AFL-2.0' />
+    <license idref='AFL-2.1' />
+    <license idref='AFL-3.0' />
+    <detectionString>ACADEMIC FREE LICENSE</detectionString>
+  </licenseSet>
+  ...
 </licenses>
 ----
 
@@ -398,10 +398,10 @@ Example of the file:
 ----
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <providers>
-	<provider id='EclipseFoundation'>
-		<name>Eclipse Foundation</name>
-		<url>https://www.eclipse.org/</url>
-	</provider>
+  <provider id='EclipseFoundation'>
+    <name>Eclipse Foundation</name>
+    <url>https://www.eclipse.org/</url>
+  </provider>
 </providers>
 ----
 
@@ -414,16 +414,16 @@ Example of the file:
 ----
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <notices>
-	<notice id='EPL-1.0'>
-		<text>Notice for EPL 1</text>
-	</notice>
-	<notice id='EPL-2.0'>
-		<text>Notice for EPL 2</text>
-	</notice>
-	<notice id='MIT-1'>
-		<text>Notice for MIT 1</text>
-	</notice>
-	...
+  <notice id='EPL-1.0'>
+    <text>Notice for EPL 1</text>
+  </notice>
+  <notice id='EPL-2.0'>
+    <text>Notice for EPL 2</text>
+  </notice>
+  <notice id='MIT-1'>
+    <text>Notice for MIT 1</text>
+  </notice>
+  ...
 </notices>
 ----
 
@@ -552,6 +552,7 @@ My fancy open source project
 
 Empty lines and lines starting with `#` are ignored.
 
+[[report-templates]]
 === Report templates
 
 For the TXT and HTML license reports the Velocity template engine is used.

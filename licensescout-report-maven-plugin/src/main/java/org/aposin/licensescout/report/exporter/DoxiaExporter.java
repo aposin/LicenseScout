@@ -40,7 +40,7 @@ public class DoxiaExporter implements IReportExporter {
     private Sink sink;
 
     /**
-     * Gets the single instance of Exporter.
+     * Gets an instance of Exporter.
      * @param sinkProvider 
      * 
      * @return an exporter instance
@@ -115,16 +115,9 @@ public class DoxiaExporter implements IReportExporter {
         sink.paragraph_();
         if (!outputResult.isPomResolutionUsed()) {
             sink.paragraph();
-            sink.text("Parent POm resolution was not active. Results may be incomplete.");
+            sink.text("Parent POM resolution was not active. Results may be incomplete.");
             sink.paragraph_();
         }
-
-        //        sink.section1();
-        //        sink.sectionTitle1();
-        //        sink.text("Section title");
-        //        sink.sectionTitle1_();
-
-        sink.section1_();
 
         sink.table();
         createTableHeader(outputResult, reportConfiguration);
@@ -139,17 +132,17 @@ public class DoxiaExporter implements IReportExporter {
 
     private void createTableHeader(final OutputResult outputResult, final ReportConfiguration reportConfiguration) {
         sink.tableRow();
-        createTableHeaderCell(sink, "Type");
-        createTableHeaderCell(sink, "Filename");
-        createTableHeaderCell(sink, "Version");
-        createTableHeaderCell(sink, "Detection status");
-        createTableHeaderCell(sink, "Legal status");
-        createTableHeaderCell(sink, "Archive path");
+        createTableHeaderCell("Type");
+        createTableHeaderCell("Filename");
+        createTableHeaderCell("Version");
+        createTableHeaderCell("Detection status");
+        createTableHeaderCell("Legal status");
+        createTableHeaderCell("Archive path");
         if (reportConfiguration.isShowDocumentationUrl()) {
-            createTableHeaderCell(sink, "Documentation");
+            createTableHeaderCell("Documentation");
         }
-        createTableHeaderCell(sink, "Licenses");
-        createTableHeaderCell(sink, "Message Digest (" + outputResult.getMessageDigestAlgorithm() + ")");
+        createTableHeaderCell("Licenses");
+        createTableHeaderCell("Message Digest (" + outputResult.getMessageDigestAlgorithm() + ")");
         sink.tableRow_();
     }
 
@@ -193,10 +186,9 @@ public class DoxiaExporter implements IReportExporter {
     }
 
     /**
-     * @param sink
      * @param text
      */
-    private void createTableHeaderCell(final Sink sink, String text) {
+    private void createTableHeaderCell(String text) {
         sink.tableHeaderCell();
         sink.text(text);
         sink.tableHeaderCell_();
