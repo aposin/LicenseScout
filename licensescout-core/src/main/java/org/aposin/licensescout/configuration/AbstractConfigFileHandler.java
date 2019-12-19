@@ -13,33 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aposin.licensescout.report.mojo;
+package org.aposin.licensescout.configuration;
 
-import org.aposin.licensescout.archive.ArchiveType;
-import org.junit.Assert;
-import org.junit.Test;
+import org.aposin.licensescout.util.ILFLog;
 
 /**
- * Base class for unit tests of subclasses of {@link AbstractReportMojo}.
- *
+ * Base class for implementations of {@link ConfigFileHandler}.
  */
-public abstract class AbstractReportMojoTest {
+public abstract class AbstractConfigFileHandler implements ConfigFileHandler {
 
-    protected abstract Class<?> getExpectedFinderClass();
+    private final ConfigFileParameters configFileParameters;
+    private final ILFLog log;
 
     /**
-     * Test case for the method {@link AbstractReportMojo#getArchiveType()}.
+     * Constructor.
      * 
-     * @throws Exception
+     * @param configFileParameters
+     * @param log 
      */
-    @Test
-    public void testGetArchiveType() throws Exception {
-        final AbstractReportMojo reportMojo = createMojo();
-        Assert.assertEquals("wrong type returned by getArchiveType()", getExpectedArchiveType(),
-                reportMojo.getArchiveType());
+    protected AbstractConfigFileHandler(final ConfigFileParameters configFileParameters, final ILFLog log) {
+        this.configFileParameters = configFileParameters;
+        this.log = log;
     }
 
-    protected abstract AbstractReportMojo createMojo();
+    /**
+     * @return the executionParameters
+     */
+    protected final ConfigFileParameters getExecutionParameters() {
+        return configFileParameters;
+    }
 
-    protected abstract ArchiveType getExpectedArchiveType();
+    /**
+     * @return the log
+     */
+    protected final ILFLog getLog() {
+        return log;
+    }
 }

@@ -12,14 +12,16 @@
 	</parent>
 
 	<groupId>org.aposin.licensescout</groupId>
-	<artifactId>licensescout-maven-utils</artifactId>
+	<artifactId>licensescout-core</artifactId>
 	<version>1.3.${revision}</version>
 	<packaging>jar</packaging>
 
-	<name>LicenseScout Maven Utilities</name>
-	<description>Utility methods that are specific to the Maven runtime system.
-	Isolated because they are used by multiple maven plug-in implementations,
-	but should not be in the core to keep core free from Maven runtime system dependencies.</description>
+	<name>LicenseScout Core</name>
+	<description>Finds license information and collects them to a license report.</description>
+
+	<prerequisites>
+		<maven>3.3.0</maven>
+	</prerequisites>
 
 	<distributionManagement>
 		<site>
@@ -34,63 +36,64 @@
 
 	<dependencies>
 		<!-- Project internal dependencies -->
-		<dependency>
-			<groupId>org.aposin.licensescout</groupId>
-			<artifactId>licensescout-core</artifactId>
-			<version>1.3.${revision}</version>
-		</dependency>
 
 		<!-- External dependencies -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-plugin-api</artifactId>
 		</dependency>
+		<!-- Currently needed by classes Output and DatabaseConfiguration -->
 		<dependency>
 			<groupId>org.apache.maven.plugin-tools</groupId>
 			<artifactId>maven-plugin-annotations</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.maven.resolver</groupId>
-			<artifactId>maven-resolver-api</artifactId>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity-engine-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.maven.resolver</groupId>
-			<artifactId>maven-resolver-impl</artifactId>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-core</artifactId>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-collections4</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mariadb.jdbc</groupId>
+			<artifactId>mariadb-java-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
 		</dependency>
 
+
 		<!-- Test dependencies -->
+		<!-- Commented out because snyk thinks this version has a security vulnerability -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>com.h2database</groupId> -->
+<!-- 			<artifactId>h2</artifactId> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
-
 		<dependency>
-			<groupId>org.eclipse.aether</groupId>
-			<artifactId>aether-connector-basic</artifactId>
-			<version>${org.eclipse.aether.version}</version>
-			<scope>test</scope>
+			<groupId>org.dbunit</groupId>
+			<artifactId>dbunit</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.eclipse.aether</groupId>
-			<artifactId>aether-transport-file</artifactId>
-			<version>${org.eclipse.aether.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.aether</groupId>
-			<artifactId>aether-transport-http</artifactId>
-			<version>${org.eclipse.aether.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.aether</groupId>
-			<artifactId>aether-transport-wagon</artifactId>
-			<version>${org.eclipse.aether.version}</version>
-			<scope>test</scope>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -110,11 +113,33 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+				<executions>
+					<!-- Needed because other projects have test cases which derive from 
+						classes in this project. -->
+					<execution>
+						<id>create-test-jar</id>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-plugin-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>help-goal</id>
+						<goals>
+							<goal>helpmojo</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<!-- We need sources always to allow the 'maven-plugin-plugin' to read 
-				annotations. This is needed because the class ArtifactItem is used as a type 
-				for a MOJO parameter. -->
+				annotations. This is needed because classes are used as a type for a MOJO 
+				parameter. -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
@@ -146,19 +171,23 @@
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
 				<configuration>
-					<header>LICENSE_header.txt</header>
-					<includes>
-						<!-- include all sources -->
-						<include>src/**</include>
-					</includes>
-					<excludes>
-						<exclude>**/*.xml</exclude>
-						<exlucde>**/*.txt</exlucde>
-						<exclude>**/*.csv</exclude>
+					<excludes combine.children="append">
+						<exclude>**/*.sql</exclude>
+						<!-- check fails on files with UTF-16 encoding because it uses UTF-8 
+							encoding (which is the case for all other files) -->
+						<exclude>**/*UTF-16*.vm</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
-
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>**/DatabaseWriterTest.java</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
 		</plugins>
 
 	</build>
@@ -188,6 +217,10 @@
 						</reports>
 					</reportSet>
 				</reportSets>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-plugin-plugin</artifactId>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

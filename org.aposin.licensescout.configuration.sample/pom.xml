@@ -6,9 +6,9 @@
 
 	<parent>
 		<groupId>org.aposin.licensescout</groupId>
-		<artifactId>org.aposin.licensescout.parent</artifactId>
+		<artifactId>licensescout-parent</artifactId>
 		<version>1.3.1-SNAPSHOT</version>
-		<relativePath>../org.aposin.licensescout.parent/</relativePath>
+		<relativePath>../licensescout-parent/</relativePath>
 	</parent>
 
 	<groupId>org.aposin.licensescout</groupId>

@@ -11,9 +11,9 @@
 		and instead uses the transitive dependency 'velocity' from 'doxia-site-renderer'. -->
 	<parent>
 		<groupId>org.aposin.licensescout</groupId>
-		<artifactId>org.aposin.licensescout.parent</artifactId>
+		<artifactId>licensescout-parent</artifactId>
 		<version>1.3.1-SNAPSHOT</version>
-		<relativePath>../org.aposin.licensescout.parent/</relativePath>
+		<relativePath>../licensescout-parent/</relativePath>
 	</parent>
 
 	<groupId>org.aposin.licensescout</groupId>
@@ -43,8 +43,9 @@
 		<!-- Project internal dependencies -->
 		<dependency>
 			<groupId>org.aposin.licensescout</groupId>
-			<artifactId>licensescout-maven-plugin</artifactId>
+			<artifactId>licensescout-core</artifactId>
 			<version>${project.version}</version>
+			<type>jar</type>
 			<exclusions>
 				<exclusion>
 					<groupId>org.apache.velocity</groupId>
@@ -54,7 +55,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.aposin.licensescout</groupId>
-			<artifactId>licensescout-maven-plugin</artifactId>
+			<artifactId>licensescout-core</artifactId>
 			<version>${project.version}</version>
 			<type>test-jar</type>
 			<scope>test</scope>
@@ -72,10 +73,6 @@
 		</dependency>
 
 		<!-- External dependencies -->
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-model</artifactId>

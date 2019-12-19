@@ -11,7 +11,7 @@ cache:
     - $HOME/.m2
 
 before_install:
-  - cd org.aposin.licensescout.parent
+  - cd licensescout-parent
 
 script:
   - if [[ $TYPE == test ]]; then

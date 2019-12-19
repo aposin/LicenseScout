@@ -11,9 +11,10 @@
 	<description>Aggregator POM that builds locally the LicenseScout, the sample configuration for the LicenseScout, and executes the LicenseScout to generate a license report for itself</description>
 
 	<modules>
-		<module>../org.aposin.licensescout.parent</module>
+		<module>../licensescout-parent</module>
 		<module>../licensescout-maven-utils</module>
-		<module>../org.aposin.licensescout.core</module>
+		<module>../licensescout-core</module>
+		<module>../licensescout-maven-plugin</module>
 		<module>../org.aposin.licensescout.configuration.sample</module>
 		<module>../org.aposin.licensescout.licensereport</module>
 	</modules>

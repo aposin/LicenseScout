@@ -13,49 +13,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aposin.licensescout.report.mojo;
+package org.aposin.licensescout.mojo;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.maven.doxia.sink.Sink;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.reporting.AbstractMavenReport;
-import org.apache.maven.reporting.MavenReportException;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
 import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.configuration.ConfigFileHandler;
 import org.aposin.licensescout.configuration.ConfigFileParameters;
+import org.aposin.licensescout.configuration.DatabaseConfiguration;
 import org.aposin.licensescout.configuration.FilesystemConfigFileHandler;
 import org.aposin.licensescout.configuration.Output;
-import org.aposin.licensescout.configuration.OutputFileType;
 import org.aposin.licensescout.configuration.ZipConfigFileHandler;
 import org.aposin.licensescout.execution.ExecutionParameters;
 import org.aposin.licensescout.execution.Executor;
-import org.aposin.licensescout.execution.IReportExporterFactory;
 import org.aposin.licensescout.execution.LicenseScoutExecutionException;
+import org.aposin.licensescout.execution.StandardReportExporterFactory;
 import org.aposin.licensescout.license.LegalStatus;
 import org.aposin.licensescout.maven.utils.ArtifactHelper;
 import org.aposin.licensescout.maven.utils.ArtifactItem;
 import org.aposin.licensescout.maven.utils.IRepositoryParameters;
 import org.aposin.licensescout.maven.utils.MavenLog;
-import org.aposin.licensescout.report.exporter.DoxiaReportExporterFactory;
-import org.aposin.licensescout.report.exporter.ISinkProvider;
 import org.aposin.licensescout.util.ILFLog;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
 /**
- * Creates a report integrated into a Maven site report of license information found by the LicenseScout.
+ * Scans directory for licenses (either JAVA Jars or NPM packages).
  *
  */
-public abstract class AbstractReportMojo extends AbstractMavenReport implements IRepositoryParameters {
+public abstract class AbstractScanMojo extends AbstractMojo implements IRepositoryParameters {
 
     /**
      * Directory to scan for archives.
@@ -64,8 +62,26 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
      * 
      * @since 1.1
      */
-    @Parameter(property = "scanDirectory", required = true)
+    @Parameter(property = "scanDirectory", required = false)
     private File scanDirectory;
+
+    /**
+     * Location of the output file (will be combined with output filename).
+     * <p>The directory is created if it does not exist.</p>
+     * 
+     * @since 1.0
+     */
+    @Parameter(defaultValue = "${project.build.directory}/licensescout", property = "outputDirectory", required = false)
+    private String outputDirectory;
+
+    /**
+     * Specification of output types and filenames.
+     * 
+     * @see Output
+     * @since 1.2
+     */
+    @Parameter(property = "outputs", required = false)
+    private List<Output> outputs;
 
     /**
      * Name of the file to read known licenses from.
@@ -205,6 +221,52 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
     private boolean showDocumentationUrl;
 
     /**
+     * Whether a skeleton archive XML file of all found archives should be written.
+     * 
+     * <p>If enabled, the file is written to {@link #archiveXmlSkeletonFile}.</p>
+     * 
+     * @see #archiveXmlSkeletonFile
+     * 
+     * @since 1.2.6
+     */
+    @Parameter(defaultValue = "false", property = "writeArchiveXmlSkeleton", required = false)
+    private boolean writeArchiveXmlSkeleton;
+
+    /**
+     * File name a skeleton archive XML file of all found archives should be written to.
+     * 
+     * <p>Only used if {@link #writeArchiveXmlSkeleton} is true. </p>
+     * 
+     * @see #writeArchiveXmlSkeleton
+     * 
+     * @since 1.2.6
+     */
+    @Parameter(defaultValue = "archiveSkeleton.xml", property = "archiveXmlSkeletonFile", required = false)
+    private File archiveXmlSkeletonFile;
+
+    /**
+     * Whether a skeleton archive CSV file of all found archives should be written.
+     * 
+     * <p>If enabled, the file is written to {@link #archiveXmlSkeletonFile}.</p>
+     * 
+     * @see #archiveCsvSkeletonFile
+     * @since 1.2.6
+     */
+    @Parameter(defaultValue = "false", property = "writeArchiveCsvSkeleton", required = false)
+    private boolean writeArchiveCsvSkeleton;
+
+    /**
+     * File name a skeleton archive CSV file of all found archives should be written to.
+     * 
+     * <p>Only used if {@link #writeArchiveCsvSkeleton} is true. </p>
+     * 
+     * @see #writeArchiveCsvSkeleton
+     * @since 1.2.6
+     */
+    @Parameter(defaultValue = "archiveSkeleton.csv", property = "archiveCsvSkeletonFile", required = false)
+    private File archiveCsvSkeletonFile;
+
+    /**
      * The name of the build to use when writing database entries.
      * 
      * <p>Only used if {@link #writeResultsToDatabase} is true. </p>
@@ -235,15 +297,71 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
     private String buildUrl;
 
     /**
+     * Whether the resulting reports should be written to a database.
+     * 
+     * <p>If enabled, the reports are written to the database configured with {@link #resultDatabaseConfiguration}.</p>
+     * 
+     * @see #resultDatabaseConfiguration
+     * @since 1.2.6
+     */
+    @Parameter(defaultValue = "false", property = "writeResultsToDatabase", required = false)
+    private boolean writeResultsToDatabase;
+
+    /**
+     * Whether the resulting reports should be written to a database in case the build is a snapshot
+     * (identified by the value of {@link #buildVersion} ending with "-SNAPSHOT").
+     * 
+     * <p>This setting only has an effect if {@link #writeResultsToDatabase} is enabled.</p>
+     * 
+     * @see #writeResultsToDatabase
+     * @see #resultDatabaseConfiguration
+     * @since 1.2.6
+     */
+    @Parameter(defaultValue = "false", property = "writeResultsToDatabaseForSnapshotBuilds", required = false)
+    private boolean writeResultsToDatabaseForSnapshotBuilds;
+
+    /**
+     * Database configuration for the database the reports should be written to.
+     * 
+     * <p>Only used if {@link #writeResultsToDatabase} is true. </p>
+     * 
+     * @see #writeResultsToDatabase
+     * @see DatabaseConfiguration
+     * @since 1.2.6
+     */
+    @Parameter(property = "resultDatabaseConfiguration", required = false)
+    private DatabaseConfiguration resultDatabaseConfiguration;
+
+    /**
      * Skips the execution.
      * 
      * @since 1.3.1
      */
     @Parameter(defaultValue = "false", property = "skip", required = false)
     private boolean skip;
+
     /**
-     * Configuration bundle artifact.
-     * 
+     * Attach generated reports as files to the main artifact.
+     * @since 1.3.1
+     */
+    @Parameter(defaultValue = "true", property = "attachReports", required = false)
+    private boolean attachReports;
+
+    /**
+     * The Maven Project model.
+     * @since 1.3.1
+     */
+    @Parameter(defaultValue = "${project}", required = true, readonly = true)
+    private MavenProject mavenProject;
+
+    /**
+     * The Maven project helper.
+     */
+    @Component
+    private MavenProjectHelper mavenProjectHelper;
+
+    /**
+     * Artifact to use as configuration bundle.
      * @since 1.3.1
      */
     @Parameter(property = "configurationBundle", required = false)
@@ -274,31 +392,7 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
      * {@inheritDoc}
      */
     @Override
-    public String getOutputName() {
-        return "licensereport";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getName(Locale locale) {
-        return "LicenseScout License Report";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getDescription(Locale locale) {
-        return "A detailled report on licenses";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void executeReport(Locale locale) throws MavenReportException {
+    public void execute() throws MojoExecutionException {
         final ILFLog log = new MavenLog(getLog());
 
         if (skip) {
@@ -306,12 +400,8 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
             return;
         }
         File configurationBundleFile = null;
-        try {
-            if (configurationBundle != null) {
-                configurationBundleFile = ArtifactHelper.getArtifactFile(this, configurationBundle);
-            }
-        } catch (MojoExecutionException e1) {
-            throw new MavenReportException(e1.getLocalizedMessage(), e1);
+        if (configurationBundle != null && !StringUtils.isEmpty(configurationBundle.getArtifactId())) {
+            configurationBundleFile = ArtifactHelper.getArtifactFile(this, configurationBundle);
         }
 
         final ExecutionParameters executionParameters = new ExecutionParameters();
@@ -320,24 +410,11 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
             BeanUtils.copyProperties(executionParameters, this);
             BeanUtils.copyProperties(configFileParameters, this);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new MavenReportException("Internal error occured: " + e.getLocalizedMessage(), e);
+            throw new MojoExecutionException("Internal error occured: " + e.getLocalizedMessage(), e);
         }
-        Output output = new Output();
-        output.setType(OutputFileType.DOXIA);
-        executionParameters.setOutputs(Arrays.asList(output));
-        // TODO: setEncoding()
-        //        output.setEncoding(outputEncoding);
         executionParameters.setArchiveType(getArchiveType());
         executionParameters.setLsLog(log);
-        executionParameters.setOutputDirectory(new File(getOutputDirectory()));
-        IReportExporterFactory doxiaFactory = new DoxiaReportExporterFactory(new ISinkProvider() {
-
-            @Override
-            public Sink getSink() {
-                return AbstractReportMojo.this.getSink();
-            }
-        });
-        executionParameters.setExporterFactories(Arrays.asList(doxiaFactory));
+        executionParameters.setExporterFactories(Arrays.asList(new StandardReportExporterFactory()));
 
         final ConfigFileHandler configFileHandler = createConfigFileHandler(configurationBundleFile,
                 configFileParameters, log);
@@ -346,8 +423,10 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
         try {
             executor.execute();
         } catch (LicenseScoutExecutionException e) {
-            throw new MavenReportException("Internal error occured: " + e.getLocalizedMessage(), e);
+            throw new MojoExecutionException("Internal error occured: " + e.getLocalizedMessage(), e);
         }
+
+        attachReports(executionParameters, log);
     }
 
     /**
@@ -356,7 +435,6 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
      * @param log
      * @return a configuration file handler
      */
-    //TODO: factor out with Abstractscanmojo
     private ConfigFileHandler createConfigFileHandler(final File configurationBundleFile,
                                                       final ConfigFileParameters configFileParameters,
                                                       final ILFLog log) {
@@ -369,6 +447,18 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
             log.info("reading configuration files from file system");
         }
         return configFileHandler;
+    }
+
+    /**
+     * @param executionParameters
+     * @param log
+     */
+    private void attachReports(final ExecutionParameters executionParameters, final ILFLog log) {
+        if (attachReports) {
+            AttachHelper.attachReports(mavenProject, mavenProjectHelper, executionParameters);
+        } else {
+            log.info("Not attaching license reports as artifacts because not cnfigured");
+        }
     }
 
     /**
@@ -392,6 +482,20 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
      */
     public final File getScanDirectory() {
         return scanDirectory;
+    }
+
+    /**
+     * @return the outputDirectory
+     */
+    public final String getOutputDirectory() {
+        return outputDirectory;
+    }
+
+    /**
+     * @return the outputs
+     */
+    public final List<Output> getOutputs() {
+        return outputs;
     }
 
     /**
@@ -500,6 +604,34 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
     }
 
     /**
+     * @return the writeArchiveXmlSkeleton
+     */
+    public final boolean isWriteArchiveXmlSkeleton() {
+        return writeArchiveXmlSkeleton;
+    }
+
+    /**
+     * @return the archiveXmlSkeletonFile
+     */
+    public final File getArchiveXmlSkeletonFile() {
+        return archiveXmlSkeletonFile;
+    }
+
+    /**
+     * @return the writeArchiveCsvSkeleton
+     */
+    public final boolean isWriteArchiveCsvSkeleton() {
+        return writeArchiveCsvSkeleton;
+    }
+
+    /**
+     * @return the archiveCsvSkeletonFile
+     */
+    public final File getArchiveCsvSkeletonFile() {
+        return archiveCsvSkeletonFile;
+    }
+
+    /**
      * @return the buildName
      */
     public final String getBuildName() {
@@ -518,6 +650,27 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
      */
     public final String getBuildUrl() {
         return buildUrl;
+    }
+
+    /**
+     * @return the writeResultsToDatabase
+     */
+    public final boolean isWriteResultsToDatabase() {
+        return writeResultsToDatabase;
+    }
+
+    /**
+     * @return the writeResultsToDatabaseForSnapshotBuilds
+     */
+    public final boolean isWriteResultsToDatabaseForSnapshotBuilds() {
+        return writeResultsToDatabaseForSnapshotBuilds;
+    }
+
+    /**
+     * @return the resultDatabaseConfiguration
+     */
+    public final DatabaseConfiguration getResultDatabaseConfiguration() {
+        return resultDatabaseConfiguration;
     }
 
     /**
