@@ -15,7 +15,7 @@
  */
 package org.aposin.licensescout.core.test.util;
 
-import java.io.File;
+import java.io.FileInputStream;
 import java.util.logging.Logger;
 
 import org.aposin.licensescout.configuration.RunParameters;
@@ -56,7 +56,7 @@ public abstract class TestUtil {
      */
     public static LicenseStoreData readLicenseStoreData(final ILFLog log) throws Exception {
         LicenseStoreData licenseStoreData = new LicenseStoreData();
-        licenseStoreData.readLicenses(new File("src/test/resources/configuration/licenses.xml"), null, false, log);
+        licenseStoreData.readLicenses(new FileInputStream("src/test/resources/configuration/licenses.xml"), null, false, log);
         return licenseStoreData;
     }
 
