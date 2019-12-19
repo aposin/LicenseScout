@@ -97,6 +97,17 @@
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
 		</dependency>
+
+		<!-- Test dependencies -->
+		<!-- Commented out because snyk thinks this version has a security vulnerability -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>com.h2database</groupId> -->
+<!-- 			<artifactId>h2</artifactId> -->
+<!-- 		</dependency> -->
+		<dependency>
+			<groupId>org.dbunit</groupId>
+			<artifactId>dbunit</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -177,13 +188,22 @@
 				<artifactId>license-maven-plugin</artifactId>
 				<configuration>
 					<excludes combine.children="append">
+						<exclude>**/*.sql</exclude>
 						<!-- check fails on files with UTF-16 encoding because it uses UTF-8 
 							encoding (which is the case for all other files) -->
 						<exclude>**/*UTF-16*.vm</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
-
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>**/DatabaseWriterTest.java</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
 		</plugins>
 
 	</build>

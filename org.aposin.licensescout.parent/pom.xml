@@ -93,6 +93,7 @@
 		<junit.version>4.12</junit.version>
 		<json.version>20190722</json.version>
 		<mariadb-java-client.version>2.4.1</mariadb-java-client.version>
+		<maven-core.version>3.6.0</maven-core.version>
 		<maven-model.version>3.6.0</maven-model.version>
 		<maven-plugin-annotations.version>3.6.0</maven-plugin-annotations.version>
 		<maven-plugin-api.version>3.6.0</maven-plugin-api.version>
@@ -145,6 +146,10 @@
 		<!-- groupId: org.sonatype.plugins -->
 		<nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
 
+		<license-maven-plugin.version>3.0</license-maven-plugin.version>
+		<org.dbunit.version>2.6.0</org.dbunit.version>
+		<com.h2database.version>1.4.200</com.h2database.version>
+
 		<!-- ==================== -->
 		<!-- Compiler definitions -->
 
@@ -175,6 +180,11 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>org.apache.maven</groupId>
+				<artifactId>maven-core</artifactId>
+				<version>${maven-core.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.apache.maven</groupId>
 				<artifactId>maven-model</artifactId>
@@ -295,15 +305,18 @@
 				<version>${org.jsoup.version}</version>
 				<scope>test</scope>
 			</dependency>
+
+			<!-- Test dependencies -->
 			<dependency>
-				<groupId>org.apache.maven</groupId>
-				<artifactId>maven-core</artifactId>
-				<version>3.6.0</version>
+				<groupId>org.dbunit</groupId>
+				<artifactId>dbunit</artifactId>
+				<version>${org.dbunit.version}</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.apache.maven.plugin-testing</groupId>
-				<artifactId>maven-plugin-testing-harness</artifactId>
-				<version>3.3.0</version>
+				<groupId>com.h2database</groupId>
+				<artifactId>h2</artifactId>
+				<version>${com.h2database.version}</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
