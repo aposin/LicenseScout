@@ -7,33 +7,11 @@
 	<body>
 		<menu name="Overview">
 			<item name="Introduction" href="index.html" />
-			<item name="Goals" href="plugin-info.html" />
 			<item name="Usage" href="usage.html" />
 			<item name="Download" href="download.html" />
 			<item name="License"
 				href="https://www.apache.org/licenses/LICENSE-2.0" />
 			<item name="Sitemap" href="sitemap.html" />
-		</menu>
-
-		<menu name="Examples">
-			<item href="examples/alternative-attach.html"
-				name="Alternative way of attaching license reports as artifacts" />
-			<item href="examples/alternative-dbms.html"
-				name="Use an alternative DBMS" />
-			<item href="examples/buildurl-jenkins.html"
-				name="Setting the build URL from Jenkins" />
-			<item href="examples/controlling-execution.html"
-				name="Controlling the execution (Skip)" />
-			<item href="examples/custom-output-filenames.html"
-				name="Using custom output filenames" />
-			<item href="examples/custom-templates.html"
-				name="Use custom report templates" />
-			<item href="examples/filesystem-config-files.html"
-				name="Reading configuration files from the file system" />
-			<item href="examples/output-encoding.html"
-				name="Configuring the output encoding of the license reports" />
-			<item href="examples/scan-maven-dependencies.html"
-				name="Scanning Maven dependencies" />
 		</menu>
 
 		<menu name="Documentation">

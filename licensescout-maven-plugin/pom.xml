@@ -136,13 +136,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- We need sources always to allow the 'maven-plugin-plugin' to read 
-				annotations. This is needed because classes are used as a type for a MOJO 
-				parameter. -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-			</plugin>
 
 			<!-- groupId: org.jacoco -->
 			<plugin>

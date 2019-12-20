@@ -25,8 +25,12 @@
 
 == Setting up LicenseScout database
 
-The file `org.aposin.licensescout.core/sql/licensescout.sql` contains an SQL script that creates the tables in the database needed for storing the LicenseScout results.
-//TODO: the database unit test PR contains different sql  files for different DBMSs
+The following files contains an SQL script that creates the tables in the database needed for storing the LicenseScout results.
+
+* `licensescout-core/sql/licensescout-mysql.sql`
+* `licensescout-core/sql/licensescout-h2.sql`
+* `licensescout-core/sql/licensescout-hsqldb.sql`
+
 
 == Database driver
 

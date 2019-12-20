@@ -68,6 +68,6 @@ The results are written into three tables:
 
 NOTE: For details on the table structure see the files:
 
-* `org.aposin.licensescout.core/sql/licensescout-mysql.sql`
-* `org.aposin.licensescout.core/sql/licensescout-h2.sql`
-* `org.aposin.licensescout.core/sql/licensescout-hsqldb.sql`
+* `licensescout-core/sql/licensescout-mysql.sql`
+* `licensescout-core/sql/licensescout-h2.sql`
+* `licensescout-core/sql/licensescout-hsqldb.sql`

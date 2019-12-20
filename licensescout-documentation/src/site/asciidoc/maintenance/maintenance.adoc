@@ -88,8 +88,10 @@ There is a special project that contains the parts of LicenseScout that should b
 It is an aggregator POM called `org.aposin.licensescout.release-aggrgator`.
 It references the following modules:
 
-* `org.aposin.licensescout.parent`
-* `org.aposin.licensescout.core`
+* `licensescout-parent`
+* `licensescout-core`
+* `licensescout-maven-utils`
+* `licensescout-maven-plugin`
 * `org.aposin.licensescout.configuration.sample`
 
 NOTE: The `release-aggregator` is configured in a way that it is not installed or deployed itself.
@@ -158,11 +160,11 @@ This results in the actual version number (example: '1.3.1.005').
 
 Site generation is done in two steps:
 
-. Generating content and staging to a local irectory using the run configuration `org.aposin.licensescout.parent_multimodule_site_stage`.
+. Generating content and staging to a local irectory using the run configuration `licensescout-parent_multimodule_site_stage`.
 This does a `package site site:stage` with the profiles `site-modules,clean-site-staging`. Note `package` is necessary due to a Maven bug (https://jira.apache.org/jira/browse/MDEP-98)
 
 . Checkin from the staging directory to the `gh-pages` branch using he run configuration
-`org.aposin.licensescout.parent_site_publish` which does `scm-publish:publish-scm`.
+`licensescout-parent_site_publish` which does `scm-publish:publish-scm`.
 
 Note the definitions:
 [source, xml]

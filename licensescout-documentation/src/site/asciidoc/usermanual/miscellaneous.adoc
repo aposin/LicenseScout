@@ -25,8 +25,8 @@
 == Local execution
 LicenseScout can also be executed locally. Do the following:
 
-* Do a build of LicenseScout using the launch configuration `/org.aposin.licensescout.core/launch/org.aposin.licensescout.core_clean_install.launch`
+* Do a build of LicenseScout using the launch configuration `/licensescout-core/launch/licensescout-core_clean_install.launch`
 * Do a build of the license finder sample configuration using the launch configuration `/org.aposin.licensescout.configuration.sample/launch/org.aposin.licensescout.configuration.sample_clean_install.launch`
-* Make sure the current (SNAPSHOT) version numbers of LicenseScout (from `/org.aposin.licensescout.core/pom.xml`) and the license finder configuration (from `/org.aposin.licensescout.configuration.sample/pom.xml`) are entered as property values in `/org.aposin.licensescout.licensereport/pom.xml`
+* Make sure the current (SNAPSHOT) version numbers of LicenseScout (from `/licensescout-core/pom.xml`) and the license finder configuration (from `/org.aposin.licensescout.configuration.sample/pom.xml`) are entered as property values in `/org.aposin.licensescout.licensereport/pom.xml`
 * Run LicenseScout: `/org.aposin.licensescout.licensereport/launch/org.aposin.licensescout.licensereport_scan.launch`
 

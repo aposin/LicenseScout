@@ -50,11 +50,20 @@ Key features include:
 |===
 |artifactId |Purpose
 
-|`org.aposin.licensescout.parent`
+|`licensescout-parent`
 |Parent POM for all other LicenseScout projects
 
-|`org.aposin.licensescout.core`
+|`licensescout-core`
+|Code for the processing core of the LicenseScout
+
+|`licensescout-maven-utils`
+|Utility methods related to the Maven runtime system
+
+|`licensescout-maven-plugin`
 |Code for LicenseScout maven plugin
+
+|`licensescout-report-maven-plugin`
+|Code for LicenseScout maven plugin generating site reports
 
 |`org.aposin.licensescout.configuration.sample`
 |Sample configuration files
