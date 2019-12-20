@@ -39,6 +39,8 @@ import org.junit.Test;
  * Unit test for {@link ArtifactHelper}.
  *
  */
+// NOTE: if you are working in an environment where maven central is not reachable, ignore this test class by uncommenting the annotation '@Ignore'.
+//@Ignore
 public class ArtifactHelperTest {
 
     /**

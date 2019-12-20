@@ -1,0 +1,205 @@
+//
+// Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+= LicenseScout maintenance manual
+
+:encoding: utf-8
+:lang: en
+:doctype: book
+:toc:
+:toclevels: 4
+
+
+This handbook describes project maintenance tasks for the LicenseScout project.
+
+
+== Doing releases
+
+=== Setup for releases
+
+You need a local Maven installation.
+
+You need basic knowledge of Maven. If you are new to Maven, check out this:
+https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html
+
+
+=== Customize settings file
+
+[source,xml]
+.Minimal settings.xml file
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+  <servers>
+    <server>
+      <id>ossrh</id>                                   <1>
+      <username>[SONATYPE ACCOUNT ID]</username>       <2>
+      <password>[SONATYPE ACCOUNT PASSWORD]</password> <3>
+    </server>
+  </servers>
+
+  <profiles>
+    <profile>
+      <id>ossrh</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <gpg.keyname>[PGP SIGNING KEY ID]</gpg.keyname> <4>
+      </properties>
+    </profile>
+  </profiles>
+
+</settings>
+----
+<1> this server ID is related to the definitions under `<distributionManagement>` in the parent POM
+and is referenced in the configuration of the `nexus-staging-maven-plugin`
+<2> replace the value with the username of your sonatype account
+<3> replace the value with the password of your sonatype account
+<4> replace the value with the ID of your GPG key that should be used for code signing
+
+=== Use encrypted passwords
+It is highly recommended to use encrypted passwords in the `settings.xml` file as described in these resources:
+
+* https://maven.apache.org/guides/mini/guide-encryption.html
+* https://blog.sonatype.com/2009/10/maven-tips-and-tricks-encrypting-passwords/
+
+=== Release project
+
+//TODO: replaced by profile in parent
+
+There is a special project that contains the parts of LicenseScout that should be released.
+It is an aggregator POM called `org.aposin.licensescout.release-aggrgator`.
+It references the following modules:
+
+* `licensescout-parent`
+* `licensescout-core`
+* `licensescout-maven-utils`
+* `licensescout-maven-plugin`
+* `org.aposin.licensescout.configuration.sample`
+
+NOTE: The `release-aggregator` is configured in a way that it is not installed or deployed itself.
+
+=== Doing a snapshot release
+
+A Maven profile `snapshot-release` is used for this.
+
+To do a snapshot release take the following steps:
+
+* Do the following on the command line:
+
+[source, bash]
+----
+> cd org.aposin.licensescout.release-aggrgator
+> mvn -s .../settings-licensescout-minimal.xml -Psnapshot-release clean deploy
+----
+
+IMPORTANT: The command will also work without the profile, but sources will not be included and the artifacts will not be signed.
+
+NOTE: No commits to the repository are needed, since the version numbers of the projects remain unchanged.
+
+
+=== Doing a (main) release manually
+
+A Maven profile `release` is used for this.
+
+To do a release take the following steps:
+
+* Do the following on the command line:
+
+[source, bash]
+----
+> cd org.aposin.licensescout.release-aggrgator
+> mvn -s .../settings-licensescout-minimal.xml -Prelease -Drevision=1.005 clean deploy
+----
+
+TODO: this is unfinished
+
+* mvn scm:tag
+
+NOTE: the release version number is composed of the part in the POM ('1.3.') and the property 'revision' provided on the command line (example: '1.005').
+This results in the actual version number (example: '1.3.1.005').
+
+== Profiles overview
+
+.Profiles
+[cols="1m,2", options="header"]
+|===
+|Profile ID|Purpose
+|snapshot-release|Doing snapshot releases
+|release|Doing (main) releases
+|github-upload|Upload of binaries to Github
+|ci-modules|Modules used in the CI build
+|site-modules|Modules used for site generation
+|release-modules|Modules used for releases
+|it-modules|Modules used in integration testing
+|license-header-modules|Modules used in the license header check
+|clean-site-staging|Cleans the global site staging directory
+|run-its|Run integration tests
+|only-eclipse|Contains M2E definitions that lead to errors in normal reactor runs
+|===
+
+
+== Site generation
+
+Site generation is done in two steps:
+
+. Generating content and staging to a local irectory using the run configuration `licensescout-parent_multimodule_site_stage`.
+This does a `package site site:stage` with the profiles `site-modules,clean-site-staging`. Note `package` is necessary due to a Maven bug (https://jira.apache.org/jira/browse/MDEP-98)
+
+. Checkin from the staging directory to the `gh-pages` branch using he run configuration
+`licensescout-parent_site_publish` which does `scm-publish:publish-scm`.
+
+Note the definitions:
+[source, xml]
+----
+</properties>
+  ...
+  <github.owner>aposin</github.owner>
+  <siteStagingDirectory>C:\dev\tmp\licensescout-stage</siteStagingDirectory>
+  <siteBranch>gh-pages</siteBranch>
+</properties>
+----
+
+The generation uses site descriptor inheritance. To make this work, the parent POM does an `attachDescriptor`.
+
+== Maintaining Eclipse run configurations
+
+All run configurations should:
+
+* Use "Execution environment: JavaSE-11" as runtime JDK
+* Be stored in a folder "launch" in the related project
+* Use a Maven runtime named `apache-maven-current`.
+Eclipse has to be configured that an external Maven installation with this name exists.
+(See Window / Preferences / Maven / Installations)
+
+=== Naming conventions
+
+
+== Repository structure
+
+The maven projects should be stored in a folder with the name being the `artifactId` of the maven project.
+Note that there are several tools, from reporting plugins to deploy plugins that assume this nming convention. If the naming convention is not followed, the tools won't ork as expected or require additional configuration per project.
+
+== Editing XML files
+
+For `pom.xml` and `site.xml` the following applies:
+
+* indentation should be done with one tab
+* Depending on your preferences, you may or may not want to use formatting in the Eclipse XML editor, make sure that formatting of comments is turned off (Window / Preferences / XML / XML Files / Editor / Format comments).

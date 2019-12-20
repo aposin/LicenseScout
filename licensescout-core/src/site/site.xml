@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/DECORATION/1.8.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 http://maven.apache.org/xsd/decoration-1.8.0.xsd"
+	name="${project.name}">
+
+	<body>
+		<menu name="Overview">
+			<item name="Introduction" href="index.html" />
+			<item name="Usage" href="usage.html" />
+			<item name="Download" href="download.html" />
+			<item name="License"
+				href="https://www.apache.org/licenses/LICENSE-2.0" />
+			<item name="Sitemap" href="sitemap.html" />
+		</menu>
+
+		<menu name="Documentation">
+			<item name="JavaDoc" href="apidocs/index.html" />
+			<item name="Source Xref" href="xref/index.html" />
+		</menu>
+
+		<menu ref="reports" />
+
+	</body>
+</project>

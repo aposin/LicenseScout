@@ -16,13 +16,11 @@
 package org.aposin.licensescout.report.mojo;
 
 import org.aposin.licensescout.archive.ArchiveType;
-import org.aposin.licensescout.mojo.AbstractScanMojo;
-import org.aposin.licensescout.report.mojo.AbstractReportMojo;
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Base class for unit tests of subclasses of {@link AbstractScanMojo}.
+ * Base class for unit tests of subclasses of {@link AbstractReportMojo}.
  *
  */
 public abstract class AbstractReportMojoTest {
@@ -30,7 +28,7 @@ public abstract class AbstractReportMojoTest {
     protected abstract Class<?> getExpectedFinderClass();
 
     /**
-     * Test case for the method {@link AbstractScanMojo#getArchiveType()}.
+     * Test case for the method {@link AbstractReportMojo#getArchiveType()}.
      * 
      * @throws Exception
      */

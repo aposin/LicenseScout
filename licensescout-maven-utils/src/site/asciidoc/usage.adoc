@@ -35,4 +35,4 @@ You include `licensescout-maven-utils` as a Maven dependency.
   </dependencies>
 ----
 
-For the programming interface see link:apidocs/index.html["JavaDoc"].
+For the programming interface see link:apidocs/index.html[JavaDoc].
