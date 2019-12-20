@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.util</a> &gt; <span class="el_source">JsonUtil.java</span></div><h1>JsonUtil.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.util;
+
+import static org.aposin.licensescout.archive.ArchiveType.JAVASCRIPT;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Iterator;
+
+import org.aposin.licensescout.archive.ArchiveIdentifierVersion;
+import org.aposin.licensescout.model.Author;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+/**
+ * Utilities for obtaining information from JSON files.
+ * 
+ */
+public class JsonUtil {
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private JsonUtil() {
+        //  DO NOTHING
+    }
+
+    /**
+     * @param file the package.json file
+     * @return on object identifying the archive by name and version
+     * @throws IOException if an error occurred while reading the JSON file
+     */
+    public static ArchiveIdentifierVersion getNPMArchiveDescription(final File file) throws IOException {
+<span class="fc" id="L50">        final JSONObject obj = readJsconFile(file);</span>
+<span class="fc" id="L51">        final String name = obj.getString(&quot;name&quot;);</span>
+<span class="fc" id="L52">        final String version = obj.getString(&quot;version&quot;);</span>
+<span class="fc" id="L53">        return new ArchiveIdentifierVersion(JAVASCRIPT, name, version);</span>
+    }
+
+    /**
+     * @param file the package.json file
+     * @return a license name or an empty string if the package.json does not contain a 'license' tag
+     * @throws IOException if an error occurred while reading the JSON file
+     */
+    public static String getNPMArchiveLicenseName(final File file) throws IOException {
+<span class="fc" id="L62">        final JSONObject obj = readJsconFile(file);</span>
+<span class="fc" id="L63">        final JSONArray licensesArray = obj.optJSONArray(&quot;licenses&quot;);</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        if (licensesArray != null) {</span>
+<span class="fc" id="L65">            final Iterator&lt;Object&gt; iter = licensesArray.iterator();</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">            while (iter.hasNext()) {</span>
+<span class="fc" id="L67">                Object o = iter.next();</span>
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">                if (o instanceof JSONObject) {</span>
+<span class="fc" id="L69">                    final JSONObject jobj = (JSONObject) o;</span>
+<span class="fc" id="L70">                    final String typeValue = jobj.optString(&quot;type&quot;);</span>
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">                    if (typeValue != null) {</span>
+<span class="fc" id="L72">                        return typeValue;</span>
+                    }
+                }
+<span class="nc" id="L75">            }</span>
+        }
+<span class="fc" id="L77">        final JSONObject licenseObject = obj.optJSONObject(&quot;license&quot;);</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">        if (licenseObject != null) {</span>
+<span class="nc" id="L79">            return licenseObject.optString(&quot;type&quot;);</span>
+        }
+<span class="fc" id="L81">        return obj.optString(&quot;license&quot;);</span>
+    }
+
+    /**
+     * Obtains the vendor name from a package.json file.
+     * 
+     * @param file the package.json file
+     * @return a vendor name. If no vendor name is present in the file, an empty string is returned.
+     * @throws IOException if an error occurred while reading the JSON file
+     */
+    public static String getNPMArchiveVendorName(final File file) throws IOException {
+<span class="fc" id="L92">        final JSONObject obj = readJsconFile(file);</span>
+<span class="fc" id="L93">        return obj.optString(&quot;vendor&quot;);</span>
+    }
+
+    /**
+     * TODO (DOC)
+     * @param file the package.json file
+     * @return on object identifying the archive by name and version
+     * @throws IOException if an error occurred while reading the JSON file
+     */
+    public static Author getNPMAuthor(final File file) throws IOException {
+<span class="fc" id="L103">        final JSONObject obj = readJsconFile(file);</span>
+<span class="fc" id="L104">        final JSONObject authorObject = obj.optJSONObject(&quot;author&quot;);</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">        if (authorObject != null) {</span>
+<span class="fc" id="L106">            String name = authorObject.optString(&quot;name&quot;);</span>
+<span class="fc" id="L107">            String email = authorObject.optString(&quot;email&quot;);</span>
+<span class="fc" id="L108">            return new Author(name, email);</span>
+        }
+<span class="fc" id="L110">        return null;</span>
+    }
+
+    private static JSONObject readJsconFile(final File file) throws IOException {
+<span class="fc" id="L114">        final StringBuilder jsonData = new StringBuilder();</span>
+<span class="fc" id="L115">        try (BufferedReader br = new BufferedReader(new FileReader(file))) {</span>
+            String line;
+<span class="fc bfc" id="L117" title="All 2 branches covered.">            while ((line = br.readLine()) != null) {</span>
+<span class="fc" id="L118">                jsonData.append(line).append(&quot;\n&quot;);</span>
+            }
+        }
+<span class="fc" id="L121">        return new JSONObject(jsonData.toString());</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

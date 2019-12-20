@@ -1,0 +1,11 @@
+org.aposin.licensescout.archive
+org.aposin.licensescout.configuration
+org.aposin.licensescout.core.test.util
+org.aposin.licensescout.database
+org.aposin.licensescout.execution
+org.aposin.licensescout.exporter
+org.aposin.licensescout.filter
+org.aposin.licensescout.finder
+org.aposin.licensescout.license
+org.aposin.licensescout.model
+org.aposin.licensescout.util

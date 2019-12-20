@@ -1,0 +1,1 @@
+typeSearchIndex = [{"p":"org.aposin.licensescout.mojo","l":"AbstractScanMojoTest"},{"l":"All Classes","url":"allclasses-index.html"},{"p":"org.aposin.licensescout.mojo","l":"JavaScanMojoTest"},{"p":"org.aposin.licensescout.mojo","l":"NpmScanMojoTest"}]

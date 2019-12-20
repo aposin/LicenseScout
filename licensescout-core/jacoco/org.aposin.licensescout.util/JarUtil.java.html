@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JarUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.util</a> &gt; <span class="el_source">JarUtil.java</span></div><h1>JarUtil.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.util;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
+import java.util.jar.Manifest;
+
+/**
+ * Utility methods to obtain information from a JAR's MANIFEST.MF file.
+ *
+ */
+public class JarUtil {
+
+    /**
+     * Private constructor.
+     */
+    private JarUtil() {
+        // DO NOTHING
+    }
+
+    /**
+     * Tries to obtains meta information for a MANIFEST.MF that is available as a file.
+     * 
+     * &lt;p&gt;The method tries to extract the following information from the manifest:&lt;/p&gt;
+     * &lt;ul&gt;
+     * &lt;li&gt;a version number, extracted from the main attributes &quot;Bundle-Version&quot;,
+     * &quot;Implementation-Version&quot;, &quot;Specification-Version&quot; or &quot;Major-Version&quot;&lt;/li&gt;
+     * &lt;li&gt;a license URL, extracted from the main attribute &quot;Bundle-License&quot;&lt;/li&gt;
+     * &lt;li&gt;a vendor name, extracted from the main attribute &quot;Bundle-Vendor&quot;&lt;/li&gt;
+     * &lt;/ul&gt;
+     * &lt;p&gt;This method is intended for unpacked JARs.&lt;/p&gt;
+     * 
+     * @param file a manifest file
+     * @param log a logger
+     * @return an object containing version, license URL and vendor name. The
+     *         information in the object may be &lt;code&gt;null&lt;/code&gt;. The object itself
+     *         is never &lt;code&gt;null&lt;/code&gt;.
+     * @throws IOException
+     * 
+     * @see #getArchiveMetaInformationFromManifest(File, ILFLog)
+     * @see #getArchiveMetaInformationFromManifest(InputStream, ILFLog)
+     */
+    public static ArchiveMetaInformation getArchiveMetaInformationFromManifestFile(final File file, final ILFLog log)
+            throws IOException {
+<span class="fc" id="L64">        try (final InputStream is = new FileInputStream(file)) {</span>
+<span class="fc" id="L65">            final Manifest manifest = new Manifest(is);</span>
+<span class="fc" id="L66">            return getArchiveMetaInformationFromManifestObject(manifest, log, file.getAbsolutePath());</span>
+        }
+    }
+
+    /**
+     * Tries to obtains meta information for a JAR from its MANIFEST.MF.
+     * 
+     * &lt;p&gt;The method tries to extract the following information from the manifest:&lt;/p&gt;
+     * &lt;ul&gt;
+     * &lt;li&gt;a version number, extracted from the main attributes &quot;Bundle-Version&quot;,
+     * &quot;Implementation-Version&quot;, &quot;Specification-Version&quot; or &quot;Major-Version&quot;&lt;/li&gt;
+     * &lt;li&gt;a license URL, extracted from the main attribute &quot;Bundle-License&quot;&lt;/li&gt;
+     * &lt;li&gt;a vendor name, extracted from the main attribute &quot;Bundle-Vendor&quot;&lt;/li&gt;
+     * &lt;/ul&gt;
+     * &lt;p&gt;This method is intended for packed JARs available as file, i.e. as part of an unpacked JAR.&lt;/p&gt;
+     * 
+     * @param file a JAR file
+     * @param log a logger
+     * @return an object containing version, license URL and vendor name. The
+     *         information in the object may be &lt;code&gt;null&lt;/code&gt;. The object itself
+     *         is never &lt;code&gt;null&lt;/code&gt;.
+     * @throws IOException
+     * 
+     * @see #getArchiveMetaInformationFromManifestFile(File, ILFLog)
+     * @see #getArchiveMetaInformationFromManifest(InputStream, ILFLog)
+     */
+    public static ArchiveMetaInformation getArchiveMetaInformationFromManifest(final File file, final ILFLog log)
+            throws IOException {
+<span class="fc" id="L94">        final String sourceForErrorText = file.getAbsolutePath();</span>
+<span class="fc" id="L95">        try (final JarFile jarFile = new JarFile(file)) {</span>
+<span class="fc" id="L96">            final Manifest manifest = jarFile.getManifest();</span>
+<span class="fc" id="L97">            return getArchiveMetaInformationFromManifestObject(manifest, log, sourceForErrorText);</span>
+        }
+    }
+
+    /**
+     * Tries to obtains meta information for a JAR from its MANIFEST.MF.
+     * 
+     * &lt;p&gt;The method tries to extract the following information from the manifest:&lt;/p&gt;
+     * &lt;ul&gt;
+     * &lt;li&gt;a version number, extracted from the main attributes &quot;Bundle-Version&quot;,
+     * &quot;Implementation-Version&quot;, &quot;Specification-Version&quot; or &quot;Major-Version&quot;&lt;/li&gt;
+     * &lt;li&gt;a license URL, extracted from the main attribute &quot;Bundle-License&quot;&lt;/li&gt;
+     * &lt;li&gt;a vendor name, extracted from the main attribute &quot;Bundle-Vendor&quot;&lt;/li&gt;
+     * &lt;/ul&gt;
+     * &lt;p&gt;This method is intended for packed JARs available from inside another packed JAR.&lt;/p&gt;
+     * 
+     * @param inputStream a JAR file
+     * @param log a logger
+     * @return an object containing version, license URL and vendor name. The
+     *         information in the object may be &lt;code&gt;null&lt;/code&gt;. The object itself
+     *         is never &lt;code&gt;null&lt;/code&gt;.
+     * @throws IOException
+     * 
+     * @see #getArchiveMetaInformationFromManifestFile(File, ILFLog)
+     * @see #getArchiveMetaInformationFromManifest(File, ILFLog)
+     */
+    public static ArchiveMetaInformation getArchiveMetaInformationFromManifest(final InputStream inputStream,
+                                                                               final ILFLog log)
+            throws IOException {
+<span class="fc" id="L126">        final String sourceForErrorText = &quot;input stream&quot;;</span>
+<span class="fc" id="L127">        try (final JarInputStream jarFile = new JarInputStream(inputStream)) {</span>
+<span class="fc" id="L128">            final Manifest manifest = jarFile.getManifest();</span>
+<span class="fc" id="L129">            return getArchiveMetaInformationFromManifestObject(manifest, log, sourceForErrorText);</span>
+        }
+    }
+
+    private static ArchiveMetaInformation getArchiveMetaInformationFromManifestObject(final Manifest manifest,
+                                                                                      final ILFLog log,
+                                                                                      final String sourceForErrorText) {
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">        if (manifest != null) {</span>
+<span class="fc" id="L137">            final String version = getVersionFromManifest(manifest, log);</span>
+<span class="fc" id="L138">            final String licenseUrl = getLicenseFromManifest(manifest, log);</span>
+<span class="fc" id="L139">            final String vendor = getVendorFromManifest(manifest, log);</span>
+<span class="fc" id="L140">            return new ArchiveMetaInformation(version, licenseUrl, vendor);</span>
+        } else {
+<span class="nc" id="L142">            log.info(&quot;cannot find manifest in &quot; + sourceForErrorText);</span>
+<span class="nc" id="L143">            return ArchiveMetaInformation.NO_INFORMATION;</span>
+        }
+    }
+
+    /**
+     * Tries to find a version number from a manifest.
+     * 
+     * &lt;p&gt;The method considers the following main attributes of the manifest, in the order listed:&lt;/p&gt;
+     * &lt;ol&gt;
+     * &lt;li&gt;Bundle-Version&lt;/li&gt;
+     * &lt;li&gt;Implementation-Version&lt;/li&gt;
+     * &lt;li&gt;Specification-Version&lt;/li&gt;
+     * &lt;li&gt;Major-Version&lt;/li&gt;
+     * &lt;/ol&gt;
+     * &lt;p&gt;The first present is used. If none is present, &lt;code&gt;null&lt;/code&gt; is returned.&lt;/p&gt;
+     * 
+     * @param manifest a manifest from a JAR
+     * @param log a logger
+     * @return a string containing a version number or &lt;code&gt;null&lt;/code&gt;
+     * 
+     */
+    private static String getVersionFromManifest(final Manifest manifest, final ILFLog log) {
+<span class="fc" id="L165">        final Attributes mainAttributes = manifest.getMainAttributes();</span>
+<span class="fc" id="L166">        final String bundleVersion = mainAttributes.getValue(&quot;Bundle-Version&quot;);</span>
+<span class="fc" id="L167">        log.debug(&quot;Bundle-Version: &quot; + bundleVersion);</span>
+<span class="fc" id="L168">        final String implementationVersion = mainAttributes.getValue(&quot;Implementation-Version&quot;);</span>
+<span class="fc" id="L169">        log.debug(&quot;Implementation-Version: &quot; + implementationVersion);</span>
+<span class="fc" id="L170">        final String specificationVersion = mainAttributes.getValue(&quot;Specification-Version&quot;);</span>
+<span class="fc" id="L171">        log.debug(&quot;Specification-Version: &quot; + specificationVersion);</span>
+<span class="fc" id="L172">        final String majorVersion = mainAttributes.getValue(&quot;Major-Version&quot;);</span>
+<span class="fc" id="L173">        log.debug(&quot;Major-Version: &quot; + majorVersion);</span>
+<span class="pc bpc" id="L174" title="1 of 2 branches missed.">        if (bundleVersion != null) {</span>
+<span class="fc" id="L175">            return bundleVersion;</span>
+<span class="nc bnc" id="L176" title="All 2 branches missed.">        } else if (implementationVersion != null) {</span>
+<span class="nc" id="L177">            return implementationVersion;</span>
+<span class="nc bnc" id="L178" title="All 2 branches missed.">        } else if (specificationVersion != null) {</span>
+<span class="nc" id="L179">            return specificationVersion;</span>
+        } else {
+            // may be null
+<span class="nc" id="L182">            return majorVersion;</span>
+        }
+    }
+
+    /**
+     * Tries to find a license URL from a manifest.
+     * 
+     * &lt;p&gt;The method considers the following main attributes of the manifest, in the order listed:&lt;/p&gt;
+     * &lt;ol&gt;
+     * &lt;li&gt;Bundle-License&lt;/li&gt;
+     * &lt;/ol&gt;
+     * &lt;p&gt;The first present is used. If none is present, &lt;code&gt;null&lt;/code&gt; is returned.&lt;/p&gt;
+     * 
+     * @param manifest a manifest from a JAR
+     * @param log a logger
+     * @return a string containing a license URL or &lt;code&gt;null&lt;/code&gt;
+     */
+    private static String getLicenseFromManifest(final Manifest manifest, final ILFLog log) {
+<span class="fc" id="L200">        final Attributes mainAttributes = manifest.getMainAttributes();</span>
+<span class="fc" id="L201">        final String bundleLicense = mainAttributes.getValue(&quot;Bundle-License&quot;);</span>
+<span class="fc" id="L202">        log.debug(&quot;Bundle-License: &quot; + bundleLicense);</span>
+<span class="fc" id="L203">        return bundleLicense;</span>
+    }
+
+    /**
+     * Tries to find a vendor name from a manifest.
+     * 
+     * &lt;p&gt;The method considers the following main attributes of the manifest, in the order listed:&lt;/p&gt;
+     * &lt;ol&gt;
+     * &lt;li&gt;Bundle-Vendor&lt;/li&gt;
+     * &lt;/ol&gt;
+     * &lt;p&gt;The first present is used. If none is present, &lt;code&gt;null&lt;/code&gt; is returned.&lt;/p&gt;
+     * 
+     * @param manifest a manifest from a JAR
+     * @param log a logger
+     * @return a string containing a vendor name or &lt;code&gt;null&lt;/code&gt;
+     */
+    private static String getVendorFromManifest(final Manifest manifest, final ILFLog log) {
+<span class="fc" id="L220">        final Attributes mainAttributes = manifest.getMainAttributes();</span>
+<span class="fc" id="L221">        final String bundleVendor = mainAttributes.getValue(&quot;Bundle-Vendor&quot;);</span>
+<span class="fc" id="L222">        log.debug(&quot;Bundle-Vendor: &quot; + bundleVendor);</span>
+<span class="fc" id="L223">        return bundleVendor;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

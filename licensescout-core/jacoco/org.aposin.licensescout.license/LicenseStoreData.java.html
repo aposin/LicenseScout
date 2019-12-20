@@ -1,0 +1,654 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LicenseStoreData.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.license</a> &gt; <span class="el_source">LicenseStoreData.java</span></div><h1>LicenseStoreData.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.license;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.apache.commons.lang3.StringUtils;
+import org.aposin.licensescout.model.Notice;
+import org.aposin.licensescout.model.Notices;
+import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.sax.AbstractSaxHandler;
+import org.aposin.licensescout.util.sax.IElementHandler;
+import org.aposin.licensescout.util.sax.NopElementHandler;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+
+/**
+ * Collection of licenses and mappings of names and URLs to licenses.
+ * 
+ * &lt;p&gt;Initialisation:&lt;/p&gt;
+ * &lt;ol&gt;
+ * &lt;li&gt;Create an instance&lt;/li&gt;
+ * &lt;li&gt;Call {@link #readLicenses(InputStream, Notices, boolean, ILFLog)} to read in the licenses from a file&lt;/li&gt;
+ * &lt;li&gt;Call {@link #readNameMappings(InputStream, ILFLog)} and {@link #readUrlMappings(InputStream, ILFLog)}&lt;/li&gt;
+ * &lt;/ol&gt;
+ */
+public class LicenseStoreData {
+
+    /**
+     * Maps detection strings to lists of licenses.
+     */
+<span class="fc" id="L60">    private Map&lt;String, List&lt;License&gt;&gt; detectionStringMap = new HashMap&lt;&gt;();</span>
+    /**
+     * Maps SPDX identifiers to licenses
+     */
+<span class="fc" id="L64">    private Map&lt;String, License&gt; spdxStore = new HashMap&lt;&gt;();</span>
+    /**
+     * Maps license URLs associated with a license directly to licenses.
+     */
+<span class="fc" id="L68">    private Map&lt;String, License&gt; urlStore = new HashMap&lt;&gt;();</span>
+    /**
+     * Maps license URLs from the external URL mapping to licenses.
+     */
+<span class="fc" id="L72">    private Map&lt;String, List&lt;License&gt;&gt; urlMappings = new HashMap&lt;&gt;();</span>
+    /**
+     * Maps license names from the external name mapping to licenses.
+     */
+<span class="fc" id="L76">    private Map&lt;String, List&lt;License&gt;&gt; nameMappings = new HashMap&lt;&gt;();</span>
+
+    /**
+     * Constructor.
+     */
+<span class="fc" id="L81">    public LicenseStoreData() {</span>
+        // DO NOTHING
+<span class="fc" id="L83">    }</span>
+
+    private void addToSpdxAndUrlStore(final License license, final ILFLog log) {
+<span class="fc" id="L86">        final String spdxIdentifier = license.getSpdxIdentifier();</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">        if (!StringUtils.isEmpty(spdxIdentifier)) {</span>
+<span class="fc" id="L88">            final License existingLicense = spdxStore.get(spdxIdentifier);</span>
+<span class="pc bpc" id="L89" title="3 of 4 branches missed.">            if (existingLicense != null &amp;&amp; !existingLicense.equals(license)) {</span>
+<span class="nc" id="L90">                log.warn(&quot;double SPDX identifier: '&quot; + spdxIdentifier + &quot;'&quot;);</span>
+            }
+<span class="fc" id="L92">            spdxStore.put(spdxIdentifier, license);</span>
+        }
+<span class="fc" id="L94">        final String url = license.getUrlPublic();</span>
+<span class="fc" id="L95">        addToUrlStore(url, license, log);</span>
+<span class="fc bfc" id="L96" title="All 2 branches covered.">        for (final String secondaryUrl : license.getSecondaryUrls()) {</span>
+<span class="fc" id="L97">            addToUrlStore(secondaryUrl, license, log);</span>
+<span class="fc" id="L98">        }</span>
+<span class="fc" id="L99">    }</span>
+
+    private void addToUrlStore(final String url, final License license, ILFLog log) {
+<span class="fc bfc" id="L102" title="All 2 branches covered.">        if (!StringUtils.isEmpty(url)) {</span>
+<span class="fc" id="L103">            final License existingLicense = urlStore.get(url);</span>
+<span class="pc bpc" id="L104" title="3 of 4 branches missed.">            if (existingLicense != null &amp;&amp; !existingLicense.equals(license)) {</span>
+<span class="nc" id="L105">                log.warn(&quot;double License URL: '&quot; + url + &quot;'&quot;);</span>
+            }
+<span class="fc" id="L107">            urlStore.put(url, license);</span>
+        }
+<span class="fc" id="L109">    }</span>
+
+    /**
+     * Gets the license from the license store by the SPDX identifier.
+     * 
+     * @param spdxIdentifier the SPDX short identifier
+     * @return the license or null
+     */
+    public License getLicenseBySpdxIdentifier(final String spdxIdentifier) {
+<span class="fc" id="L118">        return spdxStore.get(spdxIdentifier);</span>
+    }
+
+    /**
+     * Gets the license from the license store by the public URL.
+     * 
+     * @param url the URL
+     * @return the license or null
+     */
+    public License getLicenseByPublicUrl(final String url) {
+<span class="fc" id="L128">        return urlStore.get(url);</span>
+    }
+
+    /**
+     * Gets the license from the license store by the public URL.
+     * 
+     * @param url the URL
+     * @return a list of licenses or null
+     */
+    public List&lt;License&gt; getLicensesFromUrlMapping(final String url) {
+<span class="nc" id="L138">        return urlMappings.get(url);</span>
+    }
+
+    /**
+     * Gets the license from the license store by license name.
+     * 
+     * @param licenseName a license name
+     * @return a list of licenses or null
+     */
+    public List&lt;License&gt; getLicensesFromNameMapping(final String licenseName) {
+<span class="fc" id="L148">        return nameMappings.get(licenseName);</span>
+    }
+
+    /**
+     * Exposes the internal data structure of the license store.
+     * 
+     * &lt;p&gt;Used for automatic detection of licenses by strings in {@link LicenseUtil#detectLicenses(BufferedReader, LicenseStoreData)}.&lt;/p&gt;
+     * 
+     * @return a set of license definitions
+     */
+    public Set&lt;Entry&lt;String, List&lt;License&gt;&gt;&gt; getLicenseDetectionStringMap() {
+<span class="fc" id="L159">        return detectionStringMap.entrySet();</span>
+    }
+
+    /**
+     * Reads known licenses from an XML file.
+     * @param inputStream 
+     * @param notices 
+     * @param validateXml true if the license XML file should be validated, false otherwise
+     * @param log the logger
+     * @throws IOException
+     * @throws SAXException 
+     * @throws ParserConfigurationException 
+     */
+    public void readLicenses(final InputStream inputStream, final Notices notices, boolean validateXml,
+                             final ILFLog log)
+            throws IOException, ParserConfigurationException, SAXException {
+
+<span class="fc" id="L176">        final SAXParserFactory spf = SAXParserFactory.newInstance();</span>
+<span class="fc" id="L177">        spf.setNamespaceAware(true);</span>
+<span class="fc" id="L178">        spf.setValidating(validateXml);</span>
+<span class="fc" id="L179">        final SAXParser saxParser = spf.newSAXParser();</span>
+<span class="fc" id="L180">        final XMLReader xmlReader = saxParser.getXMLReader();</span>
+<span class="fc" id="L181">        xmlReader.setContentHandler(new LicenseSaxHandler(notices, log));</span>
+<span class="fc" id="L182">        xmlReader.parse(new InputSource(inputStream));</span>
+
+<span class="fc" id="L184">        addNoManualInformationLicense(log);</span>
+<span class="fc" id="L185">    }</span>
+
+    private void addNoManualInformationLicense(final ILFLog log) {
+<span class="fc" id="L188">        final License license = new License(LicenseSpdxIdentifier.NO_MANUAL_INFORMATION, &quot;no manual information&quot;,</span>
+                LegalStatus.UNKNOWN, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, null);
+<span class="fc" id="L190">        addToSpdxAndUrlStore(license, log);</span>
+<span class="fc" id="L191">    }</span>
+
+    /**
+     * Reads license URL mappings from a CSV file.
+     * 
+     * @param inputStream
+     * @param log the logger
+     * @throws IOException
+     */
+    public void readUrlMappings(final InputStream inputStream, final ILFLog log) throws IOException {
+<span class="nc" id="L201">        String line = &quot;&quot;;</span>
+<span class="nc" id="L202">        final String cvsSplitBy = &quot;,&quot;;</span>
+
+<span class="nc" id="L204">        try (final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, &quot;UTF-8&quot;))) {</span>
+
+<span class="nc bnc" id="L206" title="All 2 branches missed.">            while ((line = br.readLine()) != null) {</span>
+<span class="nc bnc" id="L207" title="All 4 branches missed.">                if (StringUtils.isEmpty(line) || line.startsWith(&quot;#&quot;)) {</span>
+<span class="nc" id="L208">                    continue;</span>
+                }
+<span class="nc" id="L210">                final String[] values = line.split(cvsSplitBy);</span>
+<span class="nc" id="L211">                final String url = values[0].trim();</span>
+<span class="nc" id="L212">                final int numLicenseNames = values.length - 1;</span>
+<span class="nc" id="L213">                final List&lt;License&gt; licenses = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L214" title="All 2 branches missed.">                for (int i = 0; i &lt; numLicenseNames; i++) {</span>
+<span class="nc" id="L215">                    final String spdxIdentifier = values[i + 1].trim();</span>
+<span class="nc" id="L216">                    final License license = getLicenseBySpdxIdentifier(spdxIdentifier);</span>
+<span class="nc bnc" id="L217" title="All 2 branches missed.">                    if (license != null) {</span>
+<span class="nc" id="L218">                        licenses.add(license);</span>
+                    } else {
+<span class="nc" id="L220">                        log.info(&quot;readUrlMappings: SPDX identifier not found: &quot; + spdxIdentifier);</span>
+                    }
+                }
+<span class="nc" id="L223">                urlMappings.put(url, licenses);</span>
+<span class="nc" id="L224">            }</span>
+        }
+<span class="nc" id="L226">    }</span>
+
+    /**
+     * Reads license name mappings from a CSV file.
+     * 
+     * @param inputStream
+     * @param log the logger
+     * @throws IOException
+     */
+    public void readNameMappings(final InputStream inputStream, final ILFLog log) throws IOException {
+<span class="nc" id="L236">        String line = &quot;&quot;;</span>
+<span class="nc" id="L237">        final String cvsSplitBy = &quot;,&quot;;</span>
+
+<span class="nc" id="L239">        try (final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, &quot;UTF-8&quot;))) {</span>
+
+<span class="nc bnc" id="L241" title="All 2 branches missed.">            while ((line = br.readLine()) != null) {</span>
+<span class="nc bnc" id="L242" title="All 4 branches missed.">                if (StringUtils.isEmpty(line) || line.startsWith(&quot;#&quot;)) {</span>
+<span class="nc" id="L243">                    continue;</span>
+                }
+<span class="nc" id="L245">                final String[] values = line.split(cvsSplitBy);</span>
+<span class="nc" id="L246">                final String mappedName = values[0].trim();</span>
+<span class="nc" id="L247">                final int numLicenseNames = values.length - 1;</span>
+<span class="nc" id="L248">                final List&lt;License&gt; licenses = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L249" title="All 2 branches missed.">                for (int i = 0; i &lt; numLicenseNames; i++) {</span>
+<span class="nc" id="L250">                    final String spdxIdentifier = values[i + 1].trim();</span>
+<span class="nc" id="L251">                    final License license = getLicenseBySpdxIdentifier(spdxIdentifier);</span>
+<span class="nc bnc" id="L252" title="All 2 branches missed.">                    if (license != null) {</span>
+<span class="nc" id="L253">                        licenses.add(license);</span>
+                    } else {
+<span class="nc" id="L255">                        log.info(&quot;readNameMappings: SPDX identifier not found: &quot; + spdxIdentifier);</span>
+                    }
+                }
+<span class="nc" id="L258">                nameMappings.put(mappedName, licenses);</span>
+<span class="nc" id="L259">            }</span>
+        }
+<span class="nc" id="L261">    }</span>
+
+    private class LicenseSaxHandler extends AbstractSaxHandler {
+
+        private static final String ELEMENT_LICENSES = &quot;licenses&quot;;
+        private static final String ELEMENT_LICENSE = &quot;license&quot;;
+        private static final String ELEMENT_SPDX_IDENTIFIER = &quot;spdxIdentifier&quot;;
+        private static final String ELEMENT_LEGAL_STATUS = &quot;legalStatus&quot;;
+        private static final String ELEMENT_NAME = &quot;name&quot;;
+        private static final String ELEMENT_AUTHOR = &quot;author&quot;;
+        private static final String ELEMENT_VERSION = &quot;version&quot;;
+        private static final String ELEMENT_ALTERNATIVE_VERSION = &quot;alternativeVersion&quot;;
+        private static final String ELEMENT_PUBLIC_URL = &quot;publicUrl&quot;;
+        private static final String ELEMENT_SECONDARY_URL = &quot;secondaryUrl&quot;;
+        private static final String ELEMENT_LICENSE_SET = &quot;licenseSet&quot;;
+        private static final String ELEMENT_DETECTION_STRING = &quot;detectionString&quot;;
+        private static final String ELEMENT_NOTICE = &quot;notice&quot;;
+        private static final String ELEMENT_LICENSE_TEXT = &quot;licenseText&quot;;
+
+        private final Notices notices;
+<span class="fc" id="L281">        private final Map&lt;String, License&gt; licenseInternalIds = new HashMap&lt;&gt;();</span>
+        private String licenseInternalId;
+        private String spdxIdentifier;
+        private LegalStatus legalStatus;
+        private String name;
+        private String author;
+        private String version;
+        private List&lt;String&gt; alternativeVersions;
+        private String publicUrl;
+        private List&lt;String&gt; secondaryUrls;
+        private List&lt;License&gt; licenseSet;
+        private List&lt;String&gt; detectionStrings;
+        private Notice notice;
+        private String licenseText;
+
+<span class="fc" id="L296">        private final IElementHandler standardLicenseHandler = new StandardLicenseHandler();</span>
+<span class="fc" id="L297">        private final IElementHandler licenseSetLicenseHandler = new LicenseSetLicenseHandler();</span>
+
+        /**
+         * Constructor.
+         * @param notices 
+         * @param log the logger
+         */
+<span class="fc" id="L304">        public LicenseSaxHandler(final Notices notices, final ILFLog log) {</span>
+<span class="fc" id="L305">            super(log);</span>
+<span class="fc" id="L306">            this.notices = notices;</span>
+<span class="fc" id="L307">            setElementHandler(new NopElementHandler(ELEMENT_LICENSES));</span>
+<span class="fc" id="L308">            setElementHandler(standardLicenseHandler);</span>
+<span class="fc" id="L309">            setElementHandler(new SpdxIdentifierElementHandler());</span>
+<span class="fc" id="L310">            setElementHandler(new LegalStatusElementHandler());</span>
+<span class="fc" id="L311">            setElementHandler(new NameElementHandler());</span>
+<span class="fc" id="L312">            setElementHandler(new AuthorElementHandler());</span>
+<span class="fc" id="L313">            setElementHandler(new VersionElementHandler());</span>
+<span class="fc" id="L314">            setElementHandler(new AlternativeVersionElementHandler());</span>
+<span class="fc" id="L315">            setElementHandler(new PublicUrlElementHandler());</span>
+<span class="fc" id="L316">            setElementHandler(new SecondaryUrlElementHandler());</span>
+<span class="fc" id="L317">            setElementHandler(new LicenseSetElementHandler());</span>
+<span class="fc" id="L318">            setElementHandler(new DetectionStringElementHandler());</span>
+<span class="fc" id="L319">            setElementHandler(new NoticeElementHandler());</span>
+<span class="fc" id="L320">            setElementHandler(new LicenseTextElementHandler());</span>
+<span class="fc" id="L321">        }</span>
+
+        /**
+         * @return the notices
+         */
+        protected final Notices getNotices() {
+<span class="nc" id="L327">            return notices;</span>
+        }
+
+<span class="fc" id="L330">        private class StandardLicenseHandler implements IElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="fc" id="L337">                return ELEMENT_LICENSE;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            public void startElement(String uri, String localName, String qName, final Attributes attributes) {
+<span class="fc" id="L343">                licenseInternalId = attributes.getValue(ATTRIBUTE_ID);</span>
+<span class="fc" id="L344">                spdxIdentifier = null;</span>
+<span class="fc" id="L345">                legalStatus = null;</span>
+<span class="fc" id="L346">                name = null;</span>
+<span class="fc" id="L347">                author = null;</span>
+<span class="fc" id="L348">                version = null;</span>
+<span class="fc" id="L349">                alternativeVersions = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L350">                publicUrl = null;</span>
+<span class="fc" id="L351">                secondaryUrls = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L352">                notice = null;</span>
+<span class="fc" id="L353">                licenseText = null;</span>
+<span class="fc" id="L354">            }</span>
+
+            /** {@inheritDoc} */
+            @Override
+            public void endElement(String uri, String localName, String qName) {
+<span class="pc bpc" id="L359" title="1 of 2 branches missed.">                if (name == null) {</span>
+<span class="nc" id="L360">                    getLog().warn(&quot;No name for license ID: '&quot; + licenseInternalId + &quot;'&quot;);</span>
+                }
+<span class="fc bfc" id="L362" title="All 2 branches covered.">                if (licenseText == null) {</span>
+<span class="fc" id="L363">                    getLog().warn(&quot;No license text for license ID: '&quot; + licenseInternalId + &quot;'&quot;);</span>
+<span class="fc" id="L364">                    licenseText = &quot;No license text&quot;;</span>
+                }
+<span class="fc" id="L366">                final License license = new License(spdxIdentifier, name, legalStatus, author, version, publicUrl,</span>
+                        licenseText, notice);
+<span class="fc bfc" id="L368" title="All 2 branches covered.">                for (final String alternativeVersion : alternativeVersions) {</span>
+<span class="fc" id="L369">                    license.addAlternativeVersion(alternativeVersion);</span>
+<span class="fc" id="L370">                }</span>
+<span class="fc bfc" id="L371" title="All 2 branches covered.">                for (final String secondaryUrl : secondaryUrls) {</span>
+<span class="fc" id="L372">                    license.addSecondaryUrl(secondaryUrl);</span>
+<span class="fc" id="L373">                }</span>
+<span class="fc" id="L374">                licenseInternalIds.put(licenseInternalId, license);</span>
+<span class="fc" id="L375">                addToSpdxAndUrlStore(license, getLog());</span>
+<span class="fc" id="L376">            }</span>
+        }
+
+<span class="fc" id="L379">        private class LicenseSetLicenseHandler implements IElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="fc" id="L386">                return ELEMENT_LICENSE;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            public void startElement(String uri, String localName, String qName, final Attributes attributes)
+                    throws SAXException {
+<span class="fc" id="L393">                final String licenseInternalIdref = attributes.getValue(ATTRIBUTE_IDREF);</span>
+<span class="pc bpc" id="L394" title="1 of 2 branches missed.">                if (!StringUtils.isEmpty(licenseInternalIdref)) {</span>
+<span class="fc" id="L395">                    final License license = licenseInternalIds.get(licenseInternalIdref);</span>
+<span class="pc bpc" id="L396" title="1 of 2 branches missed.">                    if (license != null) {</span>
+<span class="fc" id="L397">                        licenseSet.add(license);</span>
+                    } else {
+<span class="nc" id="L399">                        throw new SAXException(&quot;no license found with id: '&quot; + licenseInternalIdref + &quot;'&quot;);</span>
+                    }
+<span class="fc" id="L401">                } else {</span>
+<span class="nc" id="L402">                    throw new SAXException(&quot;no idref attribute&quot;);</span>
+                }
+<span class="fc" id="L404">            }</span>
+
+            /** {@inheritDoc} */
+            @Override
+            public void endElement(String uri, String localName, String qName) {
+                // DO NOTHING
+<span class="fc" id="L410">            }</span>
+        }
+
+<span class="fc" id="L413">        private class LicenseSetElementHandler implements IElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="fc" id="L420">                return ELEMENT_LICENSE_SET;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            public void startElement(String uri, String localName, String qName, final Attributes attributes) {
+<span class="fc" id="L426">                detectionStrings = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L427">                licenseSet = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L428">                setInLicenseSet(true);</span>
+<span class="fc" id="L429">            }</span>
+
+            /** {@inheritDoc} */
+            @Override
+            public void endElement(String uri, String localName, String qName) {
+<span class="fc bfc" id="L434" title="All 2 branches covered.">                for (final String detectionString : detectionStrings) {</span>
+<span class="fc" id="L435">                    addToDetectionStringMap(detectionString, licenseSet, getLog());</span>
+<span class="fc" id="L436">                }</span>
+<span class="fc" id="L437">                setInLicenseSet(false);</span>
+<span class="fc" id="L438">            }</span>
+
+            private void setInLicenseSet(final boolean inLicenseSet) {
+<span class="fc bfc" id="L441" title="All 2 branches covered.">                setElementHandler(inLicenseSet ? licenseSetLicenseHandler : standardLicenseHandler);</span>
+<span class="fc" id="L442">            }</span>
+
+            /**
+             * @param detectionString
+             * @param licenses
+             * @param log the logger
+             */
+            private void addToDetectionStringMap(final String detectionString, final List&lt;License&gt; licenses,
+                                                 final ILFLog log) {
+<span class="pc bpc" id="L451" title="1 of 2 branches missed.">                if (!StringUtils.isEmpty(detectionString)) {</span>
+<span class="pc bpc" id="L452" title="1 of 2 branches missed.">                    if (detectionStringMap.containsKey(detectionString)) {</span>
+<span class="nc" id="L453">                        log.warn(&quot;duplicated detection string: '&quot; + detectionString + &quot;'&quot;);</span>
+                    }
+<span class="fc" id="L455">                    detectionStringMap.put(detectionString, licenses);</span>
+                }
+<span class="fc" id="L457">            }</span>
+
+        }
+
+<span class="fc" id="L461">        private class SpdxIdentifierElementHandler extends AbstractTextElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="fc" id="L468">                return ELEMENT_SPDX_IDENTIFIER;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            protected void processText(final String text) {
+<span class="fc" id="L474">                spdxIdentifier = text;</span>
+<span class="fc" id="L475">            }</span>
+        }
+
+<span class="fc" id="L478">        private class NameElementHandler extends AbstractTextElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="fc" id="L485">                return ELEMENT_NAME;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            protected void processText(final String text) {
+<span class="fc" id="L491">                name = text;</span>
+<span class="fc" id="L492">            }</span>
+        }
+
+<span class="fc" id="L495">        private class LegalStatusElementHandler extends AbstractTextElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="fc" id="L502">                return ELEMENT_LEGAL_STATUS;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            protected void processText(final String text) {
+<span class="fc" id="L508">                legalStatus = LegalStatus.valueOf(text);</span>
+<span class="fc" id="L509">            }</span>
+        }
+
+<span class="fc" id="L512">        private class AuthorElementHandler extends AbstractTextElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="fc" id="L519">                return ELEMENT_AUTHOR;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            protected void processText(final String text) {
+<span class="fc" id="L525">                author = text;</span>
+<span class="fc" id="L526">            }</span>
+        }
+
+<span class="fc" id="L529">        private class VersionElementHandler extends AbstractTextElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="fc" id="L536">                return ELEMENT_VERSION;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            protected void processText(final String text) {
+<span class="fc" id="L542">                version = text;</span>
+<span class="fc" id="L543">            }</span>
+        }
+
+<span class="fc" id="L546">        private class PublicUrlElementHandler extends AbstractTextElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="fc" id="L553">                return ELEMENT_PUBLIC_URL;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            protected void processText(final String text) {
+<span class="fc" id="L559">                publicUrl = text;</span>
+<span class="fc" id="L560">            }</span>
+        }
+
+<span class="fc" id="L563">        private class SecondaryUrlElementHandler extends AbstractTextElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="fc" id="L570">                return ELEMENT_SECONDARY_URL;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            protected void processText(final String text) {
+<span class="fc" id="L576">                secondaryUrls.add(text);</span>
+<span class="fc" id="L577">            }</span>
+        }
+
+<span class="fc" id="L580">        private class AlternativeVersionElementHandler extends AbstractTextElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="fc" id="L587">                return ELEMENT_ALTERNATIVE_VERSION;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            protected void processText(final String text) {
+<span class="fc" id="L593">                alternativeVersions.add(text);</span>
+<span class="fc" id="L594">            }</span>
+        }
+
+<span class="fc" id="L597">        private class DetectionStringElementHandler extends AbstractTextElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="fc" id="L604">                return ELEMENT_DETECTION_STRING;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            protected void processText(final String text) {
+<span class="fc" id="L610">                detectionStrings.add(text);</span>
+<span class="fc" id="L611">            }</span>
+        }
+
+<span class="fc" id="L614">        private class NoticeElementHandler extends AbstractTextElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="fc" id="L621">                return ELEMENT_NOTICE;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            protected void processText(final String text) {
+<span class="nc" id="L627">                final String identifier = text.trim();</span>
+<span class="nc" id="L628">                notice = getNotices().getNoticeByIdentifier(identifier);</span>
+<span class="nc bnc" id="L629" title="All 2 branches missed.">                if (notice == null) {</span>
+<span class="nc" id="L630">                    getLog().warn(&quot;Cannot find notice with ID: '&quot; + identifier + &quot;'&quot;);</span>
+                }
+<span class="nc" id="L632">            }</span>
+        }
+
+<span class="fc" id="L635">        private class LicenseTextElementHandler extends AbstractTextElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="fc" id="L642">                return ELEMENT_LICENSE_TEXT;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            protected void processText(final String text) {
+<span class="fc" id="L648">                licenseText = text;</span>
+<span class="fc" id="L649">            }</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

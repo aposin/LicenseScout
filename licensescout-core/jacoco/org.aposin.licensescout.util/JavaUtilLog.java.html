@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JavaUtilLog.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.util</a> &gt; <span class="el_source">JavaUtilLog.java</span></div><h1>JavaUtilLog.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.util;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ * Wrapper around the java.util logger.
+ * 
+ */
+public class JavaUtilLog implements ILFLog {
+
+    private final Logger log;
+
+    /**
+     * @param log
+     */
+<span class="fc" id="L32">    public JavaUtilLog(final Logger log) {</span>
+<span class="fc" id="L33">        this.log = log;</span>
+<span class="fc" id="L34">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isDebugEnabled() {
+<span class="fc" id="L41">        return log.isLoggable(Level.FINE);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void debug(CharSequence content) {
+<span class="fc" id="L49">        log.fine(content.toString());</span>
+<span class="fc" id="L50">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void debug(CharSequence content, Throwable error) {
+<span class="fc" id="L57">        log.fine(content + &quot;: &quot; + error.getMessage());</span>
+<span class="fc" id="L58">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void debug(Throwable error) {
+<span class="fc" id="L65">        log.fine(&quot;&quot; + error.getMessage());</span>
+<span class="fc" id="L66">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isInfoEnabled() {
+<span class="fc" id="L73">        return log.isLoggable(Level.INFO);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void info(CharSequence content) {
+<span class="fc" id="L81">        log.info(content.toString());</span>
+<span class="fc" id="L82">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void info(CharSequence content, Throwable error) {
+<span class="fc" id="L89">        log.info(content + &quot;: &quot; + error.getMessage());</span>
+<span class="fc" id="L90">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void info(Throwable error) {
+<span class="fc" id="L97">        log.info(error.getMessage());</span>
+<span class="fc" id="L98">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isWarnEnabled() {
+<span class="fc" id="L105">        return log.isLoggable(Level.WARNING);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void warn(CharSequence content) {
+<span class="fc" id="L113">        log.log(Level.WARNING, content.toString());</span>
+<span class="fc" id="L114">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void warn(CharSequence content, Throwable error) {
+<span class="fc" id="L121">        log.log(Level.WARNING, content + &quot;: &quot; + error.getMessage());</span>
+<span class="fc" id="L122">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void warn(Throwable error) {
+<span class="fc" id="L129">        log.log(Level.WARNING, error.getMessage());</span>
+<span class="fc" id="L130">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isErrorEnabled() {
+<span class="fc" id="L137">        return log.isLoggable(Level.SEVERE);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void error(CharSequence content) {
+<span class="fc" id="L145">        log.severe(content.toString());</span>
+<span class="fc" id="L146">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void error(CharSequence content, Throwable error) {
+<span class="fc" id="L153">        log.severe(content + &quot;: &quot; + error.getMessage());</span>
+<span class="fc" id="L154">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void error(Throwable error) {
+<span class="fc" id="L161">        log.severe(error.getMessage());</span>
+<span class="fc" id="L162">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

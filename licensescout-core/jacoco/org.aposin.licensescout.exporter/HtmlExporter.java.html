@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HtmlExporter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.exporter</a> &gt; <span class="el_source">HtmlExporter.java</span></div><h1>HtmlExporter.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.exporter;
+
+import org.apache.velocity.Template;
+import org.apache.velocity.app.Velocity;
+import org.aposin.licensescout.configuration.OutputFileType;
+
+/**
+ * The Exporter creates a HTML report listing all archives including license information.
+ * 
+ * &lt;p&gt;This implementation uses Velocity templates to generate the output.
+ * The default template used (if none is configured by the user) is at
+ * &lt;code&gt;templates/license_report_html_default.vm&lt;/code&gt;.&lt;/p&gt;
+ */
+<span class="fc" id="L29">public class HtmlExporter extends AbstractVelocityExporter {</span>
+
+    private static final String DEFAULT_TEMPLATES_LICENSE_REPORT_VM = &quot;templates/license_report_html_default.vm&quot;;
+
+    private static final String DEFAULT_TEMPLATE_ENCODING = &quot;UTF-8&quot;;
+
+<span class="fc" id="L35">    private static final IReportExporter INSTANCE = new HtmlExporter();</span>
+
+    /**
+     * Gets the single instance of Exporter.
+     * 
+     * @return single instance of Exporter
+     */
+    public static IReportExporter getInstance() {
+<span class="fc" id="L43">        return INSTANCE;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public OutputFileType getOutputFileType() {
+<span class="fc" id="L51">        return OutputFileType.HTML;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Template getDefaultTemplate() {
+<span class="fc" id="L59">        return Velocity.getTemplate(DEFAULT_TEMPLATES_LICENSE_REPORT_VM, DEFAULT_TEMPLATE_ENCODING);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

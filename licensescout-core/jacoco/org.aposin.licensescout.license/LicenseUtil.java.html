@@ -1,0 +1,614 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LicenseUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.license</a> &gt; <span class="el_source">LicenseUtil.java</span></div><h1>LicenseUtil.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.license;
+
+import static org.aposin.licensescout.license.DetectionStatus.DETECTED;
+import static org.aposin.licensescout.license.DetectionStatus.MANUAL_DETECTED;
+import static org.aposin.licensescout.license.DetectionStatus.MANUAL_SELECTED;
+import static org.aposin.licensescout.license.DetectionStatus.MULTIPLE_DETECTED;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+import org.aposin.licensescout.archive.Archive;
+import org.aposin.licensescout.archive.ArchiveIdentifierPattern;
+import org.aposin.licensescout.archive.PatternType;
+import org.aposin.licensescout.exporter.DetectionStatusStatistics;
+import org.aposin.licensescout.exporter.GeneralStatistics;
+import org.aposin.licensescout.exporter.IDetectionStatusStatistics;
+import org.aposin.licensescout.exporter.ILegalStatusStatistics;
+import org.aposin.licensescout.exporter.LegalStatusStatistics;
+import org.aposin.licensescout.model.Notice;
+import org.aposin.licensescout.model.Provider;
+import org.aposin.licensescout.util.ILFLog;
+
+/**
+ *
+ */
+public class LicenseUtil {
+
+    private static final int VERSION_LINE_TOLERANCE = 3;
+<span class="fc" id="L57">    private static final Pattern VERSION_NUMBER_PATTERN = Pattern</span>
+<span class="fc" id="L58">            .compile(&quot;.*((VERSION|V).*(\\d\\.\\d)|(VERSION|V) (\\d)).*&quot;);</span>
+
+    /**
+     * Private constructor.
+     */
+    private LicenseUtil() {
+        // DO NOTHING
+    }
+
+    /**
+     * Tries to detect a license from a text.
+     * 
+     * &lt;p&gt;This algorithm can detect multiple licenses in the same file.&lt;/p&gt;
+     * 
+     * Problem with the old version: it detects only one license per file. If a file contains more than one license, only one is detected.
+     * This version tries to detect all licenses. However, it currently does not handle well the versions. If the license name and the version are on different lines (see example below),
+     * the default version is used. In some cases, this leads to detecting Apache 1.0 as well as Apache 2.0 from the same file, while only apache 2.0 is named in the file.
+     * So the logic should be extended to use version in nearby lines.
+     * 
+     * ---
+     *                                 Apache License
+     *                           Version 2.0, January 2004
+     * ---
+     * 
+     * @param reader text input
+     * @param licenseStoreData 
+     * @return the license or an empty collection if none was detected
+     * @throws IOException signals that an I/O exception has occurred
+     */
+    public static Collection&lt;License&gt; detectLicenses(final BufferedReader reader,
+                                                     final LicenseStoreData licenseStoreData)
+            throws IOException {
+
+<span class="fc" id="L91">        final Set&lt;License&gt; allLicenses = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L92">        final List&lt;List&lt;License&gt;&gt; processedCandidateLicenseLists = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L93">        final Set&lt;Entry&lt;String, List&lt;License&gt;&gt;&gt; licenseDetectionStringMap = licenseStoreData</span>
+<span class="fc" id="L94">                .getLicenseDetectionStringMap();</span>
+<span class="fc" id="L95">        List&lt;License&gt; candidateLicenses = null;</span>
+
+        String line;
+<span class="fc" id="L98">        int lineCountAfterCandidatesFound = 0;</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">        while ((line = reader.readLine()) != null) {</span>
+
+<span class="fc" id="L101">            lineCountAfterCandidatesFound++;</span>
+<span class="fc" id="L102">            final String lineString = line.trim().toUpperCase();</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">            if (lineString.isEmpty()) {</span>
+<span class="fc" id="L104">                continue;</span>
+            }
+<span class="fc bfc" id="L106" title="All 4 branches covered.">            if (candidateLicenses != null &amp;&amp; lineCountAfterCandidatesFound &gt; VERSION_LINE_TOLERANCE) {</span>
+                /*
+                 * We are over the tolerance of the number of lines a version information is allowed after the license name if found. In this case we assume there is no more
+                 * valid information on the version, so the default license of the candidate list is selected and added to the all list.
+                 */
+<span class="fc" id="L111">                addVersionedLicenseFromCandidateList(allLicenses, candidateLicenses, null);</span>
+<span class="fc" id="L112">                candidateLicenses = null;</span>
+            }
+
+<span class="fc" id="L115">            final List&lt;License&gt; localCandidateLicenses = getCandidateLicenses(licenseDetectionStringMap, lineString);</span>
+<span class="fc" id="L116">            final boolean alreadyProcessed = processedCandidateLicenseLists.contains(localCandidateLicenses);</span>
+<span class="fc bfc" id="L117" title="All 4 branches covered.">            if (localCandidateLicenses != null &amp;&amp; !alreadyProcessed) {</span>
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">                if (candidateLicenses != null) {</span>
+                    /*
+                     * Old candidate licenses present, for which no version has been found yet, but in this line there are other (new) candidate licenses.
+                     * So select the default license from the old candidates and add this to the all list. Then make the new candidates the current ones.
+                     */
+<span class="nc" id="L123">                    addVersionedLicenseFromCandidateList(allLicenses, candidateLicenses, null);</span>
+                }
+<span class="fc" id="L125">                candidateLicenses = localCandidateLicenses;</span>
+<span class="fc" id="L126">                processedCandidateLicenseLists.add(localCandidateLicenses);</span>
+<span class="fc" id="L127">                lineCountAfterCandidatesFound = 0;</span>
+            }
+<span class="fc bfc" id="L129" title="All 2 branches covered.">            if (candidateLicenses != null) {</span>
+                /*
+                 * If we have candidate licenses, we try to find a version number. Note that this can be on the same line or on a consecutive line.
+                 * If we found a version, a license is selected and added to the overall list. Then, since we have processed the current candidate licenses they are set to null.
+                 */
+<span class="fc" id="L134">                final String version = getMatchedVersionFromLine(lineString);</span>
+<span class="fc bfc" id="L135" title="All 2 branches covered.">                if (version != null) {</span>
+<span class="fc" id="L136">                    addVersionedLicenseFromCandidateList(allLicenses, candidateLicenses, version);</span>
+<span class="fc" id="L137">                    candidateLicenses = null;</span>
+                }
+            }
+<span class="fc" id="L140">        } /* end of loop over lines */</span>
+<span class="fc bfc" id="L141" title="All 2 branches covered.">        if (candidateLicenses != null) {</span>
+            /*
+             * We have candidate licenses, but no version found in the file. Then we select the default license and add it to the all list.
+             */
+<span class="fc" id="L145">            addVersionedLicenseFromCandidateList(allLicenses, candidateLicenses, null);</span>
+        }
+<span class="fc" id="L147">        return allLicenses;</span>
+    }
+
+    /**
+     * @param allLicenses
+     * @param candidateLicenses
+     * @param version may be null - in this case the first element of the candidate licenses is selected
+     */
+    private static void addVersionedLicenseFromCandidateList(final Set&lt;License&gt; allLicenses,
+                                                             final List&lt;License&gt; candidateLicenses,
+                                                             final String version) {
+<span class="fc" id="L158">        final License license = getVersionedLicense(candidateLicenses, version);</span>
+<span class="pc bpc" id="L159" title="1 of 2 branches missed.">        if (license != null) {</span>
+<span class="fc" id="L160">            allLicenses.add(license);</span>
+        }
+<span class="fc" id="L162">    }</span>
+
+    /**
+     * @param licenseDetectionStringMap
+     * @param lineString
+     * @return may be null.
+     */
+    private static List&lt;License&gt; getCandidateLicenses(final Set&lt;Entry&lt;String, List&lt;License&gt;&gt;&gt; licenseDetectionStringMap,
+                                                      final String lineString) {
+<span class="fc bfc" id="L171" title="All 2 branches covered.">        for (final Map.Entry&lt;String, List&lt;License&gt;&gt; entry : licenseDetectionStringMap) {</span>
+<span class="fc" id="L172">            final String licenseString = entry.getKey().toUpperCase();</span>
+<span class="fc bfc" id="L173" title="All 2 branches covered.">            if (lineString.contains(licenseString)) {</span>
+<span class="fc" id="L174">                return entry.getValue();</span>
+            }
+<span class="fc" id="L176">        }</span>
+<span class="fc" id="L177">        return null; // NOSONAR - intentionally return null for faster comparison</span>
+    }
+
+    /**
+     * @param lineString
+     * @return may return null if no version number has been found.
+     */
+    /*default*/ static String getMatchedVersionFromLine(final String lineString) {
+<span class="fc" id="L185">        final Matcher matcher = VERSION_NUMBER_PATTERN.matcher(lineString.toUpperCase());</span>
+<span class="fc" id="L186">        String version = null;</span>
+<span class="fc bfc" id="L187" title="All 2 branches covered.">        if (matcher.matches()) {</span>
+<span class="fc bfc" id="L188" title="All 2 branches covered.">            if (/*matcher.groupCount() == 3 &amp;&amp;*/ matcher.group(2) != null) {</span>
+<span class="fc" id="L189">                version = matcher.group(3);</span>
+<span class="pc bpc" id="L190" title="2 of 4 branches missed.">            } else if (matcher.groupCount() &gt;= 5 &amp;&amp; matcher.group(4) != null) {</span>
+<span class="fc" id="L191">                version = matcher.group(5);</span>
+            }
+        }
+<span class="fc" id="L194">        return version;</span>
+    }
+
+    /**
+     * @param candidateLicenses
+     * @param version a string containing a version number. May be null. If null, the first element of the candidate licenses is selected and returned
+     * @return a license. Can be null if the list of candidate licenses is null or empty.
+     */
+    private static License getVersionedLicense(final List&lt;License&gt; candidateLicenses, final String version) {
+<span class="pc bpc" id="L203" title="2 of 4 branches missed.">        if (candidateLicenses != null &amp;&amp; !candidateLicenses.isEmpty()) {</span>
+<span class="fc bfc" id="L204" title="All 2 branches covered.">            if (!StringUtils.isEmpty(version)) {</span>
+<span class="pc bpc" id="L205" title="1 of 2 branches missed.">                for (final License license : candidateLicenses) {</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">                    if (isVersion(license, version)) {</span>
+<span class="fc" id="L207">                        return license;</span>
+                    }
+<span class="fc" id="L209">                }</span>
+            }
+            //no version found or no version string
+<span class="pc bpc" id="L212" title="1 of 2 branches missed.">            return candidateLicenses.isEmpty() ? null : candidateLicenses.get(0);</span>
+        } // no candidate licenses
+<span class="nc" id="L214">        return null;</span>
+    }
+
+    /**
+     * @param license
+     * @param version
+     * @return true if the license has the passed version, either as its primary version or as one of its alternative versions, false otherwise
+     */
+    private static boolean isVersion(final License license, final String version) {
+<span class="fc bfc" id="L223" title="All 4 branches covered.">        return license.getVersion().equalsIgnoreCase(version) || license.getAlternativeVersions().contains(version);</span>
+    }
+
+    /**
+     * Obtains the full name of the license, including its version number, if present.
+     * 
+     * @param license
+     * @return the full name of the license
+     */
+    public static String getLicenseNameWithVersion(final License license) {
+<span class="fc" id="L233">        String name = license.getName();</span>
+<span class="fc bfc" id="L234" title="All 2 branches covered.">        if (license.isVersionPresent()) {</span>
+<span class="fc" id="L235">            name += &quot; Version &quot; + license.getVersion();</span>
+        }
+<span class="fc" id="L237">        return name;</span>
+    }
+
+    /**
+     * Evaluates licenses and sets detection status and legal status for each archive of a collection.
+     * 
+     * @param checkedArchives information on archives with manually assigned licenses
+     * @param archives collection of archives to process
+     * @param licenseStoreData 
+     * @see #evaluateLicenses(LicenseCheckedList, Archive, LicenseStoreData)
+     * 
+     * @see DetectionStatus
+     * @see LegalStatus
+     */
+    public static void evaluateLicenses(final LicenseCheckedList checkedArchives, final Collection&lt;Archive&gt; archives,
+                                        final LicenseStoreData licenseStoreData) {
+<span class="fc bfc" id="L253" title="All 2 branches covered.">        for (final Archive archive : archives) {</span>
+<span class="fc" id="L254">            evaluateLicenses(checkedArchives, archive, licenseStoreData);</span>
+<span class="fc" id="L255">        }</span>
+<span class="fc" id="L256">    }</span>
+
+    /**
+     * Evaluates licenses and sets detection status and legal status for an archive.
+     * 
+     * @param licenseCheckedList information on archives with manually assigned licenses
+     * @param archive the archive to evaluate
+     * @param licenseStoreData 
+     * 
+     * @see DetectionStatus
+     * @see LegalStatus
+     */
+    private static void evaluateLicenses(final LicenseCheckedList licenseCheckedList, final Archive archive,
+                                         final LicenseStoreData licenseStoreData) {
+<span class="fc" id="L270">        final Set&lt;License&gt; licenses = archive.getLicenses();</span>
+<span class="fc" id="L271">        final List&lt;License&gt; detectedLicenses = new ArrayList&lt;&gt;(licenses);</span>
+<span class="fc" id="L272">        archive.setDetectedLicenses(detectedLicenses);</span>
+<span class="fc bfc" id="L273" title="All 2 branches covered.">        final boolean overWriteMode = !licenses.isEmpty();</span>
+<span class="fc" id="L274">        final DetectionStatus detectionStatus = addManualLicenses(licenseCheckedList, archive, overWriteMode);</span>
+<span class="fc" id="L275">        setDetectionStatus(archive, detectionStatus, licenseStoreData);</span>
+<span class="fc" id="L276">        setLegalStatus(archive);</span>
+<span class="fc" id="L277">    }</span>
+
+    /**
+     * @param licenseCheckedList information on archives with manually assigned licenses
+     * @param archive the archive to process
+     * @param overWriteMode if true and manual configured licenses are found, only these licenses are used (others are removed) and the returned
+     * status is {@link DetectionStatus#MANUAL_SELECTED} (instead of {@link DetectionStatus#MANUAL_DETECTED})
+     * @return the detection status to use in {@link #setDetectionStatus(Archive, DetectionStatus, LicenseStoreData)} if the status is not
+     * recognized to be {@link DetectionStatus#MANUAL_NOT_DETECTED}. The values can be {@link DetectionStatus#MANUAL_DETECTED},
+     * {@link DetectionStatus#MANUAL_SELECTED}, {@link DetectionStatus#DETECTED} or {@link DetectionStatus#MULTIPLE_DETECTED}.
+     */
+    private static DetectionStatus addManualLicenses(final LicenseCheckedList licenseCheckedList, final Archive archive,
+                                                     final boolean overWriteMode) {
+<span class="fc" id="L290">        final List&lt;License&gt; allManualLicenses = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L291">        String documentationUrl = null;</span>
+<span class="fc" id="L292">        Provider provider = null;</span>
+<span class="fc" id="L293">        Notice notice = null;</span>
+<span class="fc bfc" id="L294" title="All 2 branches covered.">        if (hasVersion(archive)) {</span>
+<span class="fc" id="L295">            final LicenseResult manualLicenses = licenseCheckedList.getManualLicense(archive.getArchiveType(),</span>
+<span class="fc" id="L296">                    archive.getFileName(), archive.getVersion());</span>
+<span class="fc bfc" id="L297" title="All 2 branches covered.">            if (manualLicenses != null) {</span>
+<span class="fc" id="L298">                allManualLicenses.addAll(manualLicenses.getLicenses());</span>
+<span class="fc" id="L299">                documentationUrl = manualLicenses.getDocumentationUrl();</span>
+<span class="fc" id="L300">                provider = manualLicenses.getProvider();</span>
+<span class="fc" id="L301">                notice = manualLicenses.getNotice();</span>
+            }
+        }
+<span class="fc bfc" id="L304" title="All 2 branches covered.">        if (archive.getMessageDigest() != null) {</span>
+<span class="fc" id="L305">            final LicenseResult manualLicenses = licenseCheckedList.getManualLicense(archive.getArchiveType(),</span>
+<span class="fc" id="L306">                    archive.getFileName(), archive.getMessageDigest());</span>
+<span class="pc bpc" id="L307" title="1 of 2 branches missed.">            if (manualLicenses != null) {</span>
+<span class="fc" id="L308">                allManualLicenses.addAll(manualLicenses.getLicenses());</span>
+<span class="fc" id="L309">                documentationUrl = manualLicenses.getDocumentationUrl();</span>
+<span class="fc" id="L310">                provider = manualLicenses.getProvider();</span>
+<span class="fc" id="L311">                notice = manualLicenses.getNotice();</span>
+            }
+        }
+        // do pattern matching only if we haven't found a license yet
+<span class="fc bfc" id="L315" title="All 2 branches covered.">        if (allManualLicenses.isEmpty()) {</span>
+<span class="fc" id="L316">            final Set&lt;Entry&lt;ArchiveIdentifierPattern, LicenseResult&gt;&gt; archivePatterns = licenseCheckedList</span>
+<span class="fc" id="L317">                    .getManualPatternArchives();</span>
+<span class="fc" id="L318">            final Iterator&lt;Entry&lt;ArchiveIdentifierPattern, LicenseResult&gt;&gt; iter = archivePatterns.iterator();</span>
+<span class="fc" id="L319">            final String name = archive.getFileName();</span>
+<span class="fc" id="L320">            final String path = archive.getPath();</span>
+<span class="pc bpc" id="L321" title="1 of 2 branches missed.">            while (iter.hasNext()) {</span>
+<span class="nc" id="L322">                final Entry&lt;ArchiveIdentifierPattern, LicenseResult&gt; entry = iter.next();</span>
+<span class="nc" id="L323">                final ArchiveIdentifierPattern aip = entry.getKey();</span>
+<span class="nc" id="L324">                final Pattern pattern = aip.getPattern();</span>
+<span class="nc bnc" id="L325" title="All 2 branches missed.">                final String checkedString = aip.getPatternType() == PatternType.PATTERN_ON_FILENAME ? name : path;</span>
+<span class="nc" id="L326">                final Matcher matcher = pattern.matcher(checkedString);</span>
+<span class="nc bnc" id="L327" title="All 2 branches missed.">                if (matcher.matches()) {</span>
+<span class="nc" id="L328">                    final LicenseResult licenseResult = entry.getValue();</span>
+<span class="nc" id="L329">                    final List&lt;License&gt; licenses = licenseResult.getLicenses();</span>
+<span class="nc" id="L330">                    allManualLicenses.addAll(licenses);</span>
+<span class="nc" id="L331">                    documentationUrl = licenseResult.getDocumentationUrl();</span>
+<span class="nc" id="L332">                    provider = licenseResult.getProvider();</span>
+<span class="nc" id="L333">                    notice = licenseResult.getNotice();</span>
+                }
+<span class="nc" id="L335">            }</span>
+        }
+<span class="fc bfc" id="L337" title="All 2 branches covered.">        if (documentationUrl != null) {</span>
+<span class="fc" id="L338">            archive.setDocumentationUrl(documentationUrl);</span>
+        }
+<span class="pc bpc" id="L340" title="1 of 2 branches missed.">        if (provider != null) {</span>
+<span class="nc" id="L341">            archive.setProvider(provider);</span>
+        }
+<span class="pc bpc" id="L343" title="1 of 2 branches missed.">        if (notice != null) {</span>
+<span class="nc" id="L344">            archive.setNotice(notice);</span>
+        }
+<span class="fc" id="L346">        return calculateDetectionStatus(archive, overWriteMode, allManualLicenses);</span>
+    }
+
+    /**
+     * @param archive
+     * @param overWriteMode
+     * @param allManualLicenses
+     * @return a detection status
+     */
+    private static DetectionStatus calculateDetectionStatus(final Archive archive, final boolean overWriteMode,
+                                                            final List&lt;License&gt; allManualLicenses) {
+<span class="fc bfc" id="L357" title="All 2 branches covered.">        final boolean multipleLicensesDetected = archive.getLicenses().size() &gt; 1;</span>
+        final DetectionStatus detectionStatus;
+<span class="fc bfc" id="L359" title="All 2 branches covered.">        if (!allManualLicenses.isEmpty()) {</span>
+<span class="fc bfc" id="L360" title="All 2 branches covered.">            if (overWriteMode) {</span>
+<span class="fc" id="L361">                archive.clearLicenses();</span>
+<span class="fc" id="L362">                detectionStatus = MANUAL_SELECTED;</span>
+            } else {
+<span class="fc" id="L364">                detectionStatus = MANUAL_DETECTED;</span>
+            }
+<span class="fc" id="L366">            addManualLicenses(archive, allManualLicenses);</span>
+        } else {
+<span class="fc bfc" id="L368" title="All 2 branches covered.">            detectionStatus = multipleLicensesDetected ? MULTIPLE_DETECTED : DETECTED;</span>
+        }
+<span class="fc" id="L370">        return detectionStatus;</span>
+    }
+
+    /**
+     * @param archive
+     * @param manualLicenses
+     * @return true if a license has been added
+     */
+    private static boolean addManualLicenses(final Archive archive, final List&lt;License&gt; manualLicenses) {
+<span class="pc bpc" id="L379" title="2 of 4 branches missed.">        if (manualLicenses != null &amp;&amp; !manualLicenses.isEmpty()) {</span>
+<span class="fc bfc" id="L380" title="All 2 branches covered.">            for (final License manualLicense : manualLicenses) {</span>
+<span class="fc" id="L381">                final String absolutePath = &quot;[added from list of exceptions]&quot;;</span>
+<span class="fc" id="L382">                archive.addLicense(manualLicense, absolutePath);</span>
+<span class="fc" id="L383">            }</span>
+<span class="fc" id="L384">            return true;</span>
+        }
+<span class="nc" id="L386">        return false;</span>
+    }
+
+    private static void setDetectionStatus(final Archive archive, final DetectionStatus manualDetectionStatus,
+                                           final LicenseStoreData licenseStoreData) {
+<span class="fc" id="L391">        final Set&lt;License&gt; licenses = archive.getLicenses();</span>
+<span class="fc" id="L392">        final boolean noManualInformation = licenses</span>
+<span class="fc" id="L393">                .contains(licenseStoreData.getLicenseBySpdxIdentifier(LicenseSpdxIdentifier.NO_MANUAL_INFORMATION));</span>
+<span class="fc bfc" id="L394" title="All 2 branches covered.">        final boolean hasLicenses = !licenses.isEmpty();</span>
+        final DetectionStatus detectionStatus;
+<span class="pc bpc" id="L396" title="1 of 2 branches missed.">        if (noManualInformation) {</span>
+<span class="nc" id="L397">            detectionStatus = DetectionStatus.MANUAL_NOT_DETECTED;</span>
+            // remove the &quot;no manual information&quot; placeholder license
+<span class="nc" id="L399">            archive.clearLicenses();</span>
+        } else {
+<span class="fc bfc" id="L401" title="All 2 branches covered.">            if (hasLicenses) {</span>
+<span class="fc" id="L402">                detectionStatus = manualDetectionStatus;</span>
+            } else {
+<span class="fc" id="L404">                detectionStatus = DetectionStatus.NOT_DETECTED;</span>
+            }
+        }
+<span class="fc" id="L407">        archive.setDetectionStatus(detectionStatus);</span>
+<span class="fc" id="L408">    }</span>
+
+    private static void setLegalStatus(final Archive archive) {
+<span class="fc" id="L411">        final Set&lt;License&gt; licenses = archive.getLicenses();</span>
+<span class="fc" id="L412">        boolean hasAcceptedLicense = false;</span>
+<span class="fc" id="L413">        boolean hasBlacklistedLicense = false;</span>
+<span class="fc" id="L414">        boolean hasUnknownLicense = false;</span>
+<span class="fc bfc" id="L415" title="All 2 branches covered.">        for (final License license : licenses) {</span>
+<span class="pc bpc" id="L416" title="3 of 4 branches missed.">            switch (license.getLegalStatus()) {</span>
+                case ACCEPTED:
+<span class="fc" id="L418">                    hasAcceptedLicense = true;</span>
+<span class="fc" id="L419">                    break;</span>
+                case NOT_ACCEPTED:
+<span class="nc" id="L421">                    hasBlacklistedLicense = true;</span>
+<span class="nc" id="L422">                    break;</span>
+                case UNKNOWN:
+<span class="nc" id="L424">                    hasUnknownLicense = true;</span>
+<span class="nc" id="L425">                    break;</span>
+                case CONFLICTING:
+                    // should not appear here
+                    break;
+            }
+<span class="fc" id="L430">        }</span>
+        final LegalStatus legalStatus;
+<span class="pc bpc" id="L432" title="1 of 2 branches missed.">        if (hasUnknownLicense) {</span>
+<span class="nc" id="L433">            legalStatus = LegalStatus.UNKNOWN;</span>
+        } else {
+<span class="pc bpc" id="L435" title="1 of 2 branches missed.">            if (hasBlacklistedLicense) {</span>
+<span class="nc bnc" id="L436" title="All 2 branches missed.">                if (hasAcceptedLicense) { //NOSONAR - code is reachable</span>
+<span class="nc" id="L437">                    legalStatus = LegalStatus.CONFLICTING;</span>
+                } else {
+<span class="nc" id="L439">                    legalStatus = LegalStatus.NOT_ACCEPTED;</span>
+                }
+            } else {
+<span class="fc bfc" id="L442" title="All 2 branches covered.">                if (hasAcceptedLicense) {</span>
+<span class="fc" id="L443">                    legalStatus = LegalStatus.ACCEPTED;</span>
+                } else {
+<span class="fc" id="L445">                    legalStatus = LegalStatus.UNKNOWN;</span>
+                }
+            }
+        }
+<span class="fc" id="L449">        archive.setLegalStatus(legalStatus);</span>
+<span class="fc" id="L450">    }</span>
+
+    private static boolean hasVersion(final Archive archive) {
+<span class="fc bfc" id="L453" title="All 2 branches covered.">        return !StringUtils.isEmpty(archive.getVersion());</span>
+    }
+
+    /**
+     * Calculates statistics for the detection status.
+     * 
+     * @param archives collection of archives to process
+     * @return a statistics object
+     * 
+     */
+    public static IDetectionStatusStatistics calculateDetectionStatusStatistics(final Collection&lt;Archive&gt; archives) {
+<span class="fc" id="L464">        final IDetectionStatusStatistics detectionStatusStatistics = new DetectionStatusStatistics();</span>
+<span class="fc bfc" id="L465" title="All 2 branches covered.">        for (final DetectionStatus detectioStatus : DetectionStatus.values()) {</span>
+<span class="fc" id="L466">            detectionStatusStatistics.put(detectioStatus, 0);</span>
+        }
+<span class="fc bfc" id="L468" title="All 2 branches covered.">        for (final Archive archive : archives) {</span>
+<span class="fc" id="L469">            final DetectionStatus detectionStatus = archive.getDetectionStatus();</span>
+<span class="fc" id="L470">            detectionStatusStatistics.put(detectionStatus, detectionStatusStatistics.get(detectionStatus) + 1);</span>
+<span class="fc" id="L471">        }</span>
+<span class="fc" id="L472">        return detectionStatusStatistics;</span>
+    }
+
+    /**
+     * Calculates statistics for the legal status.
+     * 
+     * @param archives collection of archives to process
+     * @return a statistics object
+     * 
+     */
+    public static ILegalStatusStatistics calculateLegalStatusStatistics(final Collection&lt;Archive&gt; archives) {
+<span class="fc" id="L483">        final ILegalStatusStatistics legalStatusStatistics = new LegalStatusStatistics();</span>
+<span class="fc bfc" id="L484" title="All 2 branches covered.">        for (final LegalStatus legalStatus : LegalStatus.values()) {</span>
+<span class="fc" id="L485">            legalStatusStatistics.put(legalStatus, 0);</span>
+        }
+<span class="fc bfc" id="L487" title="All 2 branches covered.">        for (final Archive archive : archives) {</span>
+<span class="fc" id="L488">            final LegalStatus legalStatus = archive.getLegalStatus();</span>
+<span class="fc" id="L489">            legalStatusStatistics.put(legalStatus, legalStatusStatistics.get(legalStatus) + 1);</span>
+<span class="fc" id="L490">        }</span>
+<span class="fc" id="L491">        return legalStatusStatistics;</span>
+    }
+
+    /**
+     * Calculates general statistics over all archives.
+     * 
+     * @param archives collection of archives to process
+     * @return an object containing statistics data
+     * 
+     */
+    public static GeneralStatistics calculateGeneralStatistics(final Collection&lt;Archive&gt; archives) {
+<span class="fc" id="L502">        final GeneralStatistics generalStatistics = new GeneralStatistics();</span>
+<span class="fc" id="L503">        generalStatistics.setTotalArchiveCount(archives.size());</span>
+<span class="fc" id="L504">        int licenseCandidateFileCount = 0;</span>
+<span class="fc bfc" id="L505" title="All 2 branches covered.">        for (final Archive archive : archives) {</span>
+<span class="fc" id="L506">            licenseCandidateFileCount += archive.getLicenseCandidateFiles().size();</span>
+<span class="fc" id="L507">        }</span>
+<span class="fc" id="L508">        generalStatistics.setCandidateLicenseFileCount(licenseCandidateFileCount);</span>
+<span class="fc" id="L509">        return generalStatistics;</span>
+    }
+
+    /**
+     * Obtains licenses from the license name mapping.
+     * 
+     * @param npmLicenseName a license name
+     * @param licenseStoreData 
+     * @return a list of licenses for the name. An empty list if the license could not be mapped.
+     */
+    public static List&lt;License&gt; mapNpmLicenseName(final String npmLicenseName,
+                                                  final LicenseStoreData licenseStoreData) {
+<span class="fc" id="L521">        final License license = licenseStoreData.getLicenseBySpdxIdentifier(npmLicenseName);</span>
+<span class="fc bfc" id="L522" title="All 2 branches covered.">        if (license != null) {</span>
+<span class="fc" id="L523">            return Arrays.asList(license);</span>
+        }
+<span class="fc" id="L525">        final List&lt;License&gt; licenseList = licenseStoreData.getLicensesFromNameMapping(npmLicenseName);</span>
+<span class="pc bpc" id="L526" title="1 of 2 branches missed.">        if (licenseList != null) {</span>
+<span class="nc" id="L527">            return licenseList;</span>
+        }
+<span class="fc" id="L529">        return Collections.emptyList();</span>
+    }
+
+    /**
+     * Tries to find licenses by license URL and associate them with an archive.
+     * 
+     * @param licenseUrl a license URL
+     * @param archive an archive
+     * @param licenseFileName the file name to record as the file the license is found in
+     * @param licenseStoreData the license store
+     * @param log a logger
+     * @return true if licenses have been added to the archive, false otherwise
+     */
+    public static boolean handleLicenseUrl(final String licenseUrl, final Archive archive, final String licenseFileName,
+                                           final LicenseStoreData licenseStoreData, final ILFLog log) {
+<span class="fc" id="L544">        boolean licenseFound = false;</span>
+<span class="fc" id="L545">        final License license = licenseStoreData.getLicenseByPublicUrl(licenseUrl);</span>
+<span class="pc bpc" id="L546" title="1 of 2 branches missed.">        if (license != null) {</span>
+<span class="fc" id="L547">            archive.addLicense(license, licenseFileName);</span>
+<span class="fc" id="L548">            licenseFound = true;</span>
+        } else {
+<span class="nc" id="L550">            log.debug(&quot;License URL not found in store: &quot; + licenseUrl);</span>
+        }
+<span class="pc bpc" id="L552" title="1 of 2 branches missed.">        if (!licenseFound) {</span>
+<span class="nc" id="L553">            final List&lt;License&gt; licenses = licenseStoreData.getLicensesFromUrlMapping(licenseUrl);</span>
+<span class="nc bnc" id="L554" title="All 2 branches missed.">            if (licenses != null) {</span>
+<span class="nc" id="L555">                licenseFound |= addLicensesToArchive(archive, licenses, licenseFileName);</span>
+            } else {
+<span class="nc" id="L557">                log.info(&quot;No license mapping found for URL: &quot; + licenseUrl);</span>
+            }
+        }
+<span class="fc" id="L560">        return licenseFound;</span>
+    }
+
+    /**
+     * Tries to find licenses by license name and associate them with an archive.
+     * 
+     * @param licenseName a license name
+     * @param archive an archive
+     * @param licenseFileName the file name to record as the file the license is found in
+     * @param licenseStoreData the license store
+     * @param log a logger
+     * @return true if licenses have been added to the archive, false otherwise
+     */
+    public static boolean handleLicenseName(final String licenseName, final Archive archive,
+                                            final String licenseFileName, LicenseStoreData licenseStoreData,
+                                            final ILFLog log) {
+<span class="nc" id="L576">        boolean licenseFound = false;</span>
+<span class="nc" id="L577">        final License license = licenseStoreData.getLicenseBySpdxIdentifier(licenseName);</span>
+<span class="nc bnc" id="L578" title="All 2 branches missed.">        if (license != null) {</span>
+<span class="nc" id="L579">            archive.addLicense(license, licenseFileName);</span>
+<span class="nc" id="L580">            licenseFound = true;</span>
+        } else {
+<span class="nc" id="L582">            log.debug(&quot;License name not found in store: &quot; + licenseName);</span>
+        }
+<span class="nc bnc" id="L584" title="All 2 branches missed.">        if (!licenseFound) {</span>
+<span class="nc" id="L585">            final List&lt;License&gt; licenses = licenseStoreData.getLicensesFromNameMapping(licenseName);</span>
+<span class="nc bnc" id="L586" title="All 2 branches missed.">            if (licenses != null) {</span>
+<span class="nc" id="L587">                licenseFound |= addLicensesToArchive(archive, licenses, licenseFileName);</span>
+            } else {
+<span class="nc" id="L589">                log.info(&quot;No license mapping found for name: &quot; + licenseName);</span>
+            }
+        }
+<span class="nc" id="L592">        return licenseFound;</span>
+    }
+
+    /**
+     * @param archive
+     * @param licenses
+     * @param licenseFileName
+     * @return true if one or more licenses have been added, false otherwise
+     */
+    private static boolean addLicensesToArchive(final Archive archive, final List&lt;License&gt; licenses,
+                                                final String licenseFileName) {
+<span class="nc" id="L603">        boolean licenseFound = false;</span>
+<span class="nc bnc" id="L604" title="All 2 branches missed.">        for (final License license : licenses) {</span>
+<span class="nc bnc" id="L605" title="All 2 branches missed.">            if (license != null) {</span>
+<span class="nc" id="L606">                archive.addLicense(license, licenseFileName);</span>
+<span class="nc" id="L607">                licenseFound = true;</span>
+            }
+<span class="nc" id="L609">        }</span>
+<span class="nc" id="L610">        return licenseFound;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

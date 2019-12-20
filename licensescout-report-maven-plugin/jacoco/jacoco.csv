@@ -1,0 +1,8 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+LicenseScout Maven Report Plugin,org.aposin.licensescout.report.exporter,DoxiaExporter,266,12,12,0,80,4,14,2,8,2
+LicenseScout Maven Report Plugin,org.aposin.licensescout.report.exporter,DoxiaReportExporterFactory,0,29,0,2,0,7,0,4,0,3
+LicenseScout Maven Report Plugin,org.aposin.licensescout.report.exporter,DoxiaExporter.new Comparator() {...},12,0,0,0,2,0,2,0,2,0
+LicenseScout Maven Report Plugin,org.aposin.licensescout.report.mojo,HelpMojo,802,0,110,0,159,0,71,0,16,0
+LicenseScout Maven Report Plugin,org.aposin.licensescout.report.mojo,JavaReportMojo,0,5,0,0,0,2,0,2,0,2
+LicenseScout Maven Report Plugin,org.aposin.licensescout.report.mojo,AbstractReportMojo.new ISinkProvider() {...},10,0,0,0,2,0,2,0,2,0
+LicenseScout Maven Report Plugin,org.aposin.licensescout.report.mojo,AbstractReportMojo,229,3,6,0,64,1,31,1,28,1

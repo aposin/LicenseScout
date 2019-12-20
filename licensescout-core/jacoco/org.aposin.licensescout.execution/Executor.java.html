@@ -1,0 +1,685 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Executor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.execution</a> &gt; <span class="el_source">Executor.java</span></div><h1>Executor.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.execution;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.commons.lang3.StringUtils;
+import org.aposin.licensescout.archive.Archive;
+import org.aposin.licensescout.archive.ArchiveType;
+import org.aposin.licensescout.configuration.BuildInfo;
+import org.aposin.licensescout.configuration.ConfigFileHandler;
+import org.aposin.licensescout.configuration.DatabaseConfiguration;
+import org.aposin.licensescout.configuration.Output;
+import org.aposin.licensescout.configuration.OutputFileType;
+import org.aposin.licensescout.configuration.RunParameters;
+import org.aposin.licensescout.database.DatabaseWriter;
+import org.aposin.licensescout.exporter.GeneralStatistics;
+import org.aposin.licensescout.exporter.IDetectionStatusStatistics;
+import org.aposin.licensescout.exporter.ILegalStatusStatistics;
+import org.aposin.licensescout.exporter.IReportExporter;
+import org.aposin.licensescout.exporter.OutputResult;
+import org.aposin.licensescout.exporter.ReportConfiguration;
+import org.aposin.licensescout.filter.CleanArchiveListFilter;
+import org.aposin.licensescout.filter.IArchiveListFilter;
+import org.aposin.licensescout.filter.VendorArchiveListFilter;
+import org.aposin.licensescout.finder.AbstractFinder;
+import org.aposin.licensescout.finder.FinderFactory;
+import org.aposin.licensescout.finder.FinderResult;
+import org.aposin.licensescout.license.GlobalFilters;
+import org.aposin.licensescout.license.License;
+import org.aposin.licensescout.license.LicenseCheckedList;
+import org.aposin.licensescout.license.LicenseStoreData;
+import org.aposin.licensescout.license.LicenseUtil;
+import org.aposin.licensescout.model.Notices;
+import org.aposin.licensescout.model.Providers;
+import org.aposin.licensescout.util.CryptUtil;
+import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.MiscUtil;
+import org.aposin.licensescout.util.OutputFileHelper;
+import org.xml.sax.SAXException;
+
+/**
+ * Engine that contains the main control flow of the LicenseScout.
+ *
+ */
+public class Executor {
+
+    private final ExecutionParameters executionParameters;
+    private final ConfigFileHandler configFileHandler;
+
+    /**
+     * Constructor.
+     * @param executionParameters 
+     * @param configFileHandler 
+     */
+<span class="fc" id="L79">    public Executor(final ExecutionParameters executionParameters, final ConfigFileHandler configFileHandler) {</span>
+<span class="fc" id="L80">        this.executionParameters = executionParameters;</span>
+<span class="fc" id="L81">        this.configFileHandler = configFileHandler;</span>
+<span class="fc" id="L82">    }</span>
+
+    /**
+     * @return the executionParameters
+     */
+    protected final ExecutionParameters getExecutionParameters() {
+<span class="fc" id="L88">        return executionParameters;</span>
+    }
+
+    /**
+     * @return the configFileHandler
+     */
+    protected final ConfigFileHandler getConfigFileHandler() {
+<span class="fc" id="L95">        return configFileHandler;</span>
+    }
+
+    protected final ILFLog getLog() {
+<span class="fc" id="L99">        return getExecutionParameters().getLsLog();</span>
+    }
+
+    /**
+     * Main execution of the LicenseScout.
+     * 
+     * &lt;p&gt;This executes:&lt;/p&gt;
+     * &lt;ol&gt;
+     * &lt;li&gt;Reads configuration files:
+     * &lt;ol type=&quot;a&quot;&gt;
+     * &lt;li&gt;Reads providers file&lt;/li&gt;
+     * &lt;li&gt;Reads notices file&lt;/li&gt;
+     * &lt;li&gt;Reads licenses file&lt;/li&gt;
+     * &lt;li&gt;Reads URL mappings file&lt;/li&gt;
+     * &lt;li&gt;Reads name mappings file&lt;/li&gt;
+     * &lt;li&gt;Reads global filters file&lt;/li&gt;
+     * &lt;li&gt;Reads checked archives file&lt;/li&gt;
+     * &lt;li&gt;Reads filtered vendor names file&lt;/li&gt;
+     * &lt;/ol&gt;
+     * &lt;/li&gt;
+     * 
+     * &lt;li&gt;Checks parameters&lt;/li&gt;
+     * &lt;li&gt;&lt;/li&gt;
+     * &lt;li&gt;&lt;/li&gt;
+     * &lt;li&gt;&lt;/li&gt;
+     * &lt;li&gt;&lt;/li&gt;
+     * &lt;li&gt;&lt;/li&gt;
+     * &lt;/ol&gt;
+     * 
+     * @throws LicenseScoutExecutionException if an unrecoverable condition occurs during the execution or
+     * if another exception is caught
+     */
+    public void execute() throws LicenseScoutExecutionException {
+
+<span class="fc" id="L133">        final Providers providers = readProviders(getConfigFileHandler(), getLog());</span>
+<span class="fc" id="L134">        final Notices notices = readNotices(getConfigFileHandler(), getLog());</span>
+<span class="fc" id="L135">        final LicenseStoreData licenseStoreData = init(notices, getLog());</span>
+
+<span class="fc" id="L137">        final GlobalFilters globalFilters = readGlobalFilters(getLog());</span>
+<span class="fc" id="L138">        final LicenseCheckedList checkedArchives = readCheckedArchives(licenseStoreData, notices, providers, getLog());</span>
+<span class="fc" id="L139">        final List&lt;License&gt; cleanOutputLicenses = createCleanOutputLicenseList(getLog(), licenseStoreData);</span>
+<span class="fc" id="L140">        final List&lt;String&gt; finalFilteredVendorNames = readAndCollectFilteredVendorNames(getLog());</span>
+
+<span class="fc" id="L142">        checkParameters(getLog());</span>
+
+<span class="fc" id="L144">        prepareOutput(getLog());</span>
+
+<span class="fc" id="L146">        logNpmExcludedDirectoryNames(getLog());</span>
+<span class="fc" id="L147">        ArchiveType archiveType = getExecutionParameters().getArchiveType();</span>
+<span class="fc" id="L148">        final RunParameters runParameters = new RunParameters();</span>
+<span class="fc" id="L149">        runParameters.setNexusCentralBaseUrl(getExecutionParameters().getNexusCentralBaseUrl());</span>
+<span class="fc" id="L150">        runParameters.setConnectTimeout(getExecutionParameters().getConnectTimeout());</span>
+<span class="fc" id="L151">        final AbstractFinder finder = FinderFactory.getInstance().createFinder(executionParameters, licenseStoreData,</span>
+                runParameters);
+<span class="fc" id="L153">        getLog().info(&quot;Starting scan on &quot; + getExecutionParameters().getScanDirectory().getAbsolutePath() + &quot;...&quot;);</span>
+
+        try {
+<span class="fc" id="L156">            final FinderResult finderResult = finder.findLicenses();</span>
+<span class="pc bpc" id="L157" title="1 of 2 branches missed.">            if (finderResult == null) {</span>
+<span class="nc" id="L158">                getLog().info(&quot;No finder results.&quot;);</span>
+<span class="nc" id="L159">                return;</span>
+            }
+<span class="fc" id="L161">            getLog().info(&quot;Evaluating licenses...&quot;);</span>
+<span class="fc" id="L162">            LicenseUtil.evaluateLicenses(checkedArchives, finderResult.getArchiveFiles(), licenseStoreData);</span>
+<span class="fc" id="L163">            filterGlobal(finderResult.getArchiveFiles(), globalFilters, getLog());</span>
+
+<span class="fc" id="L165">            final IArchiveListFilter vendorFilter = new VendorArchiveListFilter(finalFilteredVendorNames, getLog(),</span>
+                    true);
+<span class="fc" id="L167">            vendorFilter.filter(finderResult.getArchiveFiles());</span>
+<span class="fc" id="L168">            final IArchiveListFilter filter = new CleanArchiveListFilter(getLog(),</span>
+<span class="fc" id="L169">                    getExecutionParameters().isCleanOutputActive(),</span>
+<span class="fc" id="L170">                    Arrays.asList(getExecutionParameters().getCleanOutputLegalStates()), cleanOutputLicenses);</span>
+<span class="fc" id="L171">            filter.filter(finderResult.getArchiveFiles());</span>
+
+<span class="fc" id="L173">            writeArchiveSkeletonFile(finderResult.getArchiveFiles());</span>
+<span class="fc" id="L174">            final BuildInfo buildInfo = createBuildInfo();</span>
+<span class="fc" id="L175">            writeResultsToDatabase(buildInfo, finderResult.getArchiveFiles(), getLog());</span>
+
+<span class="fc" id="L177">            final OutputResult outputResult = createOutputResult(finderResult);</span>
+<span class="fc" id="L178">            outputResult.setPomResolutionUsed(finder.isPomResolutionUsed());</span>
+<span class="fc" id="L179">            final ReportConfiguration reportConfiguration = createReportConfiguration(archiveType);</span>
+
+<span class="fc" id="L181">            doOutput(getLog(), outputResult, reportConfiguration);</span>
+<span class="nc" id="L182">        } catch (Exception e) {</span>
+<span class="nc" id="L183">            throw new LicenseScoutExecutionException(e);</span>
+<span class="fc" id="L184">        }</span>
+<span class="fc" id="L185">    }</span>
+
+    /**
+     * @param log
+     */
+    private void prepareOutput(final ILFLog log) {
+<span class="fc" id="L191">        MiscUtil.createDirectoryIfNotExists(getExecutionParameters().getOutputDirectory(), getLog());</span>
+<span class="fc bfc" id="L192" title="All 2 branches covered.">        for (final Output output : getExecutionParameters().getOutputs()) {</span>
+<span class="fc" id="L193">            final File outputFile = new File(getExecutionParameters().getOutputDirectory(),</span>
+<span class="fc" id="L194">                    OutputFileHelper.getOutputFilename(output));</span>
+<span class="fc" id="L195">            log.info(&quot;using &quot; + output.getType() + &quot; output file: &quot; + outputFile.getAbsolutePath());</span>
+<span class="fc" id="L196">            final File templateFile = output.getTemplate();</span>
+<span class="pc bpc" id="L197" title="1 of 2 branches missed.">            if (templateFile != null) {</span>
+<span class="nc bnc" id="L198" title="All 4 branches missed.">                if (templateFile.isFile() &amp;&amp; templateFile.canRead()) {</span>
+<span class="nc" id="L199">                    log.info(&quot;using template: &quot; + templateFile.getAbsolutePath());</span>
+                } else {
+<span class="nc" id="L201">                    log.warn(&quot;not using template because it is not a file or it cannot be read: &quot;</span>
+<span class="nc" id="L202">                            + templateFile.getAbsolutePath());</span>
+                    // unset so that furthers steps only need to check for null
+<span class="nc" id="L204">                    output.setTemplate(null);</span>
+                }
+            }
+<span class="fc" id="L207">        }</span>
+<span class="fc" id="L208">    }</span>
+
+    private BuildInfo createBuildInfo() {
+<span class="fc" id="L211">        checkBuildParameters();</span>
+<span class="fc" id="L212">        String licenseReportCsvUrl = null;</span>
+<span class="fc" id="L213">        String licenseReportHtmlUrl = null;</span>
+<span class="fc" id="L214">        String licenseReportTxtUrl = null;</span>
+<span class="fc bfc" id="L215" title="All 2 branches covered.">        for (final Output output : getExecutionParameters().getOutputs()) {</span>
+<span class="pc bpc" id="L216" title="1 of 4 branches missed.">            switch (output.getType()) {</span>
+                case CSV:
+<span class="fc" id="L218">                    licenseReportCsvUrl = output.getUrl();</span>
+<span class="pc bpc" id="L219" title="1 of 2 branches missed.">                    if (StringUtils.isEmpty(licenseReportCsvUrl)) {</span>
+<span class="fc" id="L220">                        getLog().warn(&quot;Parameter licenseReportCsvUrl not configured&quot;);</span>
+                    }
+                    break;
+                case HTML:
+<span class="fc" id="L224">                    licenseReportHtmlUrl = output.getUrl();</span>
+<span class="pc bpc" id="L225" title="1 of 2 branches missed.">                    if (StringUtils.isEmpty(licenseReportHtmlUrl)) {</span>
+<span class="fc" id="L226">                        getLog().warn(&quot;Parameter licenseReportHtmlUrl not configured&quot;);</span>
+                    }
+                    break;
+                case TXT:
+<span class="fc" id="L230">                    licenseReportTxtUrl = output.getUrl();</span>
+<span class="pc bpc" id="L231" title="1 of 2 branches missed.">                    if (StringUtils.isEmpty(licenseReportTxtUrl)) {</span>
+<span class="fc" id="L232">                        getLog().warn(&quot;Parameter licenseReportTxtUrl not configured&quot;);</span>
+                    }
+                    break;
+                default:
+<span class="nc" id="L236">                    getLog().warn(&quot;Unhandled output type: &quot; + output.getType());</span>
+            }
+<span class="fc" id="L238">        }</span>
+        // Note: date is used from the database
+<span class="fc" id="L240">        return new BuildInfo(getExecutionParameters().getBuildName(), getExecutionParameters().getBuildVersion(), null,</span>
+<span class="fc" id="L241">                getExecutionParameters().getBuildUrl(), licenseReportCsvUrl, licenseReportHtmlUrl, licenseReportTxtUrl);</span>
+    }
+
+    private void checkBuildParameters() {
+<span class="pc bpc" id="L245" title="1 of 2 branches missed.">        if (getExecutionParameters().isWriteResultsToDatabase()) {</span>
+            // NOTE: these parameters are only used for writing information to the database
+<span class="nc bnc" id="L247" title="All 2 branches missed.">            if (StringUtils.isEmpty(getExecutionParameters().getBuildName())) {</span>
+<span class="nc" id="L248">                getLog().warn(&quot;Parameter buildName not configured&quot;);</span>
+            }
+<span class="nc bnc" id="L250" title="All 2 branches missed.">            if (StringUtils.isEmpty(getExecutionParameters().getBuildVersion())) {</span>
+<span class="nc" id="L251">                getLog().warn(&quot;Parameter buildVersion not configured&quot;);</span>
+            }
+<span class="nc bnc" id="L253" title="All 2 branches missed.">            if (StringUtils.isEmpty(getExecutionParameters().getBuildUrl())) {</span>
+<span class="nc" id="L254">                getLog().warn(&quot;Parameter buildUrl not configured&quot;);</span>
+            }
+        }
+<span class="fc" id="L257">    }</span>
+
+    private void writeArchiveSkeletonFile(final List&lt;Archive&gt; archives) throws LicenseScoutExecutionException {
+<span class="fc" id="L260">        writeArchiveXmlSkeletonFile(archives);</span>
+<span class="fc" id="L261">        writeArchiveCsvSkeletonFile(archives);</span>
+<span class="fc" id="L262">    }</span>
+
+    /**
+     * @param archives
+     * @throws LicenseScoutExecutionException
+     */
+    private void writeArchiveCsvSkeletonFile(final List&lt;Archive&gt; archives) throws LicenseScoutExecutionException {
+<span class="pc bpc" id="L269" title="1 of 2 branches missed.">        if (getExecutionParameters().isWriteArchiveCsvSkeleton()) {</span>
+<span class="nc bnc" id="L270" title="All 2 branches missed.">            if (getExecutionParameters().getArchiveCsvSkeletonFile() != null) {</span>
+<span class="nc" id="L271">                getLog().info(&quot;writing archive CSV skeleton file to: &quot;</span>
+<span class="nc" id="L272">                        + getExecutionParameters().getArchiveCsvSkeletonFile());</span>
+                try {
+<span class="nc" id="L274">                    LicenseCheckedList.writeCsvSkeletonFile(getExecutionParameters().getArchiveCsvSkeletonFile(),</span>
+                            archives);
+<span class="nc" id="L276">                } catch (IOException e) {</span>
+<span class="nc" id="L277">                    throw new LicenseScoutExecutionException(&quot;cannot write archive CSV skeleton file&quot;, e);</span>
+<span class="nc" id="L278">                }</span>
+            } else {
+<span class="nc" id="L280">                getLog().info(&quot;Not writing archive CSV skeleton file (not configured)&quot;);</span>
+            }
+        } else {
+<span class="fc" id="L283">            getLog().info(&quot;Not writing archive CSV skeleton file (not configured)&quot;);</span>
+        }
+<span class="fc" id="L285">    }</span>
+
+    /**
+     * @param archives
+     * @throws LicenseScoutExecutionException
+     */
+    private void writeArchiveXmlSkeletonFile(final List&lt;Archive&gt; archives) throws LicenseScoutExecutionException {
+<span class="pc bpc" id="L292" title="1 of 2 branches missed.">        if (getExecutionParameters().isWriteArchiveXmlSkeleton()) {</span>
+<span class="nc bnc" id="L293" title="All 2 branches missed.">            if (getExecutionParameters().getArchiveXmlSkeletonFile() != null) {</span>
+<span class="nc" id="L294">                getLog().info(&quot;writing archive XML skeleton file to: &quot;</span>
+<span class="nc" id="L295">                        + getExecutionParameters().getArchiveXmlSkeletonFile());</span>
+                try {
+<span class="nc" id="L297">                    LicenseCheckedList.writeXmlSkeletonFile(getExecutionParameters().getArchiveXmlSkeletonFile(),</span>
+                            archives);
+<span class="nc" id="L299">                } catch (IOException e) {</span>
+<span class="nc" id="L300">                    throw new LicenseScoutExecutionException(&quot;cannot write archive XML skeleton file&quot;, e);</span>
+<span class="nc" id="L301">                }</span>
+            } else {
+<span class="nc" id="L303">                getLog().info(&quot;Not writing archive XML skeleton file (not configured)&quot;);</span>
+            }
+        } else {
+<span class="fc" id="L306">            getLog().info(&quot;Not writing archive XML skeleton file (not configured)&quot;);</span>
+        }
+<span class="fc" id="L308">    }</span>
+
+    private void writeResultsToDatabase(final BuildInfo buildInfo, final List&lt;Archive&gt; archives, final ILFLog log) {
+<span class="pc bpc" id="L311" title="1 of 2 branches missed.">        if (getExecutionParameters().isWriteResultsToDatabase()) {</span>
+<span class="nc bnc" id="L312" title="All 2 branches missed.">            if (isSnapshotVersion(getExecutionParameters().getBuildVersion())</span>
+<span class="nc bnc" id="L313" title="All 2 branches missed.">                    &amp;&amp; !getExecutionParameters().isWriteResultsToDatabaseForSnapshotBuilds()) {</span>
+<span class="nc" id="L314">                getLog().info(&quot;Not writing results to database because is snapshot version&quot;);</span>
+            } else {
+<span class="nc" id="L316">                DatabaseConfiguration resultDatabaseConfiguration = getExecutionParameters()</span>
+<span class="nc" id="L317">                        .getResultDatabaseConfiguration();</span>
+<span class="nc bnc" id="L318" title="All 2 branches missed.">                if (getExecutionParameters().getResultDatabaseConfiguration() != null</span>
+<span class="nc bnc" id="L319" title="All 2 branches missed.">                        &amp;&amp; resultDatabaseConfiguration.getJdbcUrl() != null) {</span>
+<span class="nc" id="L320">                    getLog().info(&quot;Writing results to database &quot; + resultDatabaseConfiguration.getJdbcUrl()</span>
+<span class="nc" id="L321">                            + &quot; (user: '&quot; + resultDatabaseConfiguration.getUsername() + &quot;')&quot;);</span>
+<span class="nc" id="L322">                    DatabaseWriter.writeToDatabase(buildInfo, archives, resultDatabaseConfiguration, log);</span>
+                } else {
+<span class="nc" id="L324">                    getLog().info(&quot;Not writing results to database (no database configuration)&quot;);</span>
+                }
+<span class="nc" id="L326">            }</span>
+        } else {
+<span class="fc" id="L328">            getLog().info(&quot;Not writing results to database (not configured)&quot;);</span>
+        }
+<span class="fc" id="L330">    }</span>
+
+    /**
+     * @param log
+     * @param outputResult
+     * @param reportConfiguration
+     * @throws Exception
+     */
+    private void doOutput(final ILFLog log, final OutputResult outputResult,
+                          final ReportConfiguration reportConfiguration)
+            throws Exception {
+<span class="fc bfc" id="L341" title="All 2 branches covered.">        for (final Output output : getExecutionParameters().getOutputs()) {</span>
+<span class="fc" id="L342">            final File outputFile = new File(getExecutionParameters().getOutputDirectory(),</span>
+<span class="fc" id="L343">                    OutputFileHelper.getOutputFilename(output));</span>
+<span class="fc" id="L344">            final OutputFileType outputFileType = output.getType();</span>
+<span class="fc" id="L345">            final IReportExporter exporter = getReportExporter(outputFileType);</span>
+<span class="fc" id="L346">            reportConfiguration.setOutputFile(outputFile);</span>
+<span class="fc" id="L347">            reportConfiguration.setTemplateFile(output.getTemplate());</span>
+<span class="fc" id="L348">            reportConfiguration.setTemplateEncoding(output.getTemplateEncoding());</span>
+<span class="fc" id="L349">            reportConfiguration.setOutputEncoding(output.getOutputEncoding());</span>
+<span class="fc" id="L350">            exporter.export(outputResult, reportConfiguration);</span>
+<span class="fc" id="L351">            log.info(&quot;written output for &quot; + outputFileType + &quot; to &quot;</span>
+<span class="fc" id="L352">                    + reportConfiguration.getOutputFile().getAbsolutePath());</span>
+<span class="fc" id="L353">        }</span>
+<span class="pc bpc" id="L354" title="1 of 4 branches missed.">        if (getExecutionParameters().getOutputs() == null || getExecutionParameters().getOutputs().isEmpty()) {</span>
+<span class="fc" id="L355">            log.info(&quot;No output files written because no output formats are configured.&quot;);</span>
+        }
+<span class="fc" id="L357">    }</span>
+
+    /**
+     * @param archiveType
+     * @return a report configuration object
+     */
+    private ReportConfiguration createReportConfiguration(ArchiveType archiveType) {
+<span class="fc" id="L364">        final ReportConfiguration reportConfiguration = new ReportConfiguration();</span>
+<span class="fc" id="L365">        reportConfiguration.setShowLicenseCandidateFilesColumn(false);</span>
+<span class="fc bfc" id="L366" title="All 2 branches covered.">        reportConfiguration.setShowMessageDigestColumn(archiveType == ArchiveType.JAVA);</span>
+<span class="fc bfc" id="L367" title="All 2 branches covered.">        reportConfiguration.setShowPathColumn(archiveType == ArchiveType.JAVA);</span>
+<span class="fc" id="L368">        reportConfiguration.setShowDocumentationUrl(getExecutionParameters().isShowDocumentationUrl());</span>
+<span class="fc" id="L369">        return reportConfiguration;</span>
+    }
+
+    /**
+     * @param finderResult
+     * @return an output result object
+     */
+    private OutputResult createOutputResult(final FinderResult finderResult) {
+<span class="fc" id="L377">        final IDetectionStatusStatistics detectionStatusStatistics = LicenseUtil</span>
+<span class="fc" id="L378">                .calculateDetectionStatusStatistics(finderResult.getArchiveFiles());</span>
+<span class="fc" id="L379">        final ILegalStatusStatistics legalStatusStatistics = LicenseUtil</span>
+<span class="fc" id="L380">                .calculateLegalStatusStatistics(finderResult.getArchiveFiles());</span>
+<span class="fc" id="L381">        final GeneralStatistics generalStatistics = LicenseUtil</span>
+<span class="fc" id="L382">                .calculateGeneralStatistics(finderResult.getArchiveFiles());</span>
+<span class="fc" id="L383">        final OutputResult outputResult = new OutputResult();</span>
+<span class="fc" id="L384">        outputResult.setFinderResult(finderResult);</span>
+<span class="fc" id="L385">        outputResult.setGeneralStatistics(generalStatistics);</span>
+<span class="fc" id="L386">        outputResult.setDetectionStatusStatistics(detectionStatusStatistics);</span>
+<span class="fc" id="L387">        outputResult.setLegalStatusStatistics(legalStatusStatistics);</span>
+<span class="fc" id="L388">        outputResult.setMessageDigestAlgorithm(CryptUtil.getMessageDigestAlgorithm());</span>
+<span class="fc" id="L389">        return outputResult;</span>
+    }
+
+    private void checkParameters(final ILFLog log) throws LicenseScoutExecutionException {
+<span class="fc" id="L393">        final File scanDirectory = getExecutionParameters().getScanDirectory();</span>
+<span class="fc bfc" id="L394" title="All 2 branches covered.">        if (scanDirectory != null) {</span>
+<span class="fc bfc" id="L395" title="All 2 branches covered.">            if (!scanDirectory.exists()) {</span>
+<span class="fc" id="L396">                throw new LicenseScoutExecutionException(</span>
+<span class="fc" id="L397">                        &quot;This scan directory does not exist: &quot; + scanDirectory.getAbsolutePath());</span>
+            }
+<span class="fc" id="L399">            log.info(&quot;using scan directory: &quot; + scanDirectory.getAbsolutePath());</span>
+        } else {
+<span class="fc" id="L401">            throw new LicenseScoutExecutionException(&quot;scanDirectory not configured&quot;);</span>
+        }
+<span class="fc" id="L403">    }</span>
+
+    /**
+     * @param log the logger
+     * @return a license store data object
+     * @throws LicenseScoutExecutionException 
+     * @throws LicenseScoutExecutionException
+     */
+    private LicenseStoreData init(final Notices notices, final ILFLog log) throws LicenseScoutExecutionException {
+
+<span class="fc" id="L413">        final LicenseStoreData licenseStoreData = readLicenses(notices, log);</span>
+<span class="pc bpc" id="L414" title="1 of 2 branches missed.">        if (licenseStoreData != null) {</span>
+<span class="nc" id="L415">            readLicenseUrlMappings(licenseStoreData, log);</span>
+<span class="nc" id="L416">            readLicenseNameMappings(licenseStoreData, log);</span>
+        }
+
+<span class="fc" id="L419">        return licenseStoreData;</span>
+    }
+
+    /**
+     * @param log the logger
+     * @param licenseStoreData
+     * @return a list of licenses that should not appear in cleaned output
+     */
+    protected List&lt;License&gt; createCleanOutputLicenseList(final ILFLog log, final LicenseStoreData licenseStoreData) {
+
+<span class="pc bpc" id="L429" title="1 of 2 branches missed.">        log.info(&quot;Clean output: &quot; + (getExecutionParameters().isCleanOutputActive() ? &quot;active&quot; : &quot;not active&quot;));</span>
+<span class="fc" id="L430">        final List&lt;License&gt; cleanOutputLicenses = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L431" title="1 of 2 branches missed.">        if (getExecutionParameters().isCleanOutputActive()) {</span>
+<span class="nc bnc" id="L432" title="All 2 branches missed.">            for (final String cleanOutputLicenseSpdxIdentifier : getExecutionParameters()</span>
+<span class="nc" id="L433">                    .getCleanOutputLicenseSpdxIdentifiers()) {</span>
+<span class="nc" id="L434">                final License license = licenseStoreData.getLicenseBySpdxIdentifier(cleanOutputLicenseSpdxIdentifier);</span>
+<span class="nc bnc" id="L435" title="All 2 branches missed.">                if (license != null) {</span>
+<span class="nc" id="L436">                    cleanOutputLicenses.add(license);</span>
+<span class="nc" id="L437">                    log.info(&quot;Adding license to clean output filter list by SPDX identifier: &quot;</span>
+                            + cleanOutputLicenseSpdxIdentifier);
+                } else {
+<span class="nc" id="L440">                    log.warn(&quot;Cannot find license by SPDX identifier: &quot; + cleanOutputLicenseSpdxIdentifier);</span>
+                }
+            }
+        }
+<span class="fc" id="L444">        return cleanOutputLicenses;</span>
+    }
+
+    protected IReportExporter getReportExporter(final OutputFileType outputFileType) {
+<span class="fc" id="L448">        final List&lt;IReportExporterFactory&gt; reportExporterFactories = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L449" title="1 of 2 branches missed.">        if (getExecutionParameters().getExporterFactories() != null) {</span>
+<span class="fc" id="L450">            reportExporterFactories.addAll(getExecutionParameters().getExporterFactories());</span>
+        }
+<span class="pc bpc" id="L452" title="1 of 2 branches missed.">        if (reportExporterFactories.isEmpty()) {</span>
+<span class="nc" id="L453">            throw new UnsupportedOperationException(&quot;No Report exporter factories available&quot;);</span>
+        }
+<span class="pc bpc" id="L455" title="1 of 2 branches missed.">        for (IReportExporterFactory factory : reportExporterFactories) {</span>
+<span class="pc bpc" id="L456" title="1 of 2 branches missed.">            if (factory.getSupportedOutputFileTypes().contains(outputFileType)) {</span>
+<span class="fc" id="L457">                return factory.getReportExporter(outputFileType);</span>
+            }
+<span class="nc" id="L459">        }</span>
+<span class="nc" id="L460">        throw new UnsupportedOperationException(&quot;Unhandled OutputFileType: &quot; + outputFileType);</span>
+    }
+
+    /**
+     * @param licenseStoreData
+     * @param log the logger
+     * @throws LicenseScoutExecutionException
+     */
+    protected void readLicenseUrlMappings(final LicenseStoreData licenseStoreData, final ILFLog log)
+            throws LicenseScoutExecutionException {
+<span class="nc" id="L470">        try (final InputStream inputStream = getConfigFileHandler().getLicenseUrlMappingsInputStream()) {</span>
+<span class="nc bnc" id="L471" title="All 2 branches missed.">            if (inputStream != null) {</span>
+<span class="nc" id="L472">                licenseStoreData.readUrlMappings(inputStream, log);</span>
+            }
+<span class="nc" id="L474">        } catch (IOException e) {</span>
+<span class="nc" id="L475">            throw new LicenseScoutExecutionException(&quot;cannot read license URL mappings&quot;, e);</span>
+<span class="nc" id="L476">        }</span>
+<span class="nc" id="L477">    }</span>
+
+    /**
+     * @param licenseStoreData
+     * @param log the logger
+     * @throws LicenseScoutExecutionException
+     */
+    protected void readLicenseNameMappings(final LicenseStoreData licenseStoreData, final ILFLog log)
+            throws LicenseScoutExecutionException {
+<span class="nc" id="L486">        try (final InputStream inputStream = getConfigFileHandler().getLicenseNameMappingsInputStream()) {</span>
+<span class="nc bnc" id="L487" title="All 2 branches missed.">            if (inputStream != null) {</span>
+<span class="nc" id="L488">                licenseStoreData.readNameMappings(inputStream, log);</span>
+            }
+<span class="nc" id="L490">        } catch (IOException e) {</span>
+<span class="nc" id="L491">            throw new LicenseScoutExecutionException(&quot;cannot read license name mappings&quot;, e);</span>
+<span class="nc" id="L492">        }</span>
+<span class="nc" id="L493">    }</span>
+
+    /**
+     * @param log the logger
+     * @return a global filters object
+     * @throws LicenseScoutExecutionException
+     */
+    protected GlobalFilters readGlobalFilters(final ILFLog log) throws LicenseScoutExecutionException {
+<span class="fc" id="L501">        final GlobalFilters globalFilters = new GlobalFilters();</span>
+<span class="fc" id="L502">        try (final InputStream inputStream = getConfigFileHandler().getGlobalFiltersInputStream()) {</span>
+<span class="pc bpc" id="L503" title="1 of 2 branches missed.">            if (inputStream != null) {</span>
+<span class="nc" id="L504">                globalFilters.read(inputStream);</span>
+            }
+<span class="nc" id="L506">        } catch (IOException e) {</span>
+<span class="nc" id="L507">            throw new LicenseScoutExecutionException(&quot;cannot read global filters&quot;, e);</span>
+<span class="fc" id="L508">        }</span>
+<span class="fc" id="L509">        return globalFilters;</span>
+    }
+
+    /**
+     * @param notices 
+     * @param log the logger
+     * @return a license store data object
+     * @throws LicenseScoutExecutionException 
+     */
+    protected LicenseStoreData readLicenses(final Notices notices, final ILFLog log)
+            throws LicenseScoutExecutionException {
+<span class="fc" id="L520">        try (final InputStream inputStream = getConfigFileHandler().getLicensesInputStream()) {</span>
+<span class="pc bpc" id="L521" title="1 of 2 branches missed.">            if (inputStream != null) {</span>
+<span class="nc" id="L522">                final LicenseStoreData licenseStoreData = new LicenseStoreData();</span>
+<span class="nc" id="L523">                licenseStoreData.readLicenses(inputStream, notices, getExecutionParameters().isValidateLicenseXml(),</span>
+                        log);
+<span class="nc" id="L525">                return licenseStoreData;</span>
+            }
+<span class="nc bnc" id="L527" title="All 2 branches missed.">        } catch (IOException | ParserConfigurationException | SAXException e) {</span>
+<span class="nc" id="L528">            throw new LicenseScoutExecutionException(&quot;cannot read licenses&quot;, e);</span>
+<span class="fc" id="L529">        }</span>
+<span class="fc" id="L530">        return null;</span>
+
+    }
+
+    /**
+     * Reads providers.
+     * 
+     * @param configFileHandler 
+     * @param log the logger
+     * @return a providers data object
+     * @throws LicenseScoutExecutionException
+     */
+    protected Providers readProviders(final ConfigFileHandler configFileHandler, final ILFLog log)
+            throws LicenseScoutExecutionException {
+<span class="fc" id="L544">        try (InputStream inputStream = configFileHandler.getProvidersInputStream()) {</span>
+<span class="pc bpc" id="L545" title="1 of 2 branches missed.">            if (inputStream != null) {</span>
+<span class="nc" id="L546">                final Providers providers = new Providers();</span>
+<span class="nc" id="L547">                providers.readProviders(inputStream, getExecutionParameters().isValidateLicenseXml(), log);</span>
+<span class="nc" id="L548">                return providers;</span>
+            }
+<span class="nc bnc" id="L550" title="All 2 branches missed.">        } catch (IOException | ParserConfigurationException | SAXException e) {</span>
+<span class="nc" id="L551">            throw new LicenseScoutExecutionException(&quot;cannot read providers&quot;, e);</span>
+<span class="fc" id="L552">        }</span>
+<span class="fc" id="L553">        return null;</span>
+    }
+
+    /**
+     * Reads notices.
+     * @param configFileHandler 
+     * @param log the logger
+     * @return a notices data object
+     * @throws LicenseScoutExecutionException
+     */
+    protected Notices readNotices(final ConfigFileHandler configFileHandler, final ILFLog log)
+            throws LicenseScoutExecutionException {
+<span class="fc" id="L565">        try (InputStream inputStream = configFileHandler.getNoticesInputStream()) {</span>
+<span class="pc bpc" id="L566" title="1 of 2 branches missed.">            if (inputStream != null) {</span>
+<span class="nc" id="L567">                final Notices notices = new Notices();</span>
+<span class="nc" id="L568">                notices.readNotices(inputStream, getExecutionParameters().isValidateLicenseXml(), log);</span>
+<span class="nc" id="L569">                return notices;</span>
+            }
+<span class="nc bnc" id="L571" title="All 2 branches missed.">        } catch (IOException | ParserConfigurationException | SAXException e) {</span>
+<span class="nc" id="L572">            throw new LicenseScoutExecutionException(&quot;cannot read notices&quot;, e);</span>
+<span class="fc" id="L573">        }</span>
+<span class="fc" id="L574">        return null;</span>
+    }
+
+    /**
+     * @param licenseStoreData
+     * @param notices 
+     * @param providers 
+     * @param log the logger
+     * @return an object containing information on manually checked archives
+     * @throws LicenseScoutExecutionException
+     */
+    protected LicenseCheckedList readCheckedArchives(final LicenseStoreData licenseStoreData, final Notices notices,
+                                                     final Providers providers, final ILFLog log)
+            throws LicenseScoutExecutionException {
+<span class="fc" id="L588">        final LicenseCheckedList checkedArchives = new LicenseCheckedList();</span>
+<span class="fc" id="L589">        try (final InputStream inputStream = getConfigFileHandler().getCheckedArchivesInputStream()) {</span>
+<span class="pc bpc" id="L590" title="1 of 2 branches missed.">            if (inputStream != null) {</span>
+<span class="nc" id="L591">                checkedArchives.readCsv(inputStream, licenseStoreData, providers, notices, log);</span>
+            }
+<span class="nc" id="L593">        } catch (IOException e) {</span>
+<span class="nc" id="L594">            throw new LicenseScoutExecutionException(&quot;cannot read check archives list&quot;, e);</span>
+<span class="fc" id="L595">        }</span>
+<span class="fc" id="L596">        return checkedArchives;</span>
+    }
+
+    /**
+     * @param log the logger
+     * @return a list of vendor names to filter out
+     * @throws LicenseScoutExecutionException
+     */
+    protected List&lt;String&gt; readAndCollectFilteredVendorNames(final ILFLog log) throws LicenseScoutExecutionException {
+<span class="fc" id="L605">        final List&lt;String&gt; resultFilteredVendorNames = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L606" title="1 of 2 branches missed.">        for (final String vendorName : getExecutionParameters().getFilteredVendorNames()) {</span>
+<span class="nc" id="L607">            resultFilteredVendorNames.add(vendorName);</span>
+<span class="nc" id="L608">            log.info(&quot;Using vendor name to filter (from maven configuration): '&quot; + vendorName + &quot;'&quot;);</span>
+<span class="nc" id="L609">        }</span>
+<span class="fc" id="L610">        try (final InputStream inputStream = getConfigFileHandler().getFilteredVendorNamesInputStream()) {</span>
+<span class="pc bpc" id="L611" title="1 of 2 branches missed.">            if (inputStream != null) {</span>
+<span class="nc" id="L612">                final List&lt;String&gt; tmpResultList = readFilteredVendorNamesFromFile(inputStream, log);</span>
+<span class="nc" id="L613">                resultFilteredVendorNames.addAll(tmpResultList);</span>
+            }
+<span class="nc" id="L615">        } catch (IOException e) {</span>
+<span class="nc" id="L616">            throw new LicenseScoutExecutionException(&quot;cannot read filtered vendor names list&quot;, e);</span>
+<span class="fc" id="L617">        }</span>
+<span class="fc" id="L618">        return resultFilteredVendorNames;</span>
+    }
+
+    /**
+     * Reads a CSV file containing vendor names to filter out.
+     * 
+     * @param inputStream an input stream
+     * @param log the logger
+     * @return a list of strings
+     * @throws IOException if an error occurred while reading from the file
+     */
+    protected static List&lt;String&gt; readFilteredVendorNamesFromFile(final InputStream inputStream, final ILFLog log)
+            throws IOException {
+<span class="nc" id="L631">        final List&lt;String&gt; resultList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L632">        String line = &quot;&quot;;</span>
+
+<span class="nc" id="L634">        try (final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {</span>
+<span class="nc bnc" id="L635" title="All 2 branches missed.">            while ((line = br.readLine()) != null) {</span>
+
+                // ignore lines commented out
+<span class="nc bnc" id="L638" title="All 4 branches missed.">                if (line.startsWith(&quot;#&quot;) || StringUtils.isEmpty(line)) {</span>
+<span class="nc" id="L639">                    continue;</span>
+                }
+<span class="nc" id="L641">                resultList.add(line);</span>
+<span class="nc" id="L642">                log.info(&quot;Using vendor name to filter (from configuration file): '&quot; + line + &quot;'&quot;);</span>
+            }
+        }
+<span class="nc" id="L645">        return resultList;</span>
+    }
+
+    /**
+     * @param archiveFiles
+     * @param globalFilters
+     * @param log the logger
+     */
+    protected static void filterGlobal(final List&lt;Archive&gt; archiveFiles, final GlobalFilters globalFilters,
+                                       final ILFLog log) {
+<span class="fc" id="L655">        final Iterator&lt;Archive&gt; iter = archiveFiles.iterator();</span>
+<span class="pc bpc" id="L656" title="1 of 2 branches missed.">        while (iter.hasNext()) {</span>
+<span class="nc" id="L657">            final Archive archive = iter.next();</span>
+<span class="nc bnc" id="L658" title="All 2 branches missed.">            if (globalFilters.isFiltered(archive)) {</span>
+<span class="nc" id="L659">                log.info(&quot;Archive filtered out by global filter: &quot; + archive.getPath());</span>
+<span class="nc" id="L660">                iter.remove();</span>
+            }
+<span class="nc" id="L662">        }</span>
+<span class="fc" id="L663">    }</span>
+
+    /**
+     * @param log the logger
+     */
+    protected void logNpmExcludedDirectoryNames(final ILFLog log) {
+<span class="fc bfc" id="L669" title="All 2 branches covered.">        if (getExecutionParameters().getArchiveType() == ArchiveType.JAVASCRIPT) {</span>
+<span class="pc bpc" id="L670" title="1 of 2 branches missed.">            if (getExecutionParameters().getNpmExcludedDirectoryNames().isEmpty()) {</span>
+<span class="fc" id="L671">                log.info(&quot;No directory name to exclude in NPM scan configured.&quot;);</span>
+            } else {
+<span class="nc bnc" id="L673" title="All 2 branches missed.">                for (final String excludedDirectoryName : getExecutionParameters().getNpmExcludedDirectoryNames()) {</span>
+<span class="nc" id="L674">                    log.info(&quot;Using directory name to exclude in NPM scan: &quot; + excludedDirectoryName);</span>
+<span class="nc" id="L675">                }</span>
+            }
+        }
+<span class="fc" id="L678">    }</span>
+
+    private static boolean isSnapshotVersion(final String version) {
+<span class="nc" id="L681">        return version.endsWith(&quot;-SNAPSHOT&quot;);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

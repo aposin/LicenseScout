@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbstractReportMojo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Maven Report Plugin</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.report.mojo</a> &gt; <span class="el_source">AbstractReportMojo.java</span></div><h1>AbstractReportMojo.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.report.mojo;
+
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.maven.doxia.sink.Sink;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.reporting.AbstractMavenReport;
+import org.apache.maven.reporting.MavenReportException;
+import org.aposin.licensescout.archive.ArchiveType;
+import org.aposin.licensescout.configuration.ConfigFileHandler;
+import org.aposin.licensescout.configuration.ConfigFileParameters;
+import org.aposin.licensescout.configuration.FilesystemConfigFileHandler;
+import org.aposin.licensescout.configuration.Output;
+import org.aposin.licensescout.configuration.OutputFileType;
+import org.aposin.licensescout.configuration.ZipConfigFileHandler;
+import org.aposin.licensescout.execution.ExecutionParameters;
+import org.aposin.licensescout.execution.Executor;
+import org.aposin.licensescout.execution.IReportExporterFactory;
+import org.aposin.licensescout.execution.LicenseScoutExecutionException;
+import org.aposin.licensescout.license.LegalStatus;
+import org.aposin.licensescout.maven.utils.ArtifactHelper;
+import org.aposin.licensescout.maven.utils.ArtifactItem;
+import org.aposin.licensescout.maven.utils.IRepositoryParameters;
+import org.aposin.licensescout.maven.utils.MavenLog;
+import org.aposin.licensescout.report.exporter.DoxiaReportExporterFactory;
+import org.aposin.licensescout.report.exporter.ISinkProvider;
+import org.aposin.licensescout.util.ILFLog;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RemoteRepository;
+
+/**
+ * Creates a report integrated into a Maven site report of license information found by the LicenseScout.
+ *
+ */
+<span class="fc" id="L58">public abstract class AbstractReportMojo extends AbstractMavenReport implements IRepositoryParameters {</span>
+
+    /**
+     * Directory to scan for archives.
+     * &lt;p&gt;This is the directory where the LicenseScout will start to traverse directories recursively.
+     * If the directory does not exist, the LicenseScout will be terminated with an exception.&lt;/p&gt;
+     * 
+     * @since 1.1
+     */
+    @Parameter(property = &quot;scanDirectory&quot;, required = true)
+    private File scanDirectory;
+
+    /**
+     * Name of the file to read known licenses from.
+     * 
+     * @since 1.1
+     */
+    @Parameter(property = &quot;licensesFilename&quot;, required = false)
+    private File licensesFilename;
+
+    /**
+     * Name of the file to read known providers from.
+     * 
+     * @since 1.2.6
+     */
+    @Parameter(property = &quot;providersFilename&quot;, required = false)
+    private File providersFilename;
+
+    /**
+     * Name of the file to read license notices from.
+     * 
+     * @since 1.2.6
+     */
+    @Parameter(property = &quot;noticesFilename&quot;, required = false)
+    private File noticesFilename;
+
+    /**
+     * Name of the file to read checked archives from.
+     * 
+     * @since 1.2.6
+     */
+    @Parameter(defaultValue = &quot;checkedarchives.csv&quot;, property = &quot;checkedArchivesFilename&quot;, required = false)
+    private File checkedArchivesFilename;
+
+    /**
+     * Name of the file to read license URL mappings from.
+     * 
+     * @since 1.2.6
+     */
+    @Parameter(defaultValue = &quot;urlmappings.csv&quot;, property = &quot;licenseUrlMappingsFilename&quot;, required = false)
+    private String licenseUrlMappingsFilename;
+
+    /**
+     * Name of the file to read license name mappings from.
+     * 
+     * @since 1.2.6
+     */
+    @Parameter(defaultValue = &quot;namemappings.csv&quot;, property = &quot;licenseNameMappingsFilename&quot;, required = false)
+    private String licenseNameMappingsFilename;
+
+    /**
+     * Name of the file to read global filter patterns from.
+     * 
+     * @since 1.2.6
+     */
+    @Parameter(defaultValue = &quot;globalFilters.csv&quot;, property = &quot;globalFiltersFilename&quot;, required = false)
+    private String globalFiltersFilename;
+
+    /**
+     * Name of the file to read of vendor names to filter out from.
+     * This is alternative to {@link #filteredVendorNames}.
+     * If both are given, the entries are merged.
+     * 
+     * @since 1.1
+     */
+    @Parameter(property = &quot;filteredVendorNamesFilename&quot;, required = false)
+    private String filteredVendorNamesFilename;
+
+    /**
+     * If cleaning the output should be active.
+     * 
+     * @since 1.2.6
+     */
+    @Parameter(defaultValue = &quot;false&quot;, property = &quot;cleanOutputActive&quot;, required = false)
+    private boolean cleanOutputActive;
+
+    /**
+     * List of legal states that should be filtered out if cleanOutput is active.
+     * 
+     * @see LegalStatus
+     * @since 1.2.6
+     */
+    @Parameter(property = &quot;cleanOutputLegalStates&quot;, required = false)
+    private LegalStatus[] cleanOutputLegalStates;
+
+    /**
+     * List of licenses that should be filtered out if cleanOutput is active, given by their SPDX identifier.
+     * 
+     * @since 1.2.6
+     */
+    @Parameter(property = &quot;cleanOutputLicenseSpdxIdentifiers&quot;, required = false)
+    private String[] cleanOutputLicenseSpdxIdentifiers;
+
+    /**
+     * List of vendor names to filter out.
+     * This is alternative to {@link #filteredVendorNamesFilename}. If both are given, the entries are merged.
+     * 
+     * @since 1.2.6
+     */
+    @Parameter(property = &quot;filteredVendorNames&quot;, required = false)
+    private List&lt;String&gt; filteredVendorNames;
+
+    /**
+     * Base URL for fetching Maven central artifacts from a server.
+     * 
+     * This can be Maven central itself (like the default value) or a mirror of maven central on a Nexus or other artifact server.
+     * 
+     * @since 1.2.6
+     */
+    @Parameter(defaultValue = &quot;https://repo.maven.apache.org/maven2/&quot;, property = &quot;nexusCentralBaseUrl&quot;, required = false)
+    private String nexusCentralBaseUrl;
+
+    /**
+     * Timeout for connecting to artifact server. This timeout is used when
+     * connecting to an artifact server (as configured with
+     * {@link #nexusCentralBaseUrl}) to retrieve parent POMs. The value is in
+     * milliseconds.
+     * 
+     * @since 1.3.1
+     */
+    @Parameter(defaultValue = &quot;1000&quot;, property = &quot;connectTimeout&quot;, required = false)
+    private int connectTimeout;
+
+    /**
+     * Whether the license XML file should be validated while reading in.
+     * 
+     * @since 1.2.6
+     */
+    @Parameter(defaultValue = &quot;false&quot;, property = &quot;validateLicenseXml&quot;, required = false)
+    private boolean validateLicenseXml;
+
+    /**
+     * Whether the documentation URL from the checked archives file should be displayed as a column in HTML and CSV reports.
+     * 
+     * @since 1.2.6
+     */
+    @Parameter(defaultValue = &quot;true&quot;, property = &quot;showDocumentationUrl&quot;, required = false)
+    private boolean showDocumentationUrl;
+
+    /**
+     * The name of the build to use when writing database entries.
+     * 
+     * &lt;p&gt;Only used if {@link #writeResultsToDatabase} is true. &lt;/p&gt;
+     * 
+     * @since 1.2
+     */
+    @Parameter(property = &quot;buildName&quot;, required = false, defaultValue = &quot;${project.artifactId}&quot;)
+    private String buildName;
+
+    /**
+     * The version of the build to use when writing database entries.
+     * 
+     * &lt;p&gt;Only used if {@link #writeResultsToDatabase} is true.&lt;/p&gt;
+     * 
+     * @since 1.2.6
+     */
+    @Parameter(property = &quot;buildVersion&quot;, required = false, defaultValue = &quot;${project.version}&quot;)
+    private String buildVersion;
+
+    /**
+     * The URL of the build itself (point to Jenkins).
+     * 
+     * &lt;p&gt;Only used if {@link #writeResultsToDatabase} is true.&lt;/p&gt;
+     * 
+     * @since 1.2.6
+     */
+    @Parameter(property = &quot;buildUrl&quot;, required = false)
+    private String buildUrl;
+
+    /**
+     * Skips the execution.
+     * 
+     * @since 1.3.1
+     */
+    @Parameter(defaultValue = &quot;false&quot;, property = &quot;skip&quot;, required = false)
+    private boolean skip;
+    /**
+     * Configuration bundle artifact.
+     * 
+     * @since 1.3.1
+     */
+    @Parameter(property = &quot;configurationBundle&quot;, required = false)
+    private ArtifactItem configurationBundle;
+
+    /**
+     * The project's remote repositories to use for the resolution.
+     * @since 1.3.1
+     */
+    @Parameter(defaultValue = &quot;${project.remoteProjectRepositories}&quot;, readonly = true)
+    private List&lt;RemoteRepository&gt; remoteRepositories;
+
+    /**
+     * The Maven repository system.
+     * @since 1.3.1
+     */
+    @Component
+    private RepositorySystem repositorySystem;
+
+    /**
+     * The current repository/network configuration of Maven.
+     * @since 1.3.1
+     */
+    @Parameter(defaultValue = &quot;${repositorySystemSession}&quot;, readonly = true)
+    private RepositorySystemSession repositorySystemSession;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getOutputName() {
+<span class="nc" id="L278">        return &quot;licensereport&quot;;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getName(Locale locale) {
+<span class="nc" id="L286">        return &quot;LicenseScout License Report&quot;;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDescription(Locale locale) {
+<span class="nc" id="L294">        return &quot;A detailled report on licenses&quot;;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void executeReport(Locale locale) throws MavenReportException {
+<span class="nc" id="L302">        final ILFLog log = new MavenLog(getLog());</span>
+
+<span class="nc bnc" id="L304" title="All 2 branches missed.">        if (skip) {</span>
+<span class="nc" id="L305">            log.info(&quot;Not executing because skip is configured as true.&quot;);</span>
+<span class="nc" id="L306">            return;</span>
+        }
+<span class="nc" id="L308">        File configurationBundleFile = null;</span>
+        try {
+<span class="nc bnc" id="L310" title="All 2 branches missed.">            if (configurationBundle != null) {</span>
+<span class="nc" id="L311">                configurationBundleFile = ArtifactHelper.getArtifactFile(this, configurationBundle);</span>
+            }
+<span class="nc" id="L313">        } catch (MojoExecutionException e1) {</span>
+<span class="nc" id="L314">            throw new MavenReportException(e1.getLocalizedMessage(), e1);</span>
+<span class="nc" id="L315">        }</span>
+
+<span class="nc" id="L317">        final ExecutionParameters executionParameters = new ExecutionParameters();</span>
+<span class="nc" id="L318">        final ConfigFileParameters configFileParameters = new ConfigFileParameters();</span>
+        try {
+<span class="nc" id="L320">            BeanUtils.copyProperties(executionParameters, this);</span>
+<span class="nc" id="L321">            BeanUtils.copyProperties(configFileParameters, this);</span>
+<span class="nc" id="L322">        } catch (IllegalAccessException | InvocationTargetException e) {</span>
+<span class="nc" id="L323">            throw new MavenReportException(&quot;Internal error occured: &quot; + e.getLocalizedMessage(), e);</span>
+<span class="nc" id="L324">        }</span>
+<span class="nc" id="L325">        Output output = new Output();</span>
+<span class="nc" id="L326">        output.setType(OutputFileType.DOXIA);</span>
+<span class="nc" id="L327">        executionParameters.setOutputs(Arrays.asList(output));</span>
+        // TODO: setEncoding()
+        //        output.setEncoding(outputEncoding);
+<span class="nc" id="L330">        executionParameters.setArchiveType(getArchiveType());</span>
+<span class="nc" id="L331">        executionParameters.setLsLog(log);</span>
+<span class="nc" id="L332">        executionParameters.setOutputDirectory(new File(getOutputDirectory()));</span>
+<span class="nc" id="L333">        IReportExporterFactory doxiaFactory = new DoxiaReportExporterFactory(new ISinkProvider() {</span>
+
+            @Override
+            public Sink getSink() {
+<span class="nc" id="L337">                return AbstractReportMojo.this.getSink();</span>
+            }
+        });
+<span class="nc" id="L340">        executionParameters.setExporterFactories(Arrays.asList(doxiaFactory));</span>
+
+<span class="nc" id="L342">        final ConfigFileHandler configFileHandler = createConfigFileHandler(configurationBundleFile,</span>
+                configFileParameters, log);
+
+<span class="nc" id="L345">        final Executor executor = new Executor(executionParameters, configFileHandler);</span>
+        try {
+<span class="nc" id="L347">            executor.execute();</span>
+<span class="nc" id="L348">        } catch (LicenseScoutExecutionException e) {</span>
+<span class="nc" id="L349">            throw new MavenReportException(&quot;Internal error occured: &quot; + e.getLocalizedMessage(), e);</span>
+<span class="nc" id="L350">        }</span>
+<span class="nc" id="L351">    }</span>
+
+    /**
+     * @param configurationBundleFile
+     * @param configFileParameters
+     * @param log
+     * @return a configuration file handler
+     */
+    //TODO: factor out with Abstractscanmojo
+    private ConfigFileHandler createConfigFileHandler(final File configurationBundleFile,
+                                                      final ConfigFileParameters configFileParameters,
+                                                      final ILFLog log) {
+        final ConfigFileHandler configFileHandler;
+<span class="nc bnc" id="L364" title="All 2 branches missed.">        if (configurationBundleFile != null) {</span>
+<span class="nc" id="L365">            configFileHandler = new ZipConfigFileHandler(configurationBundleFile, configFileParameters, log);</span>
+<span class="nc" id="L366">            log.info(&quot;reading configuration files from ZIP file: &quot; + configurationBundleFile.getAbsolutePath());</span>
+        } else {
+<span class="nc" id="L368">            configFileHandler = new FilesystemConfigFileHandler(configFileParameters, log);</span>
+<span class="nc" id="L369">            log.info(&quot;reading configuration files from file system&quot;);</span>
+        }
+<span class="nc" id="L371">        return configFileHandler;</span>
+    }
+
+    /**
+     * Obtains the archive type handled by this MOJO.
+     * 
+     * @return an archive type
+     */
+    protected abstract ArchiveType getArchiveType();
+
+    // --------------getters -- NOTE: these are called by reflection from BeanUtils.copyProperties()
+
+    /**
+     * @return the showDocumentationUrl
+     */
+    public final boolean isShowDocumentationUrl() {
+<span class="nc" id="L387">        return showDocumentationUrl;</span>
+    }
+
+    /**
+     * @return the scanDirectory
+     */
+    public final File getScanDirectory() {
+<span class="nc" id="L394">        return scanDirectory;</span>
+    }
+
+    /**
+     * @return the licensesFilename
+     */
+    public final File getLicensesFilename() {
+<span class="nc" id="L401">        return licensesFilename;</span>
+    }
+
+    /**
+     * @return the providersFilename
+     */
+    public final File getProvidersFilename() {
+<span class="nc" id="L408">        return providersFilename;</span>
+    }
+
+    /**
+     * @return the noticesFilename
+     */
+    public final File getNoticesFilename() {
+<span class="nc" id="L415">        return noticesFilename;</span>
+    }
+
+    /**
+     * @return the checkedArchivesFilename
+     */
+    public final File getCheckedArchivesFilename() {
+<span class="nc" id="L422">        return checkedArchivesFilename;</span>
+    }
+
+    /**
+     * @return the licenseUrlMappingsFilename
+     */
+    public final String getLicenseUrlMappingsFilename() {
+<span class="nc" id="L429">        return licenseUrlMappingsFilename;</span>
+    }
+
+    /**
+     * @return the licenseNameMappingsFilename
+     */
+    public final String getLicenseNameMappingsFilename() {
+<span class="nc" id="L436">        return licenseNameMappingsFilename;</span>
+    }
+
+    /**
+     * @return the globalFiltersFilename
+     */
+    public final String getGlobalFiltersFilename() {
+<span class="nc" id="L443">        return globalFiltersFilename;</span>
+    }
+
+    /**
+     * @return the filteredVendorNamesFilename
+     */
+    public final String getFilteredVendorNamesFilename() {
+<span class="nc" id="L450">        return filteredVendorNamesFilename;</span>
+    }
+
+    /**
+     * @return the cleanOutputActive
+     */
+    public final boolean isCleanOutputActive() {
+<span class="nc" id="L457">        return cleanOutputActive;</span>
+    }
+
+    /**
+     * @return the cleanOutputLegalStates
+     */
+    public final LegalStatus[] getCleanOutputLegalStates() {
+<span class="nc" id="L464">        return cleanOutputLegalStates;</span>
+    }
+
+    /**
+     * @return the cleanOutputLicenseSpdxIdentifiers
+     */
+    public final String[] getCleanOutputLicenseSpdxIdentifiers() {
+<span class="nc" id="L471">        return cleanOutputLicenseSpdxIdentifiers;</span>
+    }
+
+    /**
+     * @return the filteredVendorNames
+     */
+    public final List&lt;String&gt; getFilteredVendorNames() {
+<span class="nc" id="L478">        return filteredVendorNames;</span>
+    }
+
+    /**
+     * @return the nexusCentralBaseUrl
+     */
+    public final String getNexusCentralBaseUrl() {
+<span class="nc" id="L485">        return nexusCentralBaseUrl;</span>
+    }
+
+    /**
+     * @return the connectTimeout
+     */
+    public final int getConnectTimeout() {
+<span class="nc" id="L492">        return connectTimeout;</span>
+    }
+
+    /**
+     * @return the validateLicenseXml
+     */
+    public final boolean isValidateLicenseXml() {
+<span class="nc" id="L499">        return validateLicenseXml;</span>
+    }
+
+    /**
+     * @return the buildName
+     */
+    public final String getBuildName() {
+<span class="nc" id="L506">        return buildName;</span>
+    }
+
+    /**
+     * @return the buildVersion
+     */
+    public final String getBuildVersion() {
+<span class="nc" id="L513">        return buildVersion;</span>
+    }
+
+    /**
+     * @return the buildUrl
+     */
+    public final String getBuildUrl() {
+<span class="nc" id="L520">        return buildUrl;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final List&lt;RemoteRepository&gt; getRemoteRepositories() {
+<span class="nc" id="L528">        return remoteRepositories;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final RepositorySystem getRepositorySystem() {
+<span class="nc" id="L536">        return repositorySystem;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final RepositorySystemSession getRepositorySystemSession() {
+<span class="nc" id="L544">        return repositorySystemSession;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

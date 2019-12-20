@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CryptUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.util</a> &gt; <span class="el_source">CryptUtil.java</span></div><h1>CryptUtil.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.util;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
+
+import org.apache.commons.io.input.MessageDigestCalculatingInputStream;
+import org.aposin.licensescout.model.LSMessageDigest;
+
+/**
+ * Utility methods for calculating message digests.
+ * 
+ */
+public class CryptUtil {
+
+    private static final String DEFAULT_MD_ALGORITHM = &quot;SHA-256&quot;;
+
+<span class="fc" id="L34">    private static String messageDigestAlgorithm = DEFAULT_MD_ALGORITHM;</span>
+
+    private CryptUtil() {
+        // DO NOTHING
+    }
+
+    /**
+     * Calculates a message digest from an input stream.
+     * 
+     * @param is an input stream
+     * @return a message digest
+     * @throws IOException
+     */
+    public static LSMessageDigest calculateMessageDigest(final InputStream is) throws IOException {
+<span class="fc" id="L48">        final MessageDigest md = getMessageDigestInstance();</span>
+<span class="fc" id="L49">        try (final MessageDigestCalculatingInputStream stream = new MessageDigestCalculatingInputStream(is, md)) {</span>
+<span class="fc" id="L50">            stream.consume();</span>
+<span class="fc" id="L51">            return new LSMessageDigest(md.digest());</span>
+        }
+    }
+
+    private static MessageDigest getMessageDigestInstance() {
+        try {
+<span class="fc" id="L57">            return MessageDigest.getInstance(messageDigestAlgorithm);</span>
+<span class="nc" id="L58">        } catch (GeneralSecurityException e) {</span>
+<span class="nc" id="L59">            throw new RuntimeException(e);</span>
+        }
+    }
+
+    /**
+     * @return the messageDigestAlgorithm
+     */
+    public static final String getMessageDigestAlgorithm() {
+<span class="fc" id="L67">        return messageDigestAlgorithm;</span>
+    }
+
+    /**
+     * @param messageDigestAlgorithm the messageDigestAlgorithm to set
+     */
+    public static final void setMessageDigestAlgorithm(final String messageDigestAlgorithm) {
+<span class="nc" id="L74">        CryptUtil.messageDigestAlgorithm = messageDigestAlgorithm;</span>
+<span class="nc" id="L75">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

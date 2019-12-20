@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbstractSaxHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.util.sax</a> &gt; <span class="el_source">AbstractSaxHandler.java</span></div><h1>AbstractSaxHandler.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.util.sax;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.aposin.licensescout.util.ILFLog;
+import org.xml.sax.Attributes;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
+/**
+ *
+ */
+public class AbstractSaxHandler extends DefaultHandler {
+
+    protected static final String ATTRIBUTE_ID = &quot;id&quot;;
+    protected static final String ATTRIBUTE_IDREF = &quot;idref&quot;;
+    protected static final String ATTRIBUTE_TYPE = &quot;type&quot;;
+
+    private final ILFLog log;
+<span class="fc" id="L37">    private final Map&lt;String, IElementHandler&gt; elementHandlers = new HashMap&lt;&gt;();</span>
+    private StringBuilder characterCollector;
+    private Locator locator;
+
+    /**
+     * Constructor.
+     * @param log the logger
+     */
+<span class="fc" id="L45">    public AbstractSaxHandler(final ILFLog log) {</span>
+<span class="fc" id="L46">        this.log = log;</span>
+<span class="fc" id="L47">    }</span>
+
+    /**
+     * @return the log
+     */
+    protected final ILFLog getLog() {
+<span class="fc" id="L53">        return log;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void startElement(String uri, String localName, String qName, final Attributes attributes)
+            throws SAXException {
+<span class="fc" id="L62">        final IElementHandler handler = elementHandlers.get(localName);</span>
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">        if (handler != null) {</span>
+<span class="fc" id="L64">            handler.startElement(uri, localName, qName, attributes);</span>
+        } else {
+<span class="nc" id="L66">            log.error(&quot;Unhandled element: '&quot; + localName + &quot;'&quot;);</span>
+        }
+<span class="fc" id="L68">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void endElement(String uri, String localName, String qName) throws SAXException {
+<span class="fc" id="L75">        final IElementHandler handler = elementHandlers.get(localName);</span>
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">        if (handler != null) {</span>
+<span class="fc" id="L77">            handler.endElement(uri, localName, qName);</span>
+        } else {
+<span class="nc" id="L79">            log.error(&quot;Unhandled element: '&quot; + localName + &quot;'&quot;);</span>
+        }
+<span class="fc" id="L81">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void characters(char[] ch, int start, int length) throws SAXException {
+<span class="fc bfc" id="L88" title="All 2 branches covered.">        if (characterCollector != null) {</span>
+<span class="fc" id="L89">            characterCollector.append(ch, start, length);</span>
+        }
+<span class="fc" id="L91">    }</span>
+
+    protected final void setElementHandler(final IElementHandler elementHandler) {
+<span class="fc" id="L94">        final String elementName = elementHandler.getElementName();</span>
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if (elementName != null) {</span>
+<span class="fc" id="L96">            setElementHandler(elementName, elementHandler);</span>
+        } else {
+<span class="nc" id="L98">            getLog().warn(&quot;Element name is null for element handler &quot; + elementHandler.toString());</span>
+        }
+<span class="fc" id="L100">    }</span>
+
+    protected final void setElementHandler(final String elementName, final IElementHandler elementHandler) {
+<span class="fc" id="L103">        elementHandlers.put(elementName, elementHandler);</span>
+<span class="fc" id="L104">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setDocumentLocator(final Locator locator) {
+<span class="fc" id="L111">        this.locator = locator;</span>
+<span class="fc" id="L112">    }</span>
+
+    protected Locator getDocumentLocator() {
+<span class="nc" id="L115">        return locator;</span>
+    }
+
+    /**
+     * Obtains a string representing the document location, suitable for log
+     * messages.
+     * 
+     * @return a string representing the location as returned by {@link #getDocumentLocator()}
+     */
+    protected String getLocationString() {
+<span class="nc" id="L125">        return locator.getPublicId() + &quot;:&quot; + locator.getLineNumber() + &quot;:&quot; + locator.getColumnNumber();</span>
+    }
+
+    /**
+     * Obtains the current line number from the locator, if present.
+     * @return the current line number as a string if the locator is present or an empty string if no locator is present
+     */
+    protected String getLineNumberInformation() {
+<span class="nc bnc" id="L133" title="All 2 branches missed.">        if (getDocumentLocator() != null) {</span>
+<span class="nc" id="L134">            return Integer.toString(getDocumentLocator().getLineNumber());</span>
+        } else {
+<span class="nc" id="L136">            return &quot;&quot;;</span>
+        }
+    }
+
+<span class="fc" id="L140">	protected abstract class AbstractTextElementHandler implements IElementHandler {</span>
+	
+	    /** {@inheritDoc} */
+	    @Override
+	    public final void startElement(final String uri, final String localName, final String qName,
+	                                   final Attributes attributes) {
+<span class="fc" id="L146">	        characterCollector = new StringBuilder();</span>
+<span class="fc" id="L147">	        startElementHook(uri, localName, qName, attributes);</span>
+<span class="fc" id="L148">	    }</span>
+	
+	    protected void startElementHook(final String uri, final String localName, final String qName,
+	                                    final Attributes attributes) {
+	        // DO NOTHING
+<span class="fc" id="L153">	    }</span>
+	
+	    /** {@inheritDoc} */
+	    @Override
+	    public final void endElement(final String uri, final String localName, final String qName) {
+<span class="fc" id="L158">	        final String tmp = getCollectedCharacters();</span>
+<span class="fc" id="L159">	        processText(tmp);</span>
+<span class="fc" id="L160">	    }</span>
+	
+	    protected abstract void processText(String text);
+	
+	    private String getCollectedCharacters() {
+<span class="fc" id="L165">	        final String tmp = characterCollector.toString();</span>
+<span class="fc" id="L166">	        characterCollector = null;</span>
+<span class="fc" id="L167">	        return tmp.trim();</span>
+	    }
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

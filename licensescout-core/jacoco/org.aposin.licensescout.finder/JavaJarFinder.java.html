@@ -1,0 +1,672 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JavaJarFinder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.finder</a> &gt; <span class="el_source">JavaJarFinder.java</span></div><h1>JavaJarFinder.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.finder;
+
+import static org.aposin.licensescout.archive.ArchiveType.JAVA;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
+
+import org.apache.commons.io.IOUtils;
+import org.aposin.licensescout.archive.Archive;
+import org.aposin.licensescout.configuration.RunParameters;
+import org.aposin.licensescout.license.ArtifactServerUtil;
+import org.aposin.licensescout.license.License;
+import org.aposin.licensescout.license.LicenseStoreData;
+import org.aposin.licensescout.license.LicenseUtil;
+import org.aposin.licensescout.model.LSMessageDigest;
+import org.aposin.licensescout.util.ArchiveMetaInformation;
+import org.aposin.licensescout.util.CryptUtil;
+import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.JarUtil;
+
+/**
+ * Scan for licenses in an Eclipse plugins directory.
+ * 
+ * &lt;p&gt;The implementation does a recursive search through the file system starting with the directory set with {@link #setScanDirectory(File)} as
+ * a starting point.&lt;/p&gt;
+ *  
+ */
+public class JavaJarFinder extends AbstractFinder {
+
+<span class="nc" id="L54">    protected enum ScanMode {</span>
+        /**
+         * In a directory in the file system that is not an archive.
+         */
+<span class="nc" id="L58">        DIRECTORY(),</span>
+        /**
+         * In a directory in the file system that is an archive (i.e. in an unpacked archive).
+         */
+<span class="nc" id="L62">        UNPACKED_ARCHIVE();</span>
+    }
+
+<span class="fc" id="L65">    private final List&lt;String&gt; specialArchiveNames = new ArrayList&lt;&gt;();</span>
+    private final FinderHandler&lt;File, FileSystemEntryContainer, File&gt; fileSystemFinderHandler;
+    private final FinderHandler&lt;JarEntry, JarEntryContainer, JarInputStream&gt; jarFinderHandler;
+    private final ArtifactServerUtil artifactServerUtil;
+
+    /**
+     * Constructor.
+     * 
+     * @param licenseStoreData
+     * @param runParameters
+     * @param log the logger
+     */
+    public JavaJarFinder(final LicenseStoreData licenseStoreData, final RunParameters runParameters, final ILFLog log) {
+<span class="fc" id="L78">        super(licenseStoreData, log);</span>
+<span class="fc" id="L79">        artifactServerUtil = new ArtifactServerUtil(runParameters.getNexusCentralBaseUrl(),</span>
+<span class="fc" id="L80">                runParameters.getConnectTimeout(), log);</span>
+
+<span class="fc" id="L82">        fileSystemFinderHandler = new FilesystemFinderHandler(log);</span>
+<span class="fc" id="L83">        jarFinderHandler = new JarFinderHandler(log);</span>
+
+<span class="fc" id="L85">        initSpecialArchiveNames();</span>
+<span class="fc" id="L86">    }</span>
+
+    private void initSpecialArchiveNames() {
+<span class="fc" id="L89">        specialArchiveNames.add(&quot;ckeditor&quot;);</span>
+<span class="fc" id="L90">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean isCandidateLicenseFile(final String fileName) {
+<span class="fc" id="L97">        final String fileNameLowerCase = fileName.toLowerCase();</span>
+<span class="pc bpc" id="L98" title="1 of 4 branches missed.">        final boolean isTextOrHtmlFile = fileNameLowerCase.endsWith(&quot;txt&quot;) || fileNameLowerCase.endsWith(&quot;html&quot;)</span>
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">                || fileNameLowerCase.endsWith(&quot;htm&quot;);</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">        final boolean containsLicenseInFilename = fileNameLowerCase.contains(&quot;license&quot;)</span>
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">                || fileNameLowerCase.contains(&quot;licence&quot;);</span>
+<span class="fc" id="L102">        final boolean containsNoticeInFilename = fileNameLowerCase.contains(&quot;notice&quot;);</span>
+<span class="pc bpc" id="L103" title="2 of 6 branches missed.">        return (isTextOrHtmlFile || containsLicenseInFilename || containsNoticeInFilename)</span>
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">                &amp;&amp; !fileNameLowerCase.endsWith(&quot;.class&quot;);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void findLicensesImpl() throws Exception {
+<span class="fc" id="L112">        final File root = getScanDirectory();</span>
+<span class="fc" id="L113">        final String filePath = &quot;&quot;;</span>
+<span class="fc" id="L114">        parseFile(root, filePath);</span>
+<span class="fc" id="L115">    }</span>
+
+    /**
+     * &lt;p&gt;This method is called recursively as long as no file or directory is detected as being an archive. For archives, the recursion continues with {@link #parsePackedJarArchive(Archive, InputStream, File, String)} or 
+     * {@link #parseUnpackedJarArchive(Archive, File, String)}.&lt;/p&gt;
+     * 
+     * @param file
+     * @param filePath
+     * 
+     * @throws Exception
+     */
+    private void parseFile(final File file, final String filePath) throws Exception {
+<span class="fc" id="L127">        getLog().debug(&quot;parseFile(): processing &quot; + file.getAbsolutePath());</span>
+<span class="fc" id="L128">        final FinderHandler&lt;File, FileSystemEntryContainer, File&gt; finderHandler = fileSystemFinderHandler;</span>
+<span class="fc" id="L129">        final String entryName = file.getName();</span>
+<span class="fc" id="L130">        final FileSystemEntryContainer entryContainer = finderHandler.createEntryContainer(file);</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">        if (finderHandler.isDirectory(file)) {</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">            if (isArchiveDirectory(file)) {</span>
+<span class="fc" id="L133">                getLog().debug(&quot;parseFile(): recognized as archive directory&quot;);</span>
+<span class="fc" id="L134">                final File manifestFile = getManifestFile(file);</span>
+<span class="fc" id="L135">                ArchiveMetaInformation archiveMetaInformation = null;</span>
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">                if (manifestFile != null) {</span>
+<span class="fc" id="L137">                    archiveMetaInformation = JarUtil.getArchiveMetaInformationFromManifestFile(manifestFile, getLog());</span>
+                }
+<span class="fc" id="L139">                final Archive foundArchive = createAndAddArchive(entryName, archiveMetaInformation, filePath);</span>
+<span class="fc" id="L140">                addLicenseFromManifest(foundArchive, archiveMetaInformation, filePath);</span>
+<span class="fc" id="L141">                parseUnpackedJarArchive(foundArchive, file, filePath);</span>
+<span class="fc" id="L142">            } else {</span>
+<span class="fc" id="L143">                getLog().debug(&quot;parseFile(): recognized as normal directory&quot;);</span>
+<span class="fc" id="L144">                final File[] children = file.listFiles();</span>
+<span class="fc bfc" id="L145" title="All 2 branches covered.">                for (final File child : children) {</span>
+<span class="fc" id="L146">                    final String newFilePath = filePath + '/' + child.getName();</span>
+<span class="fc" id="L147">                    parseFile(child, newFilePath);</span>
+                }
+<span class="fc" id="L149">            }</span>
+        } else { // is file
+<span class="fc bfc" id="L151" title="All 2 branches covered.">            if (isArchiveName(entryName)) {</span>
+<span class="fc" id="L152">                getLog().debug(&quot;parseFile(): recognized as archive file&quot;);</span>
+<span class="fc" id="L153">                handleArchiveFile(entryName, entryContainer, filePath);</span>
+            } else {
+<span class="fc" id="L155">                getLog().debug(&quot;parseFile(): recognized as normal file - ignored&quot;);</span>
+            }
+        }
+<span class="fc" id="L158">    }</span>
+
+    private void parseUnpackedJarArchive(final Archive archive, final File parent, final String filePath)
+            throws Exception {
+<span class="fc" id="L162">        getLog().debug(&quot;parseUnpackedJarArchive(): processing &quot; + parent.getAbsolutePath());</span>
+<span class="fc" id="L163">        final FinderHandler&lt;File, FileSystemEntryContainer, File&gt; finderHandler = fileSystemFinderHandler;</span>
+<span class="fc" id="L164">        final File[] entries = parent.listFiles();</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">        for (final File entry : entries) {</span>
+<span class="fc" id="L166">            final String entryName = finderHandler.getEntryName(entry);</span>
+<span class="fc" id="L167">            final FileSystemEntryContainer entryContainer = finderHandler.createEntryContainer(entry);</span>
+<span class="fc" id="L168">            final String newFilePath = filePath + '/' + entryName;</span>
+<span class="fc" id="L169">            getLog().debug(&quot;parseUnpackedJarArchive(): processing &quot; + newFilePath);</span>
+<span class="fc bfc" id="L170" title="All 2 branches covered.">            if (isSpecialArchive(entryName)) {</span>
+<span class="fc" id="L171">                getLog().debug(&quot;parseUnpackedJarArchive(): recognized as special archive&quot;);</span>
+<span class="fc" id="L172">                handleSpecialArchive(entryName, entryContainer, newFilePath);</span>
+            } else {
+<span class="fc bfc" id="L174" title="All 2 branches covered.">                if (finderHandler.isDirectory(entry)) {</span>
+<span class="fc" id="L175">                    getLog().debug(&quot;parseUnpackedJarArchive(): recognized as directory&quot;);</span>
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">                    if (finderHandler.isUseDirectoryRecursion()) {</span>
+<span class="fc" id="L177">                        parseUnpackedJarArchive(archive, entryContainer.getFile(), newFilePath);</span>
+                    }
+                } else { // is file
+<span class="fc bfc" id="L180" title="All 2 branches covered.">                    if (isArchiveName(entryName)) {</span>
+<span class="fc" id="L181">                        getLog().debug(&quot;parseUnpackedJarArchive(): recognized as archive file&quot;);</span>
+<span class="fc" id="L182">                        handleArchiveFile(entryName, entryContainer, newFilePath);</span>
+                    } else {
+<span class="fc" id="L184">                        getLog().debug(&quot;parseUnpackedJarArchive(): recognized as normal file&quot;);</span>
+<span class="fc" id="L185">                        handleArchiveNormalFile(archive, entryName, entryContainer, newFilePath);</span>
+                    }
+                }
+            }
+        }
+<span class="fc" id="L190">    }</span>
+
+    private void handleSpecialArchive(final String entryName, final FileSystemEntryContainer entryContainer,
+                                      final String newFilePath)
+            throws Exception {
+<span class="fc" id="L195">        final String version = &quot;0.0.0&quot;;</span>
+<span class="fc" id="L196">        final Archive foundArchive = createAndAddArchive(entryName, version, newFilePath);</span>
+<span class="fc" id="L197">        parseUnpackedJarArchive(foundArchive, entryContainer.getFile(), newFilePath);</span>
+<span class="fc" id="L198">    }</span>
+
+    private void parsePackedJarArchive(final Archive archive, final InputStream fileInputStream, final File parent,
+                                       final String filePath)
+            throws Exception {
+<span class="fc" id="L203">        final FinderHandler&lt;JarEntry, JarEntryContainer, JarInputStream&gt; finderHandler = jarFinderHandler;</span>
+<span class="fc" id="L204">        getLog().debug(&quot;parsePackedJarArchive(): processing &quot; + parent.getAbsolutePath());</span>
+<span class="fc" id="L205">        try (final JarInputStream jarInputStream = new JarInputStream(fileInputStream)) {</span>
+            JarEntry entry;
+<span class="fc bfc" id="L207" title="All 2 branches covered.">            while ((entry = jarInputStream.getNextJarEntry()) != null) {</span>
+<span class="fc" id="L208">                final String entryName = finderHandler.getEntryName(entry);</span>
+<span class="fc" id="L209">                final String newFilePath = filePath + '/' + entryName;</span>
+<span class="fc" id="L210">                getLog().debug(&quot;parsePackedJarArchive(): processing &quot; + newFilePath);</span>
+<span class="fc bfc" id="L211" title="All 2 branches covered.">                if (isArchiveName(entryName)) {</span>
+<span class="fc" id="L212">                    final String newFilePath2 = newFilePath + &quot;!&quot;;</span>
+<span class="fc" id="L213">                    final JarEntryContainer entryContainer = finderHandler.createEntryContainer(jarInputStream);</span>
+<span class="fc" id="L214">                    final ArchiveMetaInformation archiveMetaInformation = finderHandler</span>
+<span class="fc" id="L215">                            .getArchiveMetaInformationFromManifest(entryContainer);</span>
+<span class="fc" id="L216">                    final File file = new File(parent, entryName);</span>
+<span class="fc" id="L217">                    String version = null;</span>
+<span class="pc bpc" id="L218" title="1 of 2 branches missed.">                    if (finderHandler.isFile(entry)) {</span>
+<span class="fc" id="L219">                        version = archiveMetaInformation.getVersion();</span>
+                    }
+<span class="fc" id="L221">                    final String simpleName = getSimpleName(entryName);</span>
+<span class="fc" id="L222">                    final Archive foundArchive = createAndAddArchive(simpleName, version, newFilePath);</span>
+<span class="fc" id="L223">                    foundArchive.setVendor(archiveMetaInformation.getVendor());</span>
+<span class="pc bpc" id="L224" title="1 of 2 branches missed.">                    if (finderHandler.isFile(entry)) {</span>
+<span class="fc" id="L225">                        addMessageDigest(finderHandler, entryContainer, foundArchive);</span>
+                    }
+<span class="fc" id="L227">                    addLicenseFromManifest(foundArchive, archiveMetaInformation, newFilePath2);</span>
+<span class="fc" id="L228">                    try (final InputStream inputStream = entryContainer.getInputStream()) {</span>
+<span class="fc" id="L229">                        parsePackedJarArchive(foundArchive, inputStream, file, newFilePath2);</span>
+                    }
+<span class="fc" id="L231">                } else {</span>
+<span class="pc bpc" id="L232" title="1 of 2 branches missed.">                    if (finderHandler.isFile(entry)) {</span>
+<span class="fc" id="L233">                        final JarEntryContainer entryContainer = finderHandler.createEntryContainer(jarInputStream);</span>
+<span class="fc" id="L234">                        handleArchiveNormalFile(archive, entryName, entryContainer, newFilePath);</span>
+                    }
+                }
+<span class="fc" id="L237">            }</span>
+        }
+<span class="fc" id="L239">    }</span>
+
+    private void handleArchiveFile(final String entryName, final FileSystemEntryContainer entryContainer,
+                                   final String filePath)
+            throws IOException, Exception {
+<span class="fc" id="L244">        final FinderHandler&lt;File, FileSystemEntryContainer, File&gt; finderHandler = fileSystemFinderHandler;</span>
+<span class="fc" id="L245">        final ArchiveMetaInformation archiveMetaInformation = finderHandler</span>
+<span class="fc" id="L246">                .getArchiveMetaInformationFromManifest(entryContainer);</span>
+<span class="fc" id="L247">        final Archive foundArchive = createAndAddArchive(entryName, archiveMetaInformation, filePath);</span>
+<span class="fc" id="L248">        addMessageDigest(finderHandler, entryContainer, foundArchive);</span>
+<span class="fc" id="L249">        final String newFilePath = filePath + &quot;!&quot;;</span>
+<span class="fc" id="L250">        addLicenseFromManifest(foundArchive, archiveMetaInformation, newFilePath);</span>
+<span class="fc" id="L251">        try (final FileInputStream archiveFileInputStream = new FileInputStream(entryContainer.getFile())) {</span>
+<span class="fc" id="L252">            parsePackedJarArchive(foundArchive, archiveFileInputStream, entryContainer.getFile(), newFilePath);</span>
+        }
+<span class="fc" id="L254">    }</span>
+
+    private void handleArchiveNormalFile(final Archive archive, final String entryName,
+                                         final EntryContainer entryContainer, final String filePath)
+            throws IOException {
+<span class="fc bfc" id="L259" title="All 2 branches covered.">        if (isCandidateLicenseFile(entryName)) {</span>
+<span class="fc" id="L260">            archive.addLicenseCandidateFile(filePath);</span>
+        }
+<span class="fc" id="L262">        try (final InputStream inputStream = entryContainer.getInputStream()) {</span>
+<span class="fc" id="L263">            final Collection&lt;License&gt; licenses = checkFileForLicenses(inputStream, entryName, getLicenseStoreData());</span>
+<span class="fc" id="L264">            addLicenses(archive, licenses, filePath);</span>
+        }
+<span class="fc bfc" id="L266" title="All 2 branches covered.">        if (isPomFile(entryName)) {</span>
+<span class="fc" id="L267">            addLicensesFromPom(entryContainer, archive, filePath);</span>
+        }
+<span class="fc" id="L269">    }</span>
+
+    private Archive createAndAddArchive(final String fileName, final ArchiveMetaInformation archiveMetaInformation,
+                                        final String filePath) {
+<span class="fc" id="L273">        String version = null;</span>
+<span class="fc" id="L274">        String vendor = null;</span>
+<span class="pc bpc" id="L275" title="1 of 2 branches missed.">        if (archiveMetaInformation != null) {</span>
+<span class="fc" id="L276">            version = archiveMetaInformation.getVersion();</span>
+<span class="fc" id="L277">            vendor = archiveMetaInformation.getVendor();</span>
+        }
+<span class="fc" id="L279">        final Archive foundArchive = createAndAddArchive(fileName, version, filePath);</span>
+<span class="fc" id="L280">        foundArchive.setVendor(vendor);</span>
+<span class="fc" id="L281">        return foundArchive;</span>
+    }
+
+    private Archive createAndAddArchive(final String fileName, final String versionParam, final String filePath) {
+<span class="fc" id="L285">        final String version = getVersionNotNull(versionParam);</span>
+<span class="fc" id="L286">        final Archive foundArchive = new Archive(JAVA, fileName, version, filePath);</span>
+<span class="fc" id="L287">        addToArchiveFiles(foundArchive);</span>
+<span class="fc" id="L288">        return foundArchive;</span>
+    }
+
+    private void addLicensesFromPom(final EntryContainer entryContainer, final Archive archive, final String filePath)
+            throws IOException {
+<span class="fc" id="L293">        try (final InputStream inputStream = entryContainer.getInputStream()) {</span>
+<span class="fc" id="L294">            artifactServerUtil.addLicensesFromPom(inputStream, archive, filePath, getLicenseStoreData());</span>
+        }
+<span class="fc" id="L296">    }</span>
+
+    private String getSimpleName(final String entryName) {
+<span class="fc" id="L299">        final int pos = entryName.lastIndexOf('/');</span>
+<span class="pc bpc" id="L300" title="1 of 2 branches missed.">        if (pos &gt;= 0) {</span>
+<span class="fc" id="L301">            return entryName.substring(pos + 1);</span>
+        }
+<span class="nc" id="L303">        return entryName;</span>
+    }
+
+    private &lt;C extends EntryContainer&gt; void addMessageDigest(final FinderHandler&lt;?, C, ?&gt; finderHandler,
+                                                             final C entryContainer, final Archive archive)
+            throws IOException {
+<span class="fc" id="L309">        final LSMessageDigest md = finderHandler.calculateMessageDigest(entryContainer);</span>
+<span class="fc" id="L310">        archive.setMessageDigest(md);</span>
+<span class="fc" id="L311">    }</span>
+
+    private String getVersionNotNull(String version) {
+<span class="pc bpc" id="L314" title="1 of 2 branches missed.">        if (version == null) {</span>
+<span class="nc" id="L315">            return &quot;&quot;;</span>
+        }
+<span class="fc" id="L317">        return version;</span>
+    }
+
+    private void addLicenseFromManifest(final Archive archive, final ArchiveMetaInformation archiveMetaInformation,
+                                        final String filePath) {
+<span class="fc" id="L322">        String licenseUrl = archiveMetaInformation.getLicenseUrl();</span>
+<span class="fc bfc" id="L323" title="All 2 branches covered.">        if (licenseUrl != null) {</span>
+<span class="fc" id="L324">            licenseUrl = licenseUrl.trim();</span>
+<span class="fc" id="L325">            final String[] licenseUrls = licenseUrl.split(&quot;,&quot;);</span>
+<span class="fc" id="L326">            boolean licenseFound = false;</span>
+<span class="fc" id="L327">            final String licenseFileName = filePath + &quot;/META-INF/MANIFEST.MF&quot;;</span>
+<span class="fc bfc" id="L328" title="All 2 branches covered.">            for (String licenseUrl2 : licenseUrls) {</span>
+<span class="fc" id="L329">                licenseUrl2 = licenseUrl2.trim();</span>
+<span class="fc" id="L330">                licenseFound |= LicenseUtil.handleLicenseUrl(licenseUrl2, archive, licenseFileName,</span>
+<span class="fc" id="L331">                        getLicenseStoreData(), getLog());</span>
+            }
+<span class="pc bpc" id="L333" title="1 of 2 branches missed.">            if (!licenseFound) {</span>
+<span class="nc" id="L334">                getLog().warn(&quot;License not found by URL: &quot; + licenseUrl);</span>
+            }
+        }
+<span class="fc" id="L337">    }</span>
+
+    /**
+     * Checks if is archive by checking if the name contains &quot;jar&quot;.
+     * 
+     * &lt;p&gt;Note: this method only relies on the filename. It does not check containing files that indicate an archive.&lt;/p&gt;
+     * 
+     * @param fileName the file name
+     * @return true, if is archive
+     */
+    private static boolean isArchiveName(final String fileName) {
+<span class="fc" id="L348">        return fileName.endsWith(&quot;.jar&quot;);</span>
+    }
+
+    /**
+     * Checks if passed file is an unpacked JAR file.
+     * 
+     * @param dir the file name
+     * @return true, if is archive
+     */
+    private static boolean isArchiveDirectory(final File dir) {
+<span class="pc bpc" id="L358" title="1 of 2 branches missed.">        if (!dir.isDirectory()) {</span>
+<span class="nc" id="L359">            return false;</span>
+        }
+<span class="fc" id="L361">        final String[] entries = dir.list();</span>
+<span class="fc" id="L362">        final List&lt;String&gt; entriesList = Arrays.asList(entries);</span>
+<span class="fc" id="L363">        return entriesList.contains(&quot;META-INF&quot;);</span>
+    }
+
+    /**
+     * Obtains a file object for &quot;META-INF/MANIFEST.MF&quot; in an unpacked JAR.
+     * 
+     * @param dir the file name
+     * @return true, if is archive
+     */
+    private static File getManifestFile(final File dir) {
+<span class="fc" id="L373">        final File[] entries1 = dir.listFiles();</span>
+<span class="pc bpc" id="L374" title="1 of 2 branches missed.">        for (final File entry1 : entries1) {</span>
+<span class="fc bfc" id="L375" title="All 2 branches covered.">            if (&quot;META-INF&quot;.equalsIgnoreCase(entry1.getName())) {</span>
+<span class="fc" id="L376">                final File[] entries2 = entry1.listFiles();</span>
+<span class="pc bpc" id="L377" title="1 of 2 branches missed.">                for (final File entry2 : entries2) {</span>
+<span class="pc bpc" id="L378" title="1 of 2 branches missed.">                    if (&quot;MANIFEST.MF&quot;.equalsIgnoreCase(entry2.getName())) {</span>
+<span class="fc" id="L379">                        return entry2;</span>
+                    }
+                }
+            }
+        }
+<span class="nc" id="L384">        return null;</span>
+    }
+
+    private boolean isSpecialArchive(final String name) {
+<span class="fc" id="L388">        return specialArchiveNames.contains(name);</span>
+    }
+
+    private boolean isPomFile(final String name) {
+<span class="fc" id="L392">        return name.endsWith(&quot;pom.xml&quot;);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isPomResolutionUsed() {
+<span class="fc" id="L400">        return artifactServerUtil.isCachedCheckAccess();</span>
+    }
+
+    /**
+     * Representation of a file or file entry (in a JAR file).
+     * 
+     * &lt;p&gt;This is used to handle files from traversing the file system and entries from reading
+     * a JAR file in the same abstract way.&lt;/p&gt;
+     * 
+     * @see FileSystemEntryContainer
+     * @see JarEntryContainer
+     */
+    @FunctionalInterface
+    private static interface EntryContainer {
+
+        /**
+         * Obtains an Input stream.
+         * 
+         * @return an Input stream
+         * @throws IOException
+         */
+        public InputStream getInputStream() throws IOException;
+    }
+
+    /**
+     * Represents a file from the file system.
+     * 
+     * &lt;p&gt;Holds a reference to the file object.&lt;/p&gt;
+     *
+     * @see JarEntryContainer
+     */
+    private static class FileSystemEntryContainer implements EntryContainer {
+
+        private final File file;
+
+        /**
+         * Constructor.
+         * @param file a file
+         */
+<span class="fc" id="L439">        public FileSystemEntryContainer(final File file) {</span>
+<span class="fc" id="L440">            this.file = file;</span>
+<span class="fc" id="L441">        }</span>
+
+        /**
+         * @return the file
+         */
+        public final File getFile() {
+<span class="fc" id="L447">            return file;</span>
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public final InputStream getInputStream() throws IOException {
+<span class="fc" id="L455">            return new FileInputStream(getFile());</span>
+        }
+
+    }
+
+    /**
+     * Represents an entry from a JAR file.
+     * 
+     * &lt;p&gt;Holds the content of the entry in a byte array.&lt;/p&gt;
+     * 
+     * @see FileSystemEntryContainer
+     */
+    private static class JarEntryContainer implements EntryContainer {
+
+        private final byte[] contents;
+
+        /**
+         * Constructor.
+         * @param contents
+         */
+<span class="fc" id="L475">        public JarEntryContainer(final byte[] contents) {</span>
+<span class="pc bpc" id="L476" title="1 of 2 branches missed.">            if (contents.length == 0) {</span>
+<span class="nc" id="L477">                throw new IllegalArgumentException(&quot;contents length must not be zero&quot;);</span>
+            }
+<span class="fc" id="L479">            this.contents = contents;</span>
+<span class="fc" id="L480">        }</span>
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public final InputStream getInputStream() {
+<span class="fc" id="L487">            return new ByteArrayInputStream(contents);</span>
+        }
+    }
+
+    private static interface FinderHandler&lt;F, C extends EntryContainer, I&gt; {
+
+        /**
+         * Checks if the algorithm should go into a recursion for non-archive directories.
+         * 
+         * @return true if directory recursion should be used, false otherwise
+         */
+        public boolean isUseDirectoryRecursion();
+
+        public String getEntryName(F entry);
+
+        public boolean isFile(F file);
+
+        public boolean isDirectory(F file);
+
+        public C createEntryContainer(I ecBase) throws IOException;
+
+        public ArchiveMetaInformation getArchiveMetaInformationFromManifest(C entryContainer) throws IOException;
+
+        public LSMessageDigest calculateMessageDigest(C entryContainer) throws IOException;
+
+    }
+
+    private abstract static class AbstractFinderHandler&lt;F, C extends EntryContainer, I&gt;
+            implements FinderHandler&lt;F, C, I&gt; {
+
+        private final ILFLog log;
+
+        /**
+         * Constructor.
+         * 
+         * @param log the logger
+         */
+<span class="fc" id="L524">        protected AbstractFinderHandler(final ILFLog log) {</span>
+<span class="fc" id="L525">            this.log = log;</span>
+<span class="fc" id="L526">        }</span>
+
+        /**
+         * @return the log
+         */
+        protected final ILFLog getLog() {
+<span class="fc" id="L532">            return log;</span>
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public LSMessageDigest calculateMessageDigest(final C entryContainer) throws IOException {
+<span class="fc" id="L540">            try (final InputStream inputStream = entryContainer.getInputStream()) {</span>
+<span class="fc" id="L541">                return CryptUtil.calculateMessageDigest(inputStream);</span>
+            }
+        }
+
+    }
+
+    private static class FilesystemFinderHandler extends AbstractFinderHandler&lt;File, FileSystemEntryContainer, File&gt; {
+
+        /**
+         * Constructor.
+         * 
+         * @param log the logger
+         */
+        public FilesystemFinderHandler(ILFLog log) {
+<span class="fc" id="L555">            super(log);</span>
+<span class="fc" id="L556">        }</span>
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isUseDirectoryRecursion() {
+<span class="fc" id="L563">            return true;</span>
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getEntryName(final File entry) {
+<span class="fc" id="L571">            return entry.getName();</span>
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isFile(final File file) {
+<span class="nc" id="L579">            return file.isFile();</span>
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isDirectory(final File file) {
+<span class="fc" id="L587">            return file.isDirectory();</span>
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public FileSystemEntryContainer createEntryContainer(final File ecBase) throws IOException {
+<span class="fc" id="L595">            return new FileSystemEntryContainer(ecBase);</span>
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ArchiveMetaInformation getArchiveMetaInformationFromManifest(final FileSystemEntryContainer entryContainer)
+                throws IOException {
+<span class="fc" id="L604">            return JarUtil.getArchiveMetaInformationFromManifest(entryContainer.getFile(), getLog());</span>
+        }
+
+    }
+
+    private static class JarFinderHandler extends AbstractFinderHandler&lt;JarEntry, JarEntryContainer, JarInputStream&gt; {
+
+        /**
+         * @param log the logger
+         */
+        public JarFinderHandler(final ILFLog log) {
+<span class="fc" id="L615">            super(log);</span>
+<span class="fc" id="L616">        }</span>
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isUseDirectoryRecursion() {
+<span class="nc" id="L623">            return false;</span>
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getEntryName(final JarEntry entry) {
+<span class="fc" id="L631">            return entry.getName();</span>
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isFile(final JarEntry entry) {
+<span class="pc bpc" id="L639" title="1 of 2 branches missed.">            return !entry.isDirectory();</span>
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isDirectory(final JarEntry entry) {
+<span class="nc" id="L647">            return entry.isDirectory();</span>
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public JarEntryContainer createEntryContainer(final JarInputStream ecBase) throws IOException {
+<span class="fc" id="L655">            final byte[] archiveBytes = IOUtils.toByteArray(ecBase);</span>
+<span class="fc" id="L656">            return new JarEntryContainer(archiveBytes);</span>
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ArchiveMetaInformation getArchiveMetaInformationFromManifest(final JarEntryContainer entryContainer)
+                throws IOException {
+<span class="fc" id="L665">            try (final InputStream inputStream = entryContainer.getInputStream()) {</span>
+<span class="fc" id="L666">                return JarUtil.getArchiveMetaInformationFromManifest(inputStream, getLog());</span>
+            }
+        }
+
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

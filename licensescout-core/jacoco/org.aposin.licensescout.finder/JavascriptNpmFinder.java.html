@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JavascriptNpmFinder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.finder</a> &gt; <span class="el_source">JavascriptNpmFinder.java</span></div><h1>JavascriptNpmFinder.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.finder;
+
+import static org.aposin.licensescout.archive.ArchiveType.JAVASCRIPT;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
+import org.aposin.licensescout.archive.Archive;
+import org.aposin.licensescout.archive.ArchiveIdentifierVersion;
+import org.aposin.licensescout.license.LegalStatus;
+import org.aposin.licensescout.license.License;
+import org.aposin.licensescout.license.LicenseStoreData;
+import org.aposin.licensescout.license.LicenseUtil;
+import org.aposin.licensescout.model.Author;
+import org.aposin.licensescout.model.LicenseText;
+import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.JsonUtil;
+
+/**
+ * Scan for licenses in an NPM cache directory.
+ * 
+ * &lt;p&gt;Certain directories can be excluded from being recognized as an archive by giving their exact name as an element in the exclude list
+ * passed to the constructor (see {@link #JavascriptNpmFinder(LicenseStoreData, ILFLog, List)}).&lt;/p&gt;
+ *  
+ */
+public class JavascriptNpmFinder extends AbstractFinder {
+
+<span class="fc" id="L52">    private final List&lt;String&gt; dirNameExcludeList = new ArrayList&lt;&gt;();</span>
+
+    /**
+     * Constructor.
+     * 
+     * @param licenseStoreData 
+     * @param log the logger
+     * @param npmExcludedDirectoryNames list of directory names to ignore in scan of NPM directory
+     */
+    public JavascriptNpmFinder(final LicenseStoreData licenseStoreData, final ILFLog log,
+            final List&lt;String&gt; npmExcludedDirectoryNames) {
+<span class="fc" id="L63">        super(licenseStoreData, log);</span>
+<span class="fc" id="L64">        this.dirNameExcludeList.addAll(npmExcludedDirectoryNames);</span>
+<span class="fc" id="L65">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean isCandidateLicenseFile(final String fileName) {
+<span class="fc" id="L72">        final String fileNameLowerCase = fileName.toLowerCase();</span>
+<span class="pc bpc" id="L73" title="1 of 4 branches missed.">        return fileNameLowerCase.contains(&quot;license&quot;) || fileNameLowerCase.contains(&quot;readme&quot;);</span>
+    }
+
+    protected boolean isLicenseTextFile(final String fileName) {
+<span class="fc" id="L77">        final String fileNameLowerCase = fileName.toLowerCase();</span>
+<span class="fc" id="L78">        return fileNameLowerCase.contains(&quot;license&quot;);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void findLicensesImpl() throws IOException {
+<span class="fc" id="L86">        final File root = getScanDirectory();</span>
+<span class="fc" id="L87">        final String filePath = &quot;&quot;;</span>
+<span class="fc" id="L88">        traverseDirectory(root, filePath);</span>
+<span class="fc" id="L89">    }</span>
+
+    private void traverseDirectory(final File directory, final String filePath) throws IOException {
+<span class="fc" id="L92">        getLog().debug(&quot;traverseDirectory(): processing &quot; + directory.getAbsolutePath());</span>
+<span class="fc" id="L93">        final File[] entries = directory.listFiles();</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">        for (final File entry : entries) {</span>
+<span class="fc" id="L95">            final String entryName = entry.getName();</span>
+<span class="fc" id="L96">            final String newFilePath = filePath + &quot;/&quot; + entryName;</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">            if (!dirNameExcludeList.contains(entryName)) {</span>
+<span class="fc" id="L98">                getLog().debug(&quot;checking directory: &quot; + entryName);</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">                if (isArchive(entry)) {</span>
+<span class="fc" id="L100">                    processArchive(entry, newFilePath);</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">                } else if (entry.isDirectory()) {</span>
+<span class="fc" id="L102">                    traverseDirectory(entry, newFilePath);</span>
+                }
+            } else {
+<span class="fc" id="L105">                getLog().info(&quot;excluded directory: &quot; + newFilePath);</span>
+            }
+        }
+<span class="fc" id="L108">    }</span>
+
+    private void processArchive(final File file, final String filePath) throws IOException {
+<span class="fc" id="L111">        getLog().debug(&quot;processArchive(): processing &quot; + file.getAbsolutePath());</span>
+<span class="fc" id="L112">        final File packageJsonFile = new File(file, &quot;package.json&quot;);</span>
+<span class="fc" id="L113">        final String packageJsonFilePath = filePath + &quot;/package.json&quot;;</span>
+<span class="fc" id="L114">        final ArchiveIdentifierVersion archiveIdentifier = JsonUtil.getNPMArchiveDescription(packageJsonFile);</span>
+<span class="fc" id="L115">        final Archive foundArchive = createAndAddArchive(archiveIdentifier, filePath);</span>
+<span class="fc" id="L116">        final String vendorName = JsonUtil.getNPMArchiveVendorName(packageJsonFile);</span>
+<span class="fc" id="L117">        foundArchive.setVendor(vendorName);</span>
+<span class="fc" id="L118">        getLog().debug(&quot;vendor name: &quot; + vendorName);</span>
+<span class="fc" id="L119">        final Author author = JsonUtil.getNPMAuthor(packageJsonFile);</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        if (author != null) {</span>
+<span class="fc" id="L121">            getLog().debug(&quot;author name / email: &quot; + author.getName() + &quot; / &quot; + author.getEmail());</span>
+        } else {
+<span class="fc" id="L123">            getLog().debug(&quot;No author information found&quot;);</span>
+        }
+<span class="fc" id="L125">        foundArchive.setAuthor(author);</span>
+<span class="fc" id="L126">        final String npmArchiveLicenseName = JsonUtil.getNPMArchiveLicenseName(packageJsonFile);</span>
+<span class="fc" id="L127">        getLog().debug(&quot;license name: &quot; + npmArchiveLicenseName);</span>
+<span class="fc" id="L128">        final List&lt;License&gt; licenses = LicenseUtil.mapNpmLicenseName(npmArchiveLicenseName, getLicenseStoreData());</span>
+<span class="pc bpc" id="L129" title="1 of 4 branches missed.">        if (licenses != null &amp;&amp; !licenses.isEmpty()) {</span>
+<span class="fc bfc" id="L130" title="All 2 branches covered.">            for (final License license : licenses) {</span>
+<span class="fc" id="L131">                foundArchive.addLicense(license, packageJsonFilePath);</span>
+<span class="fc" id="L132">            }</span>
+        } else {
+<span class="fc" id="L134">            getLog().warn(&quot;No licenses and no name mapping found for license name: '&quot; + npmArchiveLicenseName + &quot;'&quot;);</span>
+<span class="fc" id="L135">            parseArchiveDirForLicenseFile(foundArchive, file, filePath);</span>
+        }
+<span class="fc" id="L137">        parseArchiveDirForLicenseText(foundArchive, file);</span>
+
+<span class="fc" id="L139">        processLicenses(foundArchive);</span>
+<span class="fc" id="L140">    }</span>
+
+    /**
+     * @param foundArchive
+     */
+    private void processLicenses(final Archive foundArchive) {
+<span class="fc" id="L146">        final boolean noLicenseInformationFound = foundArchive.getLicenses().isEmpty();</span>
+
+        // check for MIT license or no license and existing license text file
+<span class="fc bfc" id="L149" title="All 2 branches covered.">        if (foundArchive.getLicenseText() != null) {</span>
+<span class="fc" id="L150">            boolean containsMITLicense = false;</span>
+<span class="fc" id="L151">            final Iterator&lt;License&gt; licenseIterator = foundArchive.getLicenses().iterator();</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">            while (licenseIterator.hasNext()) {</span>
+<span class="fc" id="L153">                final License license = licenseIterator.next();</span>
+<span class="fc bfc" id="L154" title="All 2 branches covered.">                if (license.getSpdxIdentifier().equals(&quot;MIT&quot;)) {</span>
+<span class="fc" id="L155">                    containsMITLicense = true;</span>
+<span class="fc" id="L156">                    licenseIterator.remove();</span>
+<span class="fc" id="L157">                    break;</span>
+                }
+<span class="fc" id="L159">            }</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">            if (containsMITLicense) {</span>
+                // create a new License and replace it for the existing MIT license.
+<span class="fc" id="L162">                License additionalMitLicencse = new License(</span>
+<span class="fc" id="L163">                        &quot;MIT_&quot; + foundArchive.getFileName() + &quot;_&quot; + foundArchive.getVersion(),</span>
+<span class="fc" id="L164">                        &quot;MIT License for &quot; + foundArchive.getFileName() + &quot; &quot; + foundArchive.getVersion(),</span>
+<span class="fc" id="L165">                        LegalStatus.ACCEPTED, &quot;&quot;, &quot;&quot;, &quot;&quot;, foundArchive.getLicenseText().getText(), null);</span>
+<span class="fc" id="L166">                foundArchive.addLicense(additionalMitLicencse,</span>
+<span class="fc" id="L167">                        &quot;generated from License file &quot; + foundArchive.getLicenseText().getPath());</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">            } else if (noLicenseInformationFound) {</span>
+                // create a new unknown license from the text found
+<span class="fc" id="L170">                License unknownLicencse = new License(</span>
+<span class="fc" id="L171">                        &quot;unknown_&quot; + foundArchive.getFileName() + &quot;_&quot; + foundArchive.getVersion(),</span>
+<span class="fc" id="L172">                        &quot;Unknown License for &quot; + foundArchive.getFileName() + &quot; &quot; + foundArchive.getVersion(),</span>
+<span class="fc" id="L173">                        LegalStatus.UNKNOWN, &quot;&quot;, &quot;&quot;, &quot;&quot;, foundArchive.getLicenseText().getText(), null);</span>
+<span class="fc" id="L174">                foundArchive.addLicense(unknownLicencse,</span>
+<span class="fc" id="L175">                        &quot;generated from License file &quot; + foundArchive.getLicenseText().getPath());</span>
+            }
+        }
+<span class="fc" id="L178">    }</span>
+
+    private Archive createAndAddArchive(final ArchiveIdentifierVersion archiveIdentifier, final String filePath) {
+<span class="fc" id="L181">        final Archive foundArchive = new Archive(JAVASCRIPT, archiveIdentifier.getName(),</span>
+<span class="fc" id="L182">                archiveIdentifier.getVersion(), filePath);</span>
+<span class="fc" id="L183">        addToArchiveFiles(foundArchive);</span>
+<span class="fc" id="L184">        return foundArchive;</span>
+    }
+
+    private void parseArchiveDirForLicenseFile(final Archive archive, final File parent, final String filePath)
+            throws IOException {
+<span class="fc" id="L189">        getLog().debug(&quot;parseArchiveDir(): processing &quot; + parent.getAbsolutePath());</span>
+<span class="fc" id="L190">        final File[] entries = parent.listFiles();</span>
+<span class="fc bfc" id="L191" title="All 2 branches covered.">        for (final File entry : entries) {</span>
+<span class="pc bpc" id="L192" title="1 of 2 branches missed.">            if (entry.isFile()) {</span>
+<span class="fc" id="L193">                final String entryName = entry.getName();</span>
+<span class="fc" id="L194">                final String newFilePath = filePath + '/' + entryName;</span>
+<span class="fc bfc" id="L195" title="All 2 branches covered.">                if (isCandidateLicenseFile(entryName)) {</span>
+<span class="fc" id="L196">                    archive.addLicenseCandidateFile(newFilePath);</span>
+                }
+<span class="fc" id="L198">                try (final FileInputStream is = new FileInputStream(entry)) {</span>
+<span class="fc" id="L199">                    final Collection&lt;License&gt; licenses = checkFileForLicenses(is, entryName, getLicenseStoreData());</span>
+<span class="fc" id="L200">                    addLicenses(archive, licenses, newFilePath);</span>
+                }
+            }
+        }
+<span class="fc" id="L204">    }</span>
+
+    private void parseArchiveDirForLicenseText(final Archive archive, final File parent)
+            throws IOException {
+<span class="fc" id="L208">        getLog().debug(&quot;parseArchiveDir(): processing &quot; + parent.getAbsolutePath());</span>
+<span class="fc" id="L209">        final File[] entries = parent.listFiles();</span>
+<span class="fc bfc" id="L210" title="All 2 branches covered.">        for (final File entry : entries) {</span>
+<span class="pc bpc" id="L211" title="1 of 2 branches missed.">            if (entry.isFile()) {</span>
+<span class="fc" id="L212">                final String entryName = entry.getName();</span>
+<span class="fc bfc" id="L213" title="All 2 branches covered.">                if (isLicenseTextFile(entryName)) {</span>
+<span class="fc" id="L214">                    final String text = readFile(entry.toPath(), StandardCharsets.UTF_8);</span>
+<span class="fc" id="L215">                    final LicenseText licenseText = new LicenseText(text, entry.getAbsolutePath());</span>
+<span class="fc" id="L216">                    getLog().info(&quot;Setting license text from file &quot; + entry.getAbsolutePath());</span>
+<span class="fc" id="L217">                    archive.setLicenseText(licenseText);</span>
+                }
+            }
+        }
+<span class="fc" id="L221">    }</span>
+
+    private static String readFile(Path path, Charset encoding) throws IOException {
+<span class="fc" id="L224">        byte[] encoded = Files.readAllBytes(path);</span>
+<span class="fc" id="L225">        return new String(encoded, encoding);</span>
+    }
+
+    /**
+     * Checks if is archive.
+     * 
+     * @param file the file name
+     * @return true, if is archive
+     */
+    private static boolean isArchive(final File file) {
+<span class="fc bfc" id="L235" title="All 2 branches covered.">        if (!file.isDirectory()) {</span>
+<span class="fc" id="L236">            return false;</span>
+        }
+<span class="fc" id="L238">        final File packageJsonFile = new File(file, &quot;package.json&quot;);</span>
+<span class="fc" id="L239">        return packageJsonFile.exists();</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isPomResolutionUsed() {
+<span class="fc" id="L247">        return false;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

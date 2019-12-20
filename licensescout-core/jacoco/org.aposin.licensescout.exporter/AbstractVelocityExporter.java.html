@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbstractVelocityExporter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.exporter</a> &gt; <span class="el_source">AbstractVelocityExporter.java</span></div><h1>AbstractVelocityExporter.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.exporter;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.StringWriter;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
+import org.apache.velocity.runtime.resource.loader.FileResourceLoader;
+import org.aposin.licensescout.archive.Archive;
+import org.aposin.licensescout.license.License;
+
+/**
+ * The Exporter creates a report listing all archives including license
+ * information.
+ * 
+ * &lt;p&gt;This implementation is a base class for exporters based on Velocity templates
+ * to generate the output.&lt;/p&gt;
+ * 
+ * &lt;p&gt;Subclasses have to provide a default template by implementing {@link #getDefaultTemplate()}.&lt;/p&gt;
+ * &lt;p&gt;If necessary, subclasses can put additional information to the {@link VelocityContext} by overriding {@link #additionalSetup(VelocityContext, OutputResult)}.&lt;/p&gt;
+ */
+<span class="fc" id="L48">public abstract class AbstractVelocityExporter implements IReportExporter {</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final void export(final OutputResult outputResult, final ReportConfiguration reportConfiguration)
+            throws Exception {
+<span class="fc" id="L56">        final File outputFile = reportConfiguration.getOutputFile();</span>
+<span class="fc" id="L57">        final Charset charset = ExporterUtil.getOutputCharset(reportConfiguration);</span>
+<span class="fc" id="L58">        try (final FileWriter fileWriter = new FileWriter(outputFile, charset);</span>
+<span class="fc" id="L59">                final BufferedWriter bw = new BufferedWriter(fileWriter)) {</span>
+
+<span class="fc" id="L61">            Velocity.setProperty(RuntimeConstants.RESOURCE_LOADERS, &quot;file,classpath&quot;);</span>
+<span class="fc" id="L62">            Velocity.setProperty(RuntimeConstants.RESOURCE_LOADER + &quot;.file.class&quot;, FileResourceLoader.class.getName());</span>
+            /*
+             * NOTE: setting the path to empty is necessary because the default is &quot;.&quot; (current
+             * directory) and then using absolute path names will not work.
+             */
+<span class="fc" id="L67">            Velocity.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, &quot;&quot;);</span>
+<span class="fc" id="L68">            Velocity.setProperty(RuntimeConstants.RESOURCE_LOADER + &quot;.classpath.class&quot;,</span>
+<span class="fc" id="L69">                    ClasspathResourceLoader.class.getName());</span>
+
+<span class="fc" id="L71">            Velocity.init();</span>
+
+<span class="fc" id="L73">            final VelocityContext context = createVelocityContext(outputResult, reportConfiguration);</span>
+<span class="fc" id="L74">            final Template template = getTemplate(reportConfiguration);</span>
+
+<span class="fc" id="L76">            try (final StringWriter sw = new StringWriter()) {</span>
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">                if (template != null) {</span>
+<span class="fc" id="L78">                    template.merge(context, sw);</span>
+                }
+<span class="fc" id="L80">                bw.write(sw.getBuffer().toString());</span>
+            }
+        }
+<span class="fc" id="L83">    }</span>
+
+    private VelocityContext createVelocityContext(final OutputResult outputResult,
+                                                  final ReportConfiguration reportConfiguration) {
+<span class="fc" id="L87">        final VelocityContext context = new VelocityContext();</span>
+<span class="fc" id="L88">        final List&lt;Archive&gt; archiveFiles = getSortedArchives(outputResult);</span>
+<span class="fc" id="L89">        context.put(&quot;archiveFiles&quot;, archiveFiles);</span>
+
+<span class="fc" id="L91">        context.put(&quot;sourcePath&quot;, outputResult.getFinderResult().getScanDirectory().getAbsolutePath());</span>
+<span class="fc" id="L92">        context.put(&quot;detectionStatusStatistics&quot;, outputResult.getDetectionStatusStatistics());</span>
+<span class="fc" id="L93">        context.put(&quot;legalStatusStatistics&quot;, outputResult.getLegalStatusStatistics());</span>
+<span class="fc" id="L94">        context.put(&quot;generalStatistics&quot;, outputResult.getGeneralStatistics());</span>
+<span class="fc" id="L95">        context.put(&quot;messageDigestAlgorithm&quot;, outputResult.getMessageDigestAlgorithm());</span>
+<span class="fc" id="L96">        context.put(&quot;reportConfiguration&quot;, reportConfiguration);</span>
+<span class="fc" id="L97">        context.put(&quot;pomResolutionUsed&quot;, outputResult.isPomResolutionUsed());</span>
+
+<span class="fc" id="L99">        final List&lt;License&gt; distinctLicenses = collectDistinctLicenses(archiveFiles);</span>
+<span class="fc" id="L100">        context.put(&quot;distinctLicenses&quot;, distinctLicenses);</span>
+<span class="fc" id="L101">        context.put(&quot;encoding&quot;, ExporterUtil.getOutputCharset(reportConfiguration).name());</span>
+
+<span class="fc" id="L103">        additionalSetup(context, outputResult);</span>
+<span class="fc" id="L104">        return context;</span>
+    }
+
+    private List&lt;Archive&gt; getSortedArchives(final OutputResult outputResult) {
+<span class="fc" id="L108">        final List&lt;Archive&gt; archiveFiles = outputResult.getFinderResult().getArchiveFiles();</span>
+<span class="fc" id="L109">        Collections.sort(archiveFiles);</span>
+<span class="fc" id="L110">        return archiveFiles;</span>
+    }
+
+    private List&lt;License&gt; collectDistinctLicenses(final List&lt;Archive&gt; archiveFiles) {
+<span class="fc" id="L114">        final Set&lt;License&gt; allLicenses = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L115" title="All 2 branches covered.">        for (final Archive archive : archiveFiles) {</span>
+<span class="fc" id="L116">            allLicenses.addAll(archive.getLicenses());</span>
+<span class="fc" id="L117">        }</span>
+<span class="fc" id="L118">        final List&lt;License&gt; distinctLicenses = new ArrayList&lt;&gt;(allLicenses);</span>
+
+<span class="fc" id="L120">        Collections.sort(distinctLicenses);</span>
+<span class="fc" id="L121">        return distinctLicenses;</span>
+    }
+
+    /**
+     * Do additional setup of {@link VelocityContext}.
+     * 
+     * &lt;p&gt;This is a template method that can be used to put additional data collected from the outputResult to the
+     * {@link VelocityContext}. Default is to do nothing.&lt;/p&gt;
+     * 
+     * @param context the velocity context that can be modified
+     * @param outputResult results from the license scan
+     */
+    protected void additionalSetup(final VelocityContext context, final OutputResult outputResult) {
+        // EMPTY
+<span class="fc" id="L135">    }</span>
+
+    /**
+     * Obtains the velocity template to use in the export method.
+     * 
+     * @param reportConfiguration 
+     * @return the velocity template to use
+     */
+    protected Template getTemplate(final ReportConfiguration reportConfiguration) {
+<span class="fc bfc" id="L144" title="All 2 branches covered.">        if (reportConfiguration.getTemplateFile() != null) {</span>
+<span class="fc" id="L145">            final String templateEncoding = ExporterUtil.getTemplateCharset(reportConfiguration).name();</span>
+<span class="fc" id="L146">            return Velocity.getTemplate(reportConfiguration.getTemplateFile().getAbsolutePath(), templateEncoding);</span>
+        } else {
+<span class="fc" id="L148">            return getDefaultTemplate();</span>
+        }
+    }
+
+    /**
+     * Obtains the default velocity template to use in the export method.
+     * 
+     * &lt;p&gt;This method is called if no template is set in the configuration for the
+     * output type.&lt;/p&gt;
+     * @return the velocity template to use
+     */
+    protected abstract Template getDefaultTemplate();
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

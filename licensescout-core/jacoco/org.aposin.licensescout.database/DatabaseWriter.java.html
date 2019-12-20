@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DatabaseWriter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.database</a> &gt; <span class="el_source">DatabaseWriter.java</span></div><h1>DatabaseWriter.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.database;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
+import java.util.Set;
+
+import org.aposin.licensescout.archive.Archive;
+import org.aposin.licensescout.configuration.BuildInfo;
+import org.aposin.licensescout.configuration.DatabaseConfiguration;
+import org.aposin.licensescout.license.License;
+import org.aposin.licensescout.license.LicenseUtil;
+import org.aposin.licensescout.model.Provider;
+import org.aposin.licensescout.util.ILFLog;
+
+/**
+ * Writes information on build, library data and licenses to a database.
+ * 
+ * &lt;p&gt;This class writes data of one LicenseScout run to the following database tables:&lt;/p&gt;
+ * &lt;ul&gt;
+ * &lt;li&gt;Builds: contains general information on the LicenseScout run&lt;/li&gt;
+ * &lt;li&gt;LibraryData: contains information on the detected archives&lt;/li&gt;
+ * &lt;li&gt;DetectedLicenses: contains information of the detected licenses&lt;/li&gt;
+ * &lt;/ul&gt;
+ * 
+ * &lt;p&gt;For information on the database structure see the file 'sql/licensescout.sql'.&lt;/p&gt;
+ * 
+ * @see BuildInfo
+ * @see DatabaseConfiguration
+ */
+public class DatabaseWriter {
+
+    private DatabaseWriter() {
+        // EMPTY
+    }
+
+    /**
+     * Writes the information on one build execution to the database.
+     * @param buildInfo contains general information on the LicenseScout run
+     * @param archives the list of detected archives
+     * @param databaseConfiguration the database configuration (URL, user name, ...)
+     * @param log the log
+     */
+    public static void writeToDatabase(final BuildInfo buildInfo, final List&lt;Archive&gt; archives,
+                                       final DatabaseConfiguration databaseConfiguration, final ILFLog log) {
+        // for debugging
+<span class="nc bnc" id="L65" title="All 2 branches missed.">        if (log.isDebugEnabled()) {</span>
+<span class="nc" id="L66">            DatabaseUtil.dumpDrivers(log);</span>
+        }
+<span class="nc" id="L68">        try (final Connection connection = DatabaseUtil.getConnection(databaseConfiguration)) {</span>
+<span class="nc" id="L69">            final int buildPK = insertBuild(buildInfo, connection);</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">            for (final Archive archive : archives) {</span>
+<span class="nc" id="L71">                final int libraryPK = insertLibrary(buildPK, archive, connection);</span>
+<span class="nc" id="L72">                final List&lt;License&gt; detectedLicenses = archive.getDetectedLicenses();</span>
+<span class="nc bnc" id="L73" title="All 2 branches missed.">                for (final License detectedLicense : detectedLicenses) {</span>
+<span class="nc" id="L74">                    insertDetectedLicense(libraryPK, detectedLicense, connection);</span>
+<span class="nc" id="L75">                }</span>
+<span class="nc" id="L76">            }</span>
+<span class="nc" id="L77">        } catch (SQLException e) {</span>
+<span class="nc" id="L78">            log.error(e);</span>
+<span class="nc" id="L79">        }</span>
+<span class="nc" id="L80">    }</span>
+
+    /**
+     * @param buildInfo
+     * @param connection
+     * @return the primary key value of the inserted row
+     * @throws SQLException
+     */
+    private static int insertBuild(final BuildInfo buildInfo, final Connection connection) throws SQLException {
+        // NOTE: Datetime is set by the DBMS
+<span class="nc" id="L90">        try (final PreparedStatement statement = connection.prepareStatement(</span>
+                &quot;INSERT INTO Builds (Buildname, Version, URL_Build, URL_Licensereport_CSV, URL_Licensereport_HTML, URL_Licensereport_TXT) VALUES (?, ?, ?, ?, ?, ?)&quot;,
+                Statement.RETURN_GENERATED_KEYS)) {
+<span class="nc" id="L93">            statement.setString(1, convertNull(buildInfo.getName()));</span>
+<span class="nc" id="L94">            statement.setString(2, convertNull(buildInfo.getVersion()));</span>
+<span class="nc" id="L95">            statement.setString(3, convertNull(buildInfo.getBuildUrl()));</span>
+<span class="nc" id="L96">            statement.setString(4, convertNull(buildInfo.getLicenseReportCsvUrl()));</span>
+<span class="nc" id="L97">            statement.setString(5, convertNull(buildInfo.getLicenseReportHtmlUrl()));</span>
+<span class="nc" id="L98">            statement.setString(6, convertNull(buildInfo.getLicenseReportTxtUrl()));</span>
+<span class="nc" id="L99">            statement.executeUpdate();</span>
+<span class="nc" id="L100">            try (final ResultSet keysResultSet = statement.getGeneratedKeys();) {</span>
+<span class="nc bnc" id="L101" title="All 2 branches missed.">                if (keysResultSet.next()) {</span>
+<span class="nc" id="L102">                    return keysResultSet.getInt(1);</span>
+                }
+<span class="nc bnc" id="L104" title="All 2 branches missed.">            }</span>
+<span class="nc" id="L105">            return -1;</span>
+<span class="nc bnc" id="L106" title="All 2 branches missed.">        }</span>
+    }
+
+    private static String convertNull(final String s) {
+<span class="nc bnc" id="L110" title="All 2 branches missed.">        return s == null ? &quot;(null)&quot; : s;</span>
+    }
+
+    /**
+     * @param buildPK
+     * @param archive
+     * @param connection
+     * @return the primary key value of the inserted row
+     * @throws SQLException
+     */
+    private static int insertLibrary(final int buildPK, final Archive archive, final Connection connection)
+            throws SQLException {
+<span class="nc" id="L122">        try (final PreparedStatement statement = connection.prepareStatement(</span>
+                &quot;INSERT INTO LibraryData (FK_Build_Id, Selected_License, Filename, Provider, Version, Type, Message_Digest, Detection_Status, Legal_Status, Documentation_Link) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)&quot;,
+                Statement.RETURN_GENERATED_KEYS)) {
+<span class="nc" id="L125">            statement.setInt(1, buildPK);</span>
+<span class="nc" id="L126">            statement.setString(2, getLicenseName(archive));</span>
+<span class="nc" id="L127">            statement.setString(3, convertNull(archive.getFileName()));</span>
+<span class="nc" id="L128">            statement.setString(4, getProviderName(archive));</span>
+<span class="nc" id="L129">            statement.setString(5, getLibraryVersion(archive));</span>
+<span class="nc" id="L130">            statement.setString(6, archive.getArchiveType().name());</span>
+<span class="nc" id="L131">            statement.setString(7, archive.getMessageDigestString());</span>
+<span class="nc" id="L132">            statement.setString(8, archive.getDetectionStatus().name());</span>
+<span class="nc" id="L133">            statement.setString(9, archive.getLegalStatus().name());</span>
+<span class="nc" id="L134">            statement.setString(10, convertNull(archive.getDocumentationUrl()));</span>
+<span class="nc" id="L135">            statement.executeUpdate();</span>
+<span class="nc" id="L136">            try (final ResultSet keysResultSet = statement.getGeneratedKeys();) {</span>
+<span class="nc bnc" id="L137" title="All 2 branches missed.">                if (keysResultSet.next()) {</span>
+<span class="nc" id="L138">                    return keysResultSet.getInt(1);</span>
+                }
+<span class="nc bnc" id="L140" title="All 2 branches missed.">            }</span>
+<span class="nc" id="L141">            return -1;</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">        }</span>
+    }
+
+    /**
+     * @param libraryPK
+     * @param license
+     * @param connection
+     * @throws SQLException
+     */
+    private static void insertDetectedLicense(final int libraryPK, final License license, final Connection connection)
+            throws SQLException {
+<span class="nc" id="L153">        try (final PreparedStatement statement = connection</span>
+<span class="nc" id="L154">                .prepareStatement(&quot;INSERT INTO DetectedLicenses (FK_LibraryData_Id, License_Name) VALUES (?, ?)&quot;)) {</span>
+<span class="nc" id="L155">            statement.setInt(1, libraryPK);</span>
+<span class="nc" id="L156">            statement.setString(2, getLicenseName(license));</span>
+
+<span class="nc" id="L158">            statement.executeUpdate();</span>
+        }
+<span class="nc" id="L160">    }</span>
+
+    private static String getLicenseName(final Archive archive) {
+<span class="nc" id="L163">        final Set&lt;License&gt; licenses = archive.getLicenses();</span>
+<span class="nc bnc" id="L164" title="All 3 branches missed.">        switch (licenses.size()) {</span>
+            case 0:
+<span class="nc" id="L166">                return &quot;&quot;;</span>
+            case 1:
+<span class="nc" id="L168">                return getLicenseName(licenses.iterator().next());</span>
+            default:
+<span class="nc" id="L170">                return &quot;not unique&quot;;</span>
+        }
+    }
+
+    private static String getProviderName(final Archive archive) {
+<span class="nc" id="L175">        final Provider provider = archive.getProvider();</span>
+<span class="nc bnc" id="L176" title="All 2 branches missed.">        if (provider != null) {</span>
+<span class="nc" id="L177">            return provider.getName();</span>
+        }
+<span class="nc" id="L179">        return &quot;&quot;;</span>
+    }
+
+    private static String getLibraryVersion(final Archive archive) {
+<span class="nc" id="L183">        final String version = archive.getVersion();</span>
+<span class="nc bnc" id="L184" title="All 2 branches missed.">        if (version != null) {</span>
+<span class="nc" id="L185">            return version;</span>
+        }
+<span class="nc" id="L187">        return &quot;&quot;;</span>
+    }
+
+    private static String getLicenseName(final License license) {
+<span class="nc" id="L191">        return LicenseUtil.getLicenseNameWithVersion(license);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ConfigFileParameters.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.configuration</a> &gt; <span class="el_source">ConfigFileParameters.java</span></div><h1>ConfigFileParameters.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.configuration;
+
+import java.io.File;
+
+/**
+ * Parameter object containing all information for instantiating a ConfigFileHandler.
+ *
+ * @see ConfigFileHandler
+ */
+<span class="fc" id="L25">public class ConfigFileParameters {</span>
+
+    /**
+     * Name of the file to read known licenses from.
+     */
+    private File licensesFilename;
+
+    /**
+     * Name of the file to read known providers from.
+     */
+    private File providersFilename;
+
+    /**
+     * Name of the file to read license notices from.
+     */
+    private File noticesFilename;
+
+    /**
+     * Name of the file to read checked archives from.
+     */
+    private File checkedArchivesFilename;
+
+    /**
+     * Name of the file to read license URL mappings from.
+     */
+    private String licenseUrlMappingsFilename;
+
+    /**
+     * Name of the file to read license name mappings from.
+     */
+    private String licenseNameMappingsFilename;
+
+    /**
+     * Name of the file to read global filter patterns from.
+     */
+    private String globalFiltersFilename;
+
+    /**
+     * Name of the file to read of vendor names to filter out from.
+     * This is alternative to filteredVendorNames. If both are given, the entries are merged.
+     */
+    private String filteredVendorNamesFilename;
+
+    /**
+     * @return the licensesFilename
+     */
+    public final File getLicensesFilename() {
+<span class="fc" id="L72">        return licensesFilename;</span>
+    }
+
+    /**
+     * @param licensesFilename the licensesFilename to set
+     */
+    public final void setLicensesFilename(File licensesFilename) {
+<span class="fc" id="L79">        this.licensesFilename = licensesFilename;</span>
+<span class="fc" id="L80">    }</span>
+
+    /**
+     * @return the providersFilename
+     */
+    public final File getProvidersFilename() {
+<span class="fc" id="L86">        return providersFilename;</span>
+    }
+
+    /**
+     * @param providersFilename the providersFilename to set
+     */
+    public final void setProvidersFilename(File providersFilename) {
+<span class="fc" id="L93">        this.providersFilename = providersFilename;</span>
+<span class="fc" id="L94">    }</span>
+
+    /**
+     * @return the noticesFilename
+     */
+    public final File getNoticesFilename() {
+<span class="fc" id="L100">        return noticesFilename;</span>
+    }
+
+    /**
+     * @param noticesFilename the noticesFilename to set
+     */
+    public final void setNoticesFilename(File noticesFilename) {
+<span class="fc" id="L107">        this.noticesFilename = noticesFilename;</span>
+<span class="fc" id="L108">    }</span>
+
+    /**
+     * @return the checkedArchivesFilename
+     */
+    public final File getCheckedArchivesFilename() {
+<span class="fc" id="L114">        return checkedArchivesFilename;</span>
+    }
+
+    /**
+     * @param checkedArchivesFilename the checkedArchivesFilename to set
+     */
+    public final void setCheckedArchivesFilename(File checkedArchivesFilename) {
+<span class="fc" id="L121">        this.checkedArchivesFilename = checkedArchivesFilename;</span>
+<span class="fc" id="L122">    }</span>
+
+    /**
+     * @return the licenseUrlMappingsFilename
+     */
+    public final String getLicenseUrlMappingsFilename() {
+<span class="fc" id="L128">        return licenseUrlMappingsFilename;</span>
+    }
+
+    /**
+     * @param licenseUrlMappingsFilename the licenseUrlMappingsFilename to set
+     */
+    public final void setLicenseUrlMappingsFilename(String licenseUrlMappingsFilename) {
+<span class="fc" id="L135">        this.licenseUrlMappingsFilename = licenseUrlMappingsFilename;</span>
+<span class="fc" id="L136">    }</span>
+
+    /**
+     * @return the licenseNameMappingsFilename
+     */
+    public final String getLicenseNameMappingsFilename() {
+<span class="fc" id="L142">        return licenseNameMappingsFilename;</span>
+    }
+
+    /**
+     * @param licenseNameMappingsFilename the licenseNameMappingsFilename to set
+     */
+    public final void setLicenseNameMappingsFilename(String licenseNameMappingsFilename) {
+<span class="fc" id="L149">        this.licenseNameMappingsFilename = licenseNameMappingsFilename;</span>
+<span class="fc" id="L150">    }</span>
+
+    /**
+     * @return the globalFiltersFilename
+     */
+    public final String getGlobalFiltersFilename() {
+<span class="fc" id="L156">        return globalFiltersFilename;</span>
+    }
+
+    /**
+     * @param globalFiltersFilename the globalFiltersFilename to set
+     */
+    public final void setGlobalFiltersFilename(String globalFiltersFilename) {
+<span class="fc" id="L163">        this.globalFiltersFilename = globalFiltersFilename;</span>
+<span class="fc" id="L164">    }</span>
+
+    /**
+     * @return the filteredVendorNamesFilename
+     */
+    public final String getFilteredVendorNamesFilename() {
+<span class="fc" id="L170">        return filteredVendorNamesFilename;</span>
+    }
+
+    /**
+     * @param filteredVendorNamesFilename the filteredVendorNamesFilename to set
+     */
+    public final void setFilteredVendorNamesFilename(String filteredVendorNamesFilename) {
+<span class="fc" id="L177">        this.filteredVendorNamesFilename = filteredVendorNamesFilename;</span>
+<span class="fc" id="L178">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

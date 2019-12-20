@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MavenLog.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Maven Utilities</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.maven.utils</a> &gt; <span class="el_source">MavenLog.java</span></div><h1>MavenLog.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.maven.utils;
+
+import org.apache.maven.plugin.logging.Log;
+import org.aposin.licensescout.util.ILFLog;
+
+/**
+ * Wrapper around the Maven plugin logger.
+ * 
+ */
+public class MavenLog implements ILFLog {
+
+    private final Log log;
+
+    /**
+     * @param log
+     */
+<span class="nc" id="L32">    public MavenLog(final Log log) {</span>
+<span class="nc" id="L33">        this.log = log;</span>
+<span class="nc" id="L34">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isDebugEnabled() {
+<span class="nc" id="L41">        return log.isDebugEnabled();</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void debug(CharSequence content) {
+<span class="nc" id="L49">        log.debug(content);</span>
+<span class="nc" id="L50">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void debug(CharSequence content, Throwable error) {
+<span class="nc" id="L57">        log.debug(content, error);</span>
+<span class="nc" id="L58">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void debug(Throwable error) {
+<span class="nc" id="L65">        log.debug(error);</span>
+<span class="nc" id="L66">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isInfoEnabled() {
+<span class="nc" id="L73">        return log.isInfoEnabled();</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void info(CharSequence content) {
+<span class="nc" id="L81">        log.info(content);</span>
+<span class="nc" id="L82">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void info(CharSequence content, Throwable error) {
+<span class="nc" id="L89">        log.info(content, error);</span>
+<span class="nc" id="L90">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void info(Throwable error) {
+<span class="nc" id="L97">        log.info(error);</span>
+<span class="nc" id="L98">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isWarnEnabled() {
+<span class="nc" id="L105">        return log.isWarnEnabled();</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void warn(CharSequence content) {
+<span class="nc" id="L113">        log.warn(content);</span>
+<span class="nc" id="L114">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void warn(CharSequence content, Throwable error) {
+<span class="nc" id="L121">        log.warn(content, error);</span>
+<span class="nc" id="L122">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void warn(Throwable error) {
+<span class="nc" id="L129">        log.warn(error);</span>
+<span class="nc" id="L130">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isErrorEnabled() {
+<span class="nc" id="L137">        return log.isErrorEnabled();</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void error(CharSequence content) {
+<span class="nc" id="L145">        log.error(content);</span>
+<span class="nc" id="L146">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void error(CharSequence content, Throwable error) {
+<span class="nc" id="L153">        log.error(content, error);</span>
+<span class="nc" id="L154">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void error(Throwable error) {
+<span class="nc" id="L161">        log.error(error);</span>
+<span class="nc" id="L162">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

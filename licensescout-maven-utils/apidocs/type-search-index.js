@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"org.aposin.licensescout.maven.utils","l":"ArtifactHelper"},{"p":"org.aposin.licensescout.maven.utils","l":"ArtifactItem"},{"p":"org.aposin.licensescout.maven.utils","l":"IRepositoryParameters"},{"p":"org.aposin.licensescout.maven.utils","l":"MavenLog"}]

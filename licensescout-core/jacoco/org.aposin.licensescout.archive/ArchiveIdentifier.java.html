@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ArchiveIdentifier.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.archive</a> &gt; <span class="el_source">ArchiveIdentifier.java</span></div><h1>ArchiveIdentifier.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.archive;
+
+import java.util.Objects;
+
+/**
+ * Base class for Identifier for an archive bases on name.
+ * 
+ * &lt;p&gt;An archive can be identified either by:&lt;/p&gt;
+ * &lt;ol&gt;
+ * &lt;li&gt;Name and version ({@link ArchiveIdentifierVersion})&lt;/li&gt;
+ * &lt;li&gt;Name and message digest ({@link ArchiveIdentifierMessageDigest})&lt;/li&gt;
+ * &lt;li&gt;Regular expression on either the name or the path ({@link ArchiveIdentifierPattern})&lt;/li&gt;
+ * &lt;/ol&gt;
+ * 
+ * @see ArchiveIdentifierVersion
+ * @see ArchiveIdentifierMessageDigest
+ * @see ArchiveIdentifierPattern
+ */
+public abstract class ArchiveIdentifier {
+
+    private final ArchiveType archiveType;
+    private final NameMatchingType nameMatchingType;
+    private final String name;
+
+    /**
+     * Constructor.
+     * 
+     * @param archiveType type of the archive
+     * @param nameMatchingType the matching type
+     * @param name the name of the archive
+     */
+    protected ArchiveIdentifier(final ArchiveType archiveType, final NameMatchingType nameMatchingType,
+            final String name) {
+<span class="fc" id="L49">        super();</span>
+<span class="fc" id="L50">        this.archiveType = archiveType;</span>
+<span class="fc" id="L51">        this.nameMatchingType = nameMatchingType;</span>
+<span class="fc" id="L52">        this.name = name;</span>
+<span class="fc" id="L53">    }</span>
+
+    /**
+     * @return the archiveType
+     */
+    public final ArchiveType getArchiveType() {
+<span class="fc" id="L59">        return archiveType;</span>
+    }
+
+    /**
+     * @return the nameMatchingType
+     */
+    public final NameMatchingType getNameMatchingType() {
+<span class="fc" id="L66">        return nameMatchingType;</span>
+    }
+
+    /**
+     * @return the name
+     */
+    public final String getName() {
+<span class="fc" id="L73">        return name;</span>
+    }
+
+    @Override
+    public boolean equals(Object o) {
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">        if (this == o) { return true; }</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">        if (!(o instanceof ArchiveIdentifier)) { return false; }</span>
+<span class="fc" id="L80">        ArchiveIdentifier that = (ArchiveIdentifier) o;</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">        return getArchiveType() == that.getArchiveType() &amp;&amp;</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">            getNameMatchingType() == that.getNameMatchingType() &amp;&amp;</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">            Objects.equals(getName(), that.getName());</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="fc" id="L88">        return Objects.hash(getArchiveType(), getNameMatchingType(), getName());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

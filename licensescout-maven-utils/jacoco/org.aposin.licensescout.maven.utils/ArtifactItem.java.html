@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ArtifactItem.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Maven Utilities</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.maven.utils</a> &gt; <span class="el_source">ArtifactItem.java</span></div><h1>ArtifactItem.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.maven.utils;
+
+import org.apache.maven.plugins.annotations.Parameter;
+
+/**
+ * Description of an artifact by Maven coordinates for use in Maven configuration.
+ */
+public class ArtifactItem {
+
+    /**
+     * Group Id of artifact.
+     */
+    @Parameter(property = &quot;groupId&quot;, required = true)
+    private String groupId;
+
+    /**
+     * Artifact ID of artifact.
+     */
+    @Parameter(property = &quot;artifactId&quot;, required = true)
+    private String artifactId;
+
+    /**
+     * Version of artifact.
+     */
+    @Parameter(property = &quot;version&quot;, required = true)
+    private String version;
+
+    /**
+     * Type of Artifact (War,Jar,etc)
+     *
+     * @parameter
+     * @required
+     */
+    @Parameter(property = &quot;type&quot;, required = false)
+    private String type;
+
+    /**
+     * Classifier for Artifact (tests,sources,etc)
+     *
+     * @parameter
+     */
+    @Parameter(property = &quot;classifier&quot;, required = false)
+    private String classifier;
+
+    /**
+     * Constructor used by the Maven runtime system.
+     */
+<span class="nc" id="L63">    public ArtifactItem() {</span>
+        // EMPTY
+<span class="nc" id="L65">    }</span>
+
+    /**
+     * Constructor for testing.
+     * @param groupId
+     * @param artifactId
+     * @param version
+     * @param type
+     * @param classifier
+     */
+<span class="fc" id="L75">    public ArtifactItem(String groupId, String artifactId, String version, String type, String classifier) {</span>
+<span class="fc" id="L76">        this.groupId = groupId;</span>
+<span class="fc" id="L77">        this.artifactId = artifactId;</span>
+<span class="fc" id="L78">        this.version = version;</span>
+<span class="fc" id="L79">        this.type = type;</span>
+<span class="fc" id="L80">        this.classifier = classifier;</span>
+<span class="fc" id="L81">    }</span>
+
+    /**
+     * @return the groupId
+     */
+    public final String getGroupId() {
+<span class="fc" id="L87">        return groupId;</span>
+    }
+
+    /**
+     * @return the artifactId
+     */
+    public final String getArtifactId() {
+<span class="fc" id="L94">        return artifactId;</span>
+    }
+
+    /**
+     * @return the version
+     */
+    public final String getVersion() {
+<span class="fc" id="L101">        return version;</span>
+    }
+
+    /**
+     * @return the type
+     */
+    public final String getType() {
+<span class="fc" id="L108">        return type;</span>
+    }
+
+    /**
+     * @return the classifier
+     */
+    public final String getClassifier() {
+<span class="fc" id="L115">        return classifier;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

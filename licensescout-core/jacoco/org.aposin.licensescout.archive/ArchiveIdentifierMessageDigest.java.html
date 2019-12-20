@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ArchiveIdentifierMessageDigest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.archive</a> &gt; <span class="el_source">ArchiveIdentifierMessageDigest.java</span></div><h1>ArchiveIdentifierMessageDigest.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.archive;
+
+import java.util.Objects;
+
+import org.aposin.licensescout.model.LSMessageDigest;
+import org.aposin.licensescout.util.MiscUtil;
+
+/**
+ * Identifier for an archive bases on name and hash code.
+ * 
+ * 
+ * @see ArchiveIdentifierVersion
+ *
+ */
+public class ArchiveIdentifierMessageDigest extends ArchiveIdentifier {
+
+    private final LSMessageDigest messageDigest;
+
+    /**
+     * Constructor.
+     * 
+     * @param archiveType type of the archive
+     * @param name
+     * @param messageDigest a message digest as byte array
+     */
+    public ArchiveIdentifierMessageDigest(final ArchiveType archiveType, final String name,
+            final LSMessageDigest messageDigest) {
+<span class="fc" id="L43">        super(archiveType, NameMatchingType.EXACT, name);</span>
+<span class="fc" id="L44">        this.messageDigest = messageDigest;</span>
+<span class="fc" id="L45">    }</span>
+
+    /**
+     * Constructor.
+     * 
+     * @param archiveType type of the archive
+     * @param name
+     * @param messageDigestHexString a message digest as hex string
+     */
+    public ArchiveIdentifierMessageDigest(final ArchiveType archiveType, final String name,
+            final String messageDigestHexString) {
+<span class="fc" id="L56">        this(archiveType, name, MiscUtil.getLSMessageDigestFromHexString(messageDigestHexString));</span>
+<span class="fc" id="L57">    }</span>
+
+    /**
+     * @return the messageDigest
+     */
+    public final LSMessageDigest getMessageDigest() {
+<span class="fc" id="L63">        return messageDigest;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+<span class="fc" id="L71">        final int prime = 31;</span>
+<span class="fc" id="L72">        int result = super.hashCode();</span>
+<span class="fc" id="L73">        result = prime * result + Objects.hash(messageDigest);</span>
+<span class="fc" id="L74">        return result;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object obj) {
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        if (this == obj) {</span>
+<span class="fc" id="L83">            return true;</span>
+        }
+<span class="fc bfc" id="L85" title="All 2 branches covered.">        if (!super.equals(obj)) {</span>
+<span class="fc" id="L86">            return false;</span>
+        }
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">        if (getClass() != obj.getClass()) {</span>
+<span class="nc" id="L89">            return false;</span>
+        }
+<span class="fc" id="L91">        ArchiveIdentifierMessageDigest other = (ArchiveIdentifierMessageDigest) obj;</span>
+<span class="fc" id="L92">        return Objects.equals(messageDigest, other.messageDigest);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

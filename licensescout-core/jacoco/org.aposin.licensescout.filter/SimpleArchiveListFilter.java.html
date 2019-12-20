@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SimpleArchiveListFilter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.filter</a> &gt; <span class="el_source">SimpleArchiveListFilter.java</span></div><h1>SimpleArchiveListFilter.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
+ * 
+ */
+package org.aposin.licensescout.filter;
+
+import java.util.Iterator;
+import java.util.List;
+
+import org.aposin.licensescout.archive.Archive;
+import org.aposin.licensescout.util.ILFLog;
+
+/**
+ * Filter implementation that allows to define a single method containing a predicate related to an archive.
+ * 
+ */
+public abstract class SimpleArchiveListFilter extends AbstractArchiveListFilter {
+
+    /**
+     * @param log the logger
+     * @param filterActive true if the filter should be active, false otherwise
+     */
+    public SimpleArchiveListFilter(final ILFLog log, boolean filterActive) {
+<span class="fc" id="L38">        super(log);</span>
+<span class="fc" id="L39">        setFilterActive(filterActive);</span>
+<span class="fc" id="L40">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void filter(List&lt;Archive&gt; archiveFiles) {
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        if (isFilterActive()) {</span>
+<span class="fc" id="L48">            final Iterator&lt;Archive&gt; iter = archiveFiles.iterator();</span>
+<span class="fc bfc" id="L49" title="All 2 branches covered.">            while (iter.hasNext()) {</span>
+<span class="fc" id="L50">                final Archive archive = iter.next();</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">                if (!archiveIncluded(archive)) {</span>
+<span class="fc" id="L52">                    getLog().info(getFilterLogMessageTemplate() + archive.getPath());</span>
+<span class="fc" id="L53">                    iter.remove();</span>
+                }
+<span class="fc" id="L55">            }</span>
+        }
+<span class="fc" id="L57">    }</span>
+
+    /**
+     * Obtains a message template for the log message about an archive being removed from the list.
+     * @return a message template
+     */
+    protected abstract String getFilterLogMessageTemplate();
+
+    /**
+     * Tests if an archive should be included by the filter.
+     * 
+     * @param archive an archive
+     * @return true if the archive should be included, false otherwise (will result in the archive being removed from the list)
+     */
+    protected abstract boolean archiveIncluded(final Archive archive);
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AttachHelper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Maven Plugin</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.mojo</a> &gt; <span class="el_source">AttachHelper.java</span></div><h1>AttachHelper.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.mojo;
+
+import java.io.File;
+
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
+import org.aposin.licensescout.configuration.Output;
+import org.aposin.licensescout.execution.ExecutionParameters;
+import org.aposin.licensescout.util.OutputFileHelper;
+
+/**
+ * Helper class for {@link AbstractScanMojo}.
+ *
+ */
+<span class="nc" id="L30">public class AttachHelper {</span>
+
+    /**
+     * Attaches generated report files as secondary artifacts.
+     * 
+     * @param mavenProject 
+     * @param mavenProjectHelper 
+     * @param executionParameters 
+     * 
+     */
+    public static void attachReports(final MavenProject mavenProject, final MavenProjectHelper mavenProjectHelper,
+                                     final ExecutionParameters executionParameters) {
+<span class="nc" id="L42">        final String artifactClassifier = &quot;licensereport&quot;;</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        for (final Output output : executionParameters.getOutputs()) {</span>
+<span class="nc" id="L44">            final String artifactType = output.getType().getArtifactType();</span>
+<span class="nc" id="L45">            final File artifactFile = new File(executionParameters.getOutputDirectory(),</span>
+<span class="nc" id="L46">                    OutputFileHelper.getOutputFilename(output));</span>
+<span class="nc" id="L47">            executionParameters.getLsLog().info(&quot;attaching artifact: &quot; + artifactFile.getAbsolutePath());</span>
+<span class="nc" id="L48">            mavenProjectHelper.attachArtifact(mavenProject, artifactType, artifactClassifier, artifactFile);</span>
+<span class="nc" id="L49">        }</span>
+<span class="nc" id="L50">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

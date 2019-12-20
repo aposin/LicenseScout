@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ArtifactServerUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.license</a> &gt; <span class="el_source">ArtifactServerUtil.java</span></div><h1>ArtifactServerUtil.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.license;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.List;
+
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.aposin.licensescout.archive.Archive;
+import org.aposin.licensescout.util.ILFLog;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+/**
+ * Utility methods related to accessing a server that is caching Maven central.
+ * 
+ * &lt;p&gt;The instance of this class checks if the server is reachable under the configured URL.&lt;/p&gt;
+ */
+public class ArtifactServerUtil {
+
+    private final String mavenCentralBaseUrl;
+    private final int connectTimeoutInMilliseconds;
+    private final ILFLog log;
+    private final boolean cachedCheckAccess;
+
+    /**
+     * Constructor.
+     * 
+     * @param mavenCentralBaseUrl the URL to a locally caching server of Maven central
+     * @param connectTimeoutInMilliseconds the connect timeout
+     * @param log the logger
+     */
+    public ArtifactServerUtil(final String mavenCentralBaseUrl, final int connectTimeoutInMilliseconds,
+<span class="fc" id="L53">            final ILFLog log) {</span>
+<span class="fc" id="L54">        this.mavenCentralBaseUrl = mavenCentralBaseUrl;</span>
+<span class="fc" id="L55">        this.connectTimeoutInMilliseconds = connectTimeoutInMilliseconds;</span>
+<span class="fc" id="L56">        this.log = log;</span>
+<span class="fc" id="L57">        this.cachedCheckAccess = checkAccess();</span>
+<span class="fc" id="L58">    }</span>
+
+    /**
+     * Checks if the artifact server is accessible with the base URL configured in the constructor of this class.
+     * 
+     * @param log a logger 
+     * @return true if the artifact server is accessible under the configured base URL, false otherwise
+     */
+    private boolean checkAccess() {
+        // we check the presence of
+        // 'org.apache.maven.plugins:maven-plugin-plugin:jar:3.6.0'
+<span class="fc" id="L69">        final String groupId = &quot;org.apache.maven.plugins&quot;;</span>
+<span class="fc" id="L70">        final String artifactId = &quot;maven-plugin-plugin&quot;;</span>
+<span class="fc" id="L71">        final String version = &quot;3.6.0&quot;;</span>
+<span class="fc" id="L72">        final String urlString = getArtifactUrlString(groupId, artifactId, version);</span>
+<span class="fc" id="L73">        log.info(&quot;Checking access to artifact server using URL &quot; + urlString);</span>
+        try {
+<span class="fc" id="L75">            final URL url = new URL(urlString);</span>
+<span class="fc" id="L76">            final URLConnection urlConnection = url.openConnection();</span>
+<span class="fc" id="L77">            urlConnection.setConnectTimeout(connectTimeoutInMilliseconds);</span>
+<span class="nc" id="L78">            try (InputStream is = urlConnection.getInputStream();) {</span>
+                // DO NOTHING - we only test for an exception
+<span class="nc bnc" id="L80" title="All 2 branches missed.">            }</span>
+<span class="nc" id="L81">            return true;</span>
+<span class="fc" id="L82">        } catch (IOException e) {</span>
+<span class="fc" id="L83">            log.warn(&quot;Cannot access artifact server at: &quot; + urlString);</span>
+<span class="fc" id="L84">            log.warn(&quot;Result is cached, POM resolution is disabled for this run!&quot;);</span>
+<span class="fc" id="L85">            return false;</span>
+        }
+    }
+
+    /**
+     * @return the cachedCheckAccess
+     */
+    public final boolean isCachedCheckAccess() {
+<span class="fc" id="L93">        return cachedCheckAccess;</span>
+    }
+
+    /**
+     * @return the mavenCentralBaseUrl
+     */
+    private final String getMavenCentralBaseUrl() {
+<span class="fc" id="L100">        return mavenCentralBaseUrl;</span>
+    }
+
+    /**
+     * Adds licenses to an archive from information found in a Maven POM file.
+     * 
+     * @param inputStream input source of the POM file
+     * @param archive the archive to add the licenses to
+     * @param filePath path of the POM file (for information only)
+     * @param licenseStoreData the license data object
+     * @return true if one or more licenses have been added, false otherwise
+     */
+    public boolean addLicensesFromPom(final InputStream inputStream, final Archive archive, final String filePath,
+                                      final LicenseStoreData licenseStoreData) {
+        try {
+<span class="fc" id="L115">            log.debug(&quot;Checking POM file: &quot; + filePath);</span>
+<span class="fc" id="L116">            final Model model = getMavenModel(inputStream);</span>
+<span class="fc" id="L117">            boolean licenseFound = evaluatePomLicenses(archive, filePath, licenseStoreData, model);</span>
+            // try parent POM resolution only if we know we can reach the artifact server
+<span class="pc bpc" id="L119" title="3 of 4 branches missed.">            if (!licenseFound &amp;&amp; isCachedCheckAccess()) {</span>
+                // try parent POM from Maven central or a proxy of it on an artifact server
+<span class="nc" id="L121">                final Parent parent = model.getParent();</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">                if (parent != null) {</span>
+<span class="nc" id="L123">                    final URL url = getParentUrl(parent);</span>
+                    InputStream parentInputStream;
+                    try {
+<span class="nc" id="L126">                        parentInputStream = getInputStream(url);</span>
+<span class="nc" id="L127">                    } catch (FileNotFoundException e) {</span>
+<span class="nc" id="L128">                        log.debug(&quot;Parent POM not found on artifact server: &quot; + url.toString());</span>
+<span class="nc" id="L129">                        return licenseFound;</span>
+<span class="nc" id="L130">                    }</span>
+<span class="nc" id="L131">                    licenseFound |= processParentLicenses(archive, filePath, licenseStoreData, parent,</span>
+                            parentInputStream);
+                }
+            }
+<span class="fc" id="L135">            return licenseFound;</span>
+<span class="nc" id="L136">        } catch (Exception e) {</span>
+<span class="nc" id="L137">            log.error(e);</span>
+<span class="nc" id="L138">            return false;</span>
+        }
+    }
+
+    private boolean processParentLicenses(final Archive archive, final String filePath,
+                                          final LicenseStoreData licenseStoreData, final Parent parent,
+                                          InputStream parentInputStream)
+            throws IOException {
+<span class="nc" id="L146">        boolean licenseFoundLocal = false;</span>
+<span class="nc bnc" id="L147" title="All 2 branches missed.">        if (parentInputStream != null) {</span>
+            try {
+<span class="nc" id="L149">                final String newFilePath = filePath + &quot;![parent POM](&quot; + parent.getId() + &quot;)&quot;;</span>
+<span class="nc" id="L150">                licenseFoundLocal = addLicensesFromPom(parentInputStream, archive, newFilePath, licenseStoreData);</span>
+            } finally {
+<span class="nc" id="L152">                parentInputStream.close();</span>
+            }
+        }
+<span class="nc" id="L155">        return licenseFoundLocal;</span>
+    }
+
+    private boolean evaluatePomLicenses(final Archive archive, final String filePath,
+                                        final LicenseStoreData licenseStoreData, final Model model) {
+<span class="fc" id="L160">        boolean licenseFound = false;</span>
+<span class="fc" id="L161">        final List&lt;org.apache.maven.model.License&gt; licenses = model.getLicenses();</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">        for (final org.apache.maven.model.License license : licenses) {</span>
+<span class="fc" id="L163">            final String licenseUrl = license.getUrl();</span>
+<span class="fc" id="L164">            final String licenseName = license.getName();</span>
+<span class="fc" id="L165">            log.debug(&quot;License name: &quot; + licenseName);</span>
+<span class="fc" id="L166">            log.debug(&quot;License URL: &quot; + licenseUrl);</span>
+<span class="fc" id="L167">            final boolean licenseFoundForUrl = LicenseUtil.handleLicenseUrl(licenseUrl, archive, filePath,</span>
+                    licenseStoreData, log);
+<span class="fc" id="L169">            licenseFound |= licenseFoundForUrl;</span>
+<span class="fc" id="L170">            boolean licenseFoundForName = false;</span>
+<span class="pc bpc" id="L171" title="1 of 2 branches missed.">            if (!licenseFoundForUrl) {</span>
+<span class="nc" id="L172">                licenseFoundForName = LicenseUtil.handleLicenseName(licenseName, archive, filePath, licenseStoreData,</span>
+                        log);
+<span class="nc" id="L174">                licenseFound |= licenseFoundForName;</span>
+            }
+<span class="pc bpc" id="L176" title="3 of 4 branches missed.">            if (!licenseFoundForUrl &amp;&amp; !licenseFoundForName) {</span>
+<span class="nc" id="L177">                log.warn(&quot;Neither license name nor license URL mapping found for name/URL: &quot; + licenseName + &quot; / &quot;</span>
+                        + licenseUrl);
+            }
+<span class="fc" id="L180">        }</span>
+<span class="fc" id="L181">        return licenseFound;</span>
+    }
+
+    private URL getParentUrl(final Parent parent) throws MalformedURLException {
+<span class="nc" id="L185">        final String groupId = parent.getGroupId();</span>
+<span class="nc" id="L186">        final String artifactId = parent.getArtifactId();</span>
+<span class="nc" id="L187">        final String version = parent.getVersion();</span>
+<span class="nc" id="L188">        final String urlString = getArtifactUrlString(groupId, artifactId, version);</span>
+<span class="nc" id="L189">        return new URL(urlString);</span>
+    }
+
+    private InputStream getInputStream(final URL url) throws IOException {
+        InputStream parentInputStream;
+<span class="nc" id="L194">        final URLConnection urlConnection = url.openConnection();</span>
+<span class="nc" id="L195">        urlConnection.setConnectTimeout(connectTimeoutInMilliseconds);</span>
+<span class="nc" id="L196">        parentInputStream = urlConnection.getInputStream();</span>
+<span class="nc" id="L197">        return parentInputStream;</span>
+    }
+
+    private Model getMavenModel(final InputStream inputStream) throws IOException, XmlPullParserException {
+<span class="fc" id="L201">        final MavenXpp3Reader xpp3Reader = new MavenXpp3Reader();</span>
+<span class="fc" id="L202">        return xpp3Reader.read(inputStream);</span>
+    }
+
+    private String getArtifactUrlString(final String groupId, final String artifactId, final String version) {
+<span class="fc" id="L206">        return getMavenCentralBaseUrl() + groupId.replace('.', '/') + &quot;/&quot; + artifactId + &quot;/&quot; + version + &quot;/&quot;</span>
+                + artifactId + &quot;-&quot; + version + &quot;.pom&quot;;
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Archive.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.archive</a> &gt; <span class="el_source">Archive.java</span></div><h1>Archive.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.archive;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
+import org.aposin.licensescout.license.DetectionStatus;
+import org.aposin.licensescout.license.LegalStatus;
+import org.aposin.licensescout.license.License;
+import org.aposin.licensescout.model.Author;
+import org.aposin.licensescout.model.LSMessageDigest;
+import org.aposin.licensescout.model.LicenseText;
+import org.aposin.licensescout.model.Notice;
+import org.aposin.licensescout.model.Provider;
+import org.aposin.licensescout.util.MiscUtil;
+
+/**
+ * Representation of an archive or other artifact found during scanning.
+ * 
+ */
+public class Archive implements Comparable&lt;Archive&gt; {
+
+    private final ArchiveType archiveType;
+
+    private final String fileName;
+
+    private final String version;
+
+    private final String path;
+
+<span class="fc" id="L49">    private final MultiValuedMap&lt;License, String&gt; licenseList = new ArrayListValuedHashMap&lt;&gt;();</span>
+    private List&lt;License&gt; detectedLicenses;
+
+    private DetectionStatus detectionStatus;
+
+    private LegalStatus legalStatus;
+
+    private LSMessageDigest messageDigest;
+
+<span class="fc" id="L58">    private final List&lt;String&gt; licenseCandidateFiles = new ArrayList&lt;&gt;();</span>
+
+    private String vendor;
+
+    private String documentationUrl;
+
+    private Provider provider;
+    private Notice notice;
+
+    // NOTE: author is currently not used
+    private Author author;
+    private LicenseText licenseText;
+
+    /**
+     * Instantiates a new archive.
+     * @param archiveType the type of the archive
+     * @param fileName the file name
+     * @param version the version of the archive
+     * @param path the path
+     */
+    public Archive(final ArchiveType archiveType, final String fileName, final String version, final String path) {
+<span class="fc" id="L79">        super();</span>
+<span class="fc" id="L80">        this.archiveType = archiveType;</span>
+<span class="fc" id="L81">        this.fileName = fileName;</span>
+<span class="fc" id="L82">        this.version = version;</span>
+<span class="fc" id="L83">        this.path = path;</span>
+<span class="fc" id="L84">    }</span>
+
+    /**
+     * @return the archiveType
+     */
+    public final ArchiveType getArchiveType() {
+<span class="fc" id="L90">        return archiveType;</span>
+    }
+
+    /**
+     * Gets the file name.
+     * 
+     * @return the file name
+     */
+    public final String getFileName() {
+<span class="fc" id="L99">        return fileName;</span>
+    }
+
+    /**
+     * @return the version
+     */
+    public final String getVersion() {
+<span class="fc" id="L106">        return version;</span>
+    }
+
+    /**
+     * Gets the path.
+     * 
+     * @return the path
+     */
+    public final String getPath() {
+<span class="fc" id="L115">        return path;</span>
+    }
+
+    /**
+     * Adds a license
+     * @param license a license object
+     * @param path the path to the file containing the license
+     */
+    public void addLicense(final License license, final String path) {
+<span class="fc" id="L124">        licenseList.put(license, path);</span>
+<span class="fc" id="L125">    }</span>
+
+    /**
+     * Clears the list of licenses.
+     */
+    public void clearLicenses() {
+<span class="fc" id="L131">        licenseList.clear();</span>
+<span class="fc" id="L132">    }</span>
+
+    /**
+     * Gets the licenses.
+     * 
+     * @return the licenses
+     */
+    public Set&lt;License&gt; getLicenses() {
+<span class="fc" id="L140">        return licenseList.keySet();</span>
+    }
+
+    /**
+     * Gets the file paths.
+     * 
+     * @param license the license
+     * @return the file paths
+     */
+    public Collection&lt;String&gt; getFilePaths(final License license) {
+<span class="fc" id="L150">        return licenseList.get(license);</span>
+    }
+
+    /**
+     * @return the detectedLicenses
+     */
+    public final List&lt;License&gt; getDetectedLicenses() {
+<span class="fc" id="L157">        return detectedLicenses;</span>
+    }
+
+    /**
+     * @param detectedLicenses the detectedLicenses to set
+     */
+    public final void setDetectedLicenses(List&lt;License&gt; detectedLicenses) {
+<span class="fc" id="L164">        this.detectedLicenses = detectedLicenses;</span>
+<span class="fc" id="L165">    }</span>
+
+    /**
+     * @return the detectionStatus
+     */
+    public final DetectionStatus getDetectionStatus() {
+<span class="fc" id="L171">        return detectionStatus;</span>
+    }
+
+    /**
+     * @param detectionStatus the detectionStatus to set
+     */
+    public final void setDetectionStatus(DetectionStatus detectionStatus) {
+<span class="fc" id="L178">        this.detectionStatus = detectionStatus;</span>
+<span class="fc" id="L179">    }</span>
+
+    /**
+     * @return the legalStatus
+     */
+    public final LegalStatus getLegalStatus() {
+<span class="fc" id="L185">        return legalStatus;</span>
+    }
+
+    /**
+     * @param legalStatus the legalStatus to set
+     */
+    public final void setLegalStatus(LegalStatus legalStatus) {
+<span class="fc" id="L192">        this.legalStatus = legalStatus;</span>
+<span class="fc" id="L193">    }</span>
+
+    /**
+     * @return the messageDigest
+     */
+    public final LSMessageDigest getMessageDigest() {
+<span class="fc" id="L199">        return messageDigest;</span>
+    }
+
+    /**
+     * @param messageDigest the messageDigest to set
+     */
+    public final void setMessageDigest(final LSMessageDigest messageDigest) {
+<span class="fc" id="L206">        this.messageDigest = messageDigest;</span>
+<span class="fc" id="L207">    }</span>
+
+    /**
+     * @return the messageDigest
+     */
+    public final String getMessageDigestString() {
+<span class="fc bfc" id="L213" title="All 2 branches covered.">        if (messageDigest != null) {</span>
+<span class="fc" id="L214">            return MiscUtil.getHexString(messageDigest.getBytes());</span>
+        } else {
+<span class="fc" id="L216">            return &quot;&quot;;</span>
+        }
+    }
+
+    /**
+     * @return the licenseCandidateFiles
+     */
+    public final List&lt;String&gt; getLicenseCandidateFiles() {
+<span class="fc" id="L224">        return licenseCandidateFiles;</span>
+    }
+
+    /**
+     * @param filePath
+     */
+    public final void addLicenseCandidateFile(final String filePath) {
+<span class="fc" id="L231">        licenseCandidateFiles.add(filePath);</span>
+<span class="fc" id="L232">    }</span>
+
+    /**
+     * @return the vendor
+     */
+    public final String getVendor() {
+<span class="fc" id="L238">        return vendor;</span>
+    }
+
+    /**
+     * @param vendor the vendor to set
+     */
+    public final void setVendor(String vendor) {
+<span class="fc" id="L245">        this.vendor = vendor;</span>
+<span class="fc" id="L246">    }</span>
+
+    /**
+     * @return the documentationUrl
+     */
+    public final String getDocumentationUrl() {
+<span class="fc" id="L252">        return documentationUrl;</span>
+    }
+
+    /**
+     * @param documentationUrl the documentationUrl to set
+     */
+    public final void setDocumentationUrl(final String documentationUrl) {
+<span class="fc" id="L259">        this.documentationUrl = documentationUrl;</span>
+<span class="fc" id="L260">    }</span>
+
+    /**
+     * @return the provider
+     */
+    public final Provider getProvider() {
+<span class="fc" id="L266">        return provider;</span>
+    }
+
+    /**
+     * @param provider the provider to set
+     */
+    public final void setProvider(Provider provider) {
+<span class="nc" id="L273">        this.provider = provider;</span>
+<span class="nc" id="L274">    }</span>
+
+    /**
+     * @return the notice
+     */
+    public final Notice getNotice() {
+<span class="fc" id="L280">        return notice;</span>
+    }
+
+    /**
+     * @param notice the notice to set
+     */
+    public final void setNotice(Notice notice) {
+<span class="nc" id="L287">        this.notice = notice;</span>
+<span class="nc" id="L288">    }</span>
+
+    /**
+     * @return the author
+     */
+    public final Author getAuthor() {
+<span class="nc" id="L294">        return author;</span>
+    }
+
+    /**
+     * @param author the author to set
+     */
+    public final void setAuthor(Author author) {
+<span class="fc" id="L301">        this.author = author;</span>
+<span class="fc" id="L302">    }</span>
+
+    /**
+     * @return the licenseText
+     */
+    public final LicenseText getLicenseText() {
+<span class="fc" id="L308">        return licenseText;</span>
+    }
+
+    /**
+     * @param licenseText the licenseText to set
+     */
+    public final void setLicenseText(LicenseText licenseText) {
+<span class="fc" id="L315">        this.licenseText = licenseText;</span>
+<span class="fc" id="L316">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int compareTo(final Archive other) {
+<span class="nc bnc" id="L323" title="All 2 branches missed.">        if (this == other) {</span>
+<span class="nc" id="L324">            return 0;</span>
+        }
+<span class="nc" id="L326">        return this.getFileName().compareToIgnoreCase(other.getFileName());</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object other) {
+<span class="nc bnc" id="L334" title="All 2 branches missed.">        if (this == other) {</span>
+<span class="nc" id="L335">            return true;</span>
+        }
+<span class="nc bnc" id="L337" title="All 2 branches missed.">        if (other instanceof Archive) {</span>
+<span class="nc bnc" id="L338" title="All 2 branches missed.">            return compareTo((Archive) other) == 0;</span>
+        }
+<span class="nc" id="L340">        return false;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+<span class="nc" id="L348">        StringBuilder builder = new StringBuilder();</span>
+<span class="nc" id="L349">        builder.append(&quot;Archive [archiveType=&quot;);</span>
+<span class="nc" id="L350">        builder.append(archiveType);</span>
+<span class="nc" id="L351">        builder.append(&quot;, fileName=&quot;);</span>
+<span class="nc" id="L352">        builder.append(fileName);</span>
+<span class="nc" id="L353">        builder.append(&quot;, version=&quot;);</span>
+<span class="nc" id="L354">        builder.append(version);</span>
+<span class="nc" id="L355">        builder.append(&quot;, path=&quot;);</span>
+<span class="nc" id="L356">        builder.append(path);</span>
+<span class="nc" id="L357">        builder.append(&quot;, licenseList=&quot;);</span>
+<span class="nc" id="L358">        builder.append(licenseList);</span>
+<span class="nc" id="L359">        builder.append(&quot;, detectionStatus=&quot;);</span>
+<span class="nc" id="L360">        builder.append(detectionStatus);</span>
+<span class="nc" id="L361">        builder.append(&quot;, legalStatus=&quot;);</span>
+<span class="nc" id="L362">        builder.append(legalStatus);</span>
+<span class="nc" id="L363">        builder.append(&quot;, messageDigest=&quot;);</span>
+<span class="nc" id="L364">        builder.append(messageDigest);</span>
+<span class="nc" id="L365">        builder.append(&quot;]&quot;);</span>
+<span class="nc" id="L366">        return builder.toString();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

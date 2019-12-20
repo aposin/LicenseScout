@@ -1,0 +1,6 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+LicenseScout Maven Plugin,org.aposin.licensescout.mojo,AttachHelper,42,0,2,0,10,0,3,0,2,0
+LicenseScout Maven Plugin,org.aposin.licensescout.mojo,NpmScanMojo,3,5,0,0,1,2,1,2,1,2
+LicenseScout Maven Plugin,org.aposin.licensescout.mojo,JavaScanMojo,0,5,0,0,0,2,0,2,0,2
+LicenseScout Maven Plugin,org.aposin.licensescout.mojo,HelpMojo,802,0,110,0,159,0,71,0,16,0
+LicenseScout Maven Plugin,org.aposin.licensescout.mojo,AbstractScanMojo,235,3,10,0,67,1,40,1,35,1

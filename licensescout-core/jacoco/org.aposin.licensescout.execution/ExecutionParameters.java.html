@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExecutionParameters.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.execution</a> &gt; <span class="el_source">ExecutionParameters.java</span></div><h1>ExecutionParameters.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.execution;
+
+import java.io.File;
+import java.util.List;
+
+import org.aposin.licensescout.archive.ArchiveType;
+import org.aposin.licensescout.configuration.DatabaseConfiguration;
+import org.aposin.licensescout.configuration.Output;
+import org.aposin.licensescout.license.LegalStatus;
+import org.aposin.licensescout.util.ILFLog;
+
+/**
+ * Parameter object containing all information for a LicenseScout execution.
+ *
+ * @see Executor
+ */
+<span class="fc" id="L32">public class ExecutionParameters {</span>
+
+    private ArchiveType archiveType;
+
+    /**
+     * Directory to scan for archives.
+     */
+    private File scanDirectory;
+
+    /**
+     * Location of the output file (will be combined with output filename).
+     */
+    private File outputDirectory;
+
+    /**
+     * Specification of output types and filenames.
+     */
+    private List&lt;Output&gt; outputs;
+
+    /**
+     * If cleaning the output should be active.
+     */
+    private boolean cleanOutputActive;
+
+    /**
+     * List of legal states that should be filtered out if cleanOutput is active.
+     */
+    private LegalStatus[] cleanOutputLegalStates;
+
+    /**
+     * List of licenses that should be filtered out if cleanOutput is active, given by their SPDX identifier.
+     */
+    private String[] cleanOutputLicenseSpdxIdentifiers;
+
+    /**
+     * List of vendor names to filter out.
+     * This is alternative to filteredVendorNamesFilename. If both are given, the entries are merged.
+     */
+    private List&lt;String&gt; filteredVendorNames;
+
+    /**
+     * Base URL for fetching Maven central artifacts from a server.
+     * This can be Maven central itself (like the default value) or a mirror of maven central on a Nexus or other artifact server.
+     */
+    private String nexusCentralBaseUrl;
+
+    /**
+     * Timeout for connecting to artifact server. This timeout is used when
+     * connecting to an artifact server (as configured with
+     * {@link #nexusCentralBaseUrl}) to retrieve parent POMs. The value is in
+     * milliseconds
+     */
+    private int connectTimeout;
+
+    /**
+     * Whether the license XML file should be validated while reading in.
+     */
+    private boolean validateLicenseXml;
+
+    /**
+     * Whether the license XML file should be validated while reading in.
+     */
+    private boolean showDocumentationUrl;
+
+    /**
+     * Whether a skeleton archive XML file of all found archives should be written.
+     * 
+     * &lt;p&gt;If enabled, the file is written to {@link #archiveXmlSkeletonFile}.&lt;/p&gt;
+     * 
+     * @see #archiveXmlSkeletonFile
+     */
+    private boolean writeArchiveXmlSkeleton;
+
+    /**
+     * File name a skeleton archive XML file of all found archives should be written to.
+     * 
+     * &lt;p&gt;Only used if {@link #writeArchiveXmlSkeleton} is true. &lt;/p&gt;
+     * 
+     * @see #writeArchiveXmlSkeleton
+     */
+    private File archiveXmlSkeletonFile;
+
+    /**
+     * Whether a skeleton archive CSV file of all found archives should be written.
+     * 
+     * &lt;p&gt;If enabled, the file is written to {@link #archiveXmlSkeletonFile}.&lt;/p&gt;
+     * @see #archiveCsvSkeletonFile
+     */
+    private boolean writeArchiveCsvSkeleton;
+
+    /**
+     * File name a skeleton archive CSV file of all found archives should be written to.
+     * 
+     * &lt;p&gt;Only used if {@link #writeArchiveCsvSkeleton} is true. &lt;/p&gt;
+     * 
+     * @see #writeArchiveCsvSkeleton
+     */
+    private File archiveCsvSkeletonFile;
+
+    /**
+     * The name of the build to use when writing database entries.
+     * 
+     * &lt;p&gt;Only used if {@link #writeResultsToDatabase} is true. &lt;/p&gt;
+     * 
+     */
+    private String buildName;
+
+    /**
+     * The version of the build to use when writing database entries.
+     * 
+     * &lt;p&gt;Only used if {@link #writeResultsToDatabase} is true. &lt;/p&gt;
+     * 
+     */
+    private String buildVersion;
+
+    /**
+     * The URL of the build itself (point to Jenkins).
+     * 
+     * &lt;p&gt;Only used if {@link #writeResultsToDatabase} is true. &lt;/p&gt;
+     * 
+     */
+    private String buildUrl;
+
+    /**
+     * Whether the resulting reports should be written to a database.
+     * 
+     * &lt;p&gt;If enabled, the reports are written to the database configured with {@link #resultDatabaseConfiguration}.&lt;/p&gt;
+     * 
+     * @see #resultDatabaseConfiguration
+     */
+    private boolean writeResultsToDatabase;
+
+    /**
+     * Whether the resulting reports should be written to a database in case the build is a snapshot
+     * (identified by the value of {@link #buildVersion} ending with &quot;-SNAPSHOT&quot;).
+     * 
+     * &lt;p&gt;This setting only has an effect if {@link #writeResultsToDatabase} is enabled.&lt;/p&gt;
+     * 
+     * @see #writeResultsToDatabase
+     * @see #resultDatabaseConfiguration
+     */
+    private boolean writeResultsToDatabaseForSnapshotBuilds;
+
+    /**
+     * Database configuration for the database the reports should be written to.
+     * 
+     * &lt;p&gt;Only used if {@link #writeResultsToDatabase} is true. &lt;/p&gt;
+     * 
+     * @see #writeResultsToDatabase
+     */
+    private DatabaseConfiguration resultDatabaseConfiguration;
+
+    /**
+     * NPM only.
+     */
+    private List&lt;String&gt; npmExcludedDirectoryNames;
+
+    /**
+     * NOTE: is not simply called 'log' because in this case {@code BeanUtils#copyProperties(Object, Object)} would use the value of AbstractMojo.getLog()
+     * to initialize this value, however, they have incompatible types and this leads to a runtime error.
+     */
+    private ILFLog lsLog;
+
+    private List&lt;IReportExporterFactory&gt; exporterFactories;
+
+    /**
+     * @return the archiveType
+     */
+    public final ArchiveType getArchiveType() {
+<span class="fc" id="L201">        return archiveType;</span>
+    }
+
+    /**
+     * @param archiveType the archiveType to set
+     */
+    public final void setArchiveType(ArchiveType archiveType) {
+<span class="fc" id="L208">        this.archiveType = archiveType;</span>
+<span class="fc" id="L209">    }</span>
+
+    /**
+     * @return the scanDirectory
+     */
+    public final File getScanDirectory() {
+<span class="fc" id="L215">        return scanDirectory;</span>
+    }
+
+    /**
+     * @param scanDirectory the scanDirectory to set
+     */
+    public final void setScanDirectory(File scanDirectory) {
+<span class="fc" id="L222">        this.scanDirectory = scanDirectory;</span>
+<span class="fc" id="L223">    }</span>
+
+    /**
+     * @return the outputDirectory
+     */
+    public final File getOutputDirectory() {
+<span class="fc" id="L229">        return outputDirectory;</span>
+    }
+
+    /**
+     * @param outputDirectory the outputDirectory to set
+     */
+    public final void setOutputDirectory(File outputDirectory) {
+<span class="fc" id="L236">        this.outputDirectory = outputDirectory;</span>
+<span class="fc" id="L237">    }</span>
+
+    /**
+     * @return the outputs
+     */
+    public final List&lt;Output&gt; getOutputs() {
+<span class="fc" id="L243">        return outputs;</span>
+    }
+
+    /**
+     * @param outputs the outputs to set
+     */
+    public final void setOutputs(List&lt;Output&gt; outputs) {
+<span class="fc" id="L250">        this.outputs = outputs;</span>
+<span class="fc" id="L251">    }</span>
+
+    /**
+     * @return the cleanOutputActive
+     */
+    public final boolean isCleanOutputActive() {
+<span class="fc" id="L257">        return cleanOutputActive;</span>
+    }
+
+    /**
+     * @param cleanOutputActive the cleanOutputActive to set
+     */
+    public final void setCleanOutputActive(boolean cleanOutputActive) {
+<span class="fc" id="L264">        this.cleanOutputActive = cleanOutputActive;</span>
+<span class="fc" id="L265">    }</span>
+
+    /**
+     * @return the cleanOutputLegalStates
+     */
+    public final LegalStatus[] getCleanOutputLegalStates() {
+<span class="fc" id="L271">        return cleanOutputLegalStates;</span>
+    }
+
+    /**
+     * @param cleanOutputLegalStates the cleanOutputLegalStates to set
+     */
+    public final void setCleanOutputLegalStates(LegalStatus[] cleanOutputLegalStates) {
+<span class="fc" id="L278">        this.cleanOutputLegalStates = cleanOutputLegalStates;</span>
+<span class="fc" id="L279">    }</span>
+
+    /**
+     * @return the cleanOutputLicenseSpdxIdentifiers
+     */
+    public final String[] getCleanOutputLicenseSpdxIdentifiers() {
+<span class="nc" id="L285">        return cleanOutputLicenseSpdxIdentifiers;</span>
+    }
+
+    /**
+     * @param cleanOutputLicenseSpdxIdentifiers the cleanOutputLicenseSpdxIdentifiers to set
+     */
+    public final void setCleanOutputLicenseSpdxIdentifiers(String[] cleanOutputLicenseSpdxIdentifiers) {
+<span class="nc" id="L292">        this.cleanOutputLicenseSpdxIdentifiers = cleanOutputLicenseSpdxIdentifiers;</span>
+<span class="nc" id="L293">    }</span>
+
+    /**
+     * @return the filteredVendorNames
+     */
+    public final List&lt;String&gt; getFilteredVendorNames() {
+<span class="fc" id="L299">        return filteredVendorNames;</span>
+    }
+
+    /**
+     * @param filteredVendorNames the filteredVendorNames to set
+     */
+    public final void setFilteredVendorNames(List&lt;String&gt; filteredVendorNames) {
+<span class="fc" id="L306">        this.filteredVendorNames = filteredVendorNames;</span>
+<span class="fc" id="L307">    }</span>
+
+    /**
+     * @return the nexusCentralBaseUrl
+     */
+    public final String getNexusCentralBaseUrl() {
+<span class="fc" id="L313">        return nexusCentralBaseUrl;</span>
+    }
+
+    /**
+     * @param nexusCentralBaseUrl the nexusCentralBaseUrl to set
+     */
+    public final void setNexusCentralBaseUrl(String nexusCentralBaseUrl) {
+<span class="nc" id="L320">        this.nexusCentralBaseUrl = nexusCentralBaseUrl;</span>
+<span class="nc" id="L321">    }</span>
+
+    /**
+     * @return the connectTimeout
+     */
+    public final int getConnectTimeout() {
+<span class="fc" id="L327">        return connectTimeout;</span>
+    }
+
+    /**
+     * @param connectTimeout the connectTimeout to set
+     */
+    public final void setConnectTimeout(int connectTimeout) {
+<span class="nc" id="L334">        this.connectTimeout = connectTimeout;</span>
+<span class="nc" id="L335">    }</span>
+
+    /**
+     * @return the validateLicenseXml
+     */
+    public final boolean isValidateLicenseXml() {
+<span class="nc" id="L341">        return validateLicenseXml;</span>
+    }
+
+    /**
+     * @param validateLicenseXml the validateLicenseXml to set
+     */
+    public final void setValidateLicenseXml(boolean validateLicenseXml) {
+<span class="nc" id="L348">        this.validateLicenseXml = validateLicenseXml;</span>
+<span class="nc" id="L349">    }</span>
+
+    /**
+     * @return the showDocumentationUrl
+     */
+    public final boolean isShowDocumentationUrl() {
+<span class="fc" id="L355">        return showDocumentationUrl;</span>
+    }
+
+    /**
+     * @param showDocumentationUrl the showDocumentationUrl to set
+     */
+    public final void setShowDocumentationUrl(boolean showDocumentationUrl) {
+<span class="nc" id="L362">        this.showDocumentationUrl = showDocumentationUrl;</span>
+<span class="nc" id="L363">    }</span>
+
+    /**
+     * @return the writeArchiveXmlSkeleton
+     */
+    public final boolean isWriteArchiveXmlSkeleton() {
+<span class="fc" id="L369">        return writeArchiveXmlSkeleton;</span>
+    }
+
+    /**
+     * @param writeArchiveXmlSkeleton the writeArchiveXmlSkeleton to set
+     */
+    public final void setWriteArchiveXmlSkeleton(boolean writeArchiveXmlSkeleton) {
+<span class="nc" id="L376">        this.writeArchiveXmlSkeleton = writeArchiveXmlSkeleton;</span>
+<span class="nc" id="L377">    }</span>
+
+    /**
+     * @return the archiveXmlSkeletonFile
+     */
+    public final File getArchiveXmlSkeletonFile() {
+<span class="nc" id="L383">        return archiveXmlSkeletonFile;</span>
+    }
+
+    /**
+     * @param archiveXmlSkeletonFile the archiveXmlSkeletonFile to set
+     */
+    public final void setArchiveXmlSkeletonFile(File archiveXmlSkeletonFile) {
+<span class="nc" id="L390">        this.archiveXmlSkeletonFile = archiveXmlSkeletonFile;</span>
+<span class="nc" id="L391">    }</span>
+
+    /**
+     * @return the writeArchiveCsvSkeleton
+     */
+    public final boolean isWriteArchiveCsvSkeleton() {
+<span class="fc" id="L397">        return writeArchiveCsvSkeleton;</span>
+    }
+
+    /**
+     * @param writeArchiveCsvSkeleton the writeArchiveCsvSkeleton to set
+     */
+    public final void setWriteArchiveCsvSkeleton(boolean writeArchiveCsvSkeleton) {
+<span class="nc" id="L404">        this.writeArchiveCsvSkeleton = writeArchiveCsvSkeleton;</span>
+<span class="nc" id="L405">    }</span>
+
+    /**
+     * @return the archiveCsvSkeletonFile
+     */
+    public final File getArchiveCsvSkeletonFile() {
+<span class="nc" id="L411">        return archiveCsvSkeletonFile;</span>
+    }
+
+    /**
+     * @param archiveCsvSkeletonFile the archiveCsvSkeletonFile to set
+     */
+    public final void setArchiveCsvSkeletonFile(File archiveCsvSkeletonFile) {
+<span class="nc" id="L418">        this.archiveCsvSkeletonFile = archiveCsvSkeletonFile;</span>
+<span class="nc" id="L419">    }</span>
+
+    /**
+     * @return the buildName
+     */
+    public final String getBuildName() {
+<span class="fc" id="L425">        return buildName;</span>
+    }
+
+    /**
+     * @param buildName the buildName to set
+     */
+    public final void setBuildName(String buildName) {
+<span class="nc" id="L432">        this.buildName = buildName;</span>
+<span class="nc" id="L433">    }</span>
+
+    /**
+     * @return the buildVersion
+     */
+    public final String getBuildVersion() {
+<span class="fc" id="L439">        return buildVersion;</span>
+    }
+
+    /**
+     * @param buildVersion the buildVersion to set
+     */
+    public final void setBuildVersion(String buildVersion) {
+<span class="nc" id="L446">        this.buildVersion = buildVersion;</span>
+<span class="nc" id="L447">    }</span>
+
+    /**
+     * @return the buildUrl
+     */
+    public final String getBuildUrl() {
+<span class="fc" id="L453">        return buildUrl;</span>
+    }
+
+    /**
+     * @param buildUrl the buildUrl to set
+     */
+    public final void setBuildUrl(String buildUrl) {
+<span class="nc" id="L460">        this.buildUrl = buildUrl;</span>
+<span class="nc" id="L461">    }</span>
+
+    /**
+     * @return the writeResultsToDatabase
+     */
+    public final boolean isWriteResultsToDatabase() {
+<span class="fc" id="L467">        return writeResultsToDatabase;</span>
+    }
+
+    /**
+     * @param writeResultsToDatabase the writeResultsToDatabase to set
+     */
+    public final void setWriteResultsToDatabase(boolean writeResultsToDatabase) {
+<span class="nc" id="L474">        this.writeResultsToDatabase = writeResultsToDatabase;</span>
+<span class="nc" id="L475">    }</span>
+
+    /**
+     * @return the writeResultsToDatabaseForSnapshotBuilds
+     */
+    public final boolean isWriteResultsToDatabaseForSnapshotBuilds() {
+<span class="nc" id="L481">        return writeResultsToDatabaseForSnapshotBuilds;</span>
+    }
+
+    /**
+     * @param writeResultsToDatabaseForSnapshotBuilds the writeResultsToDatabaseForSnapshotBuilds to set
+     */
+    public final void setWriteResultsToDatabaseForSnapshotBuilds(boolean writeResultsToDatabaseForSnapshotBuilds) {
+<span class="nc" id="L488">        this.writeResultsToDatabaseForSnapshotBuilds = writeResultsToDatabaseForSnapshotBuilds;</span>
+<span class="nc" id="L489">    }</span>
+
+    /**
+     * @return the resultDatabaseConfiguration
+     */
+    public final DatabaseConfiguration getResultDatabaseConfiguration() {
+<span class="nc" id="L495">        return resultDatabaseConfiguration;</span>
+    }
+
+    /**
+     * @param resultDatabaseConfiguration the resultDatabaseConfiguration to set
+     */
+    public final void setResultDatabaseConfiguration(DatabaseConfiguration resultDatabaseConfiguration) {
+<span class="nc" id="L502">        this.resultDatabaseConfiguration = resultDatabaseConfiguration;</span>
+<span class="nc" id="L503">    }</span>
+
+    /**
+     * @return the npmExcludedDirectoryNames
+     */
+    public final List&lt;String&gt; getNpmExcludedDirectoryNames() {
+<span class="fc" id="L509">        return npmExcludedDirectoryNames;</span>
+    }
+
+    /**
+     * @param npmExcludedDirectoryNames the npmExcludedDirectoryNames to set
+     */
+    public final void setNpmExcludedDirectoryNames(List&lt;String&gt; npmExcludedDirectoryNames) {
+<span class="fc" id="L516">        this.npmExcludedDirectoryNames = npmExcludedDirectoryNames;</span>
+<span class="fc" id="L517">    }</span>
+
+    /**
+     * @return the log
+     */
+    public final ILFLog getLsLog() {
+<span class="fc" id="L523">        return lsLog;</span>
+    }
+
+    /**
+     * @param lsLog the log to set
+     */
+    public final void setLsLog(ILFLog lsLog) {
+<span class="fc" id="L530">        this.lsLog = lsLog;</span>
+<span class="fc" id="L531">    }</span>
+
+    /**
+     * @return the exporterFactories
+     */
+    public final List&lt;IReportExporterFactory&gt; getExporterFactories() {
+<span class="fc" id="L537">        return exporterFactories;</span>
+    }
+
+    /**
+     * @param exporterFactories the exporterFactories to set
+     */
+    public final void setExporterFactories(List&lt;IReportExporterFactory&gt; exporterFactories) {
+<span class="fc" id="L544">        this.exporterFactories = exporterFactories;</span>
+<span class="fc" id="L545">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

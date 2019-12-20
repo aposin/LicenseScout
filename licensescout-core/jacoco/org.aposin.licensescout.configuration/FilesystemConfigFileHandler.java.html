@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FilesystemConfigFileHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.configuration</a> &gt; <span class="el_source">FilesystemConfigFileHandler.java</span></div><h1>FilesystemConfigFileHandler.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.configuration;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.aposin.licensescout.util.ILFLog;
+
+/**
+ */
+public class FilesystemConfigFileHandler extends AbstractConfigFileHandler {
+
+    /**
+     * Constructor.
+     * 
+     * @param configFileParameters
+     * @param log 
+     */
+    public FilesystemConfigFileHandler(ConfigFileParameters configFileParameters, final ILFLog log) {
+<span class="fc" id="L36">        super(configFileParameters, log);</span>
+<span class="fc" id="L37">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InputStream getProvidersInputStream() throws IOException {
+<span class="fc" id="L44">        final File providersFilename = getExecutionParameters().getProvidersFilename();</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        if (providersFilename != null) {</span>
+<span class="pc bpc" id="L46" title="2 of 4 branches missed.">            if (providersFilename.exists() &amp;&amp; providersFilename.canRead()) {</span>
+<span class="fc" id="L47">                getLog().info(&quot;reading providers from &quot; + providersFilename);</span>
+<span class="fc" id="L48">                return new FileInputStream(providersFilename);</span>
+            } else {
+<span class="nc" id="L50">                getLog().error(&quot;not reading providers because the file does not exist or is not readable: &quot;</span>
+                        + providersFilename);
+            }
+        } else {
+<span class="fc" id="L54">            getLog().info(&quot;not reading providers (not configured)&quot;);</span>
+        }
+<span class="fc" id="L56">        return null;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InputStream getNoticesInputStream() throws IOException {
+<span class="fc" id="L64">        final File noticesFilename = getExecutionParameters().getNoticesFilename();</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if (noticesFilename != null) {</span>
+<span class="pc bpc" id="L66" title="2 of 4 branches missed.">            if (noticesFilename.exists() &amp;&amp; noticesFilename.canRead()) {</span>
+<span class="fc" id="L67">                getLog().info(&quot;reading notices from &quot; + noticesFilename);</span>
+<span class="fc" id="L68">                return new FileInputStream(noticesFilename);</span>
+            } else {
+<span class="nc" id="L70">                getLog().error(</span>
+                        &quot;not reading notices because the file does not exist or is not readable: &quot; + noticesFilename);
+            }
+        } else {
+<span class="fc" id="L74">            getLog().info(&quot;not reading notices (not configured)&quot;);</span>
+        }
+<span class="fc" id="L76">        return null;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InputStream getLicensesInputStream() throws IOException {
+<span class="fc" id="L84">        final File licensesFilename = getExecutionParameters().getLicensesFilename();</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">        if (licensesFilename != null) {</span>
+<span class="pc bpc" id="L86" title="2 of 4 branches missed.">            if (licensesFilename.exists() &amp;&amp; licensesFilename.canRead()) {</span>
+<span class="fc" id="L87">                getLog().info(&quot;reading licenses from &quot; + licensesFilename);</span>
+<span class="fc" id="L88">                return new FileInputStream(licensesFilename);</span>
+            } else {
+<span class="nc" id="L90">                getLog().error(</span>
+                        &quot;not reading licenses because the file does not exist or is not readable: &quot; + licensesFilename);
+            }
+        } else {
+<span class="fc" id="L94">            getLog().info(&quot;not reading licenses (not configured)&quot;);</span>
+        }
+<span class="fc" id="L96">        return null;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InputStream getLicenseUrlMappingsInputStream() throws IOException {
+<span class="fc" id="L104">        final String licenseUrlMappingsFilename = getExecutionParameters().getLicenseUrlMappingsFilename();</span>
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">        if (licenseUrlMappingsFilename != null) {</span>
+<span class="fc" id="L106">            final File file = new File(licenseUrlMappingsFilename);</span>
+<span class="pc bpc" id="L107" title="2 of 4 branches missed.">            if (file.exists() &amp;&amp; file.canRead()) {</span>
+<span class="fc" id="L108">                getLog().info(&quot;reading license URL mappings from &quot; + licenseUrlMappingsFilename);</span>
+<span class="fc" id="L109">                return new FileInputStream(file);</span>
+            } else {
+<span class="nc" id="L111">                getLog().error(&quot;not reading license URL mappings because the file does not exist or is not readable: &quot;</span>
+                        + licenseUrlMappingsFilename);
+            }
+<span class="nc" id="L114">        } else {</span>
+<span class="nc" id="L115">            getLog().info(&quot;not reading license URL mappings (not configured)&quot;);</span>
+        }
+<span class="nc" id="L117">        return null;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InputStream getLicenseNameMappingsInputStream() throws IOException {
+<span class="fc" id="L125">        final String licenseNameMappingsFilename = getExecutionParameters().getLicenseNameMappingsFilename();</span>
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">        if (licenseNameMappingsFilename != null) {</span>
+<span class="fc" id="L127">            final File file = new File(licenseNameMappingsFilename);</span>
+<span class="pc bpc" id="L128" title="2 of 4 branches missed.">            if (file.exists() &amp;&amp; file.canRead()) {</span>
+<span class="fc" id="L129">                getLog().info(&quot;reading license name mappings from &quot; + licenseNameMappingsFilename);</span>
+<span class="fc" id="L130">                return new FileInputStream(file);</span>
+            } else {
+<span class="nc" id="L132">                getLog().error(&quot;not reading license name mappings because the file does not exist or is not readable: &quot;</span>
+                        + licenseNameMappingsFilename);
+            }
+<span class="nc" id="L135">        } else {</span>
+<span class="nc" id="L136">            getLog().info(&quot;not reading license name mappings (not configured)&quot;);</span>
+        }
+<span class="nc" id="L138">        return null;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InputStream getGlobalFiltersInputStream() throws IOException {
+<span class="fc" id="L146">        final String globalFiltersFilename = getExecutionParameters().getGlobalFiltersFilename();</span>
+<span class="fc bfc" id="L147" title="All 2 branches covered.">        if (globalFiltersFilename != null) {</span>
+<span class="fc" id="L148">            final File file = new File(globalFiltersFilename);</span>
+<span class="pc bpc" id="L149" title="2 of 4 branches missed.">            if (file.exists() &amp;&amp; file.canRead()) {</span>
+<span class="fc" id="L150">                getLog().info(&quot;reading global filters from &quot; + globalFiltersFilename);</span>
+<span class="fc" id="L151">                return new FileInputStream(file);</span>
+            } else {
+<span class="nc" id="L153">                getLog().error(&quot;not reading global filters because the file does not exist or is not readable: &quot;</span>
+                        + globalFiltersFilename);
+            }
+<span class="nc" id="L156">        } else {</span>
+<span class="fc" id="L157">            getLog().info(&quot;not reading global filters (not configured)&quot;);</span>
+        }
+<span class="fc" id="L159">        return null;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InputStream getCheckedArchivesInputStream() throws IOException {
+<span class="fc" id="L167">        final File checkedArchivesFilename = getExecutionParameters().getCheckedArchivesFilename();</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">        if (checkedArchivesFilename != null) {</span>
+<span class="pc bpc" id="L169" title="2 of 4 branches missed.">            if (checkedArchivesFilename.exists() &amp;&amp; checkedArchivesFilename.canRead()) {</span>
+<span class="fc" id="L170">                getLog().info(&quot;reading checked archives list from &quot; + checkedArchivesFilename);</span>
+<span class="fc" id="L171">                return new FileInputStream(checkedArchivesFilename);</span>
+            } else {
+<span class="nc" id="L173">                getLog().error(&quot;not reading checked archives list because the file does not exist or is not readable: &quot;</span>
+                        + checkedArchivesFilename);
+            }
+        } else {
+<span class="fc" id="L177">            getLog().info(&quot;not reading checked archives list (not configured)&quot;);</span>
+        }
+<span class="fc" id="L179">        return null;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InputStream getFilteredVendorNamesInputStream() throws IOException {
+<span class="fc" id="L187">        final String filteredVendorNamesFilename = getExecutionParameters().getFilteredVendorNamesFilename();</span>
+<span class="fc bfc" id="L188" title="All 2 branches covered.">        if (filteredVendorNamesFilename != null) {</span>
+<span class="fc" id="L189">            final File file = new File(filteredVendorNamesFilename);</span>
+<span class="pc bpc" id="L190" title="2 of 4 branches missed.">            if (file.exists() &amp;&amp; file.canRead()) {</span>
+<span class="fc" id="L191">                getLog().info(&quot;reading vendor names to filter out from &quot; + filteredVendorNamesFilename);</span>
+<span class="fc" id="L192">                return new FileInputStream(file);</span>
+            } else {
+<span class="nc" id="L194">                getLog().error(</span>
+                        &quot;not reading vendor names to filter out because the file does not exist or is not readable: &quot;
+                                + filteredVendorNamesFilename);
+            }
+<span class="nc" id="L198">        } else {</span>
+<span class="fc" id="L199">            getLog().info(&quot;not reading vendor names to filter out from file (not configured)&quot;);</span>
+        }
+<span class="fc" id="L201">        return null;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

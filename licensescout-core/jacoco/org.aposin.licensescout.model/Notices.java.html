@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Notices.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.model</a> &gt; <span class="el_source">Notices.java</span></div><h1>Notices.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.model;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.apache.commons.lang3.StringUtils;
+import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.sax.AbstractSaxHandler;
+import org.aposin.licensescout.util.sax.IElementHandler;
+import org.aposin.licensescout.util.sax.NopElementHandler;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+
+/**
+ * Collection of notices.
+ * 
+ * &lt;p&gt;Initialisation:&lt;/p&gt;
+ * &lt;ol&gt;
+ * &lt;li&gt;Create an instance&lt;/li&gt;
+ * &lt;li&gt;Call {@link #readNotices(InputStream, boolean, ILFLog)} to read in the notices from a file&lt;/li&gt;
+ * &lt;/ol&gt;
+ */
+public class Notices {
+
+    /**
+     * Maps notice identifiers to notices
+     */
+<span class="fc" id="L51">    private Map&lt;String, Notice&gt; store = new HashMap&lt;&gt;();</span>
+
+    /**
+     * Constructor.
+     */
+<span class="fc" id="L56">    public Notices() {</span>
+        // DO NOTHING
+<span class="fc" id="L58">    }</span>
+
+    private void addToStore(final Notice notice, final ILFLog log) {
+<span class="nc" id="L61">        final String identifier = notice.getIdentifier();</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if (!StringUtils.isEmpty(identifier)) {</span>
+<span class="nc" id="L63">            final Notice existingNotice = store.get(identifier);</span>
+<span class="nc bnc" id="L64" title="All 4 branches missed.">            if (existingNotice != null &amp;&amp; !existingNotice.equals(notice)) {</span>
+<span class="nc" id="L65">                log.warn(&quot;double notice identifier: '&quot; + identifier + &quot;'&quot;);</span>
+            }
+<span class="nc" id="L67">            store.put(identifier, notice);</span>
+        }
+<span class="nc" id="L69">    }</span>
+
+    /**
+     * Gets the notice by its identifier.
+     * 
+     * @param identifier the notice identifier
+     * @return the notice or null
+     */
+    public Notice getNoticeByIdentifier(final String identifier) {
+<span class="fc" id="L78">        return store.get(identifier);</span>
+    }
+
+    /**
+     * Reads known notices from an XML file.
+     * 
+     * @param inputStream
+     * @param validateXml true if the notices XML file should be validated, false otherwise
+     * @param log the logger
+     * @throws IOException
+     * @throws SAXException 
+     * @throws ParserConfigurationException 
+     */
+    public void readNotices(final InputStream inputStream, boolean validateXml, final ILFLog log)
+            throws IOException, ParserConfigurationException, SAXException {
+
+<span class="nc" id="L94">        final SAXParserFactory spf = SAXParserFactory.newInstance();</span>
+<span class="nc" id="L95">        spf.setNamespaceAware(true);</span>
+<span class="nc" id="L96">        spf.setValidating(validateXml);</span>
+<span class="nc" id="L97">        final SAXParser saxParser = spf.newSAXParser();</span>
+<span class="nc" id="L98">        final XMLReader xmlReader = saxParser.getXMLReader();</span>
+<span class="nc" id="L99">        xmlReader.setContentHandler(new NoticeSaxHandler(log));</span>
+<span class="nc" id="L100">        xmlReader.parse(new InputSource(inputStream));</span>
+<span class="nc" id="L101">    }</span>
+
+    private class NoticeSaxHandler extends AbstractSaxHandler {
+    	
+        private static final String ELEMENT_NOTICES = &quot;notices&quot;;
+        private static final String ELEMENT_NOTICE = &quot;notice&quot;;
+        private static final String ELEMENT_TEXT = &quot;text&quot;;
+
+        private String identifier;
+        private String text;
+
+
+        /**
+         * Constructor.
+         * @param log the logger
+         */
+<span class="nc" id="L117">        public NoticeSaxHandler(final ILFLog log) {</span>
+<span class="nc" id="L118">            super(log);</span>
+<span class="nc" id="L119">            setElementHandler(new NopElementHandler(ELEMENT_NOTICES));</span>
+<span class="nc" id="L120">            setElementHandler(new StandardNoticeHandler());</span>
+<span class="nc" id="L121">            setElementHandler(new TextElementHandler());</span>
+<span class="nc" id="L122">        }</span>
+        
+<span class="nc" id="L124">        private class StandardNoticeHandler implements IElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="nc" id="L131">                return ELEMENT_NOTICE;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            public void startElement(String uri, String localName, String qName, final Attributes attributes) {
+<span class="nc" id="L137">                identifier = attributes.getValue(ATTRIBUTE_ID);</span>
+<span class="nc" id="L138">                text = null;</span>
+<span class="nc" id="L139">            }</span>
+
+            /** {@inheritDoc} */
+            @Override
+            public void endElement(String uri, String localName, String qName) {
+<span class="nc bnc" id="L144" title="All 2 branches missed.">                if (text == null) {</span>
+<span class="nc" id="L145">                    getLog().warn(&quot;No text for notice ID: '&quot; + identifier + &quot;'&quot;);</span>
+                }
+<span class="nc" id="L147">                final Notice notice = new Notice(identifier, text);</span>
+<span class="nc" id="L148">                addToStore(notice, getLog());</span>
+<span class="nc" id="L149">            }</span>
+        }
+
+<span class="nc" id="L152">        private class TextElementHandler extends AbstractTextElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="nc" id="L159">                return ELEMENT_TEXT;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            protected void processText(final String text) {
+<span class="nc" id="L165">                NoticeSaxHandler.this.text = text;</span>
+<span class="nc" id="L166">            }</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

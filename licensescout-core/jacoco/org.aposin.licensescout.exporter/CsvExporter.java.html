@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CsvExporter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.exporter</a> &gt; <span class="el_source">CsvExporter.java</span></div><h1>CsvExporter.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.exporter;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+
+import org.aposin.licensescout.archive.Archive;
+import org.aposin.licensescout.configuration.OutputFileType;
+import org.aposin.licensescout.license.License;
+
+/**
+ * Exporter creating CSV files containing only the list of archives.
+ * 
+ * &lt;p&gt;This exporter writes a single line for each found archive. The line contains:&lt;/p&gt;
+ * &lt;ol&gt;
+ * &lt;li&gt;file name&lt;/li&gt;
+ * &lt;li&gt;version (may be an empty string)&lt;/li&gt;
+ * &lt;li&gt;Message digest (may be an empty string)&lt;/li&gt;
+ * &lt;li&gt;detection status&lt;/li&gt;
+ * &lt;li&gt;legal status&lt;/li&gt;
+ * &lt;li&gt;file path&lt;/li&gt;
+ * &lt;li&gt;list of licenses identifiers (maybe empty)&lt;/li&gt;
+ * &lt;/ol&gt;
+ * 
+ * &lt;p&gt;Note that depending on the number of licenses associated with an archive the number of fields in a line may vary.
+ * SPDX identifiers are used as license names&lt;/p&gt;
+ */
+<span class="fc" id="L50">public class CsvExporter implements IReportExporter {</span>
+
+<span class="fc" id="L52">    private static final IReportExporter INSTANCE = new CsvExporter();</span>
+
+    /**
+     * Gets the single instance of Exporter.
+     * 
+     * @return single instance of Exporter
+     */
+    public static IReportExporter getInstance() {
+<span class="fc" id="L60">        return INSTANCE;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public OutputFileType getOutputFileType() {
+<span class="fc" id="L68">        return OutputFileType.CSV;</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void export(final OutputResult outputResult, final ReportConfiguration reportConfiguration)
+            throws Exception {
+<span class="fc" id="L77">        final Charset charset = ExporterUtil.getOutputCharset(reportConfiguration);</span>
+<span class="fc" id="L78">        final List&lt;Archive&gt; archiveFiles = outputResult.getFinderResult().getArchiveFiles();</span>
+<span class="fc" id="L79">        try (final FileWriter fileWriter = new FileWriter(reportConfiguration.getOutputFile(), charset);</span>
+<span class="fc" id="L80">                final BufferedWriter bw = new BufferedWriter(fileWriter)) {</span>
+
+<span class="fc" id="L82">            writeHeader(outputResult, bw, reportConfiguration);</span>
+<span class="fc" id="L83">            Collections.sort(archiveFiles);</span>
+
+<span class="fc bfc" id="L85" title="All 2 branches covered.">            for (final Archive archive : archiveFiles) {</span>
+<span class="fc" id="L86">                write(archive, bw, reportConfiguration);</span>
+<span class="fc" id="L87">            }</span>
+        }
+<span class="fc" id="L89">    }</span>
+
+    private static void write(final Archive archive, final Writer writer, final ReportConfiguration reportConfiguration)
+            throws IOException {
+<span class="fc" id="L93">        final StringBuilder buffer = new StringBuilder();</span>
+<span class="fc" id="L94">        addQuotedString(buffer, archive.getArchiveType().toString());</span>
+<span class="fc" id="L95">        buffer.append(',');</span>
+<span class="fc" id="L96">        addQuotedString(buffer, archive.getFileName());</span>
+<span class="fc" id="L97">        buffer.append(',');</span>
+<span class="fc" id="L98">        addQuotedString(buffer, archive.getVersion());</span>
+<span class="fc" id="L99">        buffer.append(',');</span>
+<span class="fc" id="L100">        addQuotedString(buffer, archive.getMessageDigestString());</span>
+<span class="fc" id="L101">        buffer.append(',');</span>
+<span class="fc" id="L102">        addQuotedString(buffer, archive.getDetectionStatus().name());</span>
+<span class="fc" id="L103">        buffer.append(',');</span>
+<span class="fc" id="L104">        addQuotedString(buffer, archive.getLegalStatus().name());</span>
+<span class="fc" id="L105">        buffer.append(',');</span>
+<span class="fc" id="L106">        addQuotedString(buffer, archive.getPath());</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">        if (reportConfiguration.isShowDocumentationUrl()) {</span>
+<span class="fc" id="L108">            buffer.append(',');</span>
+<span class="fc" id="L109">            final String documentationUrl = archive.getDocumentationUrl();</span>
+<span class="fc" id="L110">            addQuotedString(buffer, documentationUrl);</span>
+        }
+<span class="fc" id="L112">        final Set&lt;License&gt; licensesSet = archive.getLicenses();</span>
+<span class="pc bpc" id="L113" title="1 of 2 branches missed.">        if (!licensesSet.isEmpty()) {</span>
+            // sort by SPDX identifier so that we get a unique order for archives that appear multiple times
+<span class="fc" id="L115">            final List&lt;License&gt; licensesList = new ArrayList&lt;&gt;(licensesSet);</span>
+<span class="fc" id="L116">            Collections.sort(licensesList, new Comparator&lt;License&gt;() { // NOSONAR</span>
+
+                /** {@inheritDoc} */
+                @Override
+                public int compare(final License o1, final License o2) {
+<span class="nc" id="L121">                    return o1.getSpdxIdentifier().compareTo(o2.getSpdxIdentifier());</span>
+                }
+            });
+<span class="fc bfc" id="L124" title="All 2 branches covered.">            for (final License license : licensesList) {</span>
+<span class="fc" id="L125">                buffer.append(',');</span>
+<span class="fc" id="L126">                addQuotedString(buffer, license.getSpdxIdentifier());</span>
+<span class="fc" id="L127">            }</span>
+        }
+<span class="fc" id="L129">        writer.write(buffer.toString());</span>
+<span class="fc" id="L130">        writer.write(System.lineSeparator());</span>
+<span class="fc" id="L131">    }</span>
+
+    private static void writeHeader(final OutputResult outputResult, final Writer writer,
+                                    final ReportConfiguration reportConfiguration)
+            throws IOException {
+<span class="fc" id="L136">        final StringBuilder buffer = new StringBuilder();</span>
+<span class="fc" id="L137">        addQuotedString(buffer, &quot;Type&quot;);</span>
+<span class="fc" id="L138">        buffer.append(',');</span>
+<span class="fc" id="L139">        addQuotedString(buffer, &quot;Filename&quot;);</span>
+<span class="fc" id="L140">        buffer.append(',');</span>
+<span class="fc" id="L141">        addQuotedString(buffer, &quot;Version&quot;);</span>
+<span class="fc" id="L142">        buffer.append(',');</span>
+<span class="fc" id="L143">        addQuotedString(buffer, &quot;Message Digest (&quot; + outputResult.getMessageDigestAlgorithm() + &quot;)&quot;);</span>
+<span class="fc" id="L144">        buffer.append(',');</span>
+<span class="fc" id="L145">        addQuotedString(buffer, &quot;Detection status&quot;);</span>
+<span class="fc" id="L146">        buffer.append(',');</span>
+<span class="fc" id="L147">        addQuotedString(buffer, &quot;Legal status&quot;);</span>
+<span class="fc" id="L148">        buffer.append(',');</span>
+<span class="fc" id="L149">        addQuotedString(buffer, &quot;Archive path&quot;);</span>
+<span class="fc bfc" id="L150" title="All 2 branches covered.">        if (reportConfiguration.isShowDocumentationUrl()) {</span>
+<span class="fc" id="L151">            buffer.append(',');</span>
+<span class="fc" id="L152">            addQuotedString(buffer, &quot;Documentation&quot;);</span>
+        }
+<span class="fc" id="L154">        final String[] licenseHeaders = new String[] { &quot;License 1&quot;, &quot;License 2&quot;, &quot;License 3&quot;, &quot;License 4&quot; };</span>
+<span class="fc bfc" id="L155" title="All 2 branches covered.">        for (final String licenseHeader : licenseHeaders) {</span>
+<span class="fc" id="L156">            buffer.append(',');</span>
+<span class="fc" id="L157">            addQuotedString(buffer, licenseHeader);</span>
+        }
+<span class="fc" id="L159">        writer.write(buffer.toString());</span>
+<span class="fc" id="L160">        writer.write(System.lineSeparator());</span>
+<span class="fc" id="L161">    }</span>
+
+    /**
+     * @param buffer the buffer to write to
+     * @param text the text to output. May be null - in this case an empty string is output
+     */
+    private static void addQuotedString(final StringBuilder buffer, final String text) {
+<span class="fc" id="L168">        buffer.append('&quot;');</span>
+<span class="pc bpc" id="L169" title="1 of 2 branches missed.">        if (text != null) {</span>
+<span class="fc" id="L170">            buffer.append(text);</span>
+        }
+<span class="fc" id="L172">        buffer.append('&quot;');</span>
+<span class="fc" id="L173">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

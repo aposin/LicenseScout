@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbstractFinder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.finder</a> &gt; <span class="el_source">AbstractFinder.java</span></div><h1>AbstractFinder.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.finder;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.aposin.licensescout.archive.Archive;
+import org.aposin.licensescout.license.License;
+import org.aposin.licensescout.license.LicenseStoreData;
+import org.aposin.licensescout.license.LicenseUtil;
+import org.aposin.licensescout.util.ILFLog;
+
+/**
+ * Base class for implementations that scan a directory for artifacts that need a license.
+ *  
+ * @see JavaJarFinder
+ * @see JavascriptNpmFinder
+ */
+public abstract class AbstractFinder {
+
+    private final LicenseStoreData licenseStoreData;
+
+    private final ILFLog log;
+
+    private File scanDirectory;
+
+    /**
+     * List of archives found during the scanning.
+     */
+<span class="fc" id="L50">    private final List&lt;Archive&gt; archiveFiles = new ArrayList&lt;&gt;();</span>
+
+    /**
+     * If set to true, the list of found archives including their licenses is dumped to the log with level DEBUG after the scanning run.
+     * 
+     * @see #printArchiveList(List)
+     */
+<span class="fc" id="L57">    boolean debug = false;</span>
+
+    /**
+     * Constructor.
+     * @param licenseStoreData 
+     * @param log the logger 
+     */
+<span class="fc" id="L64">    public AbstractFinder(final LicenseStoreData licenseStoreData, final ILFLog log) {</span>
+<span class="fc" id="L65">        this.licenseStoreData = licenseStoreData;</span>
+<span class="fc" id="L66">        this.log = log;</span>
+<span class="fc" id="L67">    }</span>
+
+    /**
+     * @return the licenseStoreData
+     */
+    protected final LicenseStoreData getLicenseStoreData() {
+<span class="fc" id="L73">        return licenseStoreData;</span>
+    }
+
+    /**
+     * Obtains the logger.
+     * 
+     * @return the logger
+     * 
+     * @see #AbstractFinder(LicenseStoreData, ILFLog)
+     */
+    protected final ILFLog getLog() {
+<span class="fc" id="L84">        return log;</span>
+    }
+
+    /**
+     * Sets the directory to scan.
+     * 
+     * @param scanDirectory the directory to scan
+     */
+    public final void setScanDirectory(final File scanDirectory) {
+<span class="fc" id="L93">        this.scanDirectory = scanDirectory;</span>
+<span class="fc" id="L94">    }</span>
+
+    /**
+     * Obtains the directory to scan.
+     * 
+     * @return the scanDirectory
+     */
+    protected final File getScanDirectory() {
+<span class="fc" id="L102">        return scanDirectory;</span>
+    }
+
+    /**
+     * Adds an archive to the list of found archives.
+     * @param foundArchive an archive
+     */
+    protected void addToArchiveFiles(final Archive foundArchive) {
+<span class="fc" id="L110">        getLog().debug(&quot;adding archive for: &quot; + foundArchive.getPath());</span>
+<span class="fc" id="L111">        archiveFiles.add(foundArchive);</span>
+<span class="fc" id="L112">    }</span>
+
+    /**
+     * @return the results
+     * @throws Exception 
+     * @throws IOException
+     */
+    public FinderResult findLicenses() throws Exception {
+<span class="fc" id="L120">        findLicensesImpl();</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">        if (debug) {</span>
+<span class="fc" id="L122">            printArchiveList(archiveFiles);</span>
+        }
+<span class="fc" id="L124">        getLog().info(&quot;Finished scanning for licenses in &quot; + getScanDirectory().getAbsolutePath());</span>
+<span class="fc" id="L125">        return new FinderResult(getScanDirectory(), archiveFiles);</span>
+    }
+
+    /**
+     * Checks the filename if the file is a potential license file.
+     * @param fileName
+     * @return true if the file is a potential license file
+     */
+    protected abstract boolean isCandidateLicenseFile(String fileName);
+
+    /**
+     * @throws Exception 
+     */
+    protected abstract void findLicensesImpl() throws Exception;
+
+    /**
+     * @param is
+     * @param fileName
+     * @param licenseStoreData 
+     * @return a license or &lt;code&gt;null&lt;/code&gt;
+     * @throws IOException
+     */
+    protected Collection&lt;License&gt; checkFileForLicenses(final InputStream is, final String fileName,
+                                                       final LicenseStoreData licenseStoreData)
+            throws IOException {
+
+<span class="fc bfc" id="L151" title="All 2 branches covered.">        if (isCandidateLicenseFile(fileName)) {</span>
+<span class="fc" id="L152">            getLog().debug(&quot;Checking file for licenses: &quot; + fileName);</span>
+<span class="fc" id="L153">            final BufferedReader br = new BufferedReader(new InputStreamReader(is));</span>
+<span class="fc" id="L154">            final Collection&lt;License&gt; detectLicenses = LicenseUtil.detectLicenses(br, licenseStoreData);</span>
+<span class="fc" id="L155">            getLog().debug(&quot;Result licenses: &quot; + detectLicenses.toString());</span>
+<span class="fc" id="L156">            return detectLicenses;</span>
+        }
+<span class="fc" id="L158">        return null;</span>
+    }
+
+    /**
+     * @param archiveFiles
+     */
+    public void printArchiveList(final List&lt;Archive&gt; archiveFiles) {
+<span class="fc bfc" id="L165" title="All 2 branches covered.">        for (final Archive archive : archiveFiles) {</span>
+<span class="fc" id="L166">            getLog().debug(archive.getFileName() + &quot;     &quot; + archive.getPath());</span>
+<span class="fc bfc" id="L167" title="All 2 branches covered.">            for (final License license : archive.getLicenses()) {</span>
+<span class="fc" id="L168">                getLog().debug(license.getName());</span>
+<span class="fc" id="L169">            }</span>
+<span class="fc" id="L170">        }</span>
+<span class="fc" id="L171">    }</span>
+
+    protected void addLicenses(final Archive archive, final Collection&lt;License&gt; licenses, final String filePath) {
+<span class="fc bfc" id="L174" title="All 2 branches covered.">        if (licenses != null) {</span>
+<span class="fc bfc" id="L175" title="All 2 branches covered.">            for (final License license : licenses) {</span>
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">                if (license != null) {</span>
+<span class="fc" id="L177">                    archive.addLicense(license, filePath);</span>
+                }
+<span class="fc" id="L179">            }</span>
+        }
+<span class="fc" id="L181">    }</span>
+
+    public abstract boolean isPomResolutionUsed();
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

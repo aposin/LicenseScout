@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ZipConfigFileHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.configuration</a> &gt; <span class="el_source">ZipConfigFileHandler.java</span></div><h1>ZipConfigFileHandler.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.configuration;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
+import org.apache.commons.io.IOUtils;
+import org.aposin.licensescout.util.ILFLog;
+
+/**
+ * Handler for licensescout configuration files read from a ZIP file.
+ * 
+ * &lt;p&gt;(This is used if the configuration is configured as a dependency to the LicensScout plugin.)&lt;/p&gt;
+ */
+public class ZipConfigFileHandler extends AbstractConfigFileHandler {
+
+    private File artifactFile;
+
+    /**
+     * Constructor.
+     * @param artifactFile
+     * @param configFileParameters
+     * @param log 
+     */
+    public ZipConfigFileHandler(File artifactFile, ConfigFileParameters configFileParameters, final ILFLog log) {
+<span class="fc" id="L44">        super(configFileParameters, log);</span>
+<span class="fc" id="L45">        this.artifactFile = artifactFile;</span>
+<span class="fc" id="L46">    }</span>
+
+    private InputStream getInputStream(final String entryName) throws IOException {
+<span class="fc" id="L49">        try (ZipFile zipFile = new ZipFile(artifactFile)) {</span>
+<span class="fc" id="L50">            ZipEntry entry = zipFile.getEntry(entryName);</span>
+<span class="fc" id="L51">            InputStream zipInputStream = zipFile.getInputStream(entry);</span>
+            //Read the zip input stream fully into memory
+<span class="fc" id="L53">            byte[] buffer = IOUtils.toByteArray(zipInputStream);</span>
+<span class="fc" id="L54">            return new ByteArrayInputStream(buffer);</span>
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InputStream getProvidersInputStream() throws IOException {
+<span class="fc" id="L63">        return getInputStream(&quot;providers.xml&quot;);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InputStream getNoticesInputStream() throws IOException {
+<span class="fc" id="L71">        return getInputStream(&quot;notices.xml&quot;);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InputStream getLicensesInputStream() throws IOException {
+<span class="fc" id="L79">        return getInputStream(&quot;licenses.xml&quot;);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InputStream getLicenseUrlMappingsInputStream() throws IOException {
+<span class="fc" id="L87">        return getInputStream(&quot;urlmappings.csv&quot;);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InputStream getLicenseNameMappingsInputStream() throws IOException {
+<span class="fc" id="L95">        return getInputStream(&quot;namemappings.csv&quot;);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InputStream getGlobalFiltersInputStream() throws IOException {
+<span class="fc" id="L103">        return getInputStream(&quot;globalfilters.csv&quot;);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InputStream getCheckedArchivesInputStream() throws IOException {
+<span class="fc" id="L111">        return getInputStream(&quot;checkedarchives.csv&quot;);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InputStream getFilteredVendorNamesInputStream() throws IOException {
+<span class="fc" id="L119">        return getInputStream(&quot;filteredvendornames.csv&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

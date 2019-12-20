@@ -1,0 +1,696 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LicenseCheckedList.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">LicenseScout Core</a> &gt; <a href="index.source.html" class="el_package">org.aposin.licensescout.license</a> &gt; <span class="el_source">LicenseCheckedList.java</span></div><h1>LicenseCheckedList.java</h1><pre class="source lang-java linenums">/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.license;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.function.Supplier;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.apache.commons.lang3.StringUtils;
+import org.aposin.licensescout.archive.Archive;
+import org.aposin.licensescout.archive.ArchiveIdentifier;
+import org.aposin.licensescout.archive.ArchiveIdentifierMessageDigest;
+import org.aposin.licensescout.archive.ArchiveIdentifierPattern;
+import org.aposin.licensescout.archive.ArchiveIdentifierVersion;
+import org.aposin.licensescout.archive.ArchiveType;
+import org.aposin.licensescout.archive.NameMatchingType;
+import org.aposin.licensescout.archive.PatternType;
+import org.aposin.licensescout.model.LSMessageDigest;
+import org.aposin.licensescout.model.Notice;
+import org.aposin.licensescout.model.Notices;
+import org.aposin.licensescout.model.Provider;
+import org.aposin.licensescout.model.Providers;
+import org.aposin.licensescout.util.CryptUtil;
+import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.sax.AbstractSaxHandler;
+import org.aposin.licensescout.util.sax.IElementHandler;
+import org.aposin.licensescout.util.sax.NopElementHandler;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+
+/**
+ * Contains a map of archives with manually assigned licenses.
+ * 
+ * &lt;p&gt;This map is used if a license cannot be detected automatically. The archive is identified either by name and version or by name and message digest&lt;/p&gt;
+ * 
+ * &lt;p&gt;Note that this class contains a hard-coded constant for the length of the message digest values. This should correspond to the algorithm returned by {@link CryptUtil#getMessageDigestAlgorithm()}.
+ * But while the algorithm can be changed, but this length of the message digests is currently fixed.&lt;/p&gt;
+ * 
+ * @see LicenseUtil#evaluateLicenses(LicenseCheckedList, Archive, LicenseStoreData)
+ * @see CryptUtil#getMessageDigestAlgorithm()
+ */
+public class LicenseCheckedList {
+
+    private static final int TYPE_INDEX = 0;
+    private static final int NAME_INDEX = 1;
+    private static final int VERSION_OR_MD_INDEX = 2;
+    private static final int DOC_URL_INDEX = 3;
+    private static final int PROVIDER_INDEX = 4;
+    private static final int NOTICE_INDEX = 5;
+    private static final int LICENSE_NAMES_OFFSET = 6;
+
+    /**
+     * Note: this value is valid for SHA-256, should corresponds to the algorithm returned by {@link CryptUtil#getMessageDigestAlgorithm()}.
+     * (Note that the algorithm can be changed by the method {@link CryptUtil#setMessageDigestAlgorithm(String)}, but this length of the hash is always hard-coded.)
+     */
+    private static final int MESSAGE_DIGEST_NUM_BYTES = 32;
+    private static final int MESSAGE_DIGEST_NUM_CODED_CHARACTERS = MESSAGE_DIGEST_NUM_BYTES * 2;
+
+<span class="fc" id="L88">    private Map&lt;ArchiveIdentifier, LicenseResult&gt; manualArchives = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L89">    private Map&lt;ArchiveIdentifierPattern, LicenseResult&gt; manualPatternArchives = new HashMap&lt;&gt;();</span>
+
+    /**
+     * Constructor.
+     */
+<span class="fc" id="L94">    public LicenseCheckedList() {</span>
+        // DO NOTHING
+<span class="fc" id="L96">    }</span>
+
+    /**
+     * Reads a CSV file containing checked archives.
+     * 
+     * @param inputStream a filename of the file to read
+     * @param licenseStoreData 
+     * @param providers 
+     * @param notices 
+     * @param log the logger
+     * @throws IOException if an error occurred while reading from the file
+     */
+    public void readCsv(final InputStream inputStream, final LicenseStoreData licenseStoreData,
+                        final Providers providers, final Notices notices, final ILFLog log)
+            throws IOException {
+<span class="fc" id="L111">        String line = &quot;&quot;;</span>
+<span class="fc" id="L112">        String cvsSplitBy = &quot;,&quot;;</span>
+<span class="fc" id="L113">        int lineNumber = 0;</span>
+<span class="fc" id="L114">        try (final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {</span>
+
+<span class="fc bfc" id="L116" title="All 2 branches covered.">            while ((line = br.readLine()) != null) {</span>
+<span class="fc" id="L117">                lineNumber++;</span>
+                // ignore lines commented out, empty lines and the header line
+<span class="pc bpc" id="L119" title="2 of 6 branches missed.">                if (line.startsWith(&quot;#&quot;) || StringUtils.isEmpty(line) || line.startsWith(&quot;Type&quot;)) {</span>
+<span class="fc" id="L120">                    continue;</span>
+                }
+<span class="fc" id="L122">                ArchiveIdentifier archiveIdentifier = null;</span>
+                // use comma as separator
+<span class="fc" id="L124">                final String[] values = line.split(cvsSplitBy);</span>
+<span class="fc" id="L125">                final ArchiveType archiveType = getArchiveType(values[TYPE_INDEX].trim());</span>
+<span class="fc" id="L126">                final String name = values[NAME_INDEX].trim();</span>
+                // either version or hash
+<span class="fc" id="L128">                final String id = values[VERSION_OR_MD_INDEX].trim();</span>
+<span class="pc bpc" id="L129" title="2 of 4 branches missed.">                if (name.length() &gt;= 0 &amp;&amp; name.charAt(0) == '=') {</span>
+                    PatternType patternType;
+                    int patternStartIndex;
+<span class="nc bnc" id="L132" title="All 4 branches missed.">                    if (name.length() &gt;= 1 &amp;&amp; name.charAt(1) == '=') {</span>
+<span class="nc" id="L133">                        patternType = PatternType.PATTERN_ON_PATH;</span>
+<span class="nc" id="L134">                        patternStartIndex = 2;</span>
+                    } else {
+<span class="nc" id="L136">                        patternType = PatternType.PATTERN_ON_FILENAME;</span>
+<span class="nc" id="L137">                        patternStartIndex = 1;</span>
+                    }
+<span class="nc" id="L139">                    final String regex = name.substring(patternStartIndex);</span>
+<span class="nc" id="L140">                    archiveIdentifier = new ArchiveIdentifierPattern(archiveType, patternType, regex);</span>
+<span class="pc bpc" id="L141" title="1 of 2 branches missed.">                } else if (id.length() &gt;= 0) {</span>
+<span class="fc bfc" id="L142" title="All 2 branches covered.">                    if (id.length() == MESSAGE_DIGEST_NUM_CODED_CHARACTERS) {</span>
+<span class="fc" id="L143">                        archiveIdentifier = new ArchiveIdentifierMessageDigest(archiveType, name, id);</span>
+                    } else {
+<span class="fc" id="L145">                        archiveIdentifier = new ArchiveIdentifierVersion(archiveType, name, id);</span>
+                    }
+                } else {
+<span class="nc" id="L148">                    log.error(&quot;read line with error, no version or message digest&quot;);</span>
+<span class="nc" id="L149">                    archiveIdentifier = null;</span>
+                }
+<span class="fc" id="L151">                final String documentationUrl = values[DOC_URL_INDEX].trim();</span>
+<span class="fc" id="L152">                final String providerId = values[PROVIDER_INDEX].trim();</span>
+<span class="fc" id="L153">                final int lineNumberFinal = lineNumber;</span>
+<span class="fc" id="L154">                final Provider provider = getProviderFromId(providers, providerId, log,</span>
+<span class="fc" id="L155">                        () -&gt; &quot;line &quot; + lineNumberFinal);</span>
+<span class="fc" id="L156">                final String noticeId = values[NOTICE_INDEX].trim();</span>
+<span class="fc" id="L157">                final Notice notice = getNoticeFromId(notices, noticeId);</span>
+
+<span class="pc bpc" id="L159" title="1 of 2 branches missed.">                if (archiveIdentifier != null) {</span>
+<span class="fc" id="L160">                    final LicenseResult licenseResult = fetchLicenseResult(licenseStoreData, log, values,</span>
+                            documentationUrl, notice, provider);
+<span class="pc bpc" id="L162" title="1 of 2 branches missed.">                    if (archiveIdentifier.getNameMatchingType() == NameMatchingType.EXACT) {</span>
+<span class="fc" id="L163">                        manualArchives.put(archiveIdentifier, licenseResult);</span>
+                    } else {
+<span class="nc" id="L165">                        manualPatternArchives.put((ArchiveIdentifierPattern) archiveIdentifier, licenseResult);</span>
+                    }
+                }
+<span class="fc" id="L168">            }</span>
+        }
+<span class="fc" id="L170">    }</span>
+
+    /**
+     * Reads an XML file containing checked archives.
+     * 
+     * Note: currently not used.
+     * 
+     * @param file a filename of the file to read
+     * @param licenseStoreData 
+     * @param notices 
+     * @param providers 
+     * @param validateXml 
+     * @param log the logger
+     * @throws IOException if an error occurred while reading from the file
+     * @throws ParserConfigurationException 
+     * @throws SAXException 
+     */
+    public void readXml(final File file, final LicenseStoreData licenseStoreData, final Notices notices,
+                        final Providers providers, boolean validateXml, final ILFLog log)
+            throws IOException, ParserConfigurationException, SAXException {
+
+<span class="nc" id="L191">        final SAXParserFactory spf = SAXParserFactory.newInstance();</span>
+<span class="nc" id="L192">        spf.setNamespaceAware(true);</span>
+<span class="nc" id="L193">        spf.setValidating(validateXml);</span>
+<span class="nc" id="L194">        final SAXParser saxParser = spf.newSAXParser();</span>
+<span class="nc" id="L195">        final XMLReader xmlReader = saxParser.getXMLReader();</span>
+<span class="nc" id="L196">        xmlReader.setContentHandler(new ArchiveSaxHandler(licenseStoreData, notices, providers, log));</span>
+<span class="nc" id="L197">        xmlReader.parse(file.toURI().toString());</span>
+<span class="nc" id="L198">    }</span>
+
+    /**
+     * @param licenseStoreData
+     * @param log
+     * @param values
+     * @param documentationUrl 
+     * @return a result object
+     */
+    private LicenseResult fetchLicenseResult(final LicenseStoreData licenseStoreData, final ILFLog log,
+                                             final String[] values, final String documentationUrl, final Notice notice,
+                                             final Provider provider) {
+<span class="fc" id="L210">        final int numLicenseNames = values.length - LICENSE_NAMES_OFFSET;</span>
+<span class="fc" id="L211">        final List&lt;License&gt; licenses = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L212" title="1 of 2 branches missed.">        if (numLicenseNames == 0) {</span>
+<span class="nc" id="L213">            licenses.add(licenseStoreData.getLicenseBySpdxIdentifier(LicenseSpdxIdentifier.NO_MANUAL_INFORMATION));</span>
+        } else {
+<span class="fc bfc" id="L215" title="All 2 branches covered.">            for (int i = 0; i &lt; numLicenseNames; i++) {</span>
+<span class="fc" id="L216">                final String licenseName = values[i + LICENSE_NAMES_OFFSET].trim();</span>
+<span class="fc" id="L217">                final License license = licenseStoreData.getLicenseBySpdxIdentifier(licenseName);</span>
+<span class="pc bpc" id="L218" title="1 of 2 branches missed.">                if (license == null) {</span>
+<span class="nc" id="L219">                    log.error(&quot;License not found in store: '&quot; + licenseName + &quot;'&quot;);</span>
+                } else {
+<span class="fc" id="L221">                    licenses.add(license);</span>
+                }
+            }
+        }
+<span class="fc" id="L225">        return new LicenseResult(licenses, documentationUrl, notice, provider);</span>
+    }
+
+    private LicenseResult fetchLicenseResult(final List&lt;License&gt; licenses, final String documentationUrl,
+                                             final Notice notice, final Provider provider) {
+<span class="nc" id="L230">        return new LicenseResult(licenses, documentationUrl, notice, provider);</span>
+    }
+
+    private static ArchiveType getArchiveType(final String name) {
+<span class="fc" id="L234">        return ArchiveType.valueOf(name);</span>
+    }
+
+    /**
+     * Obtains manually set licenses for an archive given by name and version.
+     * 
+     * @param archiveType
+     * @param archiveName
+     * @param version
+     * @return a list of licenses, maybe empty, but not null
+     */
+    public LicenseResult getManualLicense(final ArchiveType archiveType, final String archiveName,
+                                          final String version) {
+<span class="fc" id="L247">        final ArchiveIdentifier archiveIdentifier = new ArchiveIdentifierVersion(archiveType, archiveName, version);</span>
+<span class="fc" id="L248">        return getManualArchiveLicenses(archiveIdentifier);</span>
+    }
+
+    /**
+     * Obtains manually set licenses for an archive given by name and message digest.
+     * 
+     * @param archiveType
+     * @param archiveName
+     * @param messageDigest
+     * @return a list of licenses, maybe empty
+     */
+    public LicenseResult getManualLicense(final ArchiveType archiveType, final String archiveName,
+                                          final LSMessageDigest messageDigest) {
+<span class="fc" id="L261">        final ArchiveIdentifier archiveIdentifier = new ArchiveIdentifierMessageDigest(archiveType, archiveName,</span>
+                messageDigest);
+<span class="fc" id="L263">        return getManualArchiveLicenses(archiveIdentifier);</span>
+    }
+
+    /**
+     * @param archiveIdentifier
+     * @return a list of licenses, maybe empty, but not null
+     */
+    private LicenseResult getManualArchiveLicenses(final ArchiveIdentifier archiveIdentifier) {
+<span class="fc" id="L271">        return manualArchives.get(archiveIdentifier);</span>
+    }
+
+    /**
+     * Obtains a set of archive identifiers with patterns with associated list of licenses.
+     * 
+     * &lt;p&gt;These can be used to match archives against archive identifiers that contain a regular expression for the archive name or archive path.&lt;/p&gt;
+     * 
+     * @return a set of archive identifier patterns
+     */
+    public Set&lt;Entry&lt;ArchiveIdentifierPattern, LicenseResult&gt;&gt; getManualPatternArchives() {
+<span class="fc" id="L282">        return manualPatternArchives.entrySet();</span>
+    }
+
+    /**
+     * @param outputFile
+     * @param archives
+     * @throws IOException
+     */
+    public static void writeCsvSkeletonFile(final File outputFile, final List&lt;Archive&gt; archives) throws IOException {
+<span class="nc" id="L291">        final String string = writeCsvSkeletonFile(archives);</span>
+
+<span class="nc" id="L293">        try (final FileWriter fileWriter = new FileWriter(outputFile);</span>
+<span class="nc" id="L294">                final BufferedWriter bw = new BufferedWriter(fileWriter);) {</span>
+<span class="nc" id="L295">            bw.write(string);</span>
+        }
+<span class="nc" id="L297">    }</span>
+
+    /**
+     * @return the collected CSV contents
+     */
+    private static String writeCsvSkeletonFile(final List&lt;Archive&gt; archives) {
+<span class="nc" id="L303">        final StringBuilder sb = new StringBuilder();</span>
+<span class="nc" id="L304">        final String nl = &quot;\n&quot;;</span>
+        // header line
+<span class="nc" id="L306">        sb.append(</span>
+                &quot;Type,Filename or Regex,Version or Message digest,Documentation URL, Provider,Notice,License 1,License 2,License 3&quot;)
+<span class="nc" id="L308">                .append(nl);</span>
+        // body
+<span class="nc bnc" id="L310" title="All 2 branches missed.">        for (final Archive archive : archives) {</span>
+<span class="nc" id="L311">            sb.append(archive.getArchiveType().name()).append(&quot;,&quot;);</span>
+<span class="nc" id="L312">            sb.append(archive.getFileName()).append(&quot;,&quot;);</span>
+<span class="nc bnc" id="L313" title="All 2 branches missed.">            if (!StringUtils.isEmpty(archive.getVersion())) {</span>
+<span class="nc" id="L314">                sb.append(archive.getVersion());</span>
+<span class="nc bnc" id="L315" title="All 2 branches missed.">            } else if (archive.getMessageDigest() != null) {</span>
+<span class="nc" id="L316">                sb.append(archive.getMessageDigestString());</span>
+            } else {
+<span class="nc" id="L318">                sb.append(&quot;TODO&quot;);</span>
+            }
+<span class="nc" id="L320">            sb.append(&quot;,&quot;);</span>
+<span class="nc" id="L321">            sb.append(&quot;TODO_docURL,&quot;); // documentation URL</span>
+<span class="nc" id="L322">            sb.append(&quot;TODO_provider,&quot;); // provider</span>
+<span class="nc" id="L323">            sb.append(&quot;TODO_notice,&quot;); // notice</span>
+<span class="nc" id="L324">            sb.append(&quot;TODO_license1&quot;);</span>
+<span class="nc" id="L325">            sb.append(nl);</span>
+<span class="nc" id="L326">        }</span>
+<span class="nc" id="L327">        return sb.toString();</span>
+    }
+
+    /**
+     * @param outputFile
+     * @param archives
+     * @throws IOException
+     */
+    public static void writeXmlSkeletonFile(final File outputFile, final List&lt;Archive&gt; archives) throws IOException {
+<span class="nc" id="L336">        final String string = writeXmlSkeletonFile(archives);</span>
+
+<span class="nc" id="L338">        try (final FileWriter fileWriter = new FileWriter(outputFile);</span>
+<span class="nc" id="L339">                final BufferedWriter bw = new BufferedWriter(fileWriter);) {</span>
+<span class="nc" id="L340">            bw.write(string);</span>
+        }
+<span class="nc" id="L342">    }</span>
+
+    /**
+     * @return the collected XML string
+     */
+    private static String writeXmlSkeletonFile(final List&lt;Archive&gt; archives) {
+<span class="nc" id="L348">        final StringBuilder sb = new StringBuilder();</span>
+<span class="nc" id="L349">        final String nl = &quot;\n&quot;;</span>
+<span class="nc" id="L350">        beginLine(sb, 0).append(&quot;&lt;?xml version=\&quot;1.0\&quot; encoding=\&quot;UTF-8\&quot; standalone=\&quot;yes\&quot; ?&gt;&quot;).append(nl);</span>
+<span class="nc" id="L351">        beginLine(sb, 0).append(&quot;&lt;archives&gt;&quot;).append(nl);</span>
+<span class="nc bnc" id="L352" title="All 2 branches missed.">        for (final Archive archive : archives) {</span>
+<span class="nc" id="L353">            beginLine(sb, 1).append(&quot;&lt;archive&gt;&quot;).append(nl);</span>
+<span class="nc" id="L354">            beginLine(sb, 2).append(&quot;&lt;archiveType&gt;&quot;).append(archive.getArchiveType().name()).append(&quot;&lt;/archiveType&gt;&quot;)</span>
+<span class="nc" id="L355">                    .append(nl);</span>
+<span class="nc" id="L356">            beginLine(sb, 2).append(&quot;&lt;name&gt;&quot;).append(archive.getFileName()).append(&quot;&lt;/name&gt;&quot;).append(nl);</span>
+<span class="nc bnc" id="L357" title="All 2 branches missed.">            if (!StringUtils.isEmpty(archive.getVersion())) {</span>
+<span class="nc" id="L358">                beginLine(sb, 2).append(&quot;&lt;version&gt;&quot;).append(archive.getVersion()).append(&quot;&lt;/version&gt;&quot;).append(nl);</span>
+<span class="nc bnc" id="L359" title="All 2 branches missed.">            } else if (archive.getMessageDigest() != null) {</span>
+<span class="nc" id="L360">                beginLine(sb, 2).append(&quot;&lt;messageDigest algorithm='&quot;).append(CryptUtil.getMessageDigestAlgorithm())</span>
+<span class="nc" id="L361">                        .append(&quot;'&gt;&quot;).append(archive.getMessageDigestString()).append(&quot;&lt;/messageDigest&gt;&quot;).append(nl);</span>
+            }
+<span class="nc" id="L363">            beginLine(sb, 2).append(&quot;&lt;documentationUrl&gt;&quot;).append(&quot;TODO&quot;).append(&quot;&lt;/documentationUrl&gt;&quot;).append(nl);</span>
+<span class="nc" id="L364">            beginLine(sb, 2).append(&quot;&lt;provider&gt;&quot;).append(&quot;TODO&quot;).append(&quot;&lt;/provider&gt;&quot;).append(nl);</span>
+<span class="nc" id="L365">            beginLine(sb, 2).append(&quot;&lt;notice&gt;&quot;).append(&quot;TODO&quot;).append(&quot;&lt;/notice&gt;&quot;).append(nl);</span>
+<span class="nc" id="L366">            beginLine(sb, 2).append(&quot;&lt;licenses&gt;&quot;).append(nl);</span>
+<span class="nc" id="L367">            beginLine(sb, 3).append(&quot;&lt;license&gt;&quot;).append(&quot;TODO&quot;).append(&quot;&lt;/license&gt;&quot;).append(nl);</span>
+<span class="nc" id="L368">            beginLine(sb, 2).append(&quot;&lt;/licenses&gt;&quot;).append(nl);</span>
+<span class="nc" id="L369">            beginLine(sb, 1).append(&quot;&lt;/archive&gt;&quot;).append(nl);</span>
+<span class="nc" id="L370">        }</span>
+<span class="nc" id="L371">        beginLine(sb, 0).append(&quot;&lt;/archives&gt;&quot;).append(nl);</span>
+<span class="nc" id="L372">        return sb.toString();</span>
+    }
+
+    private static StringBuilder beginLine(final StringBuilder sb, final int indentationLeve) {
+<span class="nc" id="L376">        final String indentationString = StringUtils.repeat(&quot;\t&quot;, indentationLeve);</span>
+<span class="nc" id="L377">        sb.append(indentationString);</span>
+<span class="nc" id="L378">        return sb;</span>
+    }
+
+    private static Notice getNoticeFromId(final Notices notices, final String noticeId) {
+        // NOTE: notice in license list is optional. So no error or warning here.
+<span class="fc" id="L383">        return notices.getNoticeByIdentifier(noticeId);</span>
+    }
+
+    private static Provider getProviderFromId(final Providers providers, final String providerId, final ILFLog log,
+                                              final Supplier&lt;String&gt; context) {
+<span class="fc" id="L388">        final Provider provider = providers.getProviderByIdentifier(providerId);</span>
+<span class="pc bpc" id="L389" title="1 of 2 branches missed.">        if (provider == null) {</span>
+<span class="fc" id="L390">            String message = &quot;Cannot find provider with ID: '&quot; + providerId + &quot;'&quot;;</span>
+<span class="pc bpc" id="L391" title="2 of 4 branches missed.">            if (context != null &amp;&amp; !StringUtils.isEmpty(context.get())) {</span>
+<span class="fc" id="L392">                message += &quot; (&quot; + context.get() + &quot;)&quot;;</span>
+            }
+<span class="fc" id="L394">            log.warn(message);</span>
+        }
+<span class="fc" id="L396">        return provider;</span>
+    }
+
+    private class ArchiveSaxHandler extends AbstractSaxHandler {
+
+        private static final String ELEMENT_ARCHIVES = &quot;archives&quot;;
+        private static final String ELEMENT_ARCHIVE = &quot;archive&quot;;
+        private static final String ELEMENT_ARCHIVE_TYPE = &quot;archiveType&quot;;
+        private static final String ELEMENT_NAME = &quot;name&quot;;
+        private static final String ELEMENT_VERSION = &quot;version&quot;;
+        private static final String ELEMENT_MESSAGE_DIGEST = &quot;messageDigest&quot;;
+        private static final String ELEMENT_DOCUMENTATION_URL = &quot;documentationUrl&quot;;
+        private static final String ELEMENT_PROVIDER = &quot;provider&quot;;
+        private static final String ELEMENT_NOTICE = &quot;notice&quot;;
+        private static final String ELEMENT_LICENSES = &quot;licenses&quot;;
+        private static final String ELEMENT_LICENSE = &quot;license&quot;;
+
+        private final LicenseStoreData licenseStoreData;
+        private final Notices notices;
+        private final Providers providers;
+
+        private String name;
+        private String version;
+        private PatternType patternType;
+        private List&lt;License&gt; licenses;
+        private ArchiveType archiveType;
+        private String messageDigest;
+        private String documentationUrl;
+        private Notice notice;
+        private Provider provider;
+
+        /**
+         * Constructor.
+         * @param licenseStoreData 
+         * @param notices 
+         * @param providers 
+         * @param log the logger
+         */
+        public ArchiveSaxHandler(final LicenseStoreData licenseStoreData, final Notices notices,
+<span class="nc" id="L435">                final Providers providers, final ILFLog log) {</span>
+<span class="nc" id="L436">            super(log);</span>
+<span class="nc" id="L437">            this.licenseStoreData = licenseStoreData;</span>
+<span class="nc" id="L438">            this.notices = notices;</span>
+<span class="nc" id="L439">            this.providers = providers;</span>
+<span class="nc" id="L440">            setElementHandler(new NopElementHandler(ELEMENT_ARCHIVES));</span>
+<span class="nc" id="L441">            setElementHandler(new StandardArchiveHandler());</span>
+<span class="nc" id="L442">            setElementHandler(new ArchiveTypeElementHandler());</span>
+<span class="nc" id="L443">            setElementHandler(new NameElementHandler());</span>
+<span class="nc" id="L444">            setElementHandler(new VersionElementHandler());</span>
+<span class="nc" id="L445">            setElementHandler(new MessageDigestElementHandler());</span>
+<span class="nc" id="L446">            setElementHandler(new DocumentationUrlElementHandler());</span>
+<span class="nc" id="L447">            setElementHandler(new NoticeElementHandler());</span>
+<span class="nc" id="L448">            setElementHandler(new ProviderElementHandler());</span>
+<span class="nc" id="L449">            setElementHandler(new NopElementHandler(ELEMENT_LICENSES));</span>
+<span class="nc" id="L450">            setElementHandler(new LicenseElementHandler());</span>
+<span class="nc" id="L451">        }</span>
+
+        /**
+         * @return the notices
+         */
+        protected final Notices getNotices() {
+<span class="nc" id="L457">            return notices;</span>
+        }
+
+        /**
+         * @return the providers
+         */
+        protected final Providers getProviders() {
+<span class="nc" id="L464">            return providers;</span>
+        }
+
+<span class="nc" id="L467">        private class StandardArchiveHandler implements IElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="nc" id="L474">                return ELEMENT_ARCHIVE;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            public void startElement(String uri, String localName, String qName, final Attributes attributes) {
+<span class="nc" id="L480">                archiveType = null;</span>
+<span class="nc" id="L481">                name = null;</span>
+<span class="nc" id="L482">                patternType = null;</span>
+<span class="nc" id="L483">                version = null;</span>
+<span class="nc" id="L484">                messageDigest = null;</span>
+<span class="nc" id="L485">                licenses = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L486">                documentationUrl = null;</span>
+<span class="nc" id="L487">                notice = null;</span>
+<span class="nc" id="L488">                provider = null;</span>
+<span class="nc" id="L489">            }</span>
+
+            /** {@inheritDoc} */
+            @Override
+            public void endElement(String uri, String localName, String qName) {
+<span class="nc" id="L494">                ArchiveIdentifier archiveIdentifier = null;</span>
+<span class="nc bnc" id="L495" title="All 2 branches missed.">                if (archiveType == null) {</span>
+<span class="nc" id="L496">                    getLog().warn(&quot;No archive type for archive! Line: &quot; + getLineNumberInformation());</span>
+                }
+<span class="nc bnc" id="L498" title="All 2 branches missed.">                if (name == null) {</span>
+<span class="nc" id="L499">                    getLog().warn(&quot;No name for archive! Line: &quot; + getLineNumberInformation());</span>
+                }
+<span class="nc bnc" id="L501" title="All 2 branches missed.">                if (patternType != null) {</span>
+<span class="nc" id="L502">                    archiveIdentifier = new ArchiveIdentifierPattern(archiveType, patternType, name);</span>
+                } else {
+<span class="nc bnc" id="L504" title="All 2 branches missed.">                    if (version != null) {</span>
+<span class="nc" id="L505">                        archiveIdentifier = new ArchiveIdentifierVersion(archiveType, name, version);</span>
+                    }
+<span class="nc bnc" id="L507" title="All 2 branches missed.">                    if (messageDigest != null) {</span>
+<span class="nc" id="L508">                        archiveIdentifier = new ArchiveIdentifierMessageDigest(archiveType, name, messageDigest);</span>
+                    }
+                }
+
+<span class="nc bnc" id="L512" title="All 2 branches missed.">                if (archiveIdentifier != null) {</span>
+<span class="nc" id="L513">                    final LicenseResult licenseResult = fetchLicenseResult(licenses, documentationUrl, notice,</span>
+                            provider);
+<span class="nc bnc" id="L515" title="All 2 branches missed.">                    if (archiveIdentifier.getNameMatchingType() == NameMatchingType.EXACT) {</span>
+<span class="nc" id="L516">                        manualArchives.put(archiveIdentifier, licenseResult);</span>
+                    } else {
+<span class="nc" id="L518">                        manualPatternArchives.put((ArchiveIdentifierPattern) archiveIdentifier, licenseResult);</span>
+                    }
+                }
+<span class="nc" id="L521">            }</span>
+        }
+
+<span class="nc" id="L524">        private class ArchiveTypeElementHandler extends AbstractTextElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="nc" id="L531">                return ELEMENT_ARCHIVE_TYPE;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            protected void processText(final String text) {
+<span class="nc" id="L537">                archiveType = Enum.valueOf(ArchiveType.class, text);</span>
+<span class="nc" id="L538">            }</span>
+        }
+
+<span class="nc" id="L541">        private class NameElementHandler extends AbstractTextElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="nc" id="L548">                return ELEMENT_NAME;</span>
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            protected void startElementHook(final String uri, final String localName, final String qName,
+                                            final Attributes attributes) {
+<span class="nc" id="L557">                final String typeText = attributes.getValue(ATTRIBUTE_TYPE);</span>
+<span class="nc bnc" id="L558" title="All 2 branches missed.">                if (typeText != null) {</span>
+<span class="nc bnc" id="L559" title="All 4 branches missed.">                    switch (typeText) {</span>
+                        case &quot;exact&quot;:
+<span class="nc" id="L561">                            patternType = null;</span>
+<span class="nc" id="L562">                            break;</span>
+                        case &quot;regexname&quot;:
+<span class="nc" id="L564">                            patternType = PatternType.PATTERN_ON_FILENAME;</span>
+<span class="nc" id="L565">                            break;</span>
+                        case &quot;regexpath&quot;:
+<span class="nc" id="L567">                            patternType = PatternType.PATTERN_ON_FILENAME;</span>
+<span class="nc" id="L568">                            break;</span>
+                        default:
+<span class="nc" id="L570">                            getLog().warn(&quot;Unknown matching type: '&quot; + typeText + &quot;'&quot;);</span>
+                            break;
+                    }
+                }
+<span class="nc" id="L574">            }</span>
+
+            /** {@inheritDoc} */
+            @Override
+            protected void processText(final String text) {
+<span class="nc" id="L579">                name = text;</span>
+<span class="nc" id="L580">            }</span>
+        }
+
+<span class="nc" id="L583">        private class VersionElementHandler extends AbstractTextElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="nc" id="L590">                return ELEMENT_VERSION;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            protected void processText(final String text) {
+<span class="nc" id="L596">                version = text;</span>
+<span class="nc" id="L597">            }</span>
+        }
+
+<span class="nc" id="L600">        private class MessageDigestElementHandler extends AbstractTextElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="nc" id="L607">                return ELEMENT_MESSAGE_DIGEST;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            protected void processText(final String text) {
+<span class="nc" id="L613">                messageDigest = text;</span>
+<span class="nc" id="L614">            }</span>
+        }
+
+<span class="nc" id="L617">        private class DocumentationUrlElementHandler extends AbstractTextElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="nc" id="L624">                return ELEMENT_DOCUMENTATION_URL;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            protected void processText(final String text) {
+<span class="nc" id="L630">                documentationUrl = text;</span>
+<span class="nc" id="L631">            }</span>
+        }
+
+<span class="nc" id="L634">        private class LicenseElementHandler extends AbstractTextElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="nc" id="L641">                return ELEMENT_LICENSE;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            protected void processText(final String text) {
+<span class="nc" id="L647">                final License license = licenseStoreData.getLicenseBySpdxIdentifier(text);</span>
+<span class="nc bnc" id="L648" title="All 2 branches missed.">                if (license == null) {</span>
+<span class="nc" id="L649">                    getLog().warn(&quot;Cannot find license with SPDX ID '&quot; + text + &quot;'&quot;);</span>
+                } else {
+<span class="nc" id="L651">                    licenses.add(license);</span>
+                }
+<span class="nc" id="L653">            }</span>
+        }
+
+<span class="nc" id="L656">        private class NoticeElementHandler extends AbstractTextElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="nc" id="L663">                return ELEMENT_NOTICE;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            protected void processText(final String text) {
+<span class="nc" id="L669">                final String identifier = text;</span>
+<span class="nc bnc" id="L670" title="All 2 branches missed.">                if (!StringUtils.isEmpty(identifier)) {</span>
+<span class="nc" id="L671">                    notice = getNoticeFromId(getNotices(), identifier);</span>
+                }
+<span class="nc" id="L673">            }</span>
+        }
+
+<span class="nc" id="L676">        private class ProviderElementHandler extends AbstractTextElementHandler {</span>
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public String getElementName() {
+<span class="nc" id="L683">                return ELEMENT_PROVIDER;</span>
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            protected void processText(final String text) {
+<span class="nc" id="L689">                final String identifier = text;</span>
+<span class="nc" id="L690">                provider = getProviderFromId(getProviders(), identifier, getLog(),</span>
+<span class="nc" id="L691">                        () -&gt; ArchiveSaxHandler.this.getLocationString());</span>
+<span class="nc" id="L692">            }</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
