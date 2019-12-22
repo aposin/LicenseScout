@@ -101,12 +101,11 @@ public class FilesystemConfigFileHandler extends AbstractConfigFileHandler {
      */
     @Override
     public InputStream getLicenseUrlMappingsInputStream() throws IOException {
-        final String licenseUrlMappingsFilename = getExecutionParameters().getLicenseUrlMappingsFilename();
+        final File licenseUrlMappingsFilename = getExecutionParameters().getLicenseUrlMappingsFilename();
         if (licenseUrlMappingsFilename != null) {
-            final File file = new File(licenseUrlMappingsFilename);
-            if (file.exists() && file.canRead()) {
+            if (licenseUrlMappingsFilename.exists() && licenseUrlMappingsFilename.canRead()) {
                 getLog().info("reading license URL mappings from " + licenseUrlMappingsFilename);
-                return new FileInputStream(file);
+                return new FileInputStream(licenseUrlMappingsFilename);
             } else {
                 getLog().error("not reading license URL mappings because the file does not exist or is not readable: "
                         + licenseUrlMappingsFilename);
@@ -122,12 +121,11 @@ public class FilesystemConfigFileHandler extends AbstractConfigFileHandler {
      */
     @Override
     public InputStream getLicenseNameMappingsInputStream() throws IOException {
-        final String licenseNameMappingsFilename = getExecutionParameters().getLicenseNameMappingsFilename();
+        final File licenseNameMappingsFilename = getExecutionParameters().getLicenseNameMappingsFilename();
         if (licenseNameMappingsFilename != null) {
-            final File file = new File(licenseNameMappingsFilename);
-            if (file.exists() && file.canRead()) {
+            if (licenseNameMappingsFilename.exists() && licenseNameMappingsFilename.canRead()) {
                 getLog().info("reading license name mappings from " + licenseNameMappingsFilename);
-                return new FileInputStream(file);
+                return new FileInputStream(licenseNameMappingsFilename);
             } else {
                 getLog().error("not reading license name mappings because the file does not exist or is not readable: "
                         + licenseNameMappingsFilename);
@@ -143,12 +141,11 @@ public class FilesystemConfigFileHandler extends AbstractConfigFileHandler {
      */
     @Override
     public InputStream getGlobalFiltersInputStream() throws IOException {
-        final String globalFiltersFilename = getExecutionParameters().getGlobalFiltersFilename();
+        final File globalFiltersFilename = getExecutionParameters().getGlobalFiltersFilename();
         if (globalFiltersFilename != null) {
-            final File file = new File(globalFiltersFilename);
-            if (file.exists() && file.canRead()) {
+            if (globalFiltersFilename.exists() && globalFiltersFilename.canRead()) {
                 getLog().info("reading global filters from " + globalFiltersFilename);
-                return new FileInputStream(file);
+                return new FileInputStream(globalFiltersFilename);
             } else {
                 getLog().error("not reading global filters because the file does not exist or is not readable: "
                         + globalFiltersFilename);
@@ -184,12 +181,11 @@ public class FilesystemConfigFileHandler extends AbstractConfigFileHandler {
      */
     @Override
     public InputStream getFilteredVendorNamesInputStream() throws IOException {
-        final String filteredVendorNamesFilename = getExecutionParameters().getFilteredVendorNamesFilename();
+        final File filteredVendorNamesFilename = getExecutionParameters().getFilteredVendorNamesFilename();
         if (filteredVendorNamesFilename != null) {
-            final File file = new File(filteredVendorNamesFilename);
-            if (file.exists() && file.canRead()) {
+            if (filteredVendorNamesFilename.exists() && filteredVendorNamesFilename.canRead()) {
                 getLog().info("reading vendor names to filter out from " + filteredVendorNamesFilename);
-                return new FileInputStream(file);
+                return new FileInputStream(filteredVendorNamesFilename);
             } else {
                 getLog().error(
                         "not reading vendor names to filter out because the file does not exist or is not readable: "

@@ -5,6 +5,7 @@ env:
   matrix:
     - TYPE=test
     - TYPE=check
+    - TYPE=integrationtest
 
 cache:
   directories:
@@ -18,6 +19,9 @@ script:
       mvn -Pci-modules clean install;
     elif [[ $TYPE == check ]]; then
       mvn -Plicense-header-modules license:check;
+    elif [[ $TYPE == integrationtest ]]; then
+      mvn -Pci-for-it-modules clean install;
+      mvn -DskipTests=true -Prun-its,it-modules verify;
     else
       echo "$TYPE type not recognized";
       exit 1;

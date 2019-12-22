@@ -51,7 +51,7 @@ public abstract class TestUtil {
     /**
      * Reads LicenseStoreData from a file for testing.
      * @param log
-     * @return
+     * @return a LicenseStoreData for testing
      * @throws Exception
      */
     public static LicenseStoreData readLicenseStoreData(final ILFLog log) throws Exception {

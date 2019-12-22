@@ -47,23 +47,23 @@ public class ConfigFileParameters {
     /**
      * Name of the file to read license URL mappings from.
      */
-    private String licenseUrlMappingsFilename;
+    private File licenseUrlMappingsFilename;
 
     /**
      * Name of the file to read license name mappings from.
      */
-    private String licenseNameMappingsFilename;
+    private File licenseNameMappingsFilename;
 
     /**
      * Name of the file to read global filter patterns from.
      */
-    private String globalFiltersFilename;
+    private File globalFiltersFilename;
 
     /**
      * Name of the file to read of vendor names to filter out from.
      * This is alternative to filteredVendorNames. If both are given, the entries are merged.
      */
-    private String filteredVendorNamesFilename;
+    private File filteredVendorNamesFilename;
 
     /**
      * @return the licensesFilename
@@ -124,56 +124,56 @@ public class ConfigFileParameters {
     /**
      * @return the licenseUrlMappingsFilename
      */
-    public final String getLicenseUrlMappingsFilename() {
+    public final File getLicenseUrlMappingsFilename() {
         return licenseUrlMappingsFilename;
     }
 
     /**
      * @param licenseUrlMappingsFilename the licenseUrlMappingsFilename to set
      */
-    public final void setLicenseUrlMappingsFilename(String licenseUrlMappingsFilename) {
+    public final void setLicenseUrlMappingsFilename(File licenseUrlMappingsFilename) {
         this.licenseUrlMappingsFilename = licenseUrlMappingsFilename;
     }
 
     /**
      * @return the licenseNameMappingsFilename
      */
-    public final String getLicenseNameMappingsFilename() {
+    public final File getLicenseNameMappingsFilename() {
         return licenseNameMappingsFilename;
     }
 
     /**
      * @param licenseNameMappingsFilename the licenseNameMappingsFilename to set
      */
-    public final void setLicenseNameMappingsFilename(String licenseNameMappingsFilename) {
+    public final void setLicenseNameMappingsFilename(File licenseNameMappingsFilename) {
         this.licenseNameMappingsFilename = licenseNameMappingsFilename;
     }
 
     /**
      * @return the globalFiltersFilename
      */
-    public final String getGlobalFiltersFilename() {
+    public final File getGlobalFiltersFilename() {
         return globalFiltersFilename;
     }
 
     /**
      * @param globalFiltersFilename the globalFiltersFilename to set
      */
-    public final void setGlobalFiltersFilename(String globalFiltersFilename) {
+    public final void setGlobalFiltersFilename(File globalFiltersFilename) {
         this.globalFiltersFilename = globalFiltersFilename;
     }
 
     /**
      * @return the filteredVendorNamesFilename
      */
-    public final String getFilteredVendorNamesFilename() {
+    public final File getFilteredVendorNamesFilename() {
         return filteredVendorNamesFilename;
     }
 
     /**
      * @param filteredVendorNamesFilename the filteredVendorNamesFilename to set
      */
-    public final void setFilteredVendorNamesFilename(String filteredVendorNamesFilename) {
+    public final void setFilteredVendorNamesFilename(File filteredVendorNamesFilename) {
         this.filteredVendorNamesFilename = filteredVendorNamesFilename;
     }
 

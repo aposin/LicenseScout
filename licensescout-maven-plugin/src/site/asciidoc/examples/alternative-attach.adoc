@@ -83,7 +83,7 @@ If you have special needs regarding the attach you can disable the default attac
         <goals>
           <goal>attach-artifact</goal>
         </goals>
-        <phase>verify</phase>
+        <phase>verify</phase>             <2>
         <configuration>
           <artifacts>
             <artifact>
@@ -108,3 +108,5 @@ If you have special needs regarding the attach you can disable the default attac
 </plugin>
 ----
 <1> disable the automatic attach
+<2> `attach-artifact` is executed in the same phase as the licensescout-maven-plugin (which is executed in `verify` by default). However in this case the order of definitions in the POM
+makes sure that `build-helper-maven-plugin:attach-artifact` is executed after `licensescout-maven-plugin`.

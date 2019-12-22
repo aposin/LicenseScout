@@ -26,8 +26,8 @@
 
 LicenseScout is implemented as a Maven plugin. It scans a given base directory for artifacts.
 
-=== Processing phases
-==== Initialisation
+== Processing phases
+=== Initialisation
 
 Initialisation includes:
 
@@ -35,12 +35,13 @@ Initialisation includes:
 * Creation of output directory, if necessary
 * Reading of configuration files (licenses, mappings, filters, etc)
 
-==== Scan/license detection
+=== Scan/license detection
 
 The configured base directory is scanned recursively, either for Java archives or for NPM packages. The archives found are collected in a list. If license information associated with an archive is found, the license is added to the list associated with the archive.
 During this step a mapping of license URLs to license names is done (so that licenses given as URL can be found from the internal list).
 
-==== License processing
+=== License processing
+
 Processings are done:
 
 * Manually checked licenses for specific archives are added to the archives from the checked archives list.
@@ -51,13 +52,13 @@ Processings are done:
 * Statistics on the total number of archives, the total number of considered license files and the number of archives per license state are calculated.
 
 
-==== Report Output
+=== Report Output
 From the collected, processed and filtered information reports are generated, depending on the output configuration. Either a HTML report, a CSV report, a TXT report, or a combination of these are generated.
 The CSV Output is suitable for automatic comparison between versions.
 The HTML output uses velocity templates to generate the output. The template used for this is `org.aposin.licensescout/src/main/resources/templates/license_report.vm`.
 The TXT output uses hard-coded text fragments.
 
-==== Database Output
+=== Database Output
 If configured, important data are also written to a database.
 
 The results are written into three tables:

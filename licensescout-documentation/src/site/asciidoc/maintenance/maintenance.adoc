@@ -25,6 +25,19 @@
 
 This handbook describes project maintenance tasks for the LicenseScout project.
 
+== General conventions
+
+* All files in the repository should be encoded in `UTF-8`. Exceptions are test resource files that are used to test other encodings.
+* All files in the repository should have Unix-style lline endings (LF).
+Note it is currently unclear if this can be usefully enforced for Eclipse launch configuration files.
+* All documentation should be written in English.
+
+== Project naming conventions
+
+* All Maven artifacts should have the groupId `org.aposin.licensescout`.
+* Maven artifacts should have an artifactId of either `licensescout-something` (preferred) or `org.aposin.licensescout.something`.
+* The base directory name of a project or Maven module should be equal to its artifactId.
+Note: seeral tools assueme this convention and, if not followed, will require additional configuration or simply won't work.
 
 == Doing releases
 
@@ -80,21 +93,17 @@ It is highly recommended to use encrypted passwords in the `settings.xml` file a
 * https://maven.apache.org/guides/mini/guide-encryption.html
 * https://blog.sonatype.com/2009/10/maven-tips-and-tricks-encrypting-passwords/
 
-=== Release project
+=== Release profile
 
-//TODO: replaced by profile in parent
-
-There is a special project that contains the parts of LicenseScout that should be released.
-It is an aggregator POM called `org.aposin.licensescout.release-aggrgator`.
+There is a profile that contains the parts of LicenseScout that should be released (`release-modules`).
 It references the following modules:
 
-* `licensescout-parent`
+* `licensescout-parent` (not referenced explicitly, but as the containing POM)
 * `licensescout-core`
 * `licensescout-maven-utils`
 * `licensescout-maven-plugin`
+* `licensescout-report-maven-plugin`
 * `org.aposin.licensescout.configuration.sample`
-
-NOTE: The `release-aggregator` is configured in a way that it is not installed or deployed itself.
 
 === Doing a snapshot release
 
@@ -133,8 +142,8 @@ TODO: this is unfinished
 
 * mvn scm:tag
 
-NOTE: the release version number is composed of the part in the POM ('1.3.') and the property 'revision' provided on the command line (example: '1.005').
-This results in the actual version number (example: '1.3.1.005').
+NOTE: the release version number is composed of the part in the POM ('1.4.') and the property 'revision' provided on the command line (example: '1.005').
+This results in the actual version number (example: '1.4.1.005').
 
 == Profiles overview
 
@@ -160,8 +169,8 @@ This results in the actual version number (example: '1.3.1.005').
 
 Site generation is done in two steps:
 
-. Generating content and staging to a local irectory using the run configuration `licensescout-parent_multimodule_site_stage`.
-This does a `package site site:stage` with the profiles `site-modules,clean-site-staging`. Note `package` is necessary due to a Maven bug (https://jira.apache.org/jira/browse/MDEP-98)
+. Generating content and staging to a local directory using the run configuration `licensescout-parent_multimodule_site_stage`.
+This does a `package site site:stage` with the profiles `site-modules,clean-site-staging`. Note that `package` is necessary due to a Maven bug (https://jira.apache.org/jira/browse/MDEP-98)
 
 . Checkin from the staging directory to the `gh-pages` branch using he run configuration
 `licensescout-parent_site_publish` which does `scm-publish:publish-scm`.
@@ -172,9 +181,17 @@ Note the definitions:
 </properties>
   ...
   <github.owner>aposin</github.owner>
-  <siteStagingDirectory>C:\dev\tmp\licensescout-stage</siteStagingDirectory>
+  <siteStagingDirectory>${java.io.tmpdir}/licensescout-site-stage</siteStagingDirectory>
   <siteBranch>gh-pages</siteBranch>
 </properties>
+----
+
+You can find out the actual directory staging is done to from th logs:
+
+[source, bash]
+----
+[INFO] Pushing C:\Users\matthias\git\LicenseScout\licensescout-report-maven-plugin\target\site
+[INFO]    >>> to file://C:\Users\matthias\AppData\Local\Temp\licensescout-site-stage/licensescout-report-maven-plugin
 ----
 
 The generation uses site descriptor inheritance. To make this work, the parent POM does an `attachDescriptor`.
@@ -183,8 +200,11 @@ The generation uses site descriptor inheritance. To make this work, the parent P
 
 All run configurations should:
 
-* Use "Execution environment: JavaSE-11" as runtime JDK
-* Be stored in a folder "launch" in the related project
+* Use "Execution environment: JavaSE-11" as runtime JDK.
+This allows to have a common definition in the configurations checked in into the repository.
+Make sure you have "Execution Environment JavaSE-11" actually mapped to a JDK11 installation.
+* Be stored in a folder "launch" in the related project.
+This convention makes sense to keep the root folder of a module clean.
 * Use a Maven runtime named `apache-maven-current`.
 Eclipse has to be configured that an external Maven installation with this name exists.
 (See Window / Preferences / Maven / Installations)
@@ -203,3 +223,18 @@ For `pom.xml` and `site.xml` the following applies:
 
 * indentation should be done with one tab
 * Depending on your preferences, you may or may not want to use formatting in the Eclipse XML editor, make sure that formatting of comments is turned off (Window / Preferences / XML / XML Files / Editor / Format comments).
+
+
+== Integration tests
+
+The projects containing Maven Plug-ins (`licensescout-maven-plugin`, `licensescout-report-maven-plugin`) contain integration tests that simulate calling the Plug-ins from a normal Maven runtime environment.
+
+For executing the integration tests two profiles are used: `run-its` and `it-modules`.
+
+The integration tests are also executed as checks for pull requests on Github (work in progress, see travis config file).
+
+There is an Eclipse launch configurations to execute the integration tests locally:
+`licensescout-parent/launch/licensescout-parent_multimodule_it.launch`
+
+A currently unsolved problem is that the Eclipse launch coniguration requires the environment variable `JAVA_HOME` set. A value is included in the launch configuration. However, its value is installation specific and needs to be adapted
+for different machines before executing the launh configuration.

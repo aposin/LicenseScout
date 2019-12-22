@@ -40,4 +40,4 @@ MySQL server 5.5.3 and later (see ++https://mariadb.com/kb/en/library/about-mari
 
 This JDBC driver is used because the standard JDBC driver of MySQL is licensed under the GNU General public license, which is incompatible with the Apache 2.0 license used for the LicenseScout.
 
-It is also possible too run LicenseScout with an alernatve DBMS. See the usage examples on how to do this.
+It is also possible too run LicenseScout with an alternative DBMS. See the link:../../licensescout-maven-plugin/examples/alternative-dbms.html[examples of `licensescout-maven-plugin`] on how to do this.

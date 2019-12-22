@@ -16,7 +16,7 @@
 		</menu>
 
 		<menu name="Documentation">
-			<item name="User Manual" href="documentation.html">
+			<item name="User Manual" href="usermanual/usermanual.html">
 				<item name="Design" href="usermanual/design.html" />
 				<item name="Configuration" href="usermanual/configuration.html" />
 				<item name="Internals" href="usermanual/internals.html" />

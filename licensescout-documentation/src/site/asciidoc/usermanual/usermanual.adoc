@@ -39,42 +39,43 @@ Key features include:
 * check out all LicenseScout projects
 * `cd org.aposin.licensescout.quickstart`
 * `mvn clean install`
-* The reports are written to the directory `org.aposin.licensescout.licensereport/target`
-** HTML report: `licenses_org.aposin.licensescout.licensereport.html`
-** CSV report: `licenses_org.aposin.licensescout.licensereport.csv`
-** TXT report: `licenses_org.aposin.licensescout.licensereport.txt`
+* The reports are written to the directory `org.aposin.licensescout.licensereport/target/licensescout`
+** HTML report: `licensereport.html`
+** CSV report: `licensereport.csv`
+** TXT report: `licensereport.txt`
 
 == Projects overview
 
 .LicenseScout projects
+[cols="1m,1", options="header"]
 |===
 |artifactId |Purpose
 
-|`licensescout-parent`
+|licensescout-parent
 |Parent POM for all other LicenseScout projects
 
-|`licensescout-core`
+|licensescout-core
 |Code for the processing core of the LicenseScout
 
-|`licensescout-maven-utils`
+|licensescout-maven-utils
 |Utility methods related to the Maven runtime system
 
-|`licensescout-maven-plugin`
+|licensescout-maven-plugin
 |Code for LicenseScout maven plugin
 
-|`licensescout-report-maven-plugin`
+|licensescout-report-maven-plugin
 |Code for LicenseScout maven plugin generating site reports
 
-|`org.aposin.licensescout.configuration.sample`
+|org.aposin.licensescout.configuration.sample
 |Sample configuration files
 
-|`org.aposin.licensescout.licensereport`
+|org.aposin.licensescout.licensereport
 |Sample for LicenseScout build integration, generates license reports for LicenseScout itself (using the sample configuration)
 
-|`org.aposin.licensescout.quickstart`
+|org.aposin.licensescout.quickstart
 |Compiles the Maven plugin, creates the sample configuration bundle and generates a license report for LicenseScout itself.
 
-|`org.aposin.licensescout.documentation`
+|licensescout-documentation
 |Documentation and project logos for LicenseScout
 |===
 

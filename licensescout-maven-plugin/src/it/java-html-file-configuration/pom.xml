@@ -15,7 +15,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<org.aposin.licensescout.version>1.3.1-SNAPSHOT</org.aposin.licensescout.version>
+		<org.aposin.licensescout.version>@project.version@</org.aposin.licensescout.version>
 		<licensescout-configuration.dir>${project.build.directory}/licensescout-configuration</licensescout-configuration.dir>
 
 		<!-- Configuration related to generated License Report Result Files -->
@@ -26,8 +26,16 @@
 		<licensereport.path.html>${licensescout.outputDirectory}/${licensescout.outputFilename.html}</licensereport.path.html>
 		<licensereport.path.csv>${licensescout.outputDirectory}/${licensescout.outputFilename.csv}</licensereport.path.csv>
 		<licensereport.path.txt>${licensescout.outputDirectory}/${licensescout.outputFilename.txt}</licensereport.path.txt>
-		<licensescout.scanDirectory>${project.build.directory}</licensescout.scanDirectory>
+		<dependenciesDirectory>${project.build.directory}/licenseScoutDependencies</dependenciesDirectory>
 	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.aposin.licensescout</groupId>
+			<artifactId>licensescout-maven-plugin</artifactId>
+			<version>${org.aposin.licensescout.version}</version>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<plugins>
@@ -46,7 +54,7 @@
 								<artifactItem>
 									<groupId>@project.groupId@</groupId>
 									<artifactId>org.aposin.licensescout.configuration.sample</artifactId>
-									<version>1.0.0-SNAPSHOT</version>
+									<version>@project.version@</version>
 									<classifier>configuration</classifier>
 									<type>zip</type>
 									<overWrite>true</overWrite>
@@ -57,6 +65,19 @@
 							<overWriteSnapshots>true</overWriteSnapshots>
 						</configuration>
 					</execution>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${dependenciesDirectory}</outputDirectory>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 
@@ -65,13 +86,13 @@
 				<artifactId>@project.artifactId@</artifactId>
 				<version>@project.version@</version>
 				<configuration>
-					<scanDirectory>${licensescout.scanDirectory}</scanDirectory>
+					<scanDirectory>${dependenciesDirectory}</scanDirectory>
 					<outputDirectory>${licensescout.outputDirectory}</outputDirectory>
 					<outputs>
 						<output>
-							<type>TXT</type>
-							<filename>${licensescout.outputFilename.txt}</filename>
-							<url>${licensereport.url.txt}</url>
+							<type>HTML</type>
+							<filename>${licensescout.outputFilename.html}</filename>
+							<url>${licensereport.url.html}</url>
 						</output>
 					</outputs>
 					<licensesFilename>${licensescout-configuration.dir}/licenses.xml</licensesFilename>
@@ -87,7 +108,7 @@
 					<execution>
 						<phase>test</phase>
 						<goals>
-							<goal>scanNpm</goal>
+							<goal>scanJava</goal>
 						</goals>
 					</execution>
 				</executions>

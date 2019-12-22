@@ -77,7 +77,7 @@ public class DatabaseWriterTest extends DBTestCase {
     }
 
     private void createSchema() throws SQLException {
-        // TODO: re-enable
+        // TODO: re-enable (DB-TEST)
 //        RunScript.execute(JDBC_URL, USERNAME, PASSWORD, "src/test/resources/database/licensescout-h2.sql",
 //                StandardCharsets.UTF_8, false);
     }

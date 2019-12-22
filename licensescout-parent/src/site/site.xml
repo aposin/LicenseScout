@@ -19,7 +19,7 @@
 			</gitHub>
 		</fluidoSkin>
 	</custom>
-	<!-- <bannerLeft> <name>LicenseScout</name> <src>../../../org.aposin.licensescout.documentation/images/png/LS_logo_with_text_green.png</src> 
+	<!-- <bannerLeft> <name>LicenseScout</name> <src>../../../licensescout-documentation/images/png/LS_logo_with_text_green.png</src> 
 		</bannerLeft> -->
 	<publishDate position="right" />
 	<version position="right" />

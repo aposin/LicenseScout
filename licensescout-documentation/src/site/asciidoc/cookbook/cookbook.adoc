@@ -40,7 +40,23 @@ TODO
 TODO
 
 
+== Documenting manually researched Licenses
 
+Once you have researched Licenses of an artifact manually, it is also
+necessary to document the findings in a structured way.
+It may be after years that some legal department is asking why you came to the idea that
+a certain artifact has a certain license. So it is euired to:
+
+* have the documentation structurd in a way that it is easily possible to find the information on a certain version of a certain artifact.
+* have the information in a permanent storage
+* rely on information sources that can be verified after a long time
+
+The original authors of the LicenseScout use a GIT repository to store the information. The repository has a simple structure:
+the top-level directories are the names of the artifact as detected by the LicensScout.
+the second level directories are the version numbers of the artifact as detected by the LiceseScout
+In some cases where the filename contains a version number, but we have sub-directories for different versions anyway, we leave out the version number from the top-level directory.
+
+TODO: more description
 
 === Querying the database
 

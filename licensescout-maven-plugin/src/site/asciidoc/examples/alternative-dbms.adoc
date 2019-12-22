@@ -29,11 +29,14 @@ This can be done in the following way:
 . Add a dependency for the JDBC driver of your DBMS to the `licensescout-maven-plugin`
 . Use a matching JDBC URL
 
-NOTE: The receipt above works if your JDBC driver does declare its driver class
+[NOTE]
+====
+The receipt above works if your JDBC driver does declare its driver class
 as a Java Service Provider for `java.sql.Driver` (most contemporary JDBC drivers do so).
 If you have an old-style JDBC driver that requires a call to `Class.forName()` to register
 its driver class using it is
 currently only possible by changing the source code of the LicenseScout.
+====
 
 == Using H2 DB
 

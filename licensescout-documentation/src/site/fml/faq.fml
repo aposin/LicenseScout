@@ -24,7 +24,7 @@
       <question>Can I use another DBMS than Mysql?</question>
       <answer>
         <p>
-          Yes. See the examples section: <a href="examples/alternative-dbms.html">Using an alternative DBMS</a>
+          Yes. See the examples section: <a href="../licensescout-maven-plugin/examples/alternative-dbms.html">Using an alternative DBMS</a>
         </p>
       </answer>
     </faq>
@@ -47,7 +47,7 @@
         <p>
           There is currently no mode in the LicenseScout that processes the Maven dependency tree directly. However, you can use the
           maven-dependency-plugin to copy all dependencies to one directory and then run the LicenseScout on this directory.
-          Have a look at the example <a href="examples/scan-maven-dependencies.html">Scanning Maven dependencies</a>.
+          Have a look at the example <a href="../licensescout-maven-plugin/examples/scan-maven-dependencies.html">Scanning Maven dependencies</a>.
         </p>
       </answer>
     </faq>

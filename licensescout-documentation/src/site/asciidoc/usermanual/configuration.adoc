@@ -22,226 +22,235 @@
 :toc:
 :toclevels: 4
 
-== Plugin Configuration
-
 LicenseScout is configured as a Maven plugin. Below you can see a typical configuration.
 
+.Common example
 [source,xml]
 ----
 <plugin>
-    <groupId>org.aposin.licensescout</groupId>
-    <artifactId>licensescout-maven-plugin</artifactId>
-    <version>1.3.1-SNAPSHOT</version>
-    <executions>
-        <execution>
-            <id>find-licenses</id>
-            <phase>verify</phase>
-            <goals>
-                <goal>scanJava</goal>
-            </goals>
-            <configuration>
-                <scanDirectory>${project.build.directory}/products/my.product/win32/win32/x86/plugins/</scanDirectory>
-                <outputDirectory>${licensescout.outputDirectory}</outputDirectory>
-                <outputs>
-                    <output>
-                        <type>HTML</type>
-                        <filename>${licensescout.outputFilename.html}</filename>
-                        <url>${licensereport.url.html}</url>
-                    </output>
-                    <output>
-                        <type>CSV</type>
-                        <filename>${licensescout.outputFilename.csv}</filename>
-                        <url>${licensereport.url.csv}</url>
-                    </output>
-                    <output>
-                        <type>TXT</type>
-                        <filename>${licensescout.outputFilename.txt}</filename>
-                        <url>${licensereport.url.txt}</url>
-                    </output>
-                </outputs>
-                <licensesFilename>${licensescout-configuration.dir}/licenses.xml</licensesFilename>
-                <providersFilename>${licensescout-configuration.dir}/providers.xml</providersFilename>
-                <noticesFilename>${licensescout-configuration.dir}/notices.xml</noticesFilename>
-                <checkedArchivesFilename>${licensescout-configuration.dir}/checkedarchives.csv</checkedArchivesFilename>
-                <licenseUrlMappingsFilename>${licensescout-configuration.dir}/urlmappings.csv</licenseUrlMappingsFilename>
-                <licenseNameMappingsFilename>${licensescout-configuration.dir}/namemappings.csv</licenseNameMappingsFilename>
-                <globalFiltersFilename>${licensescout-configuration.dir}/globalfilters.csv</globalFiltersFilename>
-                <filteredVendorNamesFilename>${licensescout-configuration.dir}/filteredvendornames.csv</filteredVendorNamesFilename>
-            </configuration>
-        </execution>
-    </executions>
+  <groupId>org.aposin.licensescout</groupId>
+  <artifactId>licensescout-maven-plugin</artifactId>
+  <version>1.4.0-SNAPSHOT</version>
+  <executions>
+    <execution>
+      <id>find-licenses</id>
+      <phase>verify</phase>
+      <goals>
+        <goal>scanJava</goal>
+      </goals>
+      <configuration>
+        <scanDirectory>${project.build.directory}/products/my.product/win32/win32/x86/plugins/</scanDirectory>
+        <outputDirectory>${licensescout.outputDirectory}</outputDirectory>
+        <outputs>
+          <output>
+            <type>HTML</type>
+            <filename>${licensescout.outputFilename.html}</filename>
+          </output>
+          <output>
+            <type>CSV</type>
+            <filename>${licensescout.outputFilename.csv}</filename>
+          </output>
+          <output>
+            <type>TXT</type>
+            <filename>${licensescout.outputFilename.txt}</filename>
+          </output>
+        </outputs>
+        <licensesFilename>${licensescout-configuration.dir}/licenses.xml</licensesFilename>
+        <providersFilename>${licensescout-configuration.dir}/providers.xml</providersFilename>
+        <noticesFilename>${licensescout-configuration.dir}/notices.xml</noticesFilename>
+        <checkedArchivesFilename>${licensescout-configuration.dir}/checkedarchives.csv</checkedArchivesFilename>
+        <licenseUrlMappingsFilename>${licensescout-configuration.dir}/urlmappings.csv</licenseUrlMappingsFilename>
+        <licenseNameMappingsFilename>${licensescout-configuration.dir}/namemappings.csv</licenseNameMappingsFilename>
+        <globalFiltersFilename>${licensescout-configuration.dir}/globalfilters.csv</globalFiltersFilename>
+        <filteredVendorNamesFilename>${licensescout-configuration.dir}/filteredvendornames.csv</filteredVendorNamesFilename>
+      </configuration>
+    </execution>
+  </executions>
 </plugin>
 ----
 
-=== XML configuration
+== XML configuration
 
 This section describes the configuration for the LicenseScout maven plugin that is done in the POM file where you want to execute the LicenseScout.
 For information on the format of configuration files see the next section.
 
 
-==== Goals
+=== Goals
 
 In one execution, LicenseScout can either scan for Java artifacts or for Javascript/NPM artifacts.
 
 * For Java executions, the Maven goal `scanJava` is used.
 * For Javascript/NPM executions the Maven goal `scanNpm` is used.
 
-==== Scan Location
+=== Scan Location
 
 The base directory where archives are searched for (recursively and also inside JARs) is configured by the parameter `scanDirectory`.
 
-==== Output types and files
+[[output-types-and-files]]
+=== Output types and files
 
 Output can be configured with the output directory (parameter `outputDirectory`) and output types.
 The actual output files to generate are configured by the output types. the available output types are 'HTML', 'CSV' and 'TXT'. One or multiple output types can be configured. If no output type is configured, no output files will be written.
-File names of the output files are the result of appending the filename given by parameters `filename` in the `output` section to the output directory. An additional parameter `url` can be used to specify the URL associated with the output that will be written to the database, if enabled.
+File names of the output files are the result of appending the filename given by parameters `filename` in the `output` section to the output directory.
+`filename` is optional.
+An additional parameter `url` can be used to specify the URL associated with the output that will be written to the database, if enabled.
 
-Example:
-
+.Example
 [source,xml]
 ----
 <properties>
-    <licensescout.outputDirectory>...<licensescout.outputDirectory>
-    licensescout.outputFilename.html TODO
+  <licensescout.outputDirectory>...<licensescout.outputDirectory>
+  <licensescout.outputFilename.html> TODO
 </properties>
 
 ...
 
 <configuration>
-    ...
-    <outputDirectory>${licensescout.outputDirectory}</outputDirectory>
-    <outputs>
-        <output>
-            <type>HTML</type>
-            <filename>${licensescout.outputFilename.html}</filename>
-        </output>
-        <output>
-            <type>CSV</type>
-            <filename>${licensescout.outputFilename.csv}</filename>
-        </output>
-        <output>
-            <type>TXT</type>
-            <filename>${licensescout.outputFilename.txt}</filename>
-        </output>
-    </outputs>
-    ...
+  ...
+  <outputDirectory>${licensescout.outputDirectory}</outputDirectory>
+  <outputs>
+    <output>
+      <type>HTML</type>
+      <filename>${licensescout.outputFilename.html}</filename>
+    </output>
+    <output>
+      <type>CSV</type>
+      <filename>${licensescout.outputFilename.csv}</filename>
+    </output>
+    <output>
+      <type>TXT</type>
+      <filename>${licensescout.outputFilename.txt}</filename>
+    </output>
+  </outputs>
+  ...
 </configuration>
 ----
 
+If `outputDirectory` is not configured the value defaults to `${project.basedir}/target/licensescout`.
+If no `output` is configured no output files will be written.
+If `output.filename` is not configured it defaults to `licensereport.csv|txt|html`.
 
-==== Vendor names to filter out
+There are additional optional parameters in the `Output` structure related to custom templates.
+Custom templates are described in <<report-templates>>.
 
-Vendor names that should be used to filter out archives from the result list can be configured either directly with the parameter `filteredVendorNamesFilename` or with a configuration file (see below). Example:
+=== Vendor names to filter out
 
+Vendor names that should be used to filter out archives from the result list can be configured either directly with the parameter `filteredVendorNamesFilename` or with a configuration file (see below).
+
+.Example
 [source,xml]
 ----
 <configuration>
-    ...
-    <filteredVendorNames>
-        <filteredVendorName>My company</filteredVendorName>
-        <filteredVendorName>Another Company</filteredVendorName>
-    </filteredVendorNames>
-    ...
+  ...
+  <filteredVendorNames>
+    <filteredVendorName>My company</filteredVendorName>
+    <filteredVendorName>Another Company</filteredVendorName>
+  </filteredVendorNames>
+  ...
 </configuration>
 ----
 
 If no vendor names are configured, no filtering by vendor name takes place.
 
-==== NPM excludes
+=== NPM excludes
 
-Directory names that should be ignored in scanning for NPM modules can be configured using the parameter `npmExcludedDirectoryNames` / `npmExcludedDirectoryName`. Example:
+Directory names that should be ignored in scanning for NPM modules can be configured using the parameter `npmExcludedDirectoryNames` / `npmExcludedDirectoryName`.
 
+.Example
 [source,xml]
 ----
 <configuration>
-    ...
-    <npmExcludedDirectoryNames>
-        <npmExcludedDirectoryName>.bin</npmExcludedDirectoryName>
-        <npmExcludedDirectoryName>@angular</npmExcludedDirectoryName>
-        <npmExcludedDirectoryName>@ngtools</npmExcludedDirectoryName>
-        <npmExcludedDirectoryName>@types</npmExcludedDirectoryName>
-    </npmExcludedDirectoryNames>
-    ...
+  ...
+  <npmExcludedDirectoryNames>
+    <npmExcludedDirectoryName>.bin</npmExcludedDirectoryName>
+    <npmExcludedDirectoryName>@angular</npmExcludedDirectoryName>
+    <npmExcludedDirectoryName>@ngtools</npmExcludedDirectoryName>
+    <npmExcludedDirectoryName>@types</npmExcludedDirectoryName>
+  </npmExcludedDirectoryNames>
+  ...
 </configuration>
 ----
 
 If no excludes are given, no directories are excluded.
 
-==== Maven central configuration
+=== Maven central configuration
 
 LicenseScout accesses an external Maven repository to download parent POM files if it is necessary to find out license information. The base URL used for this can be configured.
 
 In an enterprise environment, this can be used to point to an artifact server like Nexus that mirrors the Maven central repository.
 
-Example:
-
+.Example
 [source,xml]
 ----
 <configuration>
-    ...
-    <nexusCentralBaseUrl>http://nexus.company.com:8081/nexus/content/repositories/central/</nexusCentralBaseUrl>
-    ...
+  ...
+  <nexusCentralBaseUrl>http://nexus.company.com:8081/nexus/content/repositories/central/</nexusCentralBaseUrl>
+  ...
 </configuration>
 ----
 
 NOTE: If no Maven central URL is given, the default is to access Maven Central directly (value `https://repo.maven.apache.org/maven2/`).
 
-==== Output filtering
+=== Output filtering
 
 The resulting output list of archives can be filtered to remove archives with certain legal state or certain licenses. A list of
 legal states to filter out can be given with `cleanOutputLegalStates` / `cleanOutputLegalState`. Any archive that has one of the states given will be filtered out from the result list. Also, a list of license identifiers can be given with `cleanOutputLicenseSpdxIdentifiers` / `cleanOutputLicenseSpdxIdentifier`. These values are matched against the SPDX identifiers given as `spdxIdentifier` in the license XML file (see below). Any archive that contains one of the licenses given will be filtered out.
-The filtering can be activated and deactivated with a switch (`cleanOutputActive`) with values `true` or `false`. Example:
+The filtering can be activated and deactivated with a switch (`cleanOutputActive`) with values `true` or `false`.
 
+.Example
 [source,xml]
 ----
 <configuration>
-    ...
-        <cleanOutputActive>true</cleanOutputActive>
-        <cleanOutputLegalStates>
-            <cleanOutputLegalState>NOT_ACCEPTED</cleanOutputLegalState>
-            <cleanOutputLegalState>CONFLICTING</cleanOutputLegalState>
-        </cleanOutputLegalStates>
-        <cleanOutputLicenseSpdxIdentifiers>
-            <cleanOutputLicenseSpdxIdentifier>WTFPL</cleanOutputLicenseSpdxIdentifier>
-        </cleanOutputLicenseSpdxIdentifiers>
-    ...
+  ...
+  <cleanOutputActive>true</cleanOutputActive>
+  <cleanOutputLegalStates>
+    <cleanOutputLegalState>NOT_ACCEPTED</cleanOutputLegalState>
+    <cleanOutputLegalState>CONFLICTING</cleanOutputLegalState>
+  </cleanOutputLegalStates>
+  <cleanOutputLicenseSpdxIdentifiers>
+    <cleanOutputLicenseSpdxIdentifier>WTFPL</cleanOutputLicenseSpdxIdentifier>
+  </cleanOutputLicenseSpdxIdentifiers>
+  ...
 </configuration>
 ----
 
 If `cleanOutputActive` is not configured or if no states or licenses to filter out are configured, no filtering takes place.
 
-==== Report output configuration
+=== Report output configuration
 
 The resulting output files (HTML, CSV and TXT) can be configured to contain or not contain specific Information.
-The documentation URL from the checked licenses list can be used in the output report. This can be activated with a switch (`showDocumentationUrl`) with values `true` or `false`. Example:
+The documentation URL from the checked licenses list can be used in the output report. This can be activated with a switch (`showDocumentationUrl`) with values `true` or `false`.
 
+.Example
+[source, xml]
 ----
 <configuration>
-    ...
-        <showDocumentationUrl>true</showDocumentationUrl>
-    ...
+  ...
+  <showDocumentationUrl>true</showDocumentationUrl>
+  ...
 </configuration>
 ----
 
 If `showDocumentationUrl` is not configured the documentation URL is included into the output.
 
-==== Execution configuration
+=== Execution configuration
 
 The The execution of the LicenseScout can be disabled completely by configuring the parameter `skip` to `true`.
 In this case, no reading of configuration files or other processing takes place.
-Example:
 
+.Example
+[source, xml]
 ----
 <configuration>
-    ...
-        <skip>true</skip>
-    ...
+  ...
+  <skip>true</skip>
+  ...
 </configuration>
 ----
 
 If `skip` is not configured the execution takes place in the normal way.
 
-==== Results database configuration
+=== Results database configuration
 
 LicenseScout can use a database to write core information of the report to.
 With the parameter `writeResultsToDatabase` writing to the database can be enabled or disabled.
@@ -251,19 +260,18 @@ The record `resultDatabaseConfiguration` with the parameter `jdbcUrl`, `username
 
 If writing to the result database is enabled, further parameters are used to obtain information to write to the database. There are parameters for the build name, the build version, the build URL and (inside `output`) for the URLs of the output files.
 
-Example:
-
+.Example
 [source,xml]
 ----
 <properties>
-    <licensescout.writeResultsToDatabase>true</licensescout.writeResultsToDatabase>
-    <licensescout.database.url>...</licensescout.database.url>
-    <licensescout.database.username>...</licensescout.database.username>
-    <licensescout.database.password>...</licensescout.database.password>
+  <licensescout.writeResultsToDatabase>true</licensescout.writeResultsToDatabase>
+  <licensescout.database.url>...</licensescout.database.url>
+  <licensescout.database.username>...</licensescout.database.username>
+  <licensescout.database.password>...</licensescout.database.password>
 
-    <licensescout.buildName>${project.artifactId}</licensescout.buildName>
-    <licensescout.buildVersion>${project.version}</licensescout.buildVersion>
-    <licensescout.buildUrl>...</licensescout.buildUrl>
+  <licensescout.buildName>${project.artifactId}</licensescout.buildName>
+  <licensescout.buildVersion>${project.version}</licensescout.buildVersion>
+  <licensescout.buildUrl>...</licensescout.buildUrl>
 </properties>
 
 ...
@@ -287,7 +295,7 @@ Example:
 It is recommended to configure the values for `username` and `password` via `settings.xml` so that they do not appear in the normal project POMs that are under version control and are easily visible to everybody.
 
 
-=== Configuration files
+== Configuration files
 
 LicenseScout can use eight configuration files for
 
@@ -312,11 +320,11 @@ The following sections describe the file Format and the effect of the configurat
 * `filteredVendorNamesFilename`
 (for an example see above)
 
-==== Licenses
+=== Licenses
 
 Known licenses, their URLs and associated detection strings are configured using an XML file. The filename is configured using the Maven Parameter `licensesFilename`.
-Example of the file:
 
+.Example of the file
 [source,xml]
 ----
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
@@ -389,11 +397,11 @@ Each license should be given as a `license` element. Also different versions of 
 TIP: For automatic detection, different versions of the same licenses can be grouped to license sets. A license set has one or more associated detection strings. If a detection string of a license set is found in a text file that may be a potential license file, the mechanism tries to detect a version number from the file. If a version number is found and matches the version string of one of the licenses of the set, the file is recognized as that dedicated version of the license. Otherwise the first license of the set is recognized. Note that for special detection behaviour a license can be member of multiple license sets with different detection strings (though this case is not very common). Detection strings are matched case-insensitive against potential license text.
 
 
-==== Providers
+=== Providers
 
 Providers with their name and URL are configured using an XML file. The filename is configured using the Maven Parameter `providersFilename`.
-Example of the file:
 
+.Example of the file
 [source,xml]
 ----
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
@@ -405,11 +413,11 @@ Example of the file:
 </providers>
 ----
 
-==== Notices
+=== Notices
 
 Notices are pieces that a license requires to be published with a software that uses a third-party software under this license.
-Example of the file:
 
+.Example of the file
 [source,xml]
 ----
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
@@ -430,7 +438,7 @@ Example of the file:
 Each notice should be given as a `notice` element. Also different versions of a license should be given as separate `notice` element.
  The `id` attribute of `notice` is mandatory, it is used to refer to the notice from licenses (in the licenses XML file) and checked archives (in the checked archives CSV file).
 
-==== Checked archives
+=== Checked archives
 
 Here, archives that have no license detected automatically can be assigned a licenses that has been checked manually.
 
@@ -467,8 +475,10 @@ The sixth column is an identifier of a notive. This is optional. The value may b
 The seventh and any further column are license identifiers.
   An archive can have one multiple or no license assigned. If no license is assigned, it will get the status `MANUALLY_NOT_DETECTED`.
 
-Empty lines and lines starting with '#' are ignored. Examples:
+Empty lines and lines starting with '#' are ignored.
 
+.Examples
+[source, csv]
 ----
 JAVA, bcprov-ext-jdk15on-155.jar, 2FBFC48DA088C1223ADB84A928ABEA4083C2702F4C06CC9692736627DD50C59B,http://dummy,,, MIT
 JAVA, xpp3_min.jar, 8D60778CD5018E7A130B3FB6C96A57DD9E1877B9EFBF76B4B63A8DD395128EAEhttp://path/to/cpp3-license-documentation,, ExtremeLab-1.1.1, Apache-1.1,EclipseFoundation,EPL-Notice-1, PublicDomain
@@ -479,10 +489,12 @@ Empty lines and lines starting with '#' are ignored.
 
 WARNING: Note that ',' is not an allowed character in regular expressions, since it is used as a separation character for the CSV parsing, and it cannot be quoted at the moment.
 
-==== License URL mapping
+=== License URL mapping
 
-In some places licenses are usually given by URL, not by license name (this can be the case in `MANIFEST.MF`, `pom.xml` and `package.json` files). The URL mapping maps these URLs (and, actually, other fancy names used) to internal license names (SPDX identifiers). Examples:
+In some places licenses are usually given by URL, not by license name (this can be the case in `MANIFEST.MF`, `pom.xml` and `package.json` files). The URL mapping maps these URLs (and, actually, other fancy names used) to internal license names (SPDX identifiers).
 
+.Examples
+[source, csv]
 ----
 https://javaee.github.io/javamail/LICENSE, CDDL-1.1
 http://www.h2database.com/html/license.html, MPL-2.0, EPL-1.0
@@ -499,10 +511,12 @@ Empty lines and lines starting with '#' are ignored.
 
 NOTE: From the file, lines are split by the character ','. The first column is the URL that should be mapped. The second and any further columns are license identifiers. Note that this way, an URL can be mapped to multiple licenses.
 
-==== License name mapping
+=== License name mapping
 
-In some places licenses are given by their name. This includes `pom.xml` files, NPM `package.json` files, and in some cases `MANIFEST.MF` files. The name mapping maps these names to internal license names (SPDX identifiers). Example file:
+In some places licenses are given by their name. This includes `pom.xml` files, NPM `package.json` files, and in some cases `MANIFEST.MF` files. The name mapping maps these names to internal license names (SPDX identifiers).
 
+.Example file
+[source, csv]
 ----
 (MIT AND CC-BY-3.0), MIT, CC-BY-3.0
 (MIT OR Apache-2.0), MIT, Apache-2.0
@@ -518,14 +532,14 @@ Empty lines and lines starting with '#' are ignored.
 
 From the file, lines are split by the character ','. The first column is the name that should be mapped. The second and any further columns are license identifiers. Note that this way, a name can be mapped to multiple licenses.
 
-==== Global filters
+=== Global filters
 
 Archives matching a global filter are removed from the output list completely.
 
 This Feature can be used to filter out inner JARs that have no license information.
 
- Examples:
-
+.Examples
+[source, csv]
 ----
 ==/org\.eclipse\.[_\-a-z0-9\.]+jar!/ant_tasks/[_\-a-zA-Z0-9\.]+\.jar
 ----
@@ -539,7 +553,7 @@ Empty lines and lines starting with '#' are ignored.
 
 NOTE: unlike the checked archives file, here ',' is an allowed character in regular expressions, since here not splitting by that character is done.
 
-==== Vendor names
+=== Vendor names
 
 If vendor names are given, archives are checked if their vendor name (retrieved from `MANIFEST.MF` `Bundle-Vendor`, POM file or NPM `package.json` `Vendor`) matches exactly. If yes, the archive is removed from the result list.
 
@@ -553,11 +567,37 @@ My fancy open source project
 Empty lines and lines starting with `#` are ignored.
 
 [[report-templates]]
-=== Report templates
+== Report templates
 
 For the TXT and HTML license reports the Velocity template engine is used.
 Default report templates are included in the LicenseScout. If a different appearance is desired,
 custom templates can be created and configured.
+
+Inside an `output`, the following opional parameters can be configured:
+
+* `template`: path to a template file 
+* `templateEncoding`: encoding of the template file. If not configured defaults to `project.build.sourceEncoding`. If this is not configured, too, it defaults to the platform specific default encoding.
+
+.Example
+[source,xml]
+----
+<configuration>
+  ...
+  <outputs>
+    <output>
+      <type>HTML</type>
+      <template>src/licensescout/templates/template_html.vm</template>
+      <templateEncoding>UTF-8</templateEncoing>
+    </output>
+    <output>
+      <type>TXT</type>
+      <template>src/licensescout/templates/template_txt.vm</template>
+      <templateEncoding>ISO8859-1</templateEncoing>
+    </output>
+  </outputs>
+  ...
+</configuration>
+----
 
 The tables below list the variables in the Velocity context that can be used in templates.
 
@@ -587,7 +627,10 @@ The tables below list the variables in the Velocity context that can be used in 
 |usedLicenses|List<License>
 |===
 
-=== Sample Configuration Project
+
+See also <<output-types-and-files>>.
+
+== Sample Configuration Project
 
 The recommended way of maintaining the configuration files of LicenseScout is to bundle them in a Maven artifact. This approach is described here.
 
@@ -610,41 +653,77 @@ It contains the following files:
 * `urlmappings.csv`
 
 It is created and uploaded using `mvn install` or `mvn deploy`.
-In builds that use this configuration project it is downloaded and unpacked to a local directory using the `maven-dependency-plugin`. A typical configuration for downloading looks like this:
+
+=== New configuration style (recommended)
+
+The recommended way of using the configuration bundle is to simply reference it by its Maven coordinates in a `configBundle` element.
+LicenseScout can then reference the configuration files in the local file system like this:
 
 [source,xml]
 ----
 <properties>
-    <licensescout-configuration.dir>${project.build.directory}/licensescout-configuration</licensescout-configuration.dir>
+  <org.aposin.licensescout.version>1.4.0</org.aposin.licensescout.version>
+  <org.aposin.licensescout.configuration.version>1.4.0</org.aposin.licensescout.configuration.version>
+</properties>
+
+<plugin>
+  <groupId>org.aposin.licensescout</groupId>
+  <artifactId>licensescout-maven-plugin</artifactId>
+  <version>${org.aposin.licensescout.version}</version>
+  <configuration>
+    ...
+    <configurationBundle>
+      <groupId>org.aposin.licensescout</groupId>
+      <artifactId>org.aposin.licensescout.configuration.sample</artifactId>
+      <version>${org.aposin.licensescout.configuration.version}</version>
+      <classifier>configuration</classifier>
+      <type>zip</type>
+    </configurationBundle>
+    ...
+  </configuration>
+</plugin>
+----
+
+=== Old configuration style
+
+Alternatively, it can be downloaded and unpacked to a local directory using the `maven-dependency-plugin`.
+A typical configuration for downloading looks like this:
+
+[source,xml]
+----
+<properties>
+  <org.aposin.licensescout.version>1.4.0</org.aposin.licensescout.version>
+  <org.aposin.licensescout.configuration.version>1.4.0</org.aposin.licensescout.configuration.version>
+  <licensescout-configuration.dir>${project.build.directory}/licensescout-configuration</licensescout-configuration.dir>
 </properties>
 ...
 <plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-dependency-plugin</artifactId>
-    <executions>
-        <execution>
-            <id>unpack-licensescout-configuration</id>
-            <phase>process-resources</phase>
-            <goals>
-                <goal>unpack</goal>
-            </goals>
-            <configuration>
-                <artifactItems>
-                    <artifactItem>
-                        <groupId>org.aposin.licensescout</groupId>
-                        <artifactId>org.aposin.licensescout.configuration.sample</artifactId>
-                        <version>1.3.1-SNAPSHOT</version>
-                        <classifier>configuration</classifier>
-                        <type>zip</type>
-                        <overWrite>true</overWrite>
-                        <outputDirectory>${licensescout-configuration.dir}</outputDirectory>
-                    </artifactItem>
-                </artifactItems>
-                <overWriteReleases>false</overWriteReleases>
-                <overWriteSnapshots>true</overWriteSnapshots>
-            </configuration>
-        </execution>
-    </executions>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-dependency-plugin</artifactId>
+  <executions>
+    <execution>
+      <id>unpack-licensescout-configuration</id>
+      <phase>process-resources</phase>
+      <goals>
+        <goal>unpack</goal>
+      </goals>
+      <configuration>
+        <artifactItems>
+          <artifactItem>
+            <groupId>org.aposin.licensescout</groupId>
+            <artifactId>org.aposin.licensescout.configuration.sample</artifactId>
+            <version>${org.aposin.licensescout.configuration.version}</version>
+            <classifier>configuration</classifier>
+            <type>zip</type>
+            <overWrite>true</overWrite>
+            <outputDirectory>${licensescout-configuration.dir}</outputDirectory>
+          </artifactItem>
+        </artifactItems>
+        <overWriteReleases>false</overWriteReleases>
+        <overWriteSnapshots>true</overWriteSnapshots>
+      </configuration>
+    </execution>
+  </executions>
 </plugin>
 ----
 
@@ -652,18 +731,21 @@ LicenseScout can then reference the configuration files in the local file system
 
 [source,xml]
 ----
-    <configuration>
-        ...
-        <licensesFilename>${licensescout-configuration.dir}/licenses.xml</licensesFilename>
-        <checkedArchivesFilename>${licensescout-configuration.dir}/checkedarchives.csv</checkedArchivesFilename>
-        <licenseUrlMappingsFilename>${licensescout-configuration.dir}/urlmappings.csv</licenseUrlMappingsFilename>
-        <licenseNameMappingsFilename>${licensescout-configuration.dir}/namemappings.csv</licenseNameMappingsFilename>
-        <noticesFilename>${licensescout-configuration.dir}/notices.xml</noticesFilename>
-        <providersFilename>${licensescout-configuration.dir}/providers.xml</providersFilename>
-        <globalFiltersFilename>${licensescout-configuration.dir}/globalfilters.csv</globalFiltersFilename>
-        <filteredVendorNamesFilename>${licensescout-configuration.dir}/filteredvendornames.csv</filteredVendorNamesFilename>
-        ...
-    </configuration>
+<plugin>
+  <groupId>org.aposin.licensescout</groupId>
+  <artifactId>licensescout-maven-plugin</artifactId>
+  <version>${org.aposin.licensescout.version}</version>
+  <configuration>
+    ...
+    <licensesFilename>${licensescout-configuration.dir}/licenses.xml</licensesFilename>
+    <checkedArchivesFilename>${licensescout-configuration.dir}/checkedarchives.csv</checkedArchivesFilename>
+    <licenseUrlMappingsFilename>${licensescout-configuration.dir}/urlmappings.csv</licenseUrlMappingsFilename>
+    <licenseNameMappingsFilename>${licensescout-configuration.dir}/namemappings.csv</licenseNameMappingsFilename>
+    <noticesFilename>${licensescout-configuration.dir}/notices.xml</noticesFilename>
+    <providersFilename>${licensescout-configuration.dir}/providers.xml</providersFilename>
+    <globalFiltersFilename>${licensescout-configuration.dir}/globalfilters.csv</globalFiltersFilename>
+    <filteredVendorNamesFilename>${licensescout-configuration.dir}/filteredvendornames.csv</filteredVendorNamesFilename>
+    ...
+  </configuration>
+</plugin>
 ----
-
-
