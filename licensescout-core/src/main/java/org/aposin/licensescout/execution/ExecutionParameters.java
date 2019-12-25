@@ -64,6 +64,22 @@ public class ExecutionParameters {
     private String[] cleanOutputLicenseSpdxIdentifiers;
 
     /**
+     * If the Plug-in in case of an error should terminate with a condition that lets the build fail.
+     * 
+     * @see errorLegalStates
+     */
+    private boolean failOnError;
+
+    /**
+     * List of legal states that should be considered an error.
+     * 
+     * <p>The listed states lead to a build error if {@link #failOnError} is active.</p>
+     * 
+     * @see LegalStatus
+     */
+    private LegalStatus[] errorLegalStates;
+
+    /**
      * List of vendor names to filter out.
      * This is alternative to filteredVendorNamesFilename. If both are given, the entries are merged.
      */
@@ -290,6 +306,34 @@ public class ExecutionParameters {
      */
     public final void setCleanOutputLicenseSpdxIdentifiers(String[] cleanOutputLicenseSpdxIdentifiers) {
         this.cleanOutputLicenseSpdxIdentifiers = cleanOutputLicenseSpdxIdentifiers;
+    }
+
+    /**
+     * @return the failOnError
+     */
+    public final boolean isFailOnError() {
+        return failOnError;
+    }
+
+    /**
+     * @param failOnError the failOnError to set
+     */
+    public final void setFailOnError(boolean failOnError) {
+        this.failOnError = failOnError;
+    }
+
+    /**
+     * @return the errorLegalStates
+     */
+    public final LegalStatus[] getErrorLegalStates() {
+        return errorLegalStates;
+    }
+
+    /**
+     * @param errorLegalStates the errorLegalStates to set
+     */
+    public final void setErrorLegalStates(LegalStatus[] errorLegalStates) {
+        this.errorLegalStates = errorLegalStates;
     }
 
     /**

@@ -13,22 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aposin.licensescout.util;
+package org.aposin.licensescout.maven.utils;
 
+import org.apache.maven.plugin.logging.SystemStreamLog;
+import org.aposin.licensescout.util.AbstractLogTest;
 import org.junit.Before;
 
 /**
- * Unit tests for {@link NullLog}.
+ * Unit tests for {@link MavenLog}.
  * 
  */
-public class NullLogTest extends AbstractLogTest {
+public class MavenLogTest extends AbstractLogTest {
 
     /**
      * 
      */
     @Before
     public void setUp() {
-        setLog(new NullLog());
+        setLog(new MavenLog(new SystemStreamLog()));
     }
 
     /**
@@ -36,7 +38,7 @@ public class NullLogTest extends AbstractLogTest {
      */
     @Override
     protected boolean getExpectedEnabled() {
-        return false;
+        return true;
     }
 
     /**

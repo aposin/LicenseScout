@@ -43,14 +43,24 @@ public abstract class AbstractLogTest {
         this.log = log;
     }
 
+    /**
+     * Expected value for for {@link ILFLog#isInfoEnabled()}, {@link ILFLog#isWarnEnabled()} and {@link ILFLog#isErrorEnabled()}.
+     * @return the expected value
+     */
     protected abstract boolean getExpectedEnabled();
+
+    /**
+     * Expected value for {@link ILFLog#isDebugEnabled()}.
+     * @return the expected value
+     */
+    protected abstract boolean getExpectedDebugEnabled();
 
     /**
      * Test method for {@link org.aposin.licensescout.util.NullLog#isDebugEnabled()}.
      */
     @Test
     public void testIsDebugEnabled() {
-        Assert.assertEquals("isDebugEnabled()", getExpectedEnabled(), log.isDebugEnabled());
+        Assert.assertEquals("isDebugEnabled()", getExpectedDebugEnabled(), log.isDebugEnabled());
     }
 
     /**

@@ -56,12 +56,162 @@ public class SimpleExecutionTest {
     @Test
     public void testExecutionJavaWithOutputs() throws Exception {
         final File scanDirectory = new File("src/test/resources/scans/empty");
-        final ArrayList<Output> outputs = new ArrayList<>();
-        outputs.add(createOutput(OutputFileType.CSV, "licensereport.csv"));
-        outputs.add(createOutput(OutputFileType.HTML, "licensereport.html"));
-        outputs.add(createOutput(OutputFileType.TXT, "licensereport.txt"));
+        final ArrayList<Output> outputs = createTripleOutput();
         final ExecutionParameters executionParameters = createExecutionParameters(ArchiveType.JAVA, scanDirectory,
                 outputs);
+        assertExecution(executionParameters);
+    }
+
+    /**
+     * Test case for the method {@link Executor#execute()}.
+     * 
+     * @throws Exception
+     */
+    @Test(expected = LicenseScoutFailOnErrorException.class)
+    public void testExecutionJavaFailOnErrorException() throws Exception {
+        final File scanDirectory = new File("src/test/resources/scans/java-unpacked-license-none");
+        final ExecutionParameters executionParameters = createExecutionParametersNoOutputs(ArchiveType.JAVA,
+                scanDirectory);
+        executionParameters.setFailOnError(true);
+        executionParameters.setErrorLegalStates(
+                new LegalStatus[] { LegalStatus.UNKNOWN, LegalStatus.CONFLICTING, LegalStatus.NOT_ACCEPTED });
+        assertExecution(executionParameters, true);
+    }
+
+    /**
+     * Test case for the method {@link Executor#execute()}.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testExecutionJavaFailOnErrorNoException() throws Exception {
+        final File scanDirectory = new File("src/test/resources/scans/java-unpacked-license-manifest");
+        final ExecutionParameters executionParameters = createExecutionParametersNoOutputs(ArchiveType.JAVA,
+                scanDirectory);
+        executionParameters.setFailOnError(true);
+        executionParameters.setErrorLegalStates(
+                new LegalStatus[] { LegalStatus.UNKNOWN, LegalStatus.CONFLICTING, LegalStatus.NOT_ACCEPTED });
+        assertExecution(executionParameters, true);
+    }
+
+    /**
+     * Test case for the method {@link Executor#execute()}.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testExecutionJavaWriteArchiveCsvSkeleton() throws Exception {
+        final File scanDirectory = new File("src/test/resources/scans/java-unpacked-license-manifest");
+        final ExecutionParameters executionParameters = createExecutionParametersNoOutputs(ArchiveType.JAVA,
+                scanDirectory);
+        executionParameters.setWriteArchiveCsvSkeleton(true);
+        executionParameters.setArchiveCsvSkeletonFile(new File("target/archiveSkeleton.csv"));
+        assertExecution(executionParameters, true);
+    }
+
+    /**
+     * Test case for the method {@link Executor#execute()}.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testExecutionJavaWriteArchiveXmlSkeleton() throws Exception {
+        final File scanDirectory = new File("src/test/resources/scans/java-unpacked-license-manifest");
+        final ExecutionParameters executionParameters = createExecutionParametersNoOutputs(ArchiveType.JAVA,
+                scanDirectory);
+        executionParameters.setWriteArchiveXmlSkeleton(true);
+        executionParameters.setArchiveXmlSkeletonFile(new File("target/archiveSkeleton.xml"));
+        assertExecution(executionParameters, true);
+    }
+
+    /**
+     * Test case for the method {@link Executor#execute()}.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testExecutionJavaCleanOuput() throws Exception {
+        final File scanDirectory = new File("src/test/resources/scans/java-unpacked-license-manifest");
+        final ExecutionParameters executionParameters = createExecutionParametersNoOutputs(ArchiveType.JAVA,
+                scanDirectory);
+        executionParameters.setCleanOutputActive(true);
+        executionParameters.setCleanOutputLegalStates(new LegalStatus[] { LegalStatus.UNKNOWN });
+        executionParameters.setCleanOutputLicenseSpdxIdentifiers(new String[] { "ABC", "EPL-1.0" });
+        assertExecution(executionParameters, true);
+    }
+
+    /**
+     * Test case for the method {@link Executor#execute()}.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testExecutionJavaReadConfigFiles() throws Exception {
+        final File scanDirectory = new File("src/test/resources/scans/empty");
+        final ExecutionParameters executionParameters = createExecutionParametersNoOutputs(ArchiveType.JAVA,
+                scanDirectory);
+        assertExecution(executionParameters, true);
+    }
+
+    /**
+     * Test case for the method {@link Executor#execute()}.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testExecutionJavaWriteToDatabaseNoDatabaseConfigured() throws Exception {
+        final File scanDirectory = new File("src/test/resources/scans/empty");
+        final ExecutionParameters executionParameters = createExecutionParametersNoOutputs(ArchiveType.JAVA,
+                scanDirectory);
+        executionParameters.setWriteResultsToDatabase(true);
+        executionParameters.setWriteResultsToDatabaseForSnapshotBuilds(false);
+        executionParameters.setBuildVersion("1.0.0");
+        assertExecution(executionParameters, true);
+    }
+
+    /**
+     * Test case for the method {@link Executor#execute()}.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testExecutionJavaWriteToDatabaseNoDatabaseConfiguredSnapshotVersionNoWrite() throws Exception {
+        final File scanDirectory = new File("src/test/resources/scans/empty");
+        final ExecutionParameters executionParameters = createExecutionParametersNoOutputs(ArchiveType.JAVA,
+                scanDirectory);
+        executionParameters.setWriteResultsToDatabase(true);
+        executionParameters.setWriteResultsToDatabaseForSnapshotBuilds(false);
+        executionParameters.setBuildVersion("1.0.0-SNAPSHOT");
+        assertExecution(executionParameters, true);
+    }
+
+    /**
+     * Test case for the method {@link Executor#execute()}.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testExecutionJavaWriteToDatabaseNoDatabaseConfiguredSnapshotVersionWrite() throws Exception {
+        final File scanDirectory = new File("src/test/resources/scans/empty");
+        final ExecutionParameters executionParameters = createExecutionParametersNoOutputs(ArchiveType.JAVA,
+                scanDirectory);
+        executionParameters.setWriteResultsToDatabase(true);
+        executionParameters.setWriteResultsToDatabaseForSnapshotBuilds(true);
+        executionParameters.setBuildVersion("1.0.0-SNAPSHOT");
+        assertExecution(executionParameters, true);
+    }
+
+    /**
+     * Test case for the method {@link Executor#execute()}.
+     * 
+     * @throws Exception
+     */
+    @Test(expected = LicenseScoutExecutionException.class)
+    public void testExecutionJavaNoReportExporterFactory() throws Exception {
+        final File scanDirectory = new File("src/test/resources/scans/java-unpacked-license-manifest");
+        final ArrayList<Output> outputs = createTripleOutput();
+        final ExecutionParameters executionParameters = createExecutionParameters(ArchiveType.JAVA, scanDirectory,
+                outputs, false);
         assertExecution(executionParameters);
     }
 
@@ -104,11 +254,53 @@ public class SimpleExecutionTest {
         assertExecution(executionParameters);
     }
 
-    private void assertExecution(final ExecutionParameters executionParameters) throws LicenseScoutExecutionException {
-        final ConfigFileHandler configFileHandler = new FilesystemConfigFileHandler(new ConfigFileParameters(),
+    private void assertExecution(final ExecutionParameters executionParameters)
+            throws BaseLicenseScoutExecutionException {
+        assertExecution(executionParameters, false);
+    }
+
+    /**
+     * @param executionParameters
+     * @param withConfigFiles
+     * @throws LicenseScoutExecutionException
+     * @throws LicenseScoutFailOnErrorException
+     */
+    private void assertExecution(final ExecutionParameters executionParameters, final boolean withConfigFiles)
+            throws LicenseScoutExecutionException, LicenseScoutFailOnErrorException {
+        final ConfigFileParameters configFileParameters = new ConfigFileParameters();
+        if (withConfigFiles) {
+            configFileParameters.setCheckedArchivesFilename(
+                    new File("src/test/resources/configuration_sample_test/checkedarchives.csv"));
+            configFileParameters.setFilteredVendorNamesFilename(
+                    "src/test/resources/configuration_sample_test/filteredvendornames.csv");
+            configFileParameters
+                    .setGlobalFiltersFilename("src/test/resources/configuration_sample_test/globalfilters.csv");
+            configFileParameters
+                    .setLicensesFilename(new File("src/test/resources/configuration_sample_test/licenses.xml"));
+            configFileParameters
+                    .setLicenseNameMappingsFilename("src/test/resources/configuration_sample_test/namemappings.csv");
+            configFileParameters
+                    .setNoticesFilename(new File("src/test/resources/configuration_sample_test/notices.xml"));
+            configFileParameters
+                    .setProvidersFilename(new File("src/test/resources/configuration_sample_test/providers.xml"));
+            configFileParameters
+                    .setLicenseUrlMappingsFilename("src/test/resources/configuration_sample_test/urlmappings.csv");
+        }
+        final ConfigFileHandler configFileHandler = new FilesystemConfigFileHandler(configFileParameters,
                 TestUtil.createTestLog());
         final Executor executor = new Executor(executionParameters, configFileHandler);
         executor.execute();
+    }
+
+    /**
+     * @return a list of three output definitions
+     */
+    private ArrayList<Output> createTripleOutput() {
+        final ArrayList<Output> outputs = new ArrayList<>();
+        outputs.add(createOutput(OutputFileType.CSV, "licensereport.csv"));
+        outputs.add(createOutput(OutputFileType.HTML, "licensereport.html"));
+        outputs.add(createOutput(OutputFileType.TXT, "licensereport.txt"));
+        return outputs;
     }
 
     private ExecutionParameters createExecutionParametersNoOutputs(final ArchiveType archiveType,
@@ -119,6 +311,19 @@ public class SimpleExecutionTest {
 
     private ExecutionParameters createExecutionParameters(final ArchiveType archiveType, final File scanDirectory,
                                                           final ArrayList<Output> outputs) {
+        return createExecutionParameters(archiveType, scanDirectory, outputs, true);
+    }
+
+    /**
+     * @param archiveType
+     * @param scanDirectory
+     * @param outputs
+     * @param withStandardReportExporterFactory
+     * @return an execution parameters instance
+     */
+    private ExecutionParameters createExecutionParameters(final ArchiveType archiveType, final File scanDirectory,
+                                                          final ArrayList<Output> outputs,
+                                                          final boolean withStandardReportExporterFactory) {
         final ExecutionParameters executionParameters = new ExecutionParameters();
         executionParameters.setArchiveType(archiveType);
         executionParameters.setFilteredVendorNames(new ArrayList<>());
@@ -130,7 +335,10 @@ public class SimpleExecutionTest {
         executionParameters.setCleanOutputLegalStates(new LegalStatus[0]);
         executionParameters.setLsLog(TestUtil.createTestLog());
         executionParameters.setNpmExcludedDirectoryNames(new ArrayList<>());
-        executionParameters.setExporterFactories(Arrays.asList(new StandardReportExporterFactory()));
+        if (withStandardReportExporterFactory) {
+            executionParameters.setExporterFactories(Arrays.asList(new StandardReportExporterFactory()));
+        }
+        executionParameters.setValidateLicenseXml(false);
         return executionParameters;
     }
 

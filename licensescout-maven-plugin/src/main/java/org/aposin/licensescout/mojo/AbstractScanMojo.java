@@ -38,6 +38,7 @@ import org.aposin.licensescout.configuration.ZipConfigFileHandler;
 import org.aposin.licensescout.execution.ExecutionParameters;
 import org.aposin.licensescout.execution.Executor;
 import org.aposin.licensescout.execution.LicenseScoutExecutionException;
+import org.aposin.licensescout.execution.LicenseScoutFailOnErrorException;
 import org.aposin.licensescout.execution.StandardReportExporterFactory;
 import org.aposin.licensescout.license.LegalStatus;
 import org.aposin.licensescout.maven.utils.ArtifactHelper;
@@ -173,6 +174,25 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
      */
     @Parameter(property = "cleanOutputLicenseSpdxIdentifiers", required = false)
     private String[] cleanOutputLicenseSpdxIdentifiers;
+
+    /**
+     * If the Plug-in in case of an error should terminate with with a condition that lets the build fail.
+     * 
+     * @since 1.4.0
+     */
+    @Parameter(defaultValue = "false", property = "failOnError", required = false)
+    private boolean failOnError;
+
+    /**
+     * List of legal states that should be considered an error.
+     * 
+     * The listed states lead to a build error if {@link #failOnError} is active.
+     * 
+     * @see LegalStatus
+     * @since 1.4.0
+     */
+    @Parameter(property = "errorLegalStates", required = false)
+    private LegalStatus[] errorLegalStates;
 
     /**
      * List of vendor names to filter out.
@@ -424,6 +444,8 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
             executor.execute();
         } catch (LicenseScoutExecutionException e) {
             throw new MojoExecutionException("Internal error occured: " + e.getLocalizedMessage(), e);
+        } catch (LicenseScoutFailOnErrorException e) {
+            throw new MojoExecutionException("Fail on error condition: " + e.getLocalizedMessage(), e);
         }
 
         attachReports(executionParameters, log);
@@ -573,6 +595,41 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
      */
     public final String[] getCleanOutputLicenseSpdxIdentifiers() {
         return cleanOutputLicenseSpdxIdentifiers;
+    }
+
+    /**
+     * @return the failOnError
+     */
+    public final boolean isFailOnError() {
+        return failOnError;
+    }
+
+    /**
+     * @return the errorLegalStates
+     */
+    public final LegalStatus[] getErrorLegalStates() {
+        return errorLegalStates;
+    }
+
+    /**
+     * @return the skip
+     */
+    public final boolean isSkip() {
+        return skip;
+    }
+
+    /**
+     * @return the mavenProject
+     */
+    public final MavenProject getMavenProject() {
+        return mavenProject;
+    }
+
+    /**
+     * @return the mavenProjectHelper
+     */
+    public final MavenProjectHelper getMavenProjectHelper() {
+        return mavenProjectHelper;
     }
 
     /**

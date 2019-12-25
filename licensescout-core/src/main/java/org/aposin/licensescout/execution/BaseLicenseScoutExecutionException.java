@@ -16,22 +16,22 @@
 package org.aposin.licensescout.execution;
 
 /**
- * Checked exception during the main execution of the LicenseScout.
+ * Base class for checked exception during the main execution of the LicenseScout.
  * 
  * @see Executor
  */
-public class LicenseScoutExecutionException extends BaseLicenseScoutExecutionException {
+public class BaseLicenseScoutExecutionException extends Exception {
 
     /**
      * 
      */
-    private static final long serialVersionUID = 7962771718095777982L;
+    private static final long serialVersionUID = 7177068769438055391L;
 
     /**
      * Constructor.
      * @param message
      */
-    public LicenseScoutExecutionException(String message) {
+    public BaseLicenseScoutExecutionException(String message) {
         super(message);
     }
 
@@ -39,7 +39,7 @@ public class LicenseScoutExecutionException extends BaseLicenseScoutExecutionExc
      * Constructor.
      * @param cause
      */
-    public LicenseScoutExecutionException(Throwable cause) {
+    public BaseLicenseScoutExecutionException(Throwable cause) {
         super(cause);
     }
 
@@ -48,7 +48,7 @@ public class LicenseScoutExecutionException extends BaseLicenseScoutExecutionExc
      * @param message
      * @param cause
      */
-    public LicenseScoutExecutionException(String message, Throwable cause) {
+    public BaseLicenseScoutExecutionException(String message, Throwable cause) {
         super(message, cause);
     }
 }
