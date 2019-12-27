@@ -38,11 +38,11 @@ public class FileSystemConfigFileHandlerTest extends AbstractConfigFileHandlerTe
         configFileParameters.setProvidersFilename(new File(BASE_DIRECTORY + "providers.xml"));
         configFileParameters.setNoticesFilename(new File(BASE_DIRECTORY + "notices.xml"));
         configFileParameters.setLicensesFilename(new File(BASE_DIRECTORY + "licenses.xml"));
-        configFileParameters.setLicenseUrlMappingsFilename(BASE_DIRECTORY + "urlmappings.csv");
-        configFileParameters.setLicenseNameMappingsFilename(BASE_DIRECTORY + "namemappings.csv");
-        configFileParameters.setGlobalFiltersFilename(BASE_DIRECTORY + "globalfilters.csv");
+        configFileParameters.setLicenseUrlMappingsFilename(new File(BASE_DIRECTORY + "urlmappings.csv"));
+        configFileParameters.setLicenseNameMappingsFilename(new File(BASE_DIRECTORY + "namemappings.csv"));
+        configFileParameters.setGlobalFiltersFilename(new File(BASE_DIRECTORY + "globalfilters.csv"));
         configFileParameters.setCheckedArchivesFilename(new File(BASE_DIRECTORY + "checkedarchives.csv"));
-        configFileParameters.setFilteredVendorNamesFilename(BASE_DIRECTORY + "filteredvendornames.csv");
+        configFileParameters.setFilteredVendorNamesFilename(new File(BASE_DIRECTORY + "filteredvendornames.csv"));
 
         return new FilesystemConfigFileHandler(configFileParameters, TestUtil.createTestLog());
     }

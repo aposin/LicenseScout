@@ -35,6 +35,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  * 
  * <p>The instance of this class checks if the server is reachable under the configured URL.</p>
  */
+// TODO: create interface (ArtifctResolver, MavenArtfactResolver), move to licensescout-maven-utils
+// Note: used by JavaJarFinder
 public class ArtifactServerUtil {
 
     private final String mavenCentralBaseUrl;

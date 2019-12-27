@@ -1,7 +1,9 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/cz.jirutka.rsql/rsql-parser/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.aposin.licensescout/licensescout-maven-plugin)
 [![Build Status](https://travis-ci.org/aposin/LicenseScout.svg?branch=master)](https://travis-ci.org/aposin/LicenseScout)
 [![codecov](https://codecov.io/gh/aposin/LicenseScout/branch/master/graph/badge.svg)](https://codecov.io/gh/aposin/LicenseScout)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/68b073442bd540f4a0a0ca1b33e5181b)](https://www.codacy.com/app/aposin-bot/LicenseScout?utm_source=github.com&utm_medium=referral&utm_content=aposin/LicenseScout&utm_campaign=Badge_Grade)
-[![Known Vulnerabilities](https://snyk.io/test/github/aposin/LicenseScout/badge.svg?targetFile=org.aposin.licensescout.core%2Fpom.xml)](https://snyk.io/test/github/aposin/LicenseScout?targetFile=org.aposin.licensescout.core%2Fpom.xml)
+[![Known Vulnerabilities (Core)](https://snyk.io/test/github/aposin/LicenseScout/badge.svg?targetFile=licensescout-core%2Fpom.xml)](https://snyk.io/test/github/aposin/LicenseScout?targetFile=licensescout-core%2Fpom.xml)
+[![Known Vulnerabilities (Maven Plug-in)](https://snyk.io/test/github/aposin/LicenseScout/badge.svg?targetFile=licensescout-maven-plugin%2Fpom.xml)](https://snyk.io/test/github/aposin/LicenseScout?targetFile=licensescout-maven-plugin%2Fpom.xml)
 ![GitHub top language](https://img.shields.io/github/languages/top/aposin/LicenseScout.svg)
 [![CLA assistant](https://cla-assistant.io/readme/badge/aposin/LicenseScout)](https://cla-assistant.io/aposin/LicenseScout)
 [![GitHub](https://img.shields.io/github/license/aposin/LicenseScout.svg)](https://github.com/aposin/LicenseScout/blob/master/LICENSE)
@@ -9,7 +11,7 @@
 ---
 
 <p align="center">
-<img src="org.aposin.licensescout.documentation/images/png/LS_logo_with_text_green.png" width="350">
+<img src="licensescout-documentation/images/png/LS_logo_with_text_green.png" width="350">
 </p>
 
 ---
@@ -20,7 +22,7 @@ The goal is to get an overview over the used licenses, and the artifacts for whi
 
 ## Getting started
 
-For detail information, see the [full documentation](org.aposin.licensescout.documentation/doc/documentation.adoc).
+For detail information, see the [User manual](licensescout-documentation/src/site/asciidoc/usermanual/usermanual.adoc).
 
 ### Prerequisites
 
@@ -41,9 +43,9 @@ This does:
 * Creates a LicenseScout configuration bundle
 * Runs the LicenseScout on its own dependencies and creates license reports for it
 
-The reports are written to the directory `org.aposin.licensescout.licensereport/target`.
+The reports are written to the directory `org.aposin.licensescout.licensereport/target/licensescout`.
 
-:information_source: For further information about how to configure the Plugin, please see the [full documentation](org.aposin.licensescout.core/doc/documentation.adoc).
+:information_source: For further information about how to configure the Plugin, please see the [User manual](licensescout-documentation/src/site/asciidoc/usermanual/usermanual.adoc).
 
 As an example output, the [NOTICE.txt](NOTICE.txt) in this repository is the result of LiceseScout running on itself.
 

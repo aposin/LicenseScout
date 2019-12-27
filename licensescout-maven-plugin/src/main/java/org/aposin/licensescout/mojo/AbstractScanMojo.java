@@ -30,11 +30,10 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.configuration.ConfigFileHandler;
+import org.aposin.licensescout.configuration.ConfigFileHandlerHelper;
 import org.aposin.licensescout.configuration.ConfigFileParameters;
 import org.aposin.licensescout.configuration.DatabaseConfiguration;
-import org.aposin.licensescout.configuration.FilesystemConfigFileHandler;
 import org.aposin.licensescout.configuration.Output;
-import org.aposin.licensescout.configuration.ZipConfigFileHandler;
 import org.aposin.licensescout.execution.ExecutionParameters;
 import org.aposin.licensescout.execution.Executor;
 import org.aposin.licensescout.execution.LicenseScoutExecutionException;
@@ -122,7 +121,7 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
      * @since 1.2.6
      */
     @Parameter(defaultValue = "urlmappings.csv", property = "licenseUrlMappingsFilename", required = false)
-    private String licenseUrlMappingsFilename;
+    private File licenseUrlMappingsFilename;
 
     /**
      * Name of the file to read license name mappings from.
@@ -130,7 +129,7 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
      * @since 1.2.6
      */
     @Parameter(defaultValue = "namemappings.csv", property = "licenseNameMappingsFilename", required = false)
-    private String licenseNameMappingsFilename;
+    private File licenseNameMappingsFilename;
 
     /**
      * Name of the file to read global filter patterns from.
@@ -138,7 +137,7 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
      * @since 1.2.6
      */
     @Parameter(defaultValue = "globalFilters.csv", property = "globalFiltersFilename", required = false)
-    private String globalFiltersFilename;
+    private File globalFiltersFilename;
 
     /**
      * Name of the file to read of vendor names to filter out from.
@@ -148,7 +147,7 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
      * @since 1.1
      */
     @Parameter(property = "filteredVendorNamesFilename", required = false)
-    private String filteredVendorNamesFilename;
+    private File filteredVendorNamesFilename;
 
     /**
      * If cleaning the output should be active.
@@ -436,7 +435,7 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
         executionParameters.setLsLog(log);
         executionParameters.setExporterFactories(Arrays.asList(new StandardReportExporterFactory()));
 
-        final ConfigFileHandler configFileHandler = createConfigFileHandler(configurationBundleFile,
+        final ConfigFileHandler configFileHandler = ConfigFileHandlerHelper.createConfigFileHandler(configurationBundleFile,
                 configFileParameters, log);
 
         final Executor executor = new Executor(executionParameters, configFileHandler);
@@ -449,26 +448,6 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
         }
 
         attachReports(executionParameters, log);
-    }
-
-    /**
-     * @param configurationBundleFile
-     * @param configFileParameters
-     * @param log
-     * @return a configuration file handler
-     */
-    private ConfigFileHandler createConfigFileHandler(final File configurationBundleFile,
-                                                      final ConfigFileParameters configFileParameters,
-                                                      final ILFLog log) {
-        final ConfigFileHandler configFileHandler;
-        if (configurationBundleFile != null) {
-            configFileHandler = new ZipConfigFileHandler(configurationBundleFile, configFileParameters, log);
-            log.info("reading configuration files from ZIP file: " + configurationBundleFile.getAbsolutePath());
-        } else {
-            configFileHandler = new FilesystemConfigFileHandler(configFileParameters, log);
-            log.info("reading configuration files from file system");
-        }
-        return configFileHandler;
     }
 
     /**
@@ -551,28 +530,28 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
     /**
      * @return the licenseUrlMappingsFilename
      */
-    public final String getLicenseUrlMappingsFilename() {
+    public final File getLicenseUrlMappingsFilename() {
         return licenseUrlMappingsFilename;
     }
 
     /**
      * @return the licenseNameMappingsFilename
      */
-    public final String getLicenseNameMappingsFilename() {
+    public final File getLicenseNameMappingsFilename() {
         return licenseNameMappingsFilename;
     }
 
     /**
      * @return the globalFiltersFilename
      */
-    public final String getGlobalFiltersFilename() {
+    public final File getGlobalFiltersFilename() {
         return globalFiltersFilename;
     }
 
     /**
      * @return the filteredVendorNamesFilename
      */
-    public final String getFilteredVendorNamesFilename() {
+    public final File getFilteredVendorNamesFilename() {
         return filteredVendorNamesFilename;
     }
 

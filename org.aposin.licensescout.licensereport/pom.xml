@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.aposin.licensescout</groupId>
 		<artifactId>licensescout-parent</artifactId>
-		<version>1.3.1-SNAPSHOT</version>
+		<version>1.4.0-SNAPSHOT</version>
 		<relativePath>../licensescout-parent/</relativePath>
 	</parent>
 
@@ -16,6 +16,7 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
+	<name>LicenseScout Licensereport Example</name>
 	<description>Generates license reports for the LicenseScout itself.</description>
 
 	<properties>

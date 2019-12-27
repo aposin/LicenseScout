@@ -22,8 +22,7 @@
 :toc:
 :toclevels: 4
 
-== Internals
-
+== Scan
 
 === Scan for JAVA (goal: `scanJava`)
 The scanning process starts with the configured scan directory (parameter `scanDirectory`). The entries of this directory are examined.
@@ -33,6 +32,8 @@ In packed as well as in unpacked JARS the entries (JAR entries or file system en
 
 === Scan for JAVASCRIPT (goal: `scanNpm`)
 The scanning process starts with the configured scan Directory (parameter `scanDirectory`). Entries of this directory are checked if they are a Directory and contain a file `package.json`. If so, the directory is assumed to be an NPM package and is processed further. Other directories are processed recursively. If the name of a Directory matches and entry of the excluded dir names, it is ignored. Plain files are ignored, too. For directories representing an NPM package its `package.json` is examined for name, version, vendor and license information. Then, the directory is scanned recursively for other files that  may contain license Information in text.
+
+== License processing
 
 === License detection from text files
 Files are selected for automatic detection of licenses if their file name fulfills certain criteria. For Java, a filename meets the criteria if it ends with `txt`, `htm` or `html`, or if the filename contains `license`, `licence` or `notice` and does not end with `.class`. For Javascript the filename meets the criteria if it contains `license` or `readme`. All file name comparisons are done case-insensitive.
@@ -46,8 +47,7 @@ If the end of the file is met and there is still a candidate license list, also 
 
 MIT style licenses typically have the name of the author or organisation that is the license holder as part of the license text (this is required to be copied without modifications). To fulfill this requirement automatically, files containing `license` in their file name (case insensitive) are considered as full license texts. If an artifact has MIT as a detected license and a full license text is available, the standard MIT license object is replaced in this artifacts license list by a license object that contains the actual license text. This way, the actual license text is used in the license text report.
 
-=== License processing details
-
+=== DetectionStatus and LegalStatus processing
 
 Detection status is set according to the following rules:
 
@@ -63,4 +63,9 @@ Legal status is set according to the following rules:
 * If there are only licenses with status `ACCEPTED`, the status of the archive becomes `ACCEPTED`.
 * If there are only licenses with status `NOT_ACCEPTED`, the status of the archive becomes `NOT_ACCEPTED`.
 * If there are licenses with status `ACCEPTED` and licenses with status `NOT_ACCEPTED`, the status of the archive becomes `CONFLICTING`.
+
+== Logging
+
+The LicenseScout uses a logging model that is oriented towards the Maven logging. However,
+to have the LicenseScout Core not depending directlly on Maven runtime classes an application specific logging interface called `ILSLog` (TODO: currently ILFLOg, to be renamed) is used.
 

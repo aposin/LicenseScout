@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Handler for reading configuration files..
+ * Handler for reading configuration files.
  * 
  */
 // TODO: use org.apache.maven.shared.utils.ReaderFactory.newXmlReader(InputStream)

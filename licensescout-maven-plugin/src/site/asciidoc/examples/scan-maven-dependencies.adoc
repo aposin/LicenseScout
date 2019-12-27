@@ -24,7 +24,7 @@
 
 
 The LicenseScout cannot scan Maven dependencies directly. However, it is easy
-to do this with the help of the `maven-dependency-plugin`
+to do this with the help of the link:https://maven.apache.org/plugins/maven-dependency-plugin/[`maven-dependency-plugin`]
 
 The following example shows how to:
 

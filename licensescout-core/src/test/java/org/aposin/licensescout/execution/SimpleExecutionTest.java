@@ -272,19 +272,19 @@ public class SimpleExecutionTest {
             configFileParameters.setCheckedArchivesFilename(
                     new File("src/test/resources/configuration_sample_test/checkedarchives.csv"));
             configFileParameters.setFilteredVendorNamesFilename(
-                    "src/test/resources/configuration_sample_test/filteredvendornames.csv");
-            configFileParameters
-                    .setGlobalFiltersFilename("src/test/resources/configuration_sample_test/globalfilters.csv");
+                    new File("src/test/resources/configuration_sample_test/filteredvendornames.csv"));
+            configFileParameters.setGlobalFiltersFilename(
+                    new File("src/test/resources/configuration_sample_test/globalfilters.csv"));
             configFileParameters
                     .setLicensesFilename(new File("src/test/resources/configuration_sample_test/licenses.xml"));
-            configFileParameters
-                    .setLicenseNameMappingsFilename("src/test/resources/configuration_sample_test/namemappings.csv");
+            configFileParameters.setLicenseNameMappingsFilename(
+                    new File("src/test/resources/configuration_sample_test/namemappings.csv"));
             configFileParameters
                     .setNoticesFilename(new File("src/test/resources/configuration_sample_test/notices.xml"));
             configFileParameters
                     .setProvidersFilename(new File("src/test/resources/configuration_sample_test/providers.xml"));
-            configFileParameters
-                    .setLicenseUrlMappingsFilename("src/test/resources/configuration_sample_test/urlmappings.csv");
+            configFileParameters.setLicenseUrlMappingsFilename(
+                    new File("src/test/resources/configuration_sample_test/urlmappings.csv"));
         }
         final ConfigFileHandler configFileHandler = new FilesystemConfigFileHandler(configFileParameters,
                 TestUtil.createTestLog());

@@ -6,10 +6,10 @@
 
 	<groupId>org.aposin.licensescout</groupId>
 	<artifactId>licensescout-parent</artifactId>
-	<version>1.3.1-SNAPSHOT</version>
+	<version>1.4.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>LicenseScout parent</name>
+	<name>LicenseScout Parent</name>
 	<description>Common definitions for projects of LicenseScout</description>
 
 	<url>http://www.aposin.org</url>
@@ -348,8 +348,7 @@
 					<version>${license-maven-plugin.version}</version>
 					<configuration>
 						<aggregate>true</aggregate>
-						<!-- TODO: move to src/etc -->
-						<header>LICENSE_header.txt</header>
+						<header>src/etc/LICENSE_header.txt</header>
 						<includes>
 							<!-- include all sources -->
 							<include>src/**</include>
@@ -873,6 +872,20 @@
 		</profile>
 
 		<profile>
+			<!-- Modules to build in the CI build as prerequisite for integration 
+				tests. -->
+			<id>ci-for-it-modules</id>
+
+			<modules>
+				<module>../licensescout-core</module>
+				<module>../licensescout-maven-utils</module>
+				<module>../licensescout-maven-plugin</module>
+				<module>../licensescout-report-maven-plugin</module>
+				<module>../org.aposin.licensescout.configuration.sample</module>
+			</modules>
+		</profile>
+
+		<profile>
 			<!-- Modules containing integration tests. -->
 			<id>it-modules</id>
 
@@ -888,10 +901,10 @@
 
 			<modules>
 				<module>../licensescout-core/</module>
+				<module>../licensescout-documentation/</module>
 				<module>../licensescout-maven-utils</module>
 				<module>../licensescout-maven-plugin</module>
 				<module>../licensescout-report-maven-plugin/</module>
-				<module>../licensescout-documentation/</module>
 			</modules>
 		</profile>
 
