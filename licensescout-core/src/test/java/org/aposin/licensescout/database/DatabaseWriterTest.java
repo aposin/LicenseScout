@@ -17,6 +17,7 @@ package org.aposin.licensescout.database;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +45,7 @@ import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.filter.DefaultColumnFilter;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.dbunit.operation.DatabaseOperation;
+import org.h2.tools.RunScript;
 import org.junit.Test;
 
 /**
@@ -65,21 +67,21 @@ import org.junit.Test;
  */
 public class DatabaseWriterTest extends DBTestCase {
 
-    private static final String DRIVER_CLASS = ""; //TDODO: org.h2.Driver.class.getName();
+    private static final String DRIVER_CLASS = org.h2.Driver.class.getName();
     private static final String JDBC_URL = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false;";
     private static final String USERNAME = "sa";
     private static final String PASSWORD = "";
 
     // NOTE annotation "@Before" does not work in this case
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         createSchema();
     }
 
     private void createSchema() throws SQLException {
-        // TODO: re-enable (DB-TEST)
-//        RunScript.execute(JDBC_URL, USERNAME, PASSWORD, "src/test/resources/database/licensescout-h2.sql",
-//                StandardCharsets.UTF_8, false);
+        RunScript.execute(JDBC_URL, USERNAME, PASSWORD, "src/test/resources/database/licensescout-h2.sql",
+                StandardCharsets.UTF_8, false);
     }
 
     public DatabaseWriterTest(String name) {
@@ -90,14 +92,17 @@ public class DatabaseWriterTest extends DBTestCase {
         System.setProperty(PropertiesBasedJdbcDatabaseTester.DBUNIT_PASSWORD, PASSWORD);
     }
 
+    @Override
     protected IDataSet getDataSet() throws Exception {
         return new FlatXmlDataSetBuilder().build(new FileInputStream("src/test/resources/database/dataset.xml"));
     }
 
+    @Override
     protected DatabaseOperation getSetUpOperation() throws Exception {
         return DatabaseOperation.REFRESH;
     }
 
+    @Override
     protected DatabaseOperation getTearDownOperation() throws Exception {
         return DatabaseOperation.NONE;
     }

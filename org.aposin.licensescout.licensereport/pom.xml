@@ -54,6 +54,11 @@
 			<artifactId>licensescout-maven-plugin</artifactId>
 			<version>${org.aposin.licensescout.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.aposin.licensescout</groupId>
+			<artifactId>licensescout-report-maven-plugin</artifactId>
+			<version>${org.aposin.licensescout.version}</version>
+		</dependency>
 
 	</dependencies>
 
@@ -106,6 +111,12 @@
 							<type>TXT</type>
 						</output>
 					</outputs>
+					<failOnError>true</failOnError>
+					<errorLegalStates>
+						<errorLegalState>NOT_ACCEPTED</errorLegalState>
+						<errorLegalState>CONFLICTING</errorLegalState>
+						<errorLegalState>UNKNOWN</errorLegalState>
+					</errorLegalStates>
 				</configuration>
 				<executions>
 					<execution>
