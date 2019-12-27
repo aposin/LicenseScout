@@ -34,10 +34,18 @@ public class JavaUtilLogTest extends AbstractLogTest {
     }
 
     /**
-     *
+     * {@inheritDoc}}
      */
     @Override
     protected boolean getExpectedEnabled() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}}
+     */
+    @Override
+    protected boolean getExpectedDebugEnabled() {
         return true;
     }
 

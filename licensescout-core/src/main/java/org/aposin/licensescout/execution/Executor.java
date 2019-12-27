@@ -50,10 +50,13 @@ import org.aposin.licensescout.finder.AbstractFinder;
 import org.aposin.licensescout.finder.FinderFactory;
 import org.aposin.licensescout.finder.FinderResult;
 import org.aposin.licensescout.license.GlobalFilters;
+import org.aposin.licensescout.license.LegalStatus;
 import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseCheckedList;
 import org.aposin.licensescout.license.LicenseStoreData;
 import org.aposin.licensescout.license.LicenseUtil;
+import org.aposin.licensescout.model.Alarm;
+import org.aposin.licensescout.model.AlarmCause;
 import org.aposin.licensescout.model.Notices;
 import org.aposin.licensescout.model.Providers;
 import org.aposin.licensescout.util.CryptUtil;
@@ -127,8 +130,9 @@ public class Executor {
      * 
      * @throws LicenseScoutExecutionException if an unrecoverable condition occurs during the execution or
      * if another exception is caught
+     * @throws LicenseScoutFailOnErrorException if a condition is raised thath should lead to a fail-on-error
      */
-    public void execute() throws LicenseScoutExecutionException {
+    public void execute() throws LicenseScoutExecutionException, LicenseScoutFailOnErrorException {
 
         final Providers providers = readProviders(getConfigFileHandler(), getLog());
         final Notices notices = readNotices(getConfigFileHandler(), getLog());
@@ -152,6 +156,7 @@ public class Executor {
                 runParameters);
         getLog().info("Starting scan on " + getExecutionParameters().getScanDirectory().getAbsolutePath() + "...");
 
+        OutputResult outputResult;
         try {
             final FinderResult finderResult = finder.findLicenses();
             if (finderResult == null) {
@@ -174,14 +179,57 @@ public class Executor {
             final BuildInfo buildInfo = createBuildInfo();
             writeResultsToDatabase(buildInfo, finderResult.getArchiveFiles(), getLog());
 
-            final OutputResult outputResult = createOutputResult(finderResult);
+            outputResult = createOutputResult(finderResult);
             outputResult.setPomResolutionUsed(finder.isPomResolutionUsed());
             final ReportConfiguration reportConfiguration = createReportConfiguration(archiveType);
 
             doOutput(getLog(), outputResult, reportConfiguration);
+
         } catch (Exception e) {
             throw new LicenseScoutExecutionException(e);
         }
+        if (getExecutionParameters().isFailOnError()) {
+            handleFailOnError(outputResult);
+        }
+    }
+
+    private void handleFailOnError(final OutputResult outputResult) throws LicenseScoutFailOnErrorException {
+        List<Alarm> alarms = collectAlarms(outputResult);
+        if (!alarms.isEmpty()) {
+            final StringBuffer message = new StringBuffer();
+            message.append("artifacts have unaccepted states: ");
+            for (final Alarm alarm : alarms) {
+                final Archive archive = alarm.getArchive();
+                message.append(archive.getFileName());
+                message.append("[");
+                switch (alarm.getAlarmCause()) {
+                    case PROVIDER_MISSING:
+                        break;
+                    case UNACCEPTED_DETECTION_STATUS:
+                        message.append(archive.getDetectionStatus().toString());
+                        break;
+                    case UNACCEPTED_LEGAL_STATUS:
+                        message.append(archive.getLegalStatus().toString());
+                        break;
+                    default:
+                        break;
+                }
+                message.append("] ");
+            }
+            throw new LicenseScoutFailOnErrorException(message.toString());
+        }
+    }
+
+    private List<Alarm> collectAlarms(final OutputResult outputResult) {
+        final List<Alarm> alarms = new ArrayList<>();
+        final List<LegalStatus> errorLegalStates = Arrays.asList(getExecutionParameters().getErrorLegalStates());
+        for (final Archive archive : outputResult.getFinderResult().getArchiveFiles()) {
+            if (errorLegalStates.contains(archive.getLegalStatus())) {
+                Alarm alarm = new Alarm(AlarmCause.UNACCEPTED_LEGAL_STATUS, archive);
+                alarms.add(alarm);
+            }
+        }
+        return alarms;
     }
 
     /**

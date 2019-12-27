@@ -39,6 +39,19 @@
 			<artifactId>licensescout-core</artifactId>
 			<version>1.3.${revision}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.aposin.licensescout</groupId>
+			<artifactId>licensescout-core</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.velocity</groupId>
+					<artifactId>velocity-engine-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
 		<!-- External dependencies -->
 		<dependency>

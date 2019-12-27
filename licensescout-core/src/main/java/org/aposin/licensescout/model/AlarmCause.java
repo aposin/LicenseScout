@@ -26,7 +26,11 @@ public enum AlarmCause {
      */
     PROVIDER_MISSING,
     /**
-     * An archive has a state that is not accepted.
+     * An archive has a legal status that is not accepted.
      */
-    UNACCEPTED_STATE;
+    UNACCEPTED_LEGAL_STATUS,
+    /**
+     * An archive has a detection status that is not accepted.
+     */
+    UNACCEPTED_DETECTION_STATUS;
 }

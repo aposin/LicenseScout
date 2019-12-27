@@ -39,6 +39,7 @@ import org.aposin.licensescout.execution.ExecutionParameters;
 import org.aposin.licensescout.execution.Executor;
 import org.aposin.licensescout.execution.IReportExporterFactory;
 import org.aposin.licensescout.execution.LicenseScoutExecutionException;
+import org.aposin.licensescout.execution.LicenseScoutFailOnErrorException;
 import org.aposin.licensescout.license.LegalStatus;
 import org.aposin.licensescout.maven.utils.ArtifactHelper;
 import org.aposin.licensescout.maven.utils.ArtifactItem;
@@ -347,6 +348,8 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
             executor.execute();
         } catch (LicenseScoutExecutionException e) {
             throw new MavenReportException("Internal error occured: " + e.getLocalizedMessage(), e);
+        } catch (LicenseScoutFailOnErrorException e) {
+            throw new MavenReportException("Fail on error condition: " + e.getLocalizedMessage(), e);
         }
     }
 
