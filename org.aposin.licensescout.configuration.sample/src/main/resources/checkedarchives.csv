@@ -3,21 +3,32 @@ JAVASCRIPT,testarchive1,0.0.4,,,,MIT,,
 JAVA,testarchive2,D11CDFDDC6F3CF3B48560004AA50795222F4ED8A44983651BBC9302A96AD4F46,,,,DOM4J,,
 JAVASCRIPT,testarchive3,0.0.4,,,,MIT,,
 JAVA,testarchive4,D11CDFDDC6F3CF3B48560004AA50795222F4ED8A44983651BBC9302A96AD4F46,,,,DOM4J,,
+
 #
 # This definition is needed for checking the LicenseScout itself
-# the license definition is based on information from https://repo1.maven.org/maven2/mysql/mysql-connector-java/6.0.3/mysql-connector-java-6.0.3.pom, retrieved 2019-01-14
-JAVA,mysql-connector-java-6.0.3.jar,A39C1374237E2707862933B3B606FF8F36C34B184AB49F4BEC272593BCF3CC78,,,,GPL-2.0,,
 #
-# This definition is needed for checking the LicenseScout itself
+
+# the license definition is based on information from https://repo1.maven.org/maven2/aopalliance/aopalliance/1.0/aopalliance-1.0.pom
+JAVA,aopalliance-1.0.jar,0ADDEC670FEDCD3F113C5C8091D783280D23F75E3ACB841B61A9CDB079376A08,,,,PublicDomain,,
+
+# the license definition is based on information from https://mvnrepository.com/artifact/javax.enterprise/cdi-api/1.0, retrieved 2019-12-27
+JAVA,cdi-api-1.0.jar,1F10B2204CC77C919301F20FF90461C3DF1B6E6CB148BE1C2D22107F4851D423,,,,Apache-2.0,,
+
+# the license definition is based on information from https://repo1.maven.org/maven2/org/checkerframework/checker-compat-qual/2.0.0/checker-compat-qual-2.0.0.pom
+JAVA,checker-compat-qual-2.0.0.jar,A40B2CE6D8551E5B90B1BF637064303F32944D61B52AB2014E38699DF573941B,,,,MIT,,
+
+# https://mvnrepository.com/artifact/dom4j/dom4j/1.1
+JAVA,dom4j-1.1.jar,50BD5C21B5FBD27B8BBB5F8050544B53F49A4480FD347CE9C46D55C706015156,,,,DOM4J,,
+
 # the license definition is based on information from http://central.maven.org/maven2/javax/inject/javax.inject/1/javax.inject-1.pom, retrieved 2019-01-14
 JAVA,javax.inject-1.jar,91C77044A50C481636C32D916FD89C9118A72195390452C81065080F957DE7FF,,,,Apache-2.0,,
-#
-# This definition is needed for checking the LicenseScout itself
+
 # the license definition is based on information from http://central.maven.org/maven2/javax/annotation/jsr250-api/1.0/jsr250-api-1.0.pom, retrieved 2019-01-14
 JAVA,jsr250-api-1.0.jar,A1A922D0D9B6D183ED3800DFAC01D1E1EB159F0E8C6F94736931C1DEF54A941F,,,,CDDL-1.0,,
-#
-# This definition is needed for checking the LicenseScout itself
-JAVA,javax.activation-api-1.2.0.jar,43FDEF0B5B6CEB31B0424B208B930C74AB58FAC2CEEB7B3F6FD3AEB8B5CA4393,,,,CDDL-1.1,,
-#
-# This definition is needed for checking the LicenseScout itself
-JAVA,jaxb-api-2.3.1.jar,88B955A0DF57880A26A74708BC34F74DCAF8EBF4E78843A28B50EAE945732B06,,,,CDDL-1.1,,
+
+# https://mvnrepository.com/artifact/org.codehaus.plexus/plexus-i18n/1.0-beta-10
+JAVA,plexus-i18n-1.0-beta-10.jar,B87F25B512FFAFCAFBF4A05AB943812E9C6915291370C6B46016EB3836886C41,,,,Apache-2.0,,
+
+# https://mvnrepository.com/artifact/sslext/sslext/1.2-0
+JAVA,sslext-1.2-0.jar,4EC193F85BF3C5E84BE4EF79FE1E8E71493B317858735CFE062C4C54F818C312,,,,Apache-1.1,,
+

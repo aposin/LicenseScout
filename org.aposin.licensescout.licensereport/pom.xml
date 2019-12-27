@@ -59,7 +59,6 @@
 			<artifactId>licensescout-report-maven-plugin</artifactId>
 			<version>${org.aposin.licensescout.version}</version>
 		</dependency>
-
 	</dependencies>
 
 	<build>
