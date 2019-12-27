@@ -20,11 +20,15 @@ import java.io.File;
 import org.aposin.licensescout.util.ILFLog;
 
 /**
- * Helper class for instantiating ConigFileHandler instances.
+ * Helper class for instantiating ConfigFileHandler instances.
  * 
  * @see ConfigFileHandler
  */
 public class ConfigFileHandlerHelper {
+
+    private ConfigFileHandlerHelper() {
+        // EMPTY
+    }
 
     /**
      * @param configurationBundleFile

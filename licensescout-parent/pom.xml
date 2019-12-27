@@ -170,7 +170,7 @@
 		<maven.compiler.release>${java.version}</maven.compiler.release>
 
 		<!-- Github upload/publish -->
-		<github.owner>pfistererm</github.owner>
+		<github.owner>aposin</github.owner>
 		<siteStagingDirectory>${java.io.tmpdir}/licensescout-site-stage</siteStagingDirectory>
 		<siteBranch>gh-pages</siteBranch>
 	</properties>

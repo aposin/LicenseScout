@@ -28,7 +28,7 @@ This handbook describes project maintenance tasks for the LicenseScout project.
 == General conventions
 
 * All files in the repository should be encoded in `UTF-8`. Exceptions are test resource files that are used to test other encodings.
-* All files in the repository should have Unix-style lline endings (LF).
+* All files in the repository should have Unix-style line endings (LF).
 Note it is currently unclear if this can be usefully enforced for Eclipse launch configuration files.
 * All documentation should be written in English.
 

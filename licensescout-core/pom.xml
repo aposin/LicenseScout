@@ -17,7 +17,7 @@
 	<packaging>jar</packaging>
 
 	<name>LicenseScout Core</name>
-	<description>Processing core of the LicenseScout that does read configuration files, scan for licenses and rites reports.</description>
+	<description>Processing core of the LicenseScout that does read configuration files, scan for licenses and writes reports.</description>
 
 	<distributionManagement>
 		<site>
