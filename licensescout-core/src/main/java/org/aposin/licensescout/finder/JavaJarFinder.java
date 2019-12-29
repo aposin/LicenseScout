@@ -31,8 +31,7 @@ import java.util.jar.JarInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.aposin.licensescout.archive.Archive;
-import org.aposin.licensescout.configuration.RunParameters;
-import org.aposin.licensescout.license.ArtifactServerUtil;
+import org.aposin.licensescout.license.IArtifactServerUtil;
 import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseStoreData;
 import org.aposin.licensescout.license.LicenseUtil;
@@ -65,19 +64,18 @@ public class JavaJarFinder extends AbstractFinder {
     private final List<String> specialArchiveNames = new ArrayList<>();
     private final FinderHandler<File, FileSystemEntryContainer, File> fileSystemFinderHandler;
     private final FinderHandler<JarEntry, JarEntryContainer, JarInputStream> jarFinderHandler;
-    private final ArtifactServerUtil artifactServerUtil;
+    private final IArtifactServerUtil artifactServerUtil;
 
     /**
      * Constructor.
      * 
      * @param licenseStoreData
-     * @param runParameters
+     * @param artifactServerUtil 
      * @param log the logger
      */
-    public JavaJarFinder(final LicenseStoreData licenseStoreData, final RunParameters runParameters, final ILFLog log) {
+    public JavaJarFinder(final LicenseStoreData licenseStoreData, final IArtifactServerUtil artifactServerUtil, final ILFLog log) {
         super(licenseStoreData, log);
-        artifactServerUtil = new ArtifactServerUtil(runParameters.getNexusCentralBaseUrl(),
-                runParameters.getConnectTimeout(), log);
+        this.artifactServerUtil = artifactServerUtil;
 
         fileSystemFinderHandler = new FilesystemFinderHandler(log);
         jarFinderHandler = new JarFinderHandler(log);

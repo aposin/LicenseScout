@@ -32,7 +32,7 @@ import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.configuration.ConfigFileHandler;
 import org.aposin.licensescout.configuration.ConfigFileHandlerHelper;
 import org.aposin.licensescout.configuration.ConfigFileParameters;
-import org.aposin.licensescout.configuration.Output;
+import org.aposin.licensescout.configuration.ExecutionOutput;
 import org.aposin.licensescout.configuration.OutputFileType;
 import org.aposin.licensescout.execution.ExecutionParameters;
 import org.aposin.licensescout.execution.Executor;
@@ -42,6 +42,7 @@ import org.aposin.licensescout.execution.LicenseScoutFailOnErrorException;
 import org.aposin.licensescout.license.LegalStatus;
 import org.aposin.licensescout.maven.utils.ArtifactHelper;
 import org.aposin.licensescout.maven.utils.ArtifactItem;
+import org.aposin.licensescout.maven.utils.ArtifactServerUtilHelper;
 import org.aposin.licensescout.maven.utils.IRepositoryParameters;
 import org.aposin.licensescout.maven.utils.MavenLog;
 import org.aposin.licensescout.report.exporter.DoxiaReportExporterFactory;
@@ -322,7 +323,7 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new MavenReportException("Internal error occured: " + e.getLocalizedMessage(), e);
         }
-        Output output = new Output();
+        ExecutionOutput output = new ExecutionOutput();
         output.setType(OutputFileType.DOXIA);
         executionParameters.setOutputs(Arrays.asList(output));
         output.setOutputEncoding(getOutputEncoding());
@@ -337,9 +338,10 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
             }
         });
         executionParameters.setExporterFactories(Arrays.asList(doxiaFactory));
+        ArtifactServerUtilHelper.createAndSetArtifactServerUtil(executionParameters);
 
-        final ConfigFileHandler configFileHandler = ConfigFileHandlerHelper.createConfigFileHandler(configurationBundleFile,
-                configFileParameters, log);
+        final ConfigFileHandler configFileHandler = ConfigFileHandlerHelper
+                .createConfigFileHandler(configurationBundleFile, configFileParameters, log);
 
         final Executor executor = new Executor(executionParameters, configFileHandler);
         try {

@@ -31,16 +31,22 @@ import org.eclipse.aether.resolution.ArtifactResult;
 public class ArtifactHelper {
 
     /**
+     * Private constructor to prevent instantiation.
+     */
+    private ArtifactHelper() {
+        // EMPTY
+    }
+
+    /**
      * Resolves an artifact and returns the local file.
      * @param repositoryParameters 
      * @param artifactItem the description of thr artifact to be resolved
      * @return a file object if a configuration file bundle was found, otherwise null
-     * @throws InvalidRepositoryException 
      * @throws MojoExecutionException 
      */
     public static File getArtifactFile(final IRepositoryParameters repositoryParameters,
-                                                  final ArtifactItem artifactItem)
-            throws  MojoExecutionException {
+                                       final ArtifactItem artifactItem)
+            throws MojoExecutionException {
         final Artifact artifact = resolve(repositoryParameters, artifactItem);
         if (artifact != null) {
             return artifact.getFile();

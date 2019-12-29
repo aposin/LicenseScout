@@ -16,7 +16,7 @@
 package org.aposin.licensescout.finder;
 
 import org.aposin.licensescout.archive.ArchiveType;
-import org.aposin.licensescout.configuration.RunParameters;
+import org.aposin.licensescout.configuration.FinderParameters;
 import org.aposin.licensescout.execution.ExecutionParameters;
 import org.aposin.licensescout.execution.LicenseScoutExecutionException;
 import org.aposin.licensescout.license.LicenseStoreData;
@@ -39,6 +39,10 @@ public class FinderFactory {
         // DO NOTHING
     }
 
+    /**
+     * Obtains a singleton instance of this factory.
+     * @return a factory instance
+     */
     public static FinderFactory getInstance() {
         return INSTANCE;
     }
@@ -47,16 +51,17 @@ public class FinderFactory {
      * Creates a finder instance for a specific ArchiveType.
      * @param executionParameters
      * @param licenseStoreData
-     * @param runParameters
+     * @param finderParameters
      * @return a finder instance
      * @throws LicenseScoutExecutionException if there is no finder class for the archive type
      */
     public AbstractFinder createFinder(final ExecutionParameters executionParameters,
-                                       final LicenseStoreData licenseStoreData, final RunParameters runParameters)
+                                       final LicenseStoreData licenseStoreData, final FinderParameters finderParameters)
             throws LicenseScoutExecutionException {
         final AbstractFinder finder;
         if (executionParameters.getArchiveType() == ArchiveType.JAVA) {
-            finder = new JavaJarFinder(licenseStoreData, runParameters, executionParameters.getLsLog());
+            finder = new JavaJarFinder(licenseStoreData, finderParameters.getArtifactServerUtil(),
+                    executionParameters.getLsLog());
         } else if (executionParameters.getArchiveType() == ArchiveType.JAVASCRIPT) {
             finder = new JavascriptNpmFinder(licenseStoreData, executionParameters.getLsLog(),
                     executionParameters.getNpmExcludedDirectoryNames());

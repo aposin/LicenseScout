@@ -21,7 +21,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Enumeration;
 
-import org.aposin.licensescout.configuration.DatabaseConfiguration;
+import org.aposin.licensescout.configuration.ExecutionDatabaseConfiguration;
 import org.aposin.licensescout.util.ILFLog;
 
 /**
@@ -38,7 +38,7 @@ public class DatabaseUtil {
      * @return a database connection
      * @throws SQLException
      */
-    public static Connection getConnection(final DatabaseConfiguration databaseConfiguration) throws SQLException {
+    public static Connection getConnection(final ExecutionDatabaseConfiguration databaseConfiguration) throws SQLException {
         return DriverManager.getConnection(databaseConfiguration.getJdbcUrl(), databaseConfiguration.getUsername(),
                 databaseConfiguration.getPassword());
     }

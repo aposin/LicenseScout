@@ -357,6 +357,7 @@
 							<exclude>**/*.xml</exclude>
 							<exlucde>**/*.txt</exlucde>
 							<exclude>**/*.csv</exclude>
+							<exclude>**/*.pom</exclude>
 						</excludes>
 						<properties>
 							<year>2019</year>
@@ -460,6 +461,7 @@
 							<pomInclude>**/pom.xml</pomInclude>
 						</pomIncludes>
 						<postBuildHookScript>verify</postBuildHookScript>
+						<settingsFile>src/it/settings.xml</settingsFile>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -558,6 +560,7 @@
 							<goals>
 								<goal>attach-descriptor</goal>
 							</goals>
+							<phase>pre-site</phase>
 						</execution>
 					</executions>
 				</plugin>

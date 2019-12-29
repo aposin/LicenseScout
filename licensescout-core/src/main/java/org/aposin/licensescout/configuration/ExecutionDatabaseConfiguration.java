@@ -15,33 +15,26 @@
  */
 package org.aposin.licensescout.configuration;
 
-import org.apache.maven.plugins.annotations.Parameter;
-
 /**
- * Database configuration specification for scan MOJOs.
- * 
- * <p>This is an auxiliary class for the Maven configuration of the license scout.</p>
+ * Database configuration specification.
  * 
  */
-public class DatabaseConfiguration {
+public class ExecutionDatabaseConfiguration {
 
     /**
      * JDBC URL for a database.
      */
-    @Parameter(property = "jdbcUrl", required = true)
     private String jdbcUrl;
 
     /**
      * The user name to use for a database.
      */
-    @Parameter(property = "username", required = true)
     private String username;
 
     /**
      * The password to use for a database.
      * 
      */
-    @Parameter(property = "password", required = false)
     private String password;
 
     /**

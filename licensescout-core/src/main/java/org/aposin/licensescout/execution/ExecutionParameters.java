@@ -19,8 +19,9 @@ import java.io.File;
 import java.util.List;
 
 import org.aposin.licensescout.archive.ArchiveType;
-import org.aposin.licensescout.configuration.DatabaseConfiguration;
-import org.aposin.licensescout.configuration.Output;
+import org.aposin.licensescout.configuration.ExecutionDatabaseConfiguration;
+import org.aposin.licensescout.configuration.ExecutionOutput;
+import org.aposin.licensescout.license.IArtifactServerUtil;
 import org.aposin.licensescout.license.LegalStatus;
 import org.aposin.licensescout.util.ILFLog;
 
@@ -46,7 +47,7 @@ public class ExecutionParameters {
     /**
      * Specification of output types and filenames.
      */
-    private List<Output> outputs;
+    private List<ExecutionOutput> outputs;
 
     /**
      * If cleaning the output should be active.
@@ -195,7 +196,7 @@ public class ExecutionParameters {
      * 
      * @see #writeResultsToDatabase
      */
-    private DatabaseConfiguration resultDatabaseConfiguration;
+    private ExecutionDatabaseConfiguration resultDatabaseConfiguration;
 
     /**
      * NPM only.
@@ -209,6 +210,8 @@ public class ExecutionParameters {
     private ILFLog lsLog;
 
     private List<IReportExporterFactory> exporterFactories;
+
+    private IArtifactServerUtil artifactServerUtil;
 
     /**
      * @return the archiveType
@@ -255,14 +258,14 @@ public class ExecutionParameters {
     /**
      * @return the outputs
      */
-    public final List<Output> getOutputs() {
+    public final List<ExecutionOutput> getOutputs() {
         return outputs;
     }
 
     /**
      * @param outputs the outputs to set
      */
-    public final void setOutputs(List<Output> outputs) {
+    public final void setOutputs(List<ExecutionOutput> outputs) {
         this.outputs = outputs;
     }
 
@@ -535,14 +538,14 @@ public class ExecutionParameters {
     /**
      * @return the resultDatabaseConfiguration
      */
-    public final DatabaseConfiguration getResultDatabaseConfiguration() {
+    public final ExecutionDatabaseConfiguration getResultDatabaseConfiguration() {
         return resultDatabaseConfiguration;
     }
 
     /**
      * @param resultDatabaseConfiguration the resultDatabaseConfiguration to set
      */
-    public final void setResultDatabaseConfiguration(DatabaseConfiguration resultDatabaseConfiguration) {
+    public final void setResultDatabaseConfiguration(ExecutionDatabaseConfiguration resultDatabaseConfiguration) {
         this.resultDatabaseConfiguration = resultDatabaseConfiguration;
     }
 
@@ -586,6 +589,20 @@ public class ExecutionParameters {
      */
     public final void setExporterFactories(List<IReportExporterFactory> exporterFactories) {
         this.exporterFactories = exporterFactories;
+    }
+
+    /**
+     * @return the artifactServerUtil
+     */
+    public final IArtifactServerUtil getArtifactServerUtil() {
+        return artifactServerUtil;
+    }
+
+    /**
+     * @param artifactServerUtil the artifactServerUtil to set
+     */
+    public final void setArtifactServerUtil(IArtifactServerUtil artifactServerUtil) {
+        this.artifactServerUtil = artifactServerUtil;
     }
 
 }

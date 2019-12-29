@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -29,12 +30,13 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.settings.Settings;
 import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.configuration.ConfigFileHandler;
 import org.aposin.licensescout.configuration.ConfigFileHandlerHelper;
 import org.aposin.licensescout.configuration.ConfigFileParameters;
-import org.aposin.licensescout.configuration.DatabaseConfiguration;
-import org.aposin.licensescout.configuration.Output;
+import org.aposin.licensescout.configuration.ExecutionDatabaseConfiguration;
+import org.aposin.licensescout.configuration.ExecutionOutput;
 import org.aposin.licensescout.execution.ExecutionParameters;
 import org.aposin.licensescout.execution.Executor;
 import org.aposin.licensescout.execution.LicenseScoutExecutionException;
@@ -43,8 +45,13 @@ import org.aposin.licensescout.execution.StandardReportExporterFactory;
 import org.aposin.licensescout.license.LegalStatus;
 import org.aposin.licensescout.maven.utils.ArtifactHelper;
 import org.aposin.licensescout.maven.utils.ArtifactItem;
+import org.aposin.licensescout.maven.utils.ArtifactServerUtilHelper;
+import org.aposin.licensescout.maven.utils.ConfigurationHelper;
+import org.aposin.licensescout.maven.utils.DatabaseConfiguration;
 import org.aposin.licensescout.maven.utils.IRepositoryParameters;
+import org.aposin.licensescout.maven.utils.LSArtifact;
 import org.aposin.licensescout.maven.utils.MavenLog;
+import org.aposin.licensescout.maven.utils.Output;
 import org.aposin.licensescout.util.ILFLog;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -214,6 +221,16 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
     private String nexusCentralBaseUrl;
 
     /**
+     * Base URL for creating default value of report output URL.
+     * 
+     * E.g. "https://myserver:port/nexus/myrepository/"
+     * 
+     * @since 1.4.0
+     */
+    @Parameter(property = "artifactBaseUrl", required = false)
+    private String artifactBaseUrl;
+
+    /**
      * Timeout for connecting to artifact server. This timeout is used when
      * connecting to an artifact server (as configured with
      * {@link #nexusCentralBaseUrl}) to retrieve parent POMs. The value is in
@@ -368,11 +385,25 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
     private boolean attachReports;
 
     /**
+     * Classifier to use for attaching generated reports as files to the main artifact.
+     * @since 1.4.0
+     */
+    @Parameter(defaultValue = "licensereport", property = "attachReportsClassifier", required = false)
+    private String attachReportsClassifier;
+
+    /**
      * The Maven Project model.
      * @since 1.3.1
      */
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject mavenProject;
+
+    /**
+     * The Maven session.
+     * @since 1.4
+     */
+    @Parameter(defaultValue = "${session}", readonly = true)
+    protected org.apache.maven.execution.MavenSession mavenSession;
 
     /**
      * The Maven project helper.
@@ -435,9 +466,10 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
         executionParameters.setArchiveType(getArchiveType());
         executionParameters.setLsLog(log);
         executionParameters.setExporterFactories(Arrays.asList(new StandardReportExporterFactory()));
+        ArtifactServerUtilHelper.createAndSetArtifactServerUtil(executionParameters);
 
-        final ConfigFileHandler configFileHandler = ConfigFileHandlerHelper.createConfigFileHandler(configurationBundleFile,
-                configFileParameters, log);
+        final ConfigFileHandler configFileHandler = ConfigFileHandlerHelper
+                .createConfigFileHandler(configurationBundleFile, configFileParameters, log);
 
         final Executor executor = new Executor(executionParameters, configFileHandler);
         try {
@@ -457,7 +489,7 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
      */
     private void attachReports(final ExecutionParameters executionParameters, final ILFLog log) {
         if (attachReports) {
-            AttachHelper.attachReports(mavenProject, mavenProjectHelper, executionParameters);
+            AttachHelper.attachReports(mavenProject, mavenProjectHelper, executionParameters, attachReportsClassifier);
         } else {
             log.info("Not attaching license reports as artifacts because not cnfigured");
         }
@@ -496,8 +528,8 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
     /**
      * @return the outputs
      */
-    public final List<Output> getOutputs() {
-        return outputs;
+    public final List<ExecutionOutput> getOutputs() {
+        return ConfigurationHelper.getExecutionOutputs(outputs, artifactBaseUrl, getAttachArtifact());
     }
 
     /**
@@ -705,9 +737,14 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
 
     /**
      * @return the resultDatabaseConfiguration
+     * @throws MojoExecutionException 
      */
-    public final DatabaseConfiguration getResultDatabaseConfiguration() {
-        return resultDatabaseConfiguration;
+    public final ExecutionDatabaseConfiguration getResultDatabaseConfiguration() throws MojoExecutionException {
+        if (isWriteResultsToDatabase()) {
+            return ConfigurationHelper.getExecutionDatabaseConfiguration(resultDatabaseConfiguration, getSettings(),
+                    new MavenLog(getLog()));
+        }
+        return null;
     }
 
     /**
@@ -732,6 +769,19 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
     @Override
     public final RepositorySystemSession getRepositorySystemSession() {
         return repositorySystemSession;
+    }
+
+    protected Settings getSettings() {
+        return mavenSession.getSettings();
+    }
+
+    /**
+     * @return
+     */
+    private LSArtifact getAttachArtifact() {
+        final Artifact artifact = mavenProject.getArtifact();
+        return new LSArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(),
+                artifact.getType(), attachReportsClassifier);
     }
 
 }

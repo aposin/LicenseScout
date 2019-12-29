@@ -24,12 +24,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * base class for unit test of implementations of {@link ConfigFileHandler}
+ * Base class for unit test of implementations of {@link ConfigFileHandler}
  */
 public abstract class AbstractConfigFileHandlerTest {
 
     private ConfigFileHandler configFileHandler;
 
+    /**
+     * Initializes the ConfigFileHandler used for testing
+     * @throws IOException
+     */
     @Before
     public void initConfigFileHandler() throws IOException {
         this.configFileHandler = createConfigFileHandler();
@@ -119,7 +123,7 @@ public abstract class AbstractConfigFileHandlerTest {
 
     /**
      * Creates the ConfigFileHandler to test.
-     * @return
+     * @return a {@code ConfigFileHandler} instance for testing
      * @throws IOException 
      */
     protected abstract ConfigFileHandler createConfigFileHandler() throws IOException;

@@ -25,9 +25,10 @@ import java.util.Set;
 
 import org.aposin.licensescout.archive.Archive;
 import org.aposin.licensescout.archive.ArchiveType;
-import org.aposin.licensescout.configuration.RunParameters;
 import org.aposin.licensescout.core.test.util.CreateJarFileHelper;
+import org.aposin.licensescout.core.test.util.TestArtifactServerUtil;
 import org.aposin.licensescout.core.test.util.TestUtil;
+import org.aposin.licensescout.license.IArtifactServerUtil;
 import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseStoreData;
 import org.aposin.licensescout.util.ILFLog;
@@ -55,8 +56,8 @@ public class JavaJarFinderTest extends BaseFinderTest {
     public void testPomResolutionUsed() {
         final ILFLog log = TestUtil.createTestLog();
         LicenseStoreData licenseStoreData = null;
-        final RunParameters runParameters = TestUtil.createRunParameters();
-        final JavaJarFinder finder = new JavaJarFinder(licenseStoreData, runParameters, log);
+        final IArtifactServerUtil artifactServerUtil = new TestArtifactServerUtil();
+        final JavaJarFinder finder = new JavaJarFinder(licenseStoreData, artifactServerUtil, log);
         Assert.assertFalse("isPomResolutionUsed()", finder.isPomResolutionUsed());
     }
 
@@ -404,8 +405,8 @@ public class JavaJarFinderTest extends BaseFinderTest {
     @Override
     protected JavaJarFinder createFinder() {
         final LicenseStoreData licenseStoreData = getLicenseStoreData();
-        final RunParameters runParameters = TestUtil.createRunParameters();
-        return new JavaJarFinder(licenseStoreData, runParameters, getLog());
+        final IArtifactServerUtil artifactServerUtil = new TestArtifactServerUtil(true);
+        return new JavaJarFinder(licenseStoreData, artifactServerUtil, getLog());
     }
 
     /**
@@ -457,8 +458,8 @@ public class JavaJarFinderTest extends BaseFinderTest {
         final String expectedPath0 = isJar ? "/lib1.jar" : "/lib1";
         final Archive archive0 = finderResult.getArchiveFiles().get(0);
         final String expectedVendor = "Unknown";
-        assertArchive(archive0, "archive: ", expectedFileName0, expectedPath0, "0.0.2", expectedVendor,
-                expectedLicense, isJar, expectedLicenseCandidateFilesCount);
+        assertArchive(archive0, "archive: ", expectedFileName0, expectedPath0, "0.0.2", expectedVendor, expectedLicense,
+                isJar, expectedLicenseCandidateFilesCount);
     }
 
     /**
@@ -527,13 +528,13 @@ public class JavaJarFinderTest extends BaseFinderTest {
         final String expectedFileNameOuter = isJarOuter ? "lib1.jar" : "lib1";
         final String expectedPathOuter = isJarOuter ? "/lib1.jar" : "/lib1";
         final Archive archiveOuter = finderResult.getArchiveFiles().get(0);
-        assertArchive(archiveOuter, "archive (outer): ", expectedFileNameOuter, expectedPathOuter, "0.0.2",
-                "Unknown", null, isJarOuter, 0);
+        assertArchive(archiveOuter, "archive (outer): ", expectedFileNameOuter, expectedPathOuter, "0.0.2", "Unknown",
+                null, isJarOuter, 0);
 
         // the inner
         final Archive archiveInner = finderResult.getArchiveFiles().get(1);
-        assertArchive(archiveInner, "archive (inner): ", expectedFileNameInner, expectedPathInner,
-                expectedVersionInner, expectedVendorInner, expectedLicenseInner, expectMessageDigestInner,
+        assertArchive(archiveInner, "archive (inner): ", expectedFileNameInner, expectedPathInner, expectedVersionInner,
+                expectedVendorInner, expectedLicenseInner, expectMessageDigestInner,
                 expectedLicenseCandidateFilesCountInner);
     }
 

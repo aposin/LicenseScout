@@ -26,7 +26,7 @@ import java.util.List;
 import org.aposin.licensescout.archive.Archive;
 import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.configuration.BuildInfo;
-import org.aposin.licensescout.configuration.DatabaseConfiguration;
+import org.aposin.licensescout.configuration.ExecutionDatabaseConfiguration;
 import org.aposin.licensescout.core.test.util.TestUtil;
 import org.aposin.licensescout.license.DetectionStatus;
 import org.aposin.licensescout.license.LegalStatus;
@@ -108,7 +108,7 @@ public class DatabaseWriterTest extends DBTestCase {
     }
 
     /**
-     * Tests {@link DatabaseWriter#writeToDatabase(BuildInfo, List, DatabaseConfiguration, ILFLog)}.
+     * Tests {@link DatabaseWriter#writeToDatabase(BuildInfo, List, ExecutionDatabaseConfiguration, ILFLog)}.
      * 
      * @throws Exception
      */
@@ -124,7 +124,7 @@ public class DatabaseWriterTest extends DBTestCase {
         final Archive archive2 = createArchive2();
         archives.add(archive2);
 
-        final DatabaseConfiguration databaseConfiguration = createDatabaseConfiguration();
+        final ExecutionDatabaseConfiguration databaseConfiguration = createDatabaseConfiguration();
         DatabaseWriter.writeToDatabase(buildInfo, archives, databaseConfiguration, log);
 
         final List<String> tablesNamesToCheck = Arrays.asList("Builds", "LibraryData", "DetectedLicenses");
@@ -230,8 +230,8 @@ public class DatabaseWriterTest extends DBTestCase {
      * Obtains a database configuration.
      * @return a database configuration
      */
-    private DatabaseConfiguration createDatabaseConfiguration() {
-        final DatabaseConfiguration databaseConfiguration = new DatabaseConfiguration();
+    private ExecutionDatabaseConfiguration createDatabaseConfiguration() {
+        final ExecutionDatabaseConfiguration databaseConfiguration = new ExecutionDatabaseConfiguration();
         databaseConfiguration.setJdbcUrl(JDBC_URL);
         databaseConfiguration.setUsername(USERNAME);
         databaseConfiguration.setPassword(PASSWORD);

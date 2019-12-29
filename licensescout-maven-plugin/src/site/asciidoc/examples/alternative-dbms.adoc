@@ -47,7 +47,7 @@ currently only possible by changing the source code of the LicenseScout.
   ...
 
   <!-- LicenseScout database configuration -->
-  <licensescout.database.url>h2:ssl://localhost:8085/~/sample;DATABASE_TO_LOWER=TRUE</licensescout.database.url>
+  <licensescout.database.url>jdbc:h2:ssl://localhost:8085/~/sample;DATABASE_TO_LOWER=TRUE</licensescout.database.url>
 </properties>
 
 ...

@@ -256,7 +256,10 @@ LicenseScout can use a database to write core information of the report to.
 With the parameter `writeResultsToDatabase` writing to the database can be enabled or disabled.
 The parameter `writeResultsToDatabaseForSnapshotBuilds` determines if records should be written to the database also for snapshot versions. If the value is not true, version numbers (taken from the parameter `buildVersion`) that contain `-SNAPSHOT` are not processed further.
 
-The record `resultDatabaseConfiguration` with the parameter `jdbcUrl`, `username` and `password` is used to configure the target database.
+The record `resultDatabaseConfiguration` with the parameters `jdbcUrl` and `serverId`
+is used to configure the target database.
+
+The specified `serverId` is resolved against a server definition in `settings.xml`, where username and password can be specified (see example below).
 
 If writing to the result database is enabled, further parameters are used to obtain information to write to the database. There are parameters for the build name, the build version, the build URL and (inside `output`) for the URLs of the output files.
 
@@ -266,8 +269,6 @@ If writing to the result database is enabled, further parameters are used to obt
 <properties>
   <licensescout.writeResultsToDatabase>true</licensescout.writeResultsToDatabase>
   <licensescout.database.url>...</licensescout.database.url>
-  <licensescout.database.username>...</licensescout.database.username>
-  <licensescout.database.password>...</licensescout.database.password>
 
   <licensescout.buildName>${project.artifactId}</licensescout.buildName>
   <licensescout.buildVersion>${project.version}</licensescout.buildVersion>
@@ -282,8 +283,7 @@ If writing to the result database is enabled, further parameters are used to obt
   <writeResultsToDatabaseForSnapshotBuilds>false</writeResultsToDatabaseForSnapshotBuilds>
   <resultDatabaseConfiguration>
     <jdbcUrl>${licensescout.database.url}</jdbcUrl>
-    <username>${licensescout.database.username}</username>
-    <password>${licensescout.database.password}</password>
+    <serverId>dbserverid</serverId>                    <1>
   </resultDatabaseConfiguration>
   <buildName>${licensescout.buildName}</buildName>
   <buildVersion>${licensescout.buildVersion}</buildVersion>
@@ -291,9 +291,31 @@ If writing to the result database is enabled, further parameters are used to obt
   ...
 </configuration>
 ----
+<1> the server ID for the database server, has to match the `id` of a server definition in the `settings.xml`
 
-It is recommended to configure the values for `username` and `password` via `settings.xml` so that they do not appear in the normal project POMs that are under version control and are easily visible to everybody.
+.Example settings.xml
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
 
+  <servers>
+    <server>
+      <id>dbserverid</id>         <1>
+      <username>...</username>    <2>
+      <password>...</password>    <3>
+    </server>
+  </servers>
+
+  ...
+
+</settings>
+----
+<1> server ID for the database server, has to match the value given as `serverId` in the POM
+<2> username for the database
+<3> password for the database
+
+It is recommended to use encryption for the values for `username` and `password` in the `settings.xml`.
 
 == Configuration files
 

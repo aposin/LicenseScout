@@ -143,6 +143,7 @@ public class TxtExporter extends AbstractVelocityExporter {
 
     /**
      * @param archiveFiles
+     * @return 
      */
     private List<Notice> collectNotices(final List<Archive> archiveFiles) {
         final List<Notice> usedNotices = new ArrayList<>();

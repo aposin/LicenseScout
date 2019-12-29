@@ -202,6 +202,8 @@ public class LicenseCheckedList {
      * @param log
      * @param values
      * @param documentationUrl 
+     * @param notice 
+     * @param provider 
      * @return a result object
      */
     private LicenseResult fetchLicenseResult(final LicenseStoreData licenseStoreData, final ILFLog log,
@@ -297,6 +299,7 @@ public class LicenseCheckedList {
     }
 
     /**
+     * @param archives 
      * @return the collected CSV contents
      */
     private static String writeCsvSkeletonFile(final List<Archive> archives) {
@@ -342,6 +345,7 @@ public class LicenseCheckedList {
     }
 
     /**
+     * @param archives 
      * @return the collected XML string
      */
     private static String writeXmlSkeletonFile(final List<Archive> archives) {

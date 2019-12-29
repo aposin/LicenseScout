@@ -43,8 +43,6 @@ public class ArtifactItem {
     /**
      * Type of Artifact (War,Jar,etc)
      *
-     * @parameter
-     * @required
      */
     @Parameter(property = "type", required = false)
     private String type;
@@ -52,7 +50,6 @@ public class ArtifactItem {
     /**
      * Classifier for Artifact (tests,sources,etc)
      *
-     * @parameter
      */
     @Parameter(property = "classifier", required = false)
     private String classifier;
@@ -72,7 +69,8 @@ public class ArtifactItem {
      * @param type
      * @param classifier
      */
-    public ArtifactItem(String groupId, String artifactId, String version, String type, String classifier) {
+    public ArtifactItem(final String groupId, final String artifactId, final String version, final String type,
+            final String classifier) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;

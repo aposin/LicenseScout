@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.aposin.licensescout.archive.Archive;
 import org.aposin.licensescout.configuration.BuildInfo;
-import org.aposin.licensescout.configuration.DatabaseConfiguration;
+import org.aposin.licensescout.configuration.ExecutionDatabaseConfiguration;
 import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseUtil;
 import org.aposin.licensescout.model.Provider;
@@ -44,7 +44,7 @@ import org.aposin.licensescout.util.ILFLog;
  * <p>For information on the database structure see the file 'sql/licensescout.sql'.</p>
  * 
  * @see BuildInfo
- * @see DatabaseConfiguration
+ * @see ExecutionDatabaseConfiguration
  */
 public class DatabaseWriter {
 
@@ -60,7 +60,7 @@ public class DatabaseWriter {
      * @param log the log
      */
     public static void writeToDatabase(final BuildInfo buildInfo, final List<Archive> archives,
-                                       final DatabaseConfiguration databaseConfiguration, final ILFLog log) {
+                                       final ExecutionDatabaseConfiguration databaseConfiguration, final ILFLog log) {
         // for debugging
         if (log.isDebugEnabled()) {
             DatabaseUtil.dumpDrivers(log);

@@ -15,41 +15,30 @@
  */
 package org.aposin.licensescout.configuration;
 
+import org.aposin.licensescout.finder.FinderFactory;
+import org.aposin.licensescout.license.IArtifactServerUtil;
+
 /**
- * Parameters passed to the core of the LicenseScout from the parameter handling
- * layer.
+ * Parameters passed when creating finder instances.
+ * 
+ * @see FinderFactory
  */
-public class RunParameters {
+public class FinderParameters {
 
-    private String nexusCentralBaseUrl;
-    private int connectTimeout;
+    private IArtifactServerUtil artifactServerUtil;
 
     /**
-     * @return the nexusCentralBaseUrl
+     * @return the artifactServerUtil
      */
-    public final String getNexusCentralBaseUrl() {
-        return nexusCentralBaseUrl;
+    public final IArtifactServerUtil getArtifactServerUtil() {
+        return artifactServerUtil;
     }
 
     /**
-     * @param nexusCentralBaseUrl the nexusCentralBaseUrl to set
+     * @param artifactServerUtil the artifactServerUtil to set
      */
-    public final void setNexusCentralBaseUrl(final String nexusCentralBaseUrl) {
-        this.nexusCentralBaseUrl = nexusCentralBaseUrl;
-    }
-
-    /**
-     * @return the connectTimeout
-     */
-    public final int getConnectTimeout() {
-        return connectTimeout;
-    }
-
-    /**
-     * @param connectTimeout the connectTimeout to set
-     */
-    public final void setConnectTimeout(final int connectTimeout) {
-        this.connectTimeout = connectTimeout;
+    public final void setArtifactServerUtil(IArtifactServerUtil artifactServerUtil) {
+        this.artifactServerUtil = artifactServerUtil;
     }
 
 }
