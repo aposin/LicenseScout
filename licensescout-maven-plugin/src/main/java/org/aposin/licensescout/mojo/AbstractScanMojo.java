@@ -24,6 +24,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -411,7 +412,7 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
      * {@inheritDoc}
      */
     @Override
-    public void execute() throws MojoExecutionException {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         final ILFLog log = new MavenLog(getLog());
 
         if (skip) {
@@ -444,7 +445,7 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
         } catch (LicenseScoutExecutionException e) {
             throw new MojoExecutionException("Internal error occured: " + e.getLocalizedMessage(), e);
         } catch (LicenseScoutFailOnErrorException e) {
-            throw new MojoExecutionException("Fail on error condition: " + e.getLocalizedMessage(), e);
+            throw new MojoFailureException("Fail on error condition: " + e.getLocalizedMessage(), e);
         }
 
         attachReports(executionParameters, log);
