@@ -57,7 +57,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
         final ILFLog log = TestUtil.createTestLog();
         LicenseStoreData licenseStoreData = null;
         final IArtifactServerUtil artifactServerUtil = new TestArtifactServerUtil();
-        final JavaJarFinder finder = new JavaJarFinder(licenseStoreData, artifactServerUtil, log);
+        final AbstractJavaFinder finder = new JavaJarFinder(licenseStoreData, artifactServerUtil, log);
         Assert.assertFalse("isPomResolutionUsed()", finder.isPomResolutionUsed());
     }
 
@@ -70,7 +70,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
      */
     @Test
     public void testScanEmptyDirectory() throws Exception {
-        final JavaJarFinder finder = createFinder();
+        final AbstractJavaFinder finder = createFinder();
         finder.debug = true;
         final File scanDirectory = getFile("empty");
         final int expectedArchiveCount = 0;
@@ -403,7 +403,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
      * {@inheritDoc}
      */
     @Override
-    protected JavaJarFinder createFinder() {
+    protected AbstractJavaFinder createFinder() {
         final LicenseStoreData licenseStoreData = getLicenseStoreData();
         final IArtifactServerUtil artifactServerUtil = new TestArtifactServerUtil(true);
         return new JavaJarFinder(licenseStoreData, artifactServerUtil, getLog());

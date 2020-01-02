@@ -68,7 +68,7 @@ LicenseScout is configured as a Maven plugin. Below you can see a typical config
   </executions>
 </plugin>
 ----
-
+[[xml-configuration]]
 == XML configuration
 
 This section describes the configuration for the LicenseScout maven plugin that is done in the POM file where you want to execute the LicenseScout.
@@ -317,6 +317,7 @@ If writing to the result database is enabled, further parameters are used to obt
 
 It is recommended to use encryption for the values for `username` and `password` in the `settings.xml`.
 
+[[configuration-files]]
 == Configuration files
 
 LicenseScout can use eight configuration files for
@@ -342,6 +343,7 @@ The following sections describe the file Format and the effect of the configurat
 * `filteredVendorNamesFilename`
 (for an example see above)
 
+[[configuration-file-licenses]]
 === Licenses
 
 Known licenses, their URLs and associated detection strings are configured using an XML file. The filename is configured using the Maven Parameter `licensesFilename`.
@@ -419,6 +421,7 @@ Each license should be given as a `license` element. Also different versions of 
 TIP: For automatic detection, different versions of the same licenses can be grouped to license sets. A license set has one or more associated detection strings. If a detection string of a license set is found in a text file that may be a potential license file, the mechanism tries to detect a version number from the file. If a version number is found and matches the version string of one of the licenses of the set, the file is recognized as that dedicated version of the license. Otherwise the first license of the set is recognized. Note that for special detection behaviour a license can be member of multiple license sets with different detection strings (though this case is not very common). Detection strings are matched case-insensitive against potential license text.
 
 
+[[configuration-file-providers]]
 === Providers
 
 Providers with their name and URL are configured using an XML file. The filename is configured using the Maven Parameter `providersFilename`.
@@ -435,6 +438,7 @@ Providers with their name and URL are configured using an XML file. The filename
 </providers>
 ----
 
+[[configuration-file-notices]]
 === Notices
 
 Notices are pieces that a license requires to be published with a software that uses a third-party software under this license.
@@ -460,6 +464,7 @@ Notices are pieces that a license requires to be published with a software that 
 Each notice should be given as a `notice` element. Also different versions of a license should be given as separate `notice` element.
  The `id` attribute of `notice` is mandatory, it is used to refer to the notice from licenses (in the licenses XML file) and checked archives (in the checked archives CSV file).
 
+[[configuration-file-checked-archives]]
 === Checked archives
 
 Here, archives that have no license detected automatically can be assigned a licenses that has been checked manually.
@@ -511,6 +516,8 @@ Empty lines and lines starting with '#' are ignored.
 
 WARNING: Note that ',' is not an allowed character in regular expressions, since it is used as a separation character for the CSV parsing, and it cannot be quoted at the moment.
 
+
+[[configuration-file-license-url-mapping]]
 === License URL mapping
 
 In some places licenses are usually given by URL, not by license name (this can be the case in `MANIFEST.MF`, `pom.xml` and `package.json` files). The URL mapping maps these URLs (and, actually, other fancy names used) to internal license names (SPDX identifiers).
@@ -533,6 +540,7 @@ Empty lines and lines starting with '#' are ignored.
 
 NOTE: From the file, lines are split by the character ','. The first column is the URL that should be mapped. The second and any further columns are license identifiers. Note that this way, an URL can be mapped to multiple licenses.
 
+[[configuration-file-license-name-mapping]]
 === License name mapping
 
 In some places licenses are given by their name. This includes `pom.xml` files, NPM `package.json` files, and in some cases `MANIFEST.MF` files. The name mapping maps these names to internal license names (SPDX identifiers).
@@ -554,6 +562,8 @@ Empty lines and lines starting with '#' are ignored.
 
 From the file, lines are split by the character ','. The first column is the name that should be mapped. The second and any further columns are license identifiers. Note that this way, a name can be mapped to multiple licenses.
 
+
+[[configuration-file-global-filters]]
 === Global filters
 
 Archives matching a global filter are removed from the output list completely.
@@ -575,6 +585,7 @@ Empty lines and lines starting with '#' are ignored.
 
 NOTE: unlike the checked archives file, here ',' is an allowed character in regular expressions, since here not splitting by that character is done.
 
+[[configuration-file-vendor-names]]
 === Vendor names
 
 If vendor names are given, archives are checked if their vendor name (retrieved from `MANIFEST.MF` `Bundle-Vendor`, POM file or NPM `package.json` `Vendor`) matches exactly. If yes, the archive is removed from the result list.
