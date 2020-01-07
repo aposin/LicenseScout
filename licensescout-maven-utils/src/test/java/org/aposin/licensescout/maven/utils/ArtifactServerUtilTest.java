@@ -128,7 +128,7 @@ public class ArtifactServerUtilTest {
     }
 
     /**
-     * @return
+     * @return an artifact server helper object for testing
      */
     private IArtifactServerUtil createArtifactServerUtil() {
         final int timeout = 400;

@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.aposin.licensescout.archive.Archive;
 import org.aposin.licensescout.license.IArtifactServerUtil;
 import org.aposin.licensescout.license.License;
@@ -44,8 +45,8 @@ public abstract class AbstractJavaFinder extends AbstractFinder {
 
     /**
      * Constructor.
-     * @param licenseStoreData 
-     * @param artifactServerUtil 
+     * @param licenseStoreData the data object containing information on licenses
+     * @param artifactServerUtil a helper object for accessing artifact servers
      * @param log the logger 
      */
     public AbstractJavaFinder(final LicenseStoreData licenseStoreData, final IArtifactServerUtil artifactServerUtil,
@@ -78,6 +79,14 @@ public abstract class AbstractJavaFinder extends AbstractFinder {
                 && !fileNameLowerCase.endsWith(".class");
     }
 
+    /**
+     * Adds license information from a POM file.
+     * 
+     * @param entryContainer an entry container representing the POM file
+     * @param archive the archive object to add the license information to
+     * @param filePath the symbolic path of the POM file (used for information only)
+     * @throws IOException
+     */
     protected void addLicensesFromPom(final EntryContainer entryContainer, final Archive archive, final String filePath)
             throws IOException {
         try (final InputStream inputStream = entryContainer.getInputStream()) {
@@ -85,6 +94,15 @@ public abstract class AbstractJavaFinder extends AbstractFinder {
         }
     }
 
+    /**
+     * Processes a packed archive (an uncompressed JAR file).
+     * 
+     * @param archive archive object to add the license information to
+     * @param fileInputStream input stream to read the JAR file
+     * @param parent the parent (in a file system hierarchy) that contains the JAR file
+     * @param filePath the symbolic path of the JAR file (for information only)
+     * @throws Exception
+     */
     protected void parsePackedJarArchive(final Archive archive, final InputStream fileInputStream, final File parent,
                                          final String filePath)
             throws Exception {
@@ -126,6 +144,18 @@ public abstract class AbstractJavaFinder extends AbstractFinder {
         }
     }
 
+    /**
+     * Processes a normal file (not an archive and not a normal directory).
+     * 
+     * <p>The files this method is called for a are checked if they are candidates for files containing license information.
+     * If so, they are scanned further.</p>
+     * 
+     * @param archive an archive object
+     * @param entryName the entry name of the file to check
+     * @param entryContainer the corresponding entry container
+     * @param filePath the symbolic path of the file (for information only)
+     * @throws IOException
+     */
     protected void handleArchiveNormalFile(final Archive archive, final String entryName,
                                            final EntryContainer entryContainer, final String filePath)
             throws IOException {
@@ -141,6 +171,16 @@ public abstract class AbstractJavaFinder extends AbstractFinder {
         }
     }
 
+    /**
+     * Creates an archive object and adds it to the list of found archives.
+     * 
+     * @param fileName a filename
+     * @param versionParam a version number string (may be null or empty)
+     * @param filePath the symbolic path of the archive file (for information only, may be null)
+     * @return the created archive object
+     * 
+     * @see #addToArchiveFiles(Archive)
+     */
     protected Archive createAndAddArchive(final String fileName, final String versionParam, final String filePath) {
         final String version = getVersionNotNull(versionParam);
         final Archive foundArchive = new Archive(JAVA, fileName, version, filePath);
@@ -148,6 +188,11 @@ public abstract class AbstractJavaFinder extends AbstractFinder {
         return foundArchive;
     }
 
+    /**
+     * Obtains the last part of a path name.
+     * @param entryName a path name
+     * @return the last part of a path name if the passed name contains '/', otherwise the passed name
+     */
     protected String getSimpleName(final String entryName) {
         final int pos = entryName.lastIndexOf('/');
         if (pos >= 0) {
@@ -156,6 +201,15 @@ public abstract class AbstractJavaFinder extends AbstractFinder {
         return entryName;
     }
 
+    /**
+     * Adds a message digest computed over an entry container to an archive object.
+     * 
+     * @param <C> the type of entry container
+     * @param finderHandler a finder handler
+     * @param entryContainer the entry container to use for computing the message digest
+     * @param archive an archive object
+     * @throws IOException
+     */
     protected <C extends EntryContainer> void addMessageDigest(final FinderHandler<?, C, ?> finderHandler,
                                                                final C entryContainer, final Archive archive)
             throws IOException {
@@ -163,13 +217,23 @@ public abstract class AbstractJavaFinder extends AbstractFinder {
         archive.setMessageDigest(md);
     }
 
+    /**
+     * Converts a version of null to an empty string.
+     * 
+     * @param version a version string or null
+     * @return a non empty string
+     */
     protected String getVersionNotNull(String version) {
-        if (version == null) {
-            return "";
-        }
-        return version;
+        return StringUtils.defaultString(version);
     }
 
+    /**
+     * Adds license information from a MANIFEST.MF.
+     * 
+     * @param archive an archive object
+     * @param archiveMetaInformation an object containing meta data from the MANIFEST.MF file
+     * @param filePath the symbolic path of the manifest file (used for information only)
+     */
     protected void addLicenseFromManifest(final Archive archive, final ArchiveMetaInformation archiveMetaInformation,
                                           final String filePath) {
         String licenseUrl = archiveMetaInformation.getLicenseUrl();
@@ -189,6 +253,11 @@ public abstract class AbstractJavaFinder extends AbstractFinder {
         }
     }
 
+    /**
+     * Checks if a filename represents a POM file.
+     * @param name a filename
+     * @return true if the name represents a POM file (detected from the name only), false otherwise
+     */
     protected boolean isPomFile(final String name) {
         return name.endsWith("pom.xml");
     }

@@ -50,7 +50,7 @@ public class FinderFactory {
     /**
      * Creates a finder instance for a specific ArchiveType.
      * @param executionParameters
-     * @param licenseStoreData
+     * @param licenseStoreData the data object containing information on licenses
      * @param finderParameters
      * @return a finder instance
      * @throws LicenseScoutExecutionException if there is no finder class for the archive type

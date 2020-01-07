@@ -80,8 +80,8 @@ public class Providers {
     /**
      * Reads providers from an XML file.
      * 
-     * @param inputStream
-     * @param validateXml true if the provider XML file should be validated, false otherwise
+     * @param inputStream an input stream to read the file contents from
+     * @param validateXml true if the XML content read should be validated, false otherwise
      * @param log the logger
      * @throws IOException
      * @throws SAXException 

@@ -54,7 +54,7 @@ public class JavascriptNpmFinder extends AbstractFinder {
     /**
      * Constructor.
      * 
-     * @param licenseStoreData 
+     * @param licenseStoreData the data object containing information on licenses
      * @param log the logger
      * @param npmExcludedDirectoryNames list of directory names to ignore in scan of NPM directory
      */

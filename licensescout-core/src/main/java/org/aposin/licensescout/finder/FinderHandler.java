@@ -20,6 +20,20 @@ import java.io.IOException;
 import org.aposin.licensescout.model.LSMessageDigest;
 import org.aposin.licensescout.util.ArchiveMetaInformation;
 
+/**
+ * A handler abstracting an underlying hierarchical storage for file-like objects.
+ * 
+ * <p>This interface is used to use common code for handling normal file systems and entries read from a JAR file.</p>
+ * <p>Related to this interface is the interface {@link EntryContainer}, which represents the contents of a single file-like object.</p>
+ * 
+ * @param <F> type of the entry object (used for detection of file/directory nature)
+ * @param <C> type of entry container objects
+ * @param <I> type of the entry object (used for creation of entry container objects)
+ * 
+ * @see EntryContainer
+ * @see FilesystemFinderHandler
+ * @see JarFinderHandler
+ */
 public interface FinderHandler<F, C extends EntryContainer, I> {
 
     /**
@@ -29,16 +43,50 @@ public interface FinderHandler<F, C extends EntryContainer, I> {
      */
     public boolean isUseDirectoryRecursion();
 
+    /**
+     * Obtains the entry name from an entry object.
+     * @param entry an entry object
+     * @return the entry name
+     */
     public String getEntryName(F entry);
 
+    /**
+     * Checks if an entry object represents a file.
+     * @param file an entry object
+     * @return true if the entry object represents a file, false otherwise
+     */
     public boolean isFile(F file);
 
+    /**
+     * Checks if an entry object represents a directory.
+     * @param file an entry object
+     * @return true if the entry object represents a directory, false otherwise
+     */
     public boolean isDirectory(F file);
 
+    /**
+     * Creates an entry container object from an entry object.
+     * 
+     * @param ecBase the object the entry container is based on. Note that this is a File object in case of a file system handler or an InputStream in case of a JAR handler.
+     * @return an entry container object
+     * @throws IOException
+     */
     public C createEntryContainer(I ecBase) throws IOException;
 
+    /**
+     * Obtains information from the MANIFEST.MF of an entry container.
+     * @param entryContainer
+     * @return an object containing meta data from the MANIFEST.MF
+     * @throws IOException
+     */
     public ArchiveMetaInformation getArchiveMetaInformationFromManifest(C entryContainer) throws IOException;
 
+    /**
+     * Calculates the message digest for an entry container.
+     * @param entryContainer
+     * @return a message digest object
+     * @throws IOException
+     */
     public LSMessageDigest calculateMessageDigest(C entryContainer) throws IOException;
 
 }

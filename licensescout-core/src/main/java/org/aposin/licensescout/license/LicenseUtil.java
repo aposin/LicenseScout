@@ -80,7 +80,7 @@ public class LicenseUtil {
      * ---
      * 
      * @param reader text input
-     * @param licenseStoreData 
+     * @param licenseStoreData the data object containing information on licenses
      * @return the license or an empty collection if none was detected
      * @throws IOException signals that an I/O exception has occurred
      */
@@ -242,7 +242,7 @@ public class LicenseUtil {
      * 
      * @param checkedArchives information on archives with manually assigned licenses
      * @param archives collection of archives to process
-     * @param licenseStoreData 
+     * @param licenseStoreData the data object containing information on licenses
      * @see #evaluateLicenses(LicenseCheckedList, Archive, LicenseStoreData)
      * 
      * @see DetectionStatus
@@ -260,7 +260,7 @@ public class LicenseUtil {
      * 
      * @param licenseCheckedList information on archives with manually assigned licenses
      * @param archive the archive to evaluate
-     * @param licenseStoreData 
+     * @param licenseStoreData the data object containing information on licenses
      * 
      * @see DetectionStatus
      * @see LegalStatus
@@ -513,7 +513,7 @@ public class LicenseUtil {
      * Obtains licenses from the license name mapping.
      * 
      * @param npmLicenseName a license name
-     * @param licenseStoreData 
+     * @param licenseStoreData the data object containing information on licenses
      * @return a list of licenses for the name. An empty list if the license could not be mapped.
      */
     public static List<License> mapNpmLicenseName(final String npmLicenseName,
@@ -535,7 +535,7 @@ public class LicenseUtil {
      * @param licenseUrl a license URL
      * @param archive an archive
      * @param licenseFileName the file name to record as the file the license is found in
-     * @param licenseStoreData the license store
+     * @param licenseStoreData the data object containing information on licenses
      * @param log a logger
      * @return true if licenses have been added to the archive, false otherwise
      */
@@ -566,7 +566,7 @@ public class LicenseUtil {
      * @param licenseName a license name
      * @param archive an archive
      * @param licenseFileName the file name to record as the file the license is found in
-     * @param licenseStoreData the license store
+     * @param licenseStoreData the data object containing information on licenses
      * @param log a logger
      * @return true if licenses have been added to the archive, false otherwise
      */

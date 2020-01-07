@@ -22,8 +22,14 @@ import org.aposin.licensescout.model.LSMessageDigest;
 import org.aposin.licensescout.util.CryptUtil;
 import org.aposin.licensescout.util.ILFLog;
 
-public abstract class AbstractFinderHandler<F, C extends EntryContainer, I>
-        implements FinderHandler<F, C, I> {
+/**
+ * Base class for implementations of finder handlers.
+ *
+ * @param <F> type of the entry object (used for detection of file/directory nature)
+ * @param <C> type of entry container objects
+ * @param <I> type of the entry object (used for creation of entry container objects)
+ */
+public abstract class AbstractFinderHandler<F, C extends EntryContainer, I> implements FinderHandler<F, C, I> {
 
     private final ILFLog log;
 

@@ -48,7 +48,7 @@ public class DatabaseUtil {
      * 
      * <p>This method is intended for debugging if JDBC drivers are not loaded as expected.</p>
      * 
-     * @param log
+     * @param log the logger the logger
      */
     public static void dumpDrivers(ILFLog log) {
         final Enumeration<Driver> registeredDrivers = DriverManager.getDrivers();

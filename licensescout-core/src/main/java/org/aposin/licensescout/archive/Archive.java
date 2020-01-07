@@ -225,7 +225,7 @@ public class Archive implements Comparable<Archive> {
     }
 
     /**
-     * @param filePath
+     * @param filePath the symbolic path of the license candidate file (for information only)
      */
     public final void addLicenseCandidateFile(final String filePath) {
         licenseCandidateFiles.add(filePath);

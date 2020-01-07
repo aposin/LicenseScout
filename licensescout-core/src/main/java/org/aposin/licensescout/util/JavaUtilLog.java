@@ -27,7 +27,8 @@ public class JavaUtilLog implements ILFLog {
     private final Logger log;
 
     /**
-     * @param log
+     * Constructor.
+     * @param log a java.util logger
      */
     public JavaUtilLog(final Logger log) {
         this.log = log;

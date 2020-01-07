@@ -232,7 +232,7 @@ public class Executor {
     }
 
     /**
-     * @param log
+     * @param log the logger
      */
     private void prepareOutput(final ILFLog log) {
         MiscUtil.createDirectoryIfNotExists(getExecutionParameters().getOutputDirectory(), getLog());
@@ -377,7 +377,7 @@ public class Executor {
     }
 
     /**
-     * @param log
+     * @param log the logger
      * @param outputResult
      * @param reportConfiguration
      * @throws Exception
@@ -450,11 +450,10 @@ public class Executor {
     }
 
     /**
-     * @param notices 
+     * @param notices the data object containing information on notices
      * @param log the logger
      * @return a license store data object
      * @throws LicenseScoutExecutionException 
-     * @throws LicenseScoutExecutionException
      */
     private LicenseStoreData init(final Notices notices, final ILFLog log) throws LicenseScoutExecutionException {
 
@@ -469,7 +468,7 @@ public class Executor {
 
     /**
      * @param log the logger
-     * @param licenseStoreData
+     * @param licenseStoreData the data object containing information on licenses
      * @return a list of licenses that should not appear in cleaned output
      */
     protected List<License> createCleanOutputLicenseList(final ILFLog log, final LicenseStoreData licenseStoreData) {
@@ -509,7 +508,7 @@ public class Executor {
     }
 
     /**
-     * @param licenseStoreData
+     * @param licenseStoreData the data object containing information on licenses
      * @param log the logger
      * @throws LicenseScoutExecutionException
      */
@@ -525,7 +524,7 @@ public class Executor {
     }
 
     /**
-     * @param licenseStoreData
+     * @param licenseStoreData the data object containing information on licenses
      * @param log the logger
      * @throws LicenseScoutExecutionException
      */
@@ -558,7 +557,7 @@ public class Executor {
     }
 
     /**
-     * @param notices 
+     * @param notices the data object containing information on notices
      * @param log the logger
      * @return a license store data object
      * @throws LicenseScoutExecutionException 
@@ -623,9 +622,9 @@ public class Executor {
     }
 
     /**
-     * @param licenseStoreData
-     * @param notices 
-     * @param providers 
+     * @param licenseStoreData the data object containing information on licenses
+     * @param notices the data object containing information on notices
+     * @param providers the data object containing information on providers
      * @param log the logger
      * @return an object containing information on manually checked archives
      * @throws LicenseScoutExecutionException
@@ -669,7 +668,7 @@ public class Executor {
     /**
      * Reads a CSV file containing vendor names to filter out.
      * 
-     * @param inputStream an input stream
+     * @param inputStream an input stream to read the file contents from
      * @param log the logger
      * @return a list of strings
      * @throws IOException if an error occurred while reading from the file

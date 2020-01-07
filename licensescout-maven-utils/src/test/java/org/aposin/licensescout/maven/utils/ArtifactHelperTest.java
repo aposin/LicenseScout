@@ -81,7 +81,7 @@ public class ArtifactHelperTest {
 
     /**
      * @param artifactItem
-     * @return
+     * @return a file object representing the artifact in the local repository
      * @throws MojoExecutionException
      */
     private File callGetArtifactFile(ArtifactItem artifactItem) throws MojoExecutionException {

@@ -142,10 +142,12 @@ public class TxtExporter extends AbstractVelocityExporter {
     }
 
     /**
-     * @param archiveFiles
-     * @return 
+     * Collects notices from a list of archive objects.
+     * 
+     * @param archiveFiles a list of archive objects
+     * @return a list of notices used by the passed archive objects
      */
-    private List<Notice> collectNotices(final List<Archive> archiveFiles) {
+    private static List<Notice> collectNotices(final List<Archive> archiveFiles) {
         final List<Notice> usedNotices = new ArrayList<>();
         for (final Archive archive : archiveFiles) {
             final Notice notice = archive.getNotice();
@@ -159,10 +161,10 @@ public class TxtExporter extends AbstractVelocityExporter {
     }
 
     /**
-     * @param usedNotices
-     * @param notice
+     * @param usedNotices collection of used notices
+     * @param notice a notice to add to the used notices
      */
-    private void addNotice(final List<Notice> usedNotices, final Notice notice) {
+    private static void addNotice(final List<Notice> usedNotices, final Notice notice) {
         if (notice != null && !usedNotices.contains(notice)) {
             usedNotices.add(notice);
         }

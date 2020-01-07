@@ -23,6 +23,8 @@ import java.io.InputStream;
  * 
  * <p>This is used to handle files from traversing the file system and entries from reading
  * a JAR file in the same abstract way.</p>
+ * 
+ * @see FinderHandler
  */
 @FunctionalInterface
 public interface EntryContainer {

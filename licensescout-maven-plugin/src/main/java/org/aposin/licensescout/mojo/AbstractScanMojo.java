@@ -422,9 +422,9 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
      * The Maven settings.
      * @since 1.4
      */
-    @Parameter( defaultValue = "${settings}", readonly = true )
+    @Parameter(defaultValue = "${settings}", readonly = true)
     private Settings mavenSettings;
-    
+
     /**
      * The Maven project helper.
      */
@@ -505,7 +505,7 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
 
     /**
      * @param executionParameters
-     * @param log
+     * @param log the logger
      */
     private void attachReports(final ExecutionParameters executionParameters, final ILFLog log) {
         if (attachReports) {
@@ -796,7 +796,11 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
     }
 
     /**
-     * @return
+     * Obtains an artifact description for use in an attach operation.
+     * 
+     * <p>The returned object has group ID, artifact ID, version and type set from the current project. 
+     * The classifier is set from the Maven parameter {@link #attachReportsClassifier}.</p>
+     * @return an artifact description to attach
      */
     private LSArtifact getAttachArtifact() {
         final Artifact artifact = mavenProject.getArtifact();

@@ -161,9 +161,9 @@ public class LicenseStoreData {
 
     /**
      * Reads known licenses from an XML file.
-     * @param inputStream 
-     * @param notices 
-     * @param validateXml true if the license XML file should be validated, false otherwise
+     * @param inputStream an input stream to read the file contents from
+     * @param notices the data object containing information on notices
+     * @param validateXml true if the XML content read should be validated, false otherwise
      * @param log the logger
      * @throws IOException
      * @throws SAXException 
@@ -193,7 +193,7 @@ public class LicenseStoreData {
     /**
      * Reads license URL mappings from a CSV file.
      * 
-     * @param inputStream
+     * @param inputStream an input stream to read the file contents from
      * @param log the logger
      * @throws IOException
      */
@@ -228,7 +228,7 @@ public class LicenseStoreData {
     /**
      * Reads license name mappings from a CSV file.
      * 
-     * @param inputStream
+     * @param inputStream an input stream to read the file contents from
      * @param log the logger
      * @throws IOException
      */
@@ -298,7 +298,7 @@ public class LicenseStoreData {
 
         /**
          * Constructor.
-         * @param notices 
+         * @param notices the data object containing information on notices
          * @param log the logger
          */
         public LicenseSaxHandler(final Notices notices, final ILFLog log) {

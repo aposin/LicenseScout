@@ -57,7 +57,7 @@ public class DatabaseWriter {
      * @param buildInfo contains general information on the LicenseScout run
      * @param archives the list of detected archives
      * @param databaseConfiguration the database configuration (URL, user name, ...)
-     * @param log the log
+     * @param log the logger
      */
     public static void writeToDatabase(final BuildInfo buildInfo, final List<Archive> archives,
                                        final ExecutionDatabaseConfiguration databaseConfiguration, final ILFLog log) {

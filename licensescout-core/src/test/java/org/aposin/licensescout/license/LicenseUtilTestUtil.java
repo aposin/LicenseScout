@@ -54,8 +54,8 @@ public class LicenseUtilTestUtil {
     }
 
     /**
-     * @param licenseStoreData
-     * @return an object containing checkd archives information
+     * @param licenseStoreData the data object containing information on licenses
+     * @return an object containing checked archives information
      * @throws IOException
      */
     public static LicenseCheckedList createLicenseCheckedList(final LicenseStoreData licenseStoreData)
@@ -70,7 +70,7 @@ public class LicenseUtilTestUtil {
 
     /**
      * @param licenseIdentifiers list of SPDX identifiers - may be empty
-     * @param licenseStoreData
+     * @param licenseStoreData the data object containing information on licenses
      * @return a list of licenses, maybe empty
      */
     public static List<License> createLicenseList(final String[] licenseIdentifiers,

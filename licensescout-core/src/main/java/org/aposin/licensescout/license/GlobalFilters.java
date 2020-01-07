@@ -50,7 +50,7 @@ public class GlobalFilters {
     /**
      * Reads global filters from a file.
      * 
-     * @param inputStream an input stream
+     * @param inputStream an input stream to read the file contents from
      * @throws IOException if an error occurs
      */
     public void read(final InputStream inputStream) throws IOException {

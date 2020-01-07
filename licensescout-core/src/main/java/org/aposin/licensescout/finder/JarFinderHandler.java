@@ -25,6 +25,10 @@ import org.aposin.licensescout.util.ArchiveMetaInformation;
 import org.aposin.licensescout.util.ILFLog;
 import org.aposin.licensescout.util.JarUtil;
 
+/**
+ * Handler for JAR files.
+ *
+ */
 public class JarFinderHandler extends AbstractFinderHandler<JarEntry, JarEntryContainer, JarInputStream> {
 
     /**

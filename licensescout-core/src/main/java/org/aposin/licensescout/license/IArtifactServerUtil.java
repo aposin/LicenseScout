@@ -37,8 +37,8 @@ public interface IArtifactServerUtil {
      * 
      * @param inputStream input source of the POM file
      * @param archive the archive to add the licenses to
-     * @param filePath path of the POM file (for information only)
-     * @param licenseStoreData the license data object
+     * @param filePath the symbolic path of the POM file (for information only)
+     * @param licenseStoreData the data object containing information on licenses
      * @return true if one or more licenses have been added, false otherwise
      */
     boolean addLicensesFromPom(InputStream inputStream, Archive archive, String filePath,

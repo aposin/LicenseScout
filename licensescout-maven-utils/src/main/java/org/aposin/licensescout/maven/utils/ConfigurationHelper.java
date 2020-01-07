@@ -118,7 +118,7 @@ public class ConfigurationHelper {
      * @param output
      * @param artifactBaseUrl 
      * @param reportProtoTypeArtifact 
-     * @return
+     * @return a string containing the URL of an artifact on the artifact server
      */
     private static String getArtifactUrl(final Output output, final String artifactBaseUrl,
                                          final LSArtifact reportProtoTypeArtifact) {

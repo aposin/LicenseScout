@@ -33,7 +33,7 @@ public class VendorArchiveListFilter extends SimpleArchiveListFilter {
 
     /**
      * @param filteredVendorNames 
-     * @param log
+     * @param log the logger
      * @param filterActive true if the filter should be active, false otherwise
      */
     public VendorArchiveListFilter(final List<String> filteredVendorNames, final ILFLog log,

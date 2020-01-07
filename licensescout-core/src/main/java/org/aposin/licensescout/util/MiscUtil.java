@@ -64,7 +64,7 @@ public class MiscUtil {
 
     /**
      * @param directory
-     * @param log 
+     * @param log the logger
      */
     public static void createDirectoryIfNotExists(final File directory, final ILFLog log) {
         if (!directory.exists()) {

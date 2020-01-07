@@ -135,7 +135,8 @@ public class DatabaseWriterTest extends DBTestCase {
     }
 
     /**
-     * @return
+     * Creates a build info object for testing.
+     * @return a build info object
      */
     private BuildInfo createBuildInformation() {
         final BuildInfo buildInfo = new BuildInfo("name", "version", "date", "buildUrl", "licenseReportCsvUrl",
@@ -144,8 +145,8 @@ public class DatabaseWriterTest extends DBTestCase {
     }
 
     /**
-     * @param licenseStoreData
-     * @return
+     * @param licenseStoreData the data object containing information on licenses
+     * @return an archive object for testing
      */
     private Archive createArchive1(final LicenseStoreData licenseStoreData) {
         final Archive archive = new Archive(ArchiveType.JAVA, "fileName1", "version1", "path1");
@@ -160,7 +161,7 @@ public class DatabaseWriterTest extends DBTestCase {
     }
 
     /**
-     * @return
+     * @return an archive object for testing
      */
     private Archive createArchive2() {
         final Archive archive = new Archive(ArchiveType.JAVA, "fileName2", "version2", "path2");

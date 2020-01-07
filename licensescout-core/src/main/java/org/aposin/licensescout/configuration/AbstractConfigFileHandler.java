@@ -29,7 +29,7 @@ public abstract class AbstractConfigFileHandler implements ConfigFileHandler {
      * Constructor.
      * 
      * @param configFileParameters
-     * @param log 
+     * @param log the logger
      */
     protected AbstractConfigFileHandler(final ConfigFileParameters configFileParameters, final ILFLog log) {
         this.configFileParameters = configFileParameters;

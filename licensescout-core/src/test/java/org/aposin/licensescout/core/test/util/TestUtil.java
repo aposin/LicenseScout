@@ -47,7 +47,7 @@ public abstract class TestUtil {
 
     /**
      * Reads LicenseStoreData from a file for testing.
-     * @param log
+     * @param log the logger
      * @return a LicenseStoreData for testing
      * @throws Exception
      */

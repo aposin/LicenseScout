@@ -38,7 +38,7 @@ public class ZipConfigFileHandler extends AbstractConfigFileHandler {
      * Constructor.
      * @param artifactFile
      * @param configFileParameters
-     * @param log 
+     * @param log the logger
      */
     public ZipConfigFileHandler(File artifactFile, ConfigFileParameters configFileParameters, final ILFLog log) {
         super(configFileParameters, log);

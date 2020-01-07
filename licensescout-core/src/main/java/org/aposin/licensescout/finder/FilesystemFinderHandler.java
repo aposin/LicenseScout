@@ -22,6 +22,10 @@ import org.aposin.licensescout.util.ArchiveMetaInformation;
 import org.aposin.licensescout.util.ILFLog;
 import org.aposin.licensescout.util.JarUtil;
 
+/**
+ * Handler for file system.
+ *
+ */
 public class FilesystemFinderHandler extends AbstractFinderHandler<File, FileSystemEntryContainer, File> {
 
     /**

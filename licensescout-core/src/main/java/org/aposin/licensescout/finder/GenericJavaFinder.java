@@ -22,7 +22,7 @@ import org.aposin.licensescout.license.LicenseStoreData;
 import org.aposin.licensescout.util.ILFLog;
 
 /**
- * TODO: DOC
+ * Unfinished skeleton for a new Finder that processes JAR files, but the collection is based on a Maven dependency tree.
  */
 public class GenericJavaFinder extends AbstractJavaFinder {
 
@@ -30,8 +30,8 @@ public class GenericJavaFinder extends AbstractJavaFinder {
 
     /**
      * Constructor.
-     * @param licenseStoreData 
-     * @param artifactServerUtil 
+     * @param licenseStoreData the data object containing information on licenses
+     * @param artifactServerUtil a helper object for accessing artifact servers
      * @param log the logger 
      */
     public GenericJavaFinder(final LicenseStoreData licenseStoreData, final IArtifactServerUtil artifactServerUtil,

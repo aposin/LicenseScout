@@ -98,10 +98,10 @@ public class LicenseCheckedList {
     /**
      * Reads a CSV file containing checked archives.
      * 
-     * @param inputStream a filename of the file to read
-     * @param licenseStoreData 
-     * @param providers 
-     * @param notices 
+     * @param inputStream an input stream to read the file contents from
+     * @param licenseStoreData the data object containing information on licenses
+     * @param providers the data object containing information on providers
+     * @param notices the data object containing information on notices
      * @param log the logger
      * @throws IOException if an error occurred while reading from the file
      */
@@ -175,10 +175,10 @@ public class LicenseCheckedList {
      * Note: currently not used.
      * 
      * @param file a filename of the file to read
-     * @param licenseStoreData 
-     * @param notices 
-     * @param providers 
-     * @param validateXml 
+     * @param licenseStoreData the data object containing information on licenses
+     * @param notices the data object containing information on notices
+     * @param providers the data object containing information on providers
+     * @param validateXml true if the XML content read should be validated, false otherwise
      * @param log the logger
      * @throws IOException if an error occurred while reading from the file
      * @throws ParserConfigurationException 
@@ -198,13 +198,13 @@ public class LicenseCheckedList {
     }
 
     /**
-     * @param licenseStoreData
-     * @param log
-     * @param values
-     * @param documentationUrl 
-     * @param notice 
-     * @param provider 
-     * @return a result object
+     * @param licenseStoreData the data object containing information on licenses
+     * @param log the logger
+     * @param values a list of license identifiers to add to the result object
+     * @param documentationUrl an URL to add to the result object as a link to license documentation (may be empty)
+     * @param notice a notice object
+     * @param provider a provider object
+     * @return a license result object
      */
     private LicenseResult fetchLicenseResult(final LicenseStoreData licenseStoreData, final ILFLog log,
                                              final String[] values, final String documentationUrl, final Notice notice,
@@ -430,9 +430,9 @@ public class LicenseCheckedList {
 
         /**
          * Constructor.
-         * @param licenseStoreData 
-         * @param notices 
-         * @param providers 
+         * @param licenseStoreData the data object containing information on licenses
+         * @param notices the data object containing information on notices
+         * @param providers the data object containing information on providers
          * @param log the logger
          */
         public ArchiveSaxHandler(final LicenseStoreData licenseStoreData, final Notices notices,

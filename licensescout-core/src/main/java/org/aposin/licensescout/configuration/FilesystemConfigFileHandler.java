@@ -30,7 +30,7 @@ public class FilesystemConfigFileHandler extends AbstractConfigFileHandler {
      * Constructor.
      * 
      * @param configFileParameters
-     * @param log 
+     * @param log the logger
      */
     public FilesystemConfigFileHandler(ConfigFileParameters configFileParameters, final ILFLog log) {
         super(configFileParameters, log);

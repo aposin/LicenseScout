@@ -53,14 +53,16 @@ public class JavaJarFinder extends AbstractJavaFinder {
 
     private final List<String> specialArchiveNames = new ArrayList<>();
     private final FinderHandler<File, FileSystemEntryContainer, File> fileSystemFinderHandler;
+
     /**
      * Constructor.
      * 
-     * @param licenseStoreData
-     * @param artifactServerUtil 
+     * @param licenseStoreData the data object containing information on licenses
+     * @param artifactServerUtil a helper object for accessing artifact servers
      * @param log the logger
      */
-    public JavaJarFinder(final LicenseStoreData licenseStoreData, final IArtifactServerUtil artifactServerUtil, final ILFLog log) {
+    public JavaJarFinder(final LicenseStoreData licenseStoreData, final IArtifactServerUtil artifactServerUtil,
+            final ILFLog log) {
         super(licenseStoreData, artifactServerUtil, log);
         fileSystemFinderHandler = new FilesystemFinderHandler(log);
 
@@ -86,7 +88,7 @@ public class JavaJarFinder extends AbstractJavaFinder {
      * {@link #parseUnpackedJarArchive(Archive, File, String)}.</p>
      * 
      * @param file
-     * @param filePath
+     * @param filePath the symbolic path of the JAR file (for information only)
      * 
      * @throws Exception
      */

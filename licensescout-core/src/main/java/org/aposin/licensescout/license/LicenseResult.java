@@ -21,7 +21,7 @@ import org.aposin.licensescout.model.Notice;
 import org.aposin.licensescout.model.Provider;
 
 /**
- * Container for licenseinformation associated with an exception matched to an archive.
+ * Container for license information associated with an exception matched to an archive.
  * 
  * <p>Contains:</p>
  * <ul>
@@ -42,9 +42,9 @@ public class LicenseResult {
     /**
      * Constructor.
      * @param licenses list of licenses (may be empty, but should not be null)
-     * @param documentationUrl an URL to a documentation (may be empty)
-     * @param notice  (may be null)
-     * @param provider (may be null)
+     * @param documentationUrl an URL to add to the result object as a link to license documentation (may be empty)
+     * @param notice a notice (may be null)
+     * @param provider a provider (may be null)
      */
     public LicenseResult(final List<License> licenses, final String documentationUrl, final Notice notice,
             final Provider provider) {

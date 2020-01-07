@@ -44,7 +44,7 @@ public class AlarmWriter {
      * @param buildInfo
      * @param alarms list of alarm objects
      * @param databaseConfiguration
-     * @param log
+     * @param log the logger
      */
     public static void writeAlarms(final BuildInfo buildInfo, final List<Alarm> alarms,
                                    final ExecutionDatabaseConfiguration databaseConfiguration, final ILFLog log) {
