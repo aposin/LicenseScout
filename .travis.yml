@@ -4,8 +4,9 @@ jdk:
 env:
   matrix:
     - TYPE=test
-    - TYPE=check
+    - TYPE=headercheck
     - TYPE=integrationtest
+    - TYPE=licensecheck
 
 cache:
   directories:
@@ -17,11 +18,14 @@ before_install:
 script:
   - if [[ $TYPE == test ]]; then
       mvn -Pci-modules clean install;
-    elif [[ $TYPE == check ]]; then
+    elif [[ $TYPE == headercheck ]]; then
       mvn -Plicense-header-modules license:check;
     elif [[ $TYPE == integrationtest ]]; then
       mvn -Pci-for-it-modules clean install;
       mvn -DskipTests=true -Prun-its,it-modules verify;
+    elif [[ $TYPE == licensecheck ]]; then
+      mvn -DskipTests=true -Pci-for-it-modules clean install;
+      mvn -f ../org.aposin.licensescout.licensereport verify;
     else
       echo "$TYPE type not recognized";
       exit 1;
