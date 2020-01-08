@@ -47,7 +47,7 @@ import org.aposin.licensescout.maven.utils.IRepositoryParameters;
 import org.aposin.licensescout.maven.utils.MavenLog;
 import org.aposin.licensescout.report.exporter.DoxiaReportExporterFactory;
 import org.aposin.licensescout.report.exporter.ISinkProvider;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -318,7 +318,7 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
      */
     @Override
     protected void executeReport(Locale locale) throws MavenReportException {
-        final ILFLog log = new MavenLog(getLog());
+        final ILSLog log = new MavenLog(getLog());
 
         if (skip) {
             log.info("Not executing because skip is configured as true.");

@@ -33,7 +33,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.aposin.licensescout.model.Notice;
 import org.aposin.licensescout.model.Notices;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 import org.aposin.licensescout.util.sax.AbstractSaxHandler;
 import org.aposin.licensescout.util.sax.IElementHandler;
 import org.aposin.licensescout.util.sax.NopElementHandler;
@@ -48,8 +48,8 @@ import org.xml.sax.XMLReader;
  * <p>Initialisation:</p>
  * <ol>
  * <li>Create an instance</li>
- * <li>Call {@link #readLicenses(InputStream, Notices, boolean, ILFLog)} to read in the licenses from a file</li>
- * <li>Call {@link #readNameMappings(InputStream, ILFLog)} and {@link #readUrlMappings(InputStream, ILFLog)}</li>
+ * <li>Call {@link #readLicenses(InputStream, Notices, boolean, ILSLog)} to read in the licenses from a file</li>
+ * <li>Call {@link #readNameMappings(InputStream, ILSLog)} and {@link #readUrlMappings(InputStream, ILSLog)}</li>
  * </ol>
  */
 public class LicenseStoreData {
@@ -82,7 +82,7 @@ public class LicenseStoreData {
         // DO NOTHING
     }
 
-    private void addToSpdxAndUrlStore(final License license, final ILFLog log) {
+    private void addToSpdxAndUrlStore(final License license, final ILSLog log) {
         final String spdxIdentifier = license.getSpdxIdentifier();
         if (!StringUtils.isEmpty(spdxIdentifier)) {
             final License existingLicense = spdxStore.get(spdxIdentifier);
@@ -98,7 +98,7 @@ public class LicenseStoreData {
         }
     }
 
-    private void addToUrlStore(final String url, final License license, ILFLog log) {
+    private void addToUrlStore(final String url, final License license, ILSLog log) {
         if (!StringUtils.isEmpty(url)) {
             final License existingLicense = urlStore.get(url);
             if (existingLicense != null && !existingLicense.equals(license)) {
@@ -170,7 +170,7 @@ public class LicenseStoreData {
      * @throws ParserConfigurationException 
      */
     public void readLicenses(final InputStream inputStream, final Notices notices, boolean validateXml,
-                             final ILFLog log)
+                             final ILSLog log)
             throws IOException, ParserConfigurationException, SAXException {
 
         final SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -184,7 +184,7 @@ public class LicenseStoreData {
         addNoManualInformationLicense(log);
     }
 
-    private void addNoManualInformationLicense(final ILFLog log) {
+    private void addNoManualInformationLicense(final ILSLog log) {
         final License license = new License(LicenseSpdxIdentifier.NO_MANUAL_INFORMATION, "no manual information",
                 LegalStatus.UNKNOWN, "", "", "", "", null);
         addToSpdxAndUrlStore(license, log);
@@ -197,7 +197,7 @@ public class LicenseStoreData {
      * @param log the logger
      * @throws IOException
      */
-    public void readUrlMappings(final InputStream inputStream, final ILFLog log) throws IOException {
+    public void readUrlMappings(final InputStream inputStream, final ILSLog log) throws IOException {
         String line = "";
         final String cvsSplitBy = ",";
 
@@ -232,7 +232,7 @@ public class LicenseStoreData {
      * @param log the logger
      * @throws IOException
      */
-    public void readNameMappings(final InputStream inputStream, final ILFLog log) throws IOException {
+    public void readNameMappings(final InputStream inputStream, final ILSLog log) throws IOException {
         String line = "";
         final String cvsSplitBy = ",";
 
@@ -301,7 +301,7 @@ public class LicenseStoreData {
          * @param notices the data object containing information on notices
          * @param log the logger
          */
-        public LicenseSaxHandler(final Notices notices, final ILFLog log) {
+        public LicenseSaxHandler(final Notices notices, final ILSLog log) {
             super(log);
             this.notices = notices;
             setElementHandler(new NopElementHandler(ELEMENT_LICENSES));
@@ -447,7 +447,7 @@ public class LicenseStoreData {
              * @param log the logger
              */
             private void addToDetectionStringMap(final String detectionString, final List<License> licenses,
-                                                 final ILFLog log) {
+                                                 final ILSLog log) {
                 if (!StringUtils.isEmpty(detectionString)) {
                     if (detectionStringMap.containsKey(detectionString)) {
                         log.warn("duplicated detection string: '" + detectionString + "'");

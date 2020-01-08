@@ -20,7 +20,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 
 /**
  */
@@ -32,7 +32,7 @@ public class FilesystemConfigFileHandler extends AbstractConfigFileHandler {
      * @param configFileParameters
      * @param log the logger
      */
-    public FilesystemConfigFileHandler(ConfigFileParameters configFileParameters, final ILFLog log) {
+    public FilesystemConfigFileHandler(ConfigFileParameters configFileParameters, final ILSLog log) {
         super(configFileParameters, log);
     }
 

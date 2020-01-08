@@ -27,8 +27,7 @@ package org.aposin.licensescout.util;
  * @see JavaUtilLog
  * @see NullLog
  */
-//TODO: rename to "ILSLog"
-public interface ILFLog {
+public interface ILSLog {
 
     /**
      * Checks if logging is enabled with level DEBUG.

@@ -49,7 +49,7 @@ import org.aposin.licensescout.model.Notices;
 import org.aposin.licensescout.model.Provider;
 import org.aposin.licensescout.model.Providers;
 import org.aposin.licensescout.util.CryptUtil;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 import org.aposin.licensescout.util.sax.AbstractSaxHandler;
 import org.aposin.licensescout.util.sax.IElementHandler;
 import org.aposin.licensescout.util.sax.NopElementHandler;
@@ -106,7 +106,7 @@ public class LicenseCheckedList {
      * @throws IOException if an error occurred while reading from the file
      */
     public void readCsv(final InputStream inputStream, final LicenseStoreData licenseStoreData,
-                        final Providers providers, final Notices notices, final ILFLog log)
+                        final Providers providers, final Notices notices, final ILSLog log)
             throws IOException {
         String line = "";
         String cvsSplitBy = ",";
@@ -185,7 +185,7 @@ public class LicenseCheckedList {
      * @throws SAXException 
      */
     public void readXml(final File file, final LicenseStoreData licenseStoreData, final Notices notices,
-                        final Providers providers, boolean validateXml, final ILFLog log)
+                        final Providers providers, boolean validateXml, final ILSLog log)
             throws IOException, ParserConfigurationException, SAXException {
 
         final SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -206,7 +206,7 @@ public class LicenseCheckedList {
      * @param provider a provider object
      * @return a license result object
      */
-    private LicenseResult fetchLicenseResult(final LicenseStoreData licenseStoreData, final ILFLog log,
+    private LicenseResult fetchLicenseResult(final LicenseStoreData licenseStoreData, final ILSLog log,
                                              final String[] values, final String documentationUrl, final Notice notice,
                                              final Provider provider) {
         final int numLicenseNames = values.length - LICENSE_NAMES_OFFSET;
@@ -387,7 +387,7 @@ public class LicenseCheckedList {
         return notices.getNoticeByIdentifier(noticeId);
     }
 
-    private static Provider getProviderFromId(final Providers providers, final String providerId, final ILFLog log,
+    private static Provider getProviderFromId(final Providers providers, final String providerId, final ILSLog log,
                                               final Supplier<String> context) {
         final Provider provider = providers.getProviderByIdentifier(providerId);
         if (provider == null) {
@@ -436,7 +436,7 @@ public class LicenseCheckedList {
          * @param log the logger
          */
         public ArchiveSaxHandler(final LicenseStoreData licenseStoreData, final Notices notices,
-                final Providers providers, final ILFLog log) {
+                final Providers providers, final ILSLog log) {
             super(log);
             this.licenseStoreData = licenseStoreData;
             this.notices = notices;

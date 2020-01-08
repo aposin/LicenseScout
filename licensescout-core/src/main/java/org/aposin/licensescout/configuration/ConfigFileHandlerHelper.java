@@ -17,7 +17,7 @@ package org.aposin.licensescout.configuration;
 
 import java.io.File;
 
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 
 /**
  * Helper class for instantiating ConfigFileHandler instances.
@@ -38,7 +38,7 @@ public class ConfigFileHandlerHelper {
      */
     public static ConfigFileHandler createConfigFileHandler(final File configurationBundleFile,
                                                             final ConfigFileParameters configFileParameters,
-                                                            final ILFLog log) {
+                                                            final ILSLog log) {
         final ConfigFileHandler configFileHandler;
         if (configurationBundleFile != null) {
             configFileHandler = new ZipConfigFileHandler(configurationBundleFile, configFileParameters, log);

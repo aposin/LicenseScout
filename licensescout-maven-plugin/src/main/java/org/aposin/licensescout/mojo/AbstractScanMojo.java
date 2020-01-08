@@ -52,7 +52,7 @@ import org.aposin.licensescout.maven.utils.IRepositoryParameters;
 import org.aposin.licensescout.maven.utils.LSArtifact;
 import org.aposin.licensescout.maven.utils.MavenLog;
 import org.aposin.licensescout.maven.utils.Output;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -464,7 +464,7 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
      */
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        final ILFLog log = new MavenLog(getLog());
+        final ILSLog log = new MavenLog(getLog());
 
         if (skip) {
             log.info("Not executing because skip is configured as true.");
@@ -507,7 +507,7 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
      * @param executionParameters
      * @param log the logger
      */
-    private void attachReports(final ExecutionParameters executionParameters, final ILFLog log) {
+    private void attachReports(final ExecutionParameters executionParameters, final ILSLog log) {
         if (attachReports) {
             AttachHelper.attachReports(mavenProject, mavenProjectHelper, executionParameters, attachReportsClassifier);
         } else {

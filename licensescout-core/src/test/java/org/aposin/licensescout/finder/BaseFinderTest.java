@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 import org.aposin.licensescout.core.test.util.TestUtil;
 import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseStoreData;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -36,7 +36,7 @@ import org.junit.BeforeClass;
  */
 public abstract class BaseFinderTest {
 
-    private ILFLog log;
+    private ILSLog log;
     private LicenseStoreData licenseStoreData;
 
     /**
@@ -64,7 +64,7 @@ public abstract class BaseFinderTest {
     /**
      * @return the log
      */
-    protected final ILFLog getLog() {
+    protected final ILSLog getLog() {
         return log;
     }
 

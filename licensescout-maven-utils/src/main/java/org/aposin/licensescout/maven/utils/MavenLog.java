@@ -16,13 +16,13 @@
 package org.aposin.licensescout.maven.utils;
 
 import org.apache.maven.plugin.logging.Log;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 
 /**
  * Wrapper around the Maven plugin logger.
  * 
  */
-public class MavenLog implements ILFLog {
+public class MavenLog implements ILSLog {
 
     private final Log log;
 

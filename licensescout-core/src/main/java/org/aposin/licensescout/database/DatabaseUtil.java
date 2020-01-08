@@ -22,7 +22,7 @@ import java.sql.SQLException;
 import java.util.Enumeration;
 
 import org.aposin.licensescout.configuration.ExecutionDatabaseConfiguration;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 
 /**
  * 
@@ -50,7 +50,7 @@ public class DatabaseUtil {
      * 
      * @param log the logger the logger
      */
-    public static void dumpDrivers(ILFLog log) {
+    public static void dumpDrivers(ILSLog log) {
         final Enumeration<Driver> registeredDrivers = DriverManager.getDrivers();
         log.info("DriverManager registered drivers:");
         while (registeredDrivers.hasMoreElements()) {

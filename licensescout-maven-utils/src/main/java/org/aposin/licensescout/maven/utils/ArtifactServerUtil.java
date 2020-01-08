@@ -30,7 +30,7 @@ import org.aposin.licensescout.archive.Archive;
 import org.aposin.licensescout.license.IArtifactServerUtil;
 import org.aposin.licensescout.license.LicenseStoreData;
 import org.aposin.licensescout.license.LicenseUtil;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -42,7 +42,7 @@ public class ArtifactServerUtil implements IArtifactServerUtil {
 
     private final String mavenCentralBaseUrl;
     private final int connectTimeoutInMilliseconds;
-    private final ILFLog log;
+    private final ILSLog log;
     private final boolean cachedCheckAccess;
 
     /**
@@ -53,7 +53,7 @@ public class ArtifactServerUtil implements IArtifactServerUtil {
      * @param log the logger
      */
     public ArtifactServerUtil(final String mavenCentralBaseUrl, final int connectTimeoutInMilliseconds,
-            final ILFLog log) {
+            final ILSLog log) {
         this.mavenCentralBaseUrl = mavenCentralBaseUrl;
         this.connectTimeoutInMilliseconds = connectTimeoutInMilliseconds;
         this.log = log;

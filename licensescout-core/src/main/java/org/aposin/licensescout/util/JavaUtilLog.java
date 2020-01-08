@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  * Wrapper around the java.util logger.
  * 
  */
-public class JavaUtilLog implements ILFLog {
+public class JavaUtilLog implements ILSLog {
 
     private final Logger log;
 

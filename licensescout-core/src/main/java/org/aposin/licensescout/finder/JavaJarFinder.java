@@ -27,7 +27,7 @@ import org.aposin.licensescout.archive.Archive;
 import org.aposin.licensescout.license.IArtifactServerUtil;
 import org.aposin.licensescout.license.LicenseStoreData;
 import org.aposin.licensescout.util.ArchiveMetaInformation;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 import org.aposin.licensescout.util.JarUtil;
 
 /**
@@ -62,7 +62,7 @@ public class JavaJarFinder extends AbstractJavaFinder {
      * @param log the logger
      */
     public JavaJarFinder(final LicenseStoreData licenseStoreData, final IArtifactServerUtil artifactServerUtil,
-            final ILFLog log) {
+            final ILSLog log) {
         super(licenseStoreData, artifactServerUtil, log);
         fileSystemFinderHandler = new FilesystemFinderHandler(log);
 
