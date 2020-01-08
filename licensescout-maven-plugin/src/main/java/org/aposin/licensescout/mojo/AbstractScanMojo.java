@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -29,12 +30,13 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.settings.Settings;
 import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.configuration.ConfigFileHandler;
 import org.aposin.licensescout.configuration.ConfigFileHandlerHelper;
 import org.aposin.licensescout.configuration.ConfigFileParameters;
-import org.aposin.licensescout.configuration.DatabaseConfiguration;
-import org.aposin.licensescout.configuration.Output;
+import org.aposin.licensescout.configuration.ExecutionDatabaseConfiguration;
+import org.aposin.licensescout.configuration.ExecutionOutput;
 import org.aposin.licensescout.execution.ExecutionParameters;
 import org.aposin.licensescout.execution.Executor;
 import org.aposin.licensescout.execution.LicenseScoutExecutionException;
@@ -43,8 +45,13 @@ import org.aposin.licensescout.execution.StandardReportExporterFactory;
 import org.aposin.licensescout.license.LegalStatus;
 import org.aposin.licensescout.maven.utils.ArtifactHelper;
 import org.aposin.licensescout.maven.utils.ArtifactItem;
+import org.aposin.licensescout.maven.utils.ArtifactServerUtilHelper;
+import org.aposin.licensescout.maven.utils.ConfigurationHelper;
+import org.aposin.licensescout.maven.utils.DatabaseConfiguration;
 import org.aposin.licensescout.maven.utils.IRepositoryParameters;
+import org.aposin.licensescout.maven.utils.LSArtifact;
 import org.aposin.licensescout.maven.utils.MavenLog;
+import org.aposin.licensescout.maven.utils.Output;
 import org.aposin.licensescout.util.ILFLog;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -78,6 +85,8 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
     /**
      * Specification of output types and filenames.
      * 
+     * <p>See also <a href="../licensescout-documentation/usermanual/configuration.html#output_types_and_files">Output Types and files</a>.</p>
+     * 
      * @see Output
      * @since 1.2
      */
@@ -87,6 +96,8 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
     /**
      * Name of the file to read known licenses from.
      * 
+     * <p>For the format of the file see <a href="../licensescout-documentation/usermanual/configuration.html#configuration-file-licenses">Licenses</a>.<p>
+     * 
      * @since 1.1
      */
     @Parameter(property = "licensesFilename", required = false)
@@ -94,6 +105,8 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
 
     /**
      * Name of the file to read known providers from.
+     * 
+     * <p>For the format of the file see <a href="../licensescout-documentation/usermanual/configuration.html#configuration-file-providers">Providers</a>.<p>
      * 
      * @since 1.2.6
      */
@@ -103,6 +116,8 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
     /**
      * Name of the file to read license notices from.
      * 
+     * <p>For the format of the file see <a href="../licensescout-documentation/usermanual/configuration.html#configuration-file-notices">Notices</a>.<p>
+     * 
      * @since 1.2.6
      */
     @Parameter(property = "noticesFilename", required = false)
@@ -110,6 +125,8 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
 
     /**
      * Name of the file to read checked archives from.
+     * 
+     * <p>For the format of the file see <a href="../licensescout-documentation/usermanual/configuration.html#configuration-file-checked-archives">Checked Archives</a>.<p>
      * 
      * @since 1.2.6
      */
@@ -119,6 +136,8 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
     /**
      * Name of the file to read license URL mappings from.
      * 
+     * <p>For the format of the file see <a href="../licensescout-documentation/usermanual/configuration.html#configuration-file-license-url-mapping">License URL Mapping</a>.<p>
+     * 
      * @since 1.2.6
      */
     @Parameter(defaultValue = "urlmappings.csv", property = "licenseUrlMappingsFilename", required = false)
@@ -127,6 +146,8 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
     /**
      * Name of the file to read license name mappings from.
      * 
+     * <p>For the format of the file see <a href="../licensescout-documentation/usermanual/configuration.html#configuration-file-license-name-mapping">License Name Mapping</a>.<p>
+     * 
      * @since 1.2.6
      */
     @Parameter(defaultValue = "namemappings.csv", property = "licenseNameMappingsFilename", required = false)
@@ -134,6 +155,8 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
 
     /**
      * Name of the file to read global filter patterns from.
+     * 
+     * <p>For the format of the file see <a href="../licensescout-documentation/usermanual/configuration.html#configuration-file-global-filters">Global Filters</a>.<p>
      * 
      * @since 1.2.6
      */
@@ -144,6 +167,8 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
      * Name of the file to read of vendor names to filter out from.
      * This is alternative to {@link #filteredVendorNames}.
      * If both are given, the entries are merged.
+     * 
+     * <p>For the format of the file see <a href="../licensescout-documentation/usermanual/configuration.html#configuration-file-vendor-names">Vendor Names</a>.<p>
      * 
      * @since 1.1
      */
@@ -212,6 +237,16 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
      */
     @Parameter(defaultValue = "https://repo.maven.apache.org/maven2/", property = "nexusCentralBaseUrl", required = false)
     private String nexusCentralBaseUrl;
+
+    /**
+     * Base URL for creating default value of report output URL.
+     * 
+     * E.g. "https://myserver:port/nexus/myrepository/"
+     * 
+     * @since 1.4.0
+     */
+    @Parameter(property = "artifactBaseUrl", required = false)
+    private String artifactBaseUrl;
 
     /**
      * Timeout for connecting to artifact server. This timeout is used when
@@ -355,6 +390,8 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
     /**
      * Skips the execution.
      * 
+     * <p>For examples on using this parameter in a build see <a href="../licensescout-maven-plugin/examples/controlling-execution.html">Controlling the execution</a>.<p>
+     * 
      * @since 1.3.1
      */
     @Parameter(defaultValue = "false", property = "skip", required = false)
@@ -368,11 +405,25 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
     private boolean attachReports;
 
     /**
+     * Classifier to use for attaching generated reports as files to the main artifact.
+     * @since 1.4.0
+     */
+    @Parameter(defaultValue = "licensereport", property = "attachReportsClassifier", required = false)
+    private String attachReportsClassifier;
+
+    /**
      * The Maven Project model.
      * @since 1.3.1
      */
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject mavenProject;
+
+    /**
+     * The Maven settings.
+     * @since 1.4
+     */
+    @Parameter(defaultValue = "${settings}", readonly = true)
+    private Settings mavenSettings;
 
     /**
      * The Maven project helper.
@@ -435,9 +486,10 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
         executionParameters.setArchiveType(getArchiveType());
         executionParameters.setLsLog(log);
         executionParameters.setExporterFactories(Arrays.asList(new StandardReportExporterFactory()));
+        ArtifactServerUtilHelper.createAndSetArtifactServerUtil(executionParameters);
 
-        final ConfigFileHandler configFileHandler = ConfigFileHandlerHelper.createConfigFileHandler(configurationBundleFile,
-                configFileParameters, log);
+        final ConfigFileHandler configFileHandler = ConfigFileHandlerHelper
+                .createConfigFileHandler(configurationBundleFile, configFileParameters, log);
 
         final Executor executor = new Executor(executionParameters, configFileHandler);
         try {
@@ -453,11 +505,11 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
 
     /**
      * @param executionParameters
-     * @param log
+     * @param log the logger
      */
     private void attachReports(final ExecutionParameters executionParameters, final ILFLog log) {
         if (attachReports) {
-            AttachHelper.attachReports(mavenProject, mavenProjectHelper, executionParameters);
+            AttachHelper.attachReports(mavenProject, mavenProjectHelper, executionParameters, attachReportsClassifier);
         } else {
             log.info("Not attaching license reports as artifacts because not cnfigured");
         }
@@ -496,8 +548,8 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
     /**
      * @return the outputs
      */
-    public final List<Output> getOutputs() {
-        return outputs;
+    public final List<ExecutionOutput> getOutputs() {
+        return ConfigurationHelper.getExecutionOutputs(outputs, artifactBaseUrl, getAttachArtifact());
     }
 
     /**
@@ -705,9 +757,14 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
 
     /**
      * @return the resultDatabaseConfiguration
+     * @throws MojoExecutionException 
      */
-    public final DatabaseConfiguration getResultDatabaseConfiguration() {
-        return resultDatabaseConfiguration;
+    public final ExecutionDatabaseConfiguration getResultDatabaseConfiguration() throws MojoExecutionException {
+        if (isWriteResultsToDatabase()) {
+            return ConfigurationHelper.getExecutionDatabaseConfiguration(resultDatabaseConfiguration, getSettings(),
+                    new MavenLog(getLog()));
+        }
+        return null;
     }
 
     /**
@@ -732,6 +789,23 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
     @Override
     public final RepositorySystemSession getRepositorySystemSession() {
         return repositorySystemSession;
+    }
+
+    protected Settings getSettings() {
+        return mavenSettings;
+    }
+
+    /**
+     * Obtains an artifact description for use in an attach operation.
+     * 
+     * <p>The returned object has group ID, artifact ID, version and type set from the current project. 
+     * The classifier is set from the Maven parameter {@link #attachReportsClassifier}.</p>
+     * @return an artifact description to attach
+     */
+    private LSArtifact getAttachArtifact() {
+        final Artifact artifact = mavenProject.getArtifact();
+        return new LSArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(),
+                artifact.getType(), attachReportsClassifier);
     }
 
 }

@@ -19,7 +19,7 @@ import java.io.File;
 
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
-import org.aposin.licensescout.configuration.Output;
+import org.aposin.licensescout.configuration.ExecutionOutput;
 import org.aposin.licensescout.execution.ExecutionParameters;
 import org.aposin.licensescout.util.OutputFileHelper;
 
@@ -35,17 +35,18 @@ public class AttachHelper {
      * @param mavenProject 
      * @param mavenProjectHelper 
      * @param executionParameters 
+     * @param attachReportsClassifier the classifier value to for the attached report files
      * 
      */
     public static void attachReports(final MavenProject mavenProject, final MavenProjectHelper mavenProjectHelper,
-                                     final ExecutionParameters executionParameters) {
-        final String artifactClassifier = "licensereport";
-        for (final Output output : executionParameters.getOutputs()) {
+                                     final ExecutionParameters executionParameters,
+                                     final String attachReportsClassifier) {
+        for (final ExecutionOutput output : executionParameters.getOutputs()) {
             final String artifactType = output.getType().getArtifactType();
             final File artifactFile = new File(executionParameters.getOutputDirectory(),
                     OutputFileHelper.getOutputFilename(output));
             executionParameters.getLsLog().info("attaching artifact: " + artifactFile.getAbsolutePath());
-            mavenProjectHelper.attachArtifact(mavenProject, artifactType, artifactClassifier, artifactFile);
+            mavenProjectHelper.attachArtifact(mavenProject, artifactType, attachReportsClassifier, artifactFile);
         }
     }
 }

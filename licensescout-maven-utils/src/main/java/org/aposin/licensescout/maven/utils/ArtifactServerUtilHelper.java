@@ -13,27 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aposin.licensescout.license;
+package org.aposin.licensescout.maven.utils;
 
-import org.aposin.licensescout.util.NullLog;
-import org.junit.Assert;
-import org.junit.Test;
+import org.aposin.licensescout.execution.ExecutionParameters;
+import org.aposin.licensescout.license.IArtifactServerUtil;
 
 /**
- *
+ * Helper class for instantiating IArtifactServerUtil instances.
+ * 
+ * @see IArtifactServerUtil
  */
-public class ArtifactServerUtilTest {
+public class ArtifactServerUtilHelper {
 
-    /**
-     * Test method for
-     * {@link org.aposin.licensescout.license.ArtifactServerUtil#ArtifactServerUtil(java.lang.String, int, org.aposin.licensescout.util.ILFLog)}.
-     */
-    @Test
-    public void testArtifactServerUtil() {
-        final String serverBaseUrl = "https://repo.maven.apache.org/maven2_unaccessible/";
-        final int timeout = 400;
-        final ArtifactServerUtil artifactServerUtil = new ArtifactServerUtil(serverBaseUrl, timeout, new NullLog());
-        Assert.assertFalse("isCachedCheckAccess()", artifactServerUtil.isCachedCheckAccess());
+    private ArtifactServerUtilHelper() {
+        // EMPTY
     }
 
+    /**
+     * @param executionParameters
+     */
+    public static void createAndSetArtifactServerUtil(final ExecutionParameters executionParameters) {
+        executionParameters.setArtifactServerUtil(new ArtifactServerUtil(executionParameters.getNexusCentralBaseUrl(),
+                executionParameters.getConnectTimeout(), executionParameters.getLsLog()));
+    }
 }

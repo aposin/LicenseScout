@@ -32,7 +32,7 @@ import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.configuration.ConfigFileHandler;
 import org.aposin.licensescout.configuration.ConfigFileHandlerHelper;
 import org.aposin.licensescout.configuration.ConfigFileParameters;
-import org.aposin.licensescout.configuration.Output;
+import org.aposin.licensescout.configuration.ExecutionOutput;
 import org.aposin.licensescout.configuration.OutputFileType;
 import org.aposin.licensescout.execution.ExecutionParameters;
 import org.aposin.licensescout.execution.Executor;
@@ -42,6 +42,7 @@ import org.aposin.licensescout.execution.LicenseScoutFailOnErrorException;
 import org.aposin.licensescout.license.LegalStatus;
 import org.aposin.licensescout.maven.utils.ArtifactHelper;
 import org.aposin.licensescout.maven.utils.ArtifactItem;
+import org.aposin.licensescout.maven.utils.ArtifactServerUtilHelper;
 import org.aposin.licensescout.maven.utils.IRepositoryParameters;
 import org.aposin.licensescout.maven.utils.MavenLog;
 import org.aposin.licensescout.report.exporter.DoxiaReportExporterFactory;
@@ -70,6 +71,8 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
     /**
      * Name of the file to read known licenses from.
      * 
+     * <p>For the format of the file see <a href="../licensescout-documentation/usermanual/configuration.html#configuration-file-licenses">Licenses</a>.<p>
+     * 
      * @since 1.1
      */
     @Parameter(property = "licensesFilename", required = false)
@@ -77,6 +80,8 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
 
     /**
      * Name of the file to read known providers from.
+     * 
+     * <p>For the format of the file see <a href="../licensescout-documentation/usermanual/configuration.html#configuration-file-providers">Providers</a>.<p>
      * 
      * @since 1.2.6
      */
@@ -86,6 +91,8 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
     /**
      * Name of the file to read license notices from.
      * 
+     * <p>For the format of the file see <a href="../licensescout-documentation/usermanual/configuration.html#configuration-file-notices">Notices</a>.<p>
+     * 
      * @since 1.2.6
      */
     @Parameter(property = "noticesFilename", required = false)
@@ -93,6 +100,8 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
 
     /**
      * Name of the file to read checked archives from.
+     * 
+     * <p>For the format of the file see <a href="../licensescout-documentation/usermanual/configuration.html#configuration-file-checked-archives">Checked Archives</a>.<p>
      * 
      * @since 1.2.6
      */
@@ -102,6 +111,8 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
     /**
      * Name of the file to read license URL mappings from.
      * 
+     * <p>For the format of the file see <a href="../licensescout-documentation/usermanual/configuration.html#configuration-file-license-url-mapping">License URL Mapping</a>.<p>
+     * 
      * @since 1.2.6
      */
     @Parameter(defaultValue = "urlmappings.csv", property = "licenseUrlMappingsFilename", required = false)
@@ -110,6 +121,8 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
     /**
      * Name of the file to read license name mappings from.
      * 
+     * <p>For the format of the file see <a href="../licensescout-documentation/usermanual/configuration.html#configuration-file-license-name-mapping">License Name Mapping</a>.<p>
+     * 
      * @since 1.2.6
      */
     @Parameter(defaultValue = "namemappings.csv", property = "licenseNameMappingsFilename", required = false)
@@ -117,6 +130,8 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
 
     /**
      * Name of the file to read global filter patterns from.
+     * 
+     * <p>For the format of the file see <a href="../licensescout-documentation/usermanual/configuration.html#configuration-file-global-filters">Global Filters</a>.<p>
      * 
      * @since 1.2.6
      */
@@ -127,6 +142,8 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
      * Name of the file to read of vendor names to filter out from.
      * This is alternative to {@link #filteredVendorNames}.
      * If both are given, the entries are merged.
+     * 
+     * <p>For the format of the file see <a href="../licensescout-documentation/usermanual/configuration.html#configuration-file-vendor-names">Vendor Names</a>.<p>
      * 
      * @since 1.1
      */
@@ -237,6 +254,8 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
     /**
      * Skips the execution.
      * 
+     * <p>For examples on using this parameter in a build see <a href="../licensescout-maven-plugin/examples/controlling-execution.html">Controlling the execution</a>.<p>
+     * 
      * @since 1.3.1
      */
     @Parameter(defaultValue = "false", property = "skip", required = false)
@@ -322,7 +341,7 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new MavenReportException("Internal error occured: " + e.getLocalizedMessage(), e);
         }
-        Output output = new Output();
+        ExecutionOutput output = new ExecutionOutput();
         output.setType(OutputFileType.DOXIA);
         executionParameters.setOutputs(Arrays.asList(output));
         output.setOutputEncoding(getOutputEncoding());
@@ -337,9 +356,10 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
             }
         });
         executionParameters.setExporterFactories(Arrays.asList(doxiaFactory));
+        ArtifactServerUtilHelper.createAndSetArtifactServerUtil(executionParameters);
 
-        final ConfigFileHandler configFileHandler = ConfigFileHandlerHelper.createConfigFileHandler(configurationBundleFile,
-                configFileParameters, log);
+        final ConfigFileHandler configFileHandler = ConfigFileHandlerHelper
+                .createConfigFileHandler(configurationBundleFile, configFileParameters, log);
 
         final Executor executor = new Executor(executionParameters, configFileHandler);
         try {

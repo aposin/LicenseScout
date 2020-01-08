@@ -23,7 +23,7 @@ import org.aposin.licensescout.exporter.IReportExporter;
  * 
  * <p>Reports of the license scout can be generated in different formats. This enumeration specifies the output format type.</p>
  * 
- * @see Output
+ * @see ExecutionOutput
  * @see IReportExporterFactory#getReportExporter(OutputFileType)
  * @see IReportExporter#getOutputFileType()
  */

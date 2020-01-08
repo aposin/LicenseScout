@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.aposin.licensescout.archive.Archive;
 import org.aposin.licensescout.configuration.BuildInfo;
-import org.aposin.licensescout.configuration.DatabaseConfiguration;
+import org.aposin.licensescout.configuration.ExecutionDatabaseConfiguration;
 import org.aposin.licensescout.model.Alarm;
 import org.aposin.licensescout.util.ILFLog;
 
@@ -44,10 +44,10 @@ public class AlarmWriter {
      * @param buildInfo
      * @param alarms list of alarm objects
      * @param databaseConfiguration
-     * @param log
+     * @param log the logger
      */
     public static void writeAlarms(final BuildInfo buildInfo, final List<Alarm> alarms,
-                                   final DatabaseConfiguration databaseConfiguration, final ILFLog log) {
+                                   final ExecutionDatabaseConfiguration databaseConfiguration, final ILFLog log) {
         try (final Connection connection = DatabaseUtil.getConnection(databaseConfiguration);
                 final Statement statement = connection.createStatement();) {
             for (final Alarm alarm : alarms) {

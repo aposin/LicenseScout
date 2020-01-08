@@ -33,7 +33,7 @@ public class ConfigFileHandlerHelper {
     /**
      * @param configurationBundleFile
      * @param configFileParameters
-     * @param log
+     * @param log the logger
      * @return a configuration file handler
      */
     public static ConfigFileHandler createConfigFileHandler(final File configurationBundleFile,

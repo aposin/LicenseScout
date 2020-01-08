@@ -24,12 +24,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * base class for unit test of implementations of {@link ConfigFileHandler}
+ * Base class for unit test of implementations of {@link ConfigFileHandler}
  */
 public abstract class AbstractConfigFileHandlerTest {
 
     private ConfigFileHandler configFileHandler;
 
+    /**
+     * Initializes the ConfigFileHandler used for testing
+     * @throws IOException
+     */
     @Before
     public void initConfigFileHandler() throws IOException {
         this.configFileHandler = createConfigFileHandler();
@@ -40,8 +44,9 @@ public abstract class AbstractConfigFileHandlerTest {
      */
     @Test
     public void testGetProvidersInputStream() throws IOException {
-        final InputStream inputStream = configFileHandler.getProvidersInputStream();
-        assertStream(inputStream, "getProvidersInputStream", 288);
+        try (final InputStream inputStream = configFileHandler.getProvidersInputStream()) {
+            assertStream(inputStream, "getProvidersInputStream", 288);
+        }
     }
 
     /**
@@ -49,8 +54,9 @@ public abstract class AbstractConfigFileHandlerTest {
      */
     @Test
     public void testGetNoticesInputStream() throws IOException {
-        final InputStream inputStream = configFileHandler.getNoticesInputStream();
-        assertStream(inputStream, "getNoticesInputStream", 555);
+        try (final InputStream inputStream = configFileHandler.getNoticesInputStream()) {
+            assertStream(inputStream, "getNoticesInputStream", 555);
+        }
     }
 
     /**
@@ -58,8 +64,9 @@ public abstract class AbstractConfigFileHandlerTest {
      */
     @Test
     public void testGetLicensesInputStream() throws IOException {
-        final InputStream inputStream = configFileHandler.getLicensesInputStream();
-        assertStream(inputStream, "getLicensesInputStream", 357508);
+        try (final InputStream inputStream = configFileHandler.getLicensesInputStream()) {
+            assertStream(inputStream, "getLicensesInputStream", 357508);
+        }
     }
 
     /**
@@ -67,8 +74,9 @@ public abstract class AbstractConfigFileHandlerTest {
      */
     @Test
     public void testGetLicenseUrlMappingsInputStream() throws IOException {
-        final InputStream inputStream = configFileHandler.getLicenseUrlMappingsInputStream();
-        assertStream(inputStream, "getLicenseUrlMappingsInputStream", 611);
+        try (final InputStream inputStream = configFileHandler.getLicenseUrlMappingsInputStream()) {
+            assertStream(inputStream, "getLicenseUrlMappingsInputStream", 611);
+        }
     }
 
     /**
@@ -76,8 +84,9 @@ public abstract class AbstractConfigFileHandlerTest {
      */
     @Test
     public void testGetLicenseNameMappingsInputStream() throws IOException {
-        final InputStream inputStream = configFileHandler.getLicenseNameMappingsInputStream();
-        assertStream(inputStream, "getLicenseNameMappingsInputStream", 769);
+        try (final InputStream inputStream = configFileHandler.getLicenseNameMappingsInputStream()) {
+            assertStream(inputStream, "getLicenseNameMappingsInputStream", 769);
+        }
     }
 
     /**
@@ -85,14 +94,16 @@ public abstract class AbstractConfigFileHandlerTest {
      */
     @Test
     public void testGetGlobalFiltersInputStream() throws IOException {
-        final InputStream inputStream = configFileHandler.getGlobalFiltersInputStream();
-        assertStream(inputStream, "getGlobalFiltersInputStream", 69);
+        try (final InputStream inputStream = configFileHandler.getGlobalFiltersInputStream()) {
+            assertStream(inputStream, "getGlobalFiltersInputStream", 69);
+        }
     }
 
     @Test
     public void testGetCheckedArchivesInputStream() throws IOException {
-        final InputStream inputStream = configFileHandler.getCheckedArchivesInputStream();
-        assertStream(inputStream, "getCheckedArchivesInputStream", 1740);
+        try (final InputStream inputStream = configFileHandler.getCheckedArchivesInputStream()) {
+            assertStream(inputStream, "getCheckedArchivesInputStream", 1740);
+        }
     }
 
     /**
@@ -100,12 +111,13 @@ public abstract class AbstractConfigFileHandlerTest {
      */
     @Test
     public void testGetFilteredVendorNamesInputStream() throws IOException {
-        final InputStream inputStream = configFileHandler.getFilteredVendorNamesInputStream();
-        assertStream(inputStream, "getFilteredVendorNamesInputStream", 279);
+        try (final InputStream inputStream = configFileHandler.getFilteredVendorNamesInputStream()) {
+            assertStream(inputStream, "getFilteredVendorNamesInputStream", 279);
+        }
     }
 
     /**
-     * @param inputStream
+     * @param inputStream an input stream to read the file contents from
      * @param messagePrefix
      * @param expectedStreamLength
      * @throws IOException
@@ -119,7 +131,7 @@ public abstract class AbstractConfigFileHandlerTest {
 
     /**
      * Creates the ConfigFileHandler to test.
-     * @return
+     * @return a {@code ConfigFileHandler} instance for testing
      * @throws IOException 
      */
     protected abstract ConfigFileHandler createConfigFileHandler() throws IOException;

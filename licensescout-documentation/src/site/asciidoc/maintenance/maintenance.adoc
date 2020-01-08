@@ -229,6 +229,8 @@ For `pom.xml` and `site.xml` the following applies:
 
 The projects containing Maven Plug-ins (`licensescout-maven-plugin`, `licensescout-report-maven-plugin`) contain integration tests that simulate calling the Plug-ins from a normal Maven runtime environment.
 
+The integration tests are under the directories `src/it`.
+
 For executing the integration tests two profiles are used: `run-its` and `it-modules`.
 
 The integration tests are also executed as checks for pull requests on Github (work in progress, see travis config file).
@@ -236,5 +238,11 @@ The integration tests are also executed as checks for pull requests on Github (w
 There is an Eclipse launch configurations to execute the integration tests locally:
 `licensescout-parent/launch/licensescout-parent_multimodule_it.launch`
 
-A currently unsolved problem is that the Eclipse launch coniguration requires the environment variable `JAVA_HOME` set. A value is included in the launch configuration. However, its value is installation specific and needs to be adapted
-for different machines before executing the launh configuration.
+A currently unsolved problem is that the Eclipse launch configuration requires the environment variable `JAVA_HOME` set. A value is included in the launch configuration. However, its value is installation specific and needs to be adapted
+for different machines before executing the launch configuration.
+
+For tracking problems with the execution of the ITs have a look at the build logs located at:
+ target/its/[it name]/build.log
+
+Note that also the target folder of an IT execution is available:
+ target/its/[it name]/target

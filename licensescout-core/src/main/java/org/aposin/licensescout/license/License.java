@@ -47,7 +47,7 @@ public class License implements Comparable<License> {
      * @param version the version
      * @param urlPublic the public URL
      * @param text 
-     * @param notice 
+     * @param notice a notice (may be null)
      */
     public License(final String spdxIdentifier, final String name, final LegalStatus legalStatus, final String author,
             final String version, final String urlPublic, final String text, final Notice notice) {

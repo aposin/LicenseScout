@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aposin.licensescout.configuration;
+package org.aposin.licensescout.maven.utils;
 
 import java.io.File;
 
 import org.apache.maven.plugins.annotations.Parameter;
+import org.aposin.licensescout.configuration.OutputFileType;
 
 /**
  * Output specification for scan MOJOs.
@@ -42,7 +43,9 @@ public class Output {
     private String filename;
 
     /**
-     * URL of the output file on Nexus.
+     * URL of the report file on artifact server.
+     * 
+     * <p>This information is only written to the database for information. If not configured, a default value is calculated (see {@link IArtifactUrlBuilder}).</p>
      * 
      * <p>Only used if {@code AbstractScanMojo#writeResultsToDatabase} is true.</p>
      */
@@ -79,17 +82,37 @@ public class Output {
     private String outputEncoding;
 
     /**
+     * Constructor for use by the Maven runtime system.
+     */
+    public Output() {
+        // EMPTY
+    }
+
+    /**
+     * Constructor for testing.
+     * 
+     * @param type
+     * @param filename
+     * @param url
+     * @param template
+     * @param templateEncoding
+     * @param outputEncoding
+     */
+    public Output(OutputFileType type, String filename, String url, File template, String templateEncoding,
+            String outputEncoding) {
+        this.type = type;
+        this.filename = filename;
+        this.url = url;
+        this.template = template;
+        this.templateEncoding = templateEncoding;
+        this.outputEncoding = outputEncoding;
+    }
+
+    /**
      * @return the type
      */
     public final OutputFileType getType() {
         return type;
-    }
-
-    /**
-     * @param type the type to set
-     */
-    public final void setType(OutputFileType type) {
-        this.type = type;
     }
 
     /**
@@ -100,24 +123,10 @@ public class Output {
     }
 
     /**
-     * @param filename the filename to set
-     */
-    public final void setFilename(String filename) {
-        this.filename = filename;
-    }
-
-    /**
      * @return the url
      */
     public final String getUrl() {
         return url;
-    }
-
-    /**
-     * @param url the url to set
-     */
-    public final void setUrl(String url) {
-        this.url = url;
     }
 
     /**
@@ -128,13 +137,6 @@ public class Output {
     }
 
     /**
-     * @param template the template to set
-     */
-    public final void setTemplate(final File template) {
-        this.template = template;
-    }
-
-    /**
      * @return the templateEncoding
      */
     public final String getTemplateEncoding() {
@@ -142,24 +144,10 @@ public class Output {
     }
 
     /**
-     * @param templateEncoding the templateEncoding to set
-     */
-    public final void setTemplateEncoding(String templateEncoding) {
-        this.templateEncoding = templateEncoding;
-    }
-
-    /**
      * @return the outputEncoding
      */
     public final String getOutputEncoding() {
         return outputEncoding;
-    }
-
-    /**
-     * @param outputEncoding the outputEncoding to set
-     */
-    public final void setOutputEncoding(String outputEncoding) {
-        this.outputEncoding = outputEncoding;
     }
 
 }

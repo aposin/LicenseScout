@@ -27,7 +27,7 @@ public class MavenLog implements ILFLog {
     private final Log log;
 
     /**
-     * @param log
+     * @param log a Maven logger
      */
     public MavenLog(final Log log) {
         this.log = log;

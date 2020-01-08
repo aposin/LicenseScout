@@ -50,16 +50,6 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
-		<!-- Currently needed by ArtifactServerUtil -->
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-plugin-api</artifactId>
-		</dependency>
-		<!-- Currently needed by classes Output and DatabaseConfiguration -->
-		<dependency>
-			<groupId>org.apache.maven.plugin-tools</groupId>
-			<artifactId>maven-plugin-annotations</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.apache.velocity</groupId>
 			<artifactId>velocity-engine-core</artifactId>
@@ -118,14 +108,6 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-
-			<!-- We need sources always to allow the 'maven-plugin-plugin' to read 
-				annotations. This is needed because classes are used as a type for a MOJO 
-				parameter. -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
 			</plugin>
 
 			<!-- groupId: org.jacoco -->

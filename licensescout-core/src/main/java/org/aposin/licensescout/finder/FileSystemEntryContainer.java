@@ -13,43 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aposin.licensescout.configuration;
+package org.aposin.licensescout.finder;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
- * Parameters passed to the core of the LicenseScout from the parameter handling
- * layer.
+ * Represents a file from the file system.
+ * 
+ * <p>Holds a reference to the file object.</p>
+ *
+ * @see JarEntryContainer
  */
-public class RunParameters {
+public class FileSystemEntryContainer implements EntryContainer {
 
-    private String nexusCentralBaseUrl;
-    private int connectTimeout;
+    private final File file;
 
     /**
-     * @return the nexusCentralBaseUrl
+     * Constructor.
+     * @param file a file
      */
-    public final String getNexusCentralBaseUrl() {
-        return nexusCentralBaseUrl;
+    public FileSystemEntryContainer(final File file) {
+        this.file = file;
     }
 
     /**
-     * @param nexusCentralBaseUrl the nexusCentralBaseUrl to set
+     * @return the file
      */
-    public final void setNexusCentralBaseUrl(final String nexusCentralBaseUrl) {
-        this.nexusCentralBaseUrl = nexusCentralBaseUrl;
+    public final File getFile() {
+        return file;
     }
 
     /**
-     * @return the connectTimeout
+     * {@inheritDoc}
      */
-    public final int getConnectTimeout() {
-        return connectTimeout;
-    }
-
-    /**
-     * @param connectTimeout the connectTimeout to set
-     */
-    public final void setConnectTimeout(final int connectTimeout) {
-        this.connectTimeout = connectTimeout;
+    @Override
+    public final InputStream getInputStream() throws IOException {
+        return new FileInputStream(getFile());
     }
 
 }

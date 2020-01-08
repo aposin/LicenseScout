@@ -23,8 +23,9 @@ import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.configuration.ConfigFileHandler;
 import org.aposin.licensescout.configuration.ConfigFileParameters;
 import org.aposin.licensescout.configuration.FilesystemConfigFileHandler;
-import org.aposin.licensescout.configuration.Output;
+import org.aposin.licensescout.configuration.ExecutionOutput;
 import org.aposin.licensescout.configuration.OutputFileType;
+import org.aposin.licensescout.core.test.util.TestArtifactServerUtil;
 import org.aposin.licensescout.core.test.util.TestUtil;
 import org.aposin.licensescout.license.LegalStatus;
 import org.junit.Test;
@@ -56,7 +57,7 @@ public class SimpleExecutionTest {
     @Test
     public void testExecutionJavaWithOutputs() throws Exception {
         final File scanDirectory = new File("src/test/resources/scans/empty");
-        final ArrayList<Output> outputs = createTripleOutput();
+        final ArrayList<ExecutionOutput> outputs = createTripleOutput();
         final ExecutionParameters executionParameters = createExecutionParameters(ArchiveType.JAVA, scanDirectory,
                 outputs);
         assertExecution(executionParameters);
@@ -209,7 +210,7 @@ public class SimpleExecutionTest {
     @Test(expected = LicenseScoutExecutionException.class)
     public void testExecutionJavaNoReportExporterFactory() throws Exception {
         final File scanDirectory = new File("src/test/resources/scans/java-unpacked-license-manifest");
-        final ArrayList<Output> outputs = createTripleOutput();
+        final ArrayList<ExecutionOutput> outputs = createTripleOutput();
         final ExecutionParameters executionParameters = createExecutionParameters(ArchiveType.JAVA, scanDirectory,
                 outputs, false);
         assertExecution(executionParameters);
@@ -295,8 +296,8 @@ public class SimpleExecutionTest {
     /**
      * @return a list of three output definitions
      */
-    private ArrayList<Output> createTripleOutput() {
-        final ArrayList<Output> outputs = new ArrayList<>();
+    private ArrayList<ExecutionOutput> createTripleOutput() {
+        final ArrayList<ExecutionOutput> outputs = new ArrayList<>();
         outputs.add(createOutput(OutputFileType.CSV, "licensereport.csv"));
         outputs.add(createOutput(OutputFileType.HTML, "licensereport.html"));
         outputs.add(createOutput(OutputFileType.TXT, "licensereport.txt"));
@@ -305,12 +306,12 @@ public class SimpleExecutionTest {
 
     private ExecutionParameters createExecutionParametersNoOutputs(final ArchiveType archiveType,
                                                                    final File scanDirectory) {
-        final ArrayList<Output> outputs = new ArrayList<>();
+        final ArrayList<ExecutionOutput> outputs = new ArrayList<>();
         return createExecutionParameters(archiveType, scanDirectory, outputs);
     }
 
     private ExecutionParameters createExecutionParameters(final ArchiveType archiveType, final File scanDirectory,
-                                                          final ArrayList<Output> outputs) {
+                                                          final ArrayList<ExecutionOutput> outputs) {
         return createExecutionParameters(archiveType, scanDirectory, outputs, true);
     }
 
@@ -322,7 +323,7 @@ public class SimpleExecutionTest {
      * @return an execution parameters instance
      */
     private ExecutionParameters createExecutionParameters(final ArchiveType archiveType, final File scanDirectory,
-                                                          final ArrayList<Output> outputs,
+                                                          final ArrayList<ExecutionOutput> outputs,
                                                           final boolean withStandardReportExporterFactory) {
         final ExecutionParameters executionParameters = new ExecutionParameters();
         executionParameters.setArchiveType(archiveType);
@@ -339,11 +340,12 @@ public class SimpleExecutionTest {
             executionParameters.setExporterFactories(Arrays.asList(new StandardReportExporterFactory()));
         }
         executionParameters.setValidateLicenseXml(false);
+        executionParameters.setArtifactServerUtil(new TestArtifactServerUtil());
         return executionParameters;
     }
 
-    private Output createOutput(final OutputFileType outputFileType, final String filename) {
-        final Output output = new Output();
+    private ExecutionOutput createOutput(final OutputFileType outputFileType, final String filename) {
+        final ExecutionOutput output = new ExecutionOutput();
         output.setType(outputFileType);
         output.setFilename(filename);
         return output;

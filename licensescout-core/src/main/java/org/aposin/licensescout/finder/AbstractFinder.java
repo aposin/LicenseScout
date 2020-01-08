@@ -58,7 +58,7 @@ public abstract class AbstractFinder {
 
     /**
      * Constructor.
-     * @param licenseStoreData 
+     * @param licenseStoreData the data object containing information on licenses
      * @param log the logger 
      */
     public AbstractFinder(final LicenseStoreData licenseStoreData, final ILFLog log) {
@@ -140,7 +140,7 @@ public abstract class AbstractFinder {
     /**
      * @param is
      * @param fileName
-     * @param licenseStoreData 
+     * @param licenseStoreData the data object containing information on licenses
      * @return a license or <code>null</code>
      * @throws IOException
      */
@@ -180,5 +180,10 @@ public abstract class AbstractFinder {
         }
     }
 
+    /**
+     * Obtains if POM resolution is active.
+     * 
+     * @return true if POM resolution is active, false otherwise
+     */
     public abstract boolean isPomResolutionUsed();
 }

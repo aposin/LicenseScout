@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.aposin.licensescout.archive.ArchiveType;
-import org.aposin.licensescout.configuration.RunParameters;
+import org.aposin.licensescout.configuration.FinderParameters;
 import org.aposin.licensescout.core.test.util.TestUtil;
 import org.aposin.licensescout.execution.ExecutionParameters;
 import org.aposin.licensescout.license.LicenseStoreData;
@@ -50,7 +50,7 @@ public class FinderFactoryTest {
     }
 
     /**
-     * Test case for the method {@link FinderFactory#createFinder(ExecutionParameters, LicenseStoreData, RunParameters)}.
+     * Test case for the method {@link FinderFactory#createFinder(ExecutionParameters, LicenseStoreData, FinderParameters)}.
      * 
      * @throws Exception
      */
@@ -60,9 +60,9 @@ public class FinderFactoryTest {
         executionParameters.setArchiveType(archiveType);
         executionParameters.setLsLog(TestUtil.createTestLog());
         executionParameters.setNpmExcludedDirectoryNames(new ArrayList<>());
-        final RunParameters runParameters = TestUtil.createRunParameters();
+        final FinderParameters finderParameters = TestUtil.createFinderParameters();
         final AbstractFinder finder = FinderFactory.getInstance().createFinder(executionParameters, null,
-                runParameters);
+                finderParameters);
         Assert.assertEquals("class type returned by createFinder()", expectedFinderClass, finder.getClass());
     }
 

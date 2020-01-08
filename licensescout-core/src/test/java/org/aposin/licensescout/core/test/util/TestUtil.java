@@ -18,7 +18,7 @@ package org.aposin.licensescout.core.test.util;
 import java.io.FileInputStream;
 import java.util.logging.Logger;
 
-import org.aposin.licensescout.configuration.RunParameters;
+import org.aposin.licensescout.configuration.FinderParameters;
 import org.aposin.licensescout.license.LicenseStoreData;
 import org.aposin.licensescout.util.ILFLog;
 import org.aposin.licensescout.util.JavaUtilLog;
@@ -39,24 +39,22 @@ public abstract class TestUtil {
      * Creates run parameters for testing.
      * @return a run parameters instance
      */
-    public static RunParameters createRunParameters() {
-        final String serverBaseUrl = "https://repo.maven.apache.org/maven2_unaccessible/";
-        final int timeout = 400;
-        final RunParameters runParameters = new RunParameters();
-        runParameters.setNexusCentralBaseUrl(serverBaseUrl);
-        runParameters.setConnectTimeout(timeout);
-        return runParameters;
+    public static FinderParameters createFinderParameters() {
+        final FinderParameters finderParameters = new FinderParameters();
+        finderParameters.setArtifactServerUtil(new TestArtifactServerUtil());
+        return finderParameters;
     }
 
     /**
      * Reads LicenseStoreData from a file for testing.
-     * @param log
+     * @param log the logger
      * @return a LicenseStoreData for testing
      * @throws Exception
      */
     public static LicenseStoreData readLicenseStoreData(final ILFLog log) throws Exception {
         LicenseStoreData licenseStoreData = new LicenseStoreData();
-        licenseStoreData.readLicenses(new FileInputStream("src/test/resources/configuration/licenses.xml"), null, false, log);
+        licenseStoreData.readLicenses(new FileInputStream("src/test/resources/configuration/licenses.xml"), null, false,
+                log);
         return licenseStoreData;
     }
 

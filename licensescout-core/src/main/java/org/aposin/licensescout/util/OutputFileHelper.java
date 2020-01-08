@@ -17,7 +17,7 @@ package org.aposin.licensescout.util;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.aposin.licensescout.configuration.Output;
+import org.aposin.licensescout.configuration.ExecutionOutput;
 
 /**
  * Utility methods for assembling the filenames of output files.
@@ -37,7 +37,7 @@ public class OutputFileHelper {
      * @param output an output configuration
      * @return the filename
      */
-    public static String getOutputFilename(final Output output) {
+    public static String getOutputFilename(final ExecutionOutput output) {
         final String configuredFilename = output.getFilename();
         final StringBuffer filename = new StringBuffer(
                 StringUtils.isEmpty(configuredFilename) ? "licensereport" : configuredFilename);

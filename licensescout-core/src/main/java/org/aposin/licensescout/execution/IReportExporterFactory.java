@@ -28,8 +28,17 @@ import org.aposin.licensescout.exporter.IReportExporter;
  */
 public interface IReportExporterFactory {
 
+    /**
+     * Obtains the list of output file types supported by this factory.
+     * @return the list of output file types supported by this factory
+     */
     List<OutputFileType> getSupportedOutputFileTypes();
 
+    /**
+     * Obtains a report exporter instance for a given output file type.
+     * @param outputFileType an output file type
+     * @return a report exporter instance
+     */
     IReportExporter getReportExporter(OutputFileType outputFileType);
 
 }

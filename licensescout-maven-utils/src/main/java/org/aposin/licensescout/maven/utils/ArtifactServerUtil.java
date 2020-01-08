@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aposin.licensescout.license;
+package org.aposin.licensescout.maven.utils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -27,6 +27,9 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.aposin.licensescout.archive.Archive;
+import org.aposin.licensescout.license.IArtifactServerUtil;
+import org.aposin.licensescout.license.LicenseStoreData;
+import org.aposin.licensescout.license.LicenseUtil;
 import org.aposin.licensescout.util.ILFLog;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -35,9 +38,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  * 
  * <p>The instance of this class checks if the server is reachable under the configured URL.</p>
  */
-// TODO: create interface (ArtifctResolver, MavenArtfactResolver), move to licensescout-maven-utils
-// Note: used by JavaJarFinder
-public class ArtifactServerUtil {
+public class ArtifactServerUtil implements IArtifactServerUtil {
 
     private final String mavenCentralBaseUrl;
     private final int connectTimeoutInMilliseconds;
@@ -89,8 +90,9 @@ public class ArtifactServerUtil {
     }
 
     /**
-     * @return the cachedCheckAccess
+     * {@inheritDoc}
      */
+    @Override
     public final boolean isCachedCheckAccess() {
         return cachedCheckAccess;
     }
@@ -103,14 +105,9 @@ public class ArtifactServerUtil {
     }
 
     /**
-     * Adds licenses to an archive from information found in a Maven POM file.
-     * 
-     * @param inputStream input source of the POM file
-     * @param archive the archive to add the licenses to
-     * @param filePath path of the POM file (for information only)
-     * @param licenseStoreData the license data object
-     * @return true if one or more licenses have been added, false otherwise
+     * {@inheritDoc}
      */
+    @Override
     public boolean addLicensesFromPom(final InputStream inputStream, final Archive archive, final String filePath,
                                       final LicenseStoreData licenseStoreData) {
         try {

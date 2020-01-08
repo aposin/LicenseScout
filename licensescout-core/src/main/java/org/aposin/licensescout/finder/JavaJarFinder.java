@@ -15,30 +15,18 @@
  */
 package org.aposin.licensescout.finder;
 
-import static org.aposin.licensescout.archive.ArchiveType.JAVA;
-
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarInputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.aposin.licensescout.archive.Archive;
-import org.aposin.licensescout.configuration.RunParameters;
-import org.aposin.licensescout.license.ArtifactServerUtil;
-import org.aposin.licensescout.license.License;
+import org.aposin.licensescout.license.IArtifactServerUtil;
 import org.aposin.licensescout.license.LicenseStoreData;
-import org.aposin.licensescout.license.LicenseUtil;
-import org.aposin.licensescout.model.LSMessageDigest;
 import org.aposin.licensescout.util.ArchiveMetaInformation;
-import org.aposin.licensescout.util.CryptUtil;
 import org.aposin.licensescout.util.ILFLog;
 import org.aposin.licensescout.util.JarUtil;
 
@@ -49,7 +37,8 @@ import org.aposin.licensescout.util.JarUtil;
  * a starting point.</p>
  *  
  */
-public class JavaJarFinder extends AbstractFinder {
+// TODO: rename to JavaDirectoryFinder
+public class JavaJarFinder extends AbstractJavaFinder {
 
     protected enum ScanMode {
         /**
@@ -64,44 +53,24 @@ public class JavaJarFinder extends AbstractFinder {
 
     private final List<String> specialArchiveNames = new ArrayList<>();
     private final FinderHandler<File, FileSystemEntryContainer, File> fileSystemFinderHandler;
-    private final FinderHandler<JarEntry, JarEntryContainer, JarInputStream> jarFinderHandler;
-    private final ArtifactServerUtil artifactServerUtil;
 
     /**
      * Constructor.
      * 
-     * @param licenseStoreData
-     * @param runParameters
+     * @param licenseStoreData the data object containing information on licenses
+     * @param artifactServerUtil a helper object for accessing artifact servers
      * @param log the logger
      */
-    public JavaJarFinder(final LicenseStoreData licenseStoreData, final RunParameters runParameters, final ILFLog log) {
-        super(licenseStoreData, log);
-        artifactServerUtil = new ArtifactServerUtil(runParameters.getNexusCentralBaseUrl(),
-                runParameters.getConnectTimeout(), log);
-
+    public JavaJarFinder(final LicenseStoreData licenseStoreData, final IArtifactServerUtil artifactServerUtil,
+            final ILFLog log) {
+        super(licenseStoreData, artifactServerUtil, log);
         fileSystemFinderHandler = new FilesystemFinderHandler(log);
-        jarFinderHandler = new JarFinderHandler(log);
 
         initSpecialArchiveNames();
     }
 
     private void initSpecialArchiveNames() {
         specialArchiveNames.add("ckeditor");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean isCandidateLicenseFile(final String fileName) {
-        final String fileNameLowerCase = fileName.toLowerCase();
-        final boolean isTextOrHtmlFile = fileNameLowerCase.endsWith("txt") || fileNameLowerCase.endsWith("html")
-                || fileNameLowerCase.endsWith("htm");
-        final boolean containsLicenseInFilename = fileNameLowerCase.contains("license")
-                || fileNameLowerCase.contains("licence");
-        final boolean containsNoticeInFilename = fileNameLowerCase.contains("notice");
-        return (isTextOrHtmlFile || containsLicenseInFilename || containsNoticeInFilename)
-                && !fileNameLowerCase.endsWith(".class");
     }
 
     /**
@@ -119,7 +88,7 @@ public class JavaJarFinder extends AbstractFinder {
      * {@link #parseUnpackedJarArchive(Archive, File, String)}.</p>
      * 
      * @param file
-     * @param filePath
+     * @param filePath the symbolic path of the JAR file (for information only)
      * 
      * @throws Exception
      */
@@ -197,47 +166,6 @@ public class JavaJarFinder extends AbstractFinder {
         parseUnpackedJarArchive(foundArchive, entryContainer.getFile(), newFilePath);
     }
 
-    private void parsePackedJarArchive(final Archive archive, final InputStream fileInputStream, final File parent,
-                                       final String filePath)
-            throws Exception {
-        final FinderHandler<JarEntry, JarEntryContainer, JarInputStream> finderHandler = jarFinderHandler;
-        getLog().debug("parsePackedJarArchive(): processing " + parent.getAbsolutePath());
-        try (final JarInputStream jarInputStream = new JarInputStream(fileInputStream)) {
-            JarEntry entry;
-            while ((entry = jarInputStream.getNextJarEntry()) != null) {
-                final String entryName = finderHandler.getEntryName(entry);
-                final String newFilePath = filePath + '/' + entryName;
-                getLog().debug("parsePackedJarArchive(): processing " + newFilePath);
-                if (isArchiveName(entryName)) {
-                    final String newFilePath2 = newFilePath + "!";
-                    final JarEntryContainer entryContainer = finderHandler.createEntryContainer(jarInputStream);
-                    final ArchiveMetaInformation archiveMetaInformation = finderHandler
-                            .getArchiveMetaInformationFromManifest(entryContainer);
-                    final File file = new File(parent, entryName);
-                    String version = null;
-                    if (finderHandler.isFile(entry)) {
-                        version = archiveMetaInformation.getVersion();
-                    }
-                    final String simpleName = getSimpleName(entryName);
-                    final Archive foundArchive = createAndAddArchive(simpleName, version, newFilePath);
-                    foundArchive.setVendor(archiveMetaInformation.getVendor());
-                    if (finderHandler.isFile(entry)) {
-                        addMessageDigest(finderHandler, entryContainer, foundArchive);
-                    }
-                    addLicenseFromManifest(foundArchive, archiveMetaInformation, newFilePath2);
-                    try (final InputStream inputStream = entryContainer.getInputStream()) {
-                        parsePackedJarArchive(foundArchive, inputStream, file, newFilePath2);
-                    }
-                } else {
-                    if (finderHandler.isFile(entry)) {
-                        final JarEntryContainer entryContainer = finderHandler.createEntryContainer(jarInputStream);
-                        handleArchiveNormalFile(archive, entryName, entryContainer, newFilePath);
-                    }
-                }
-            }
-        }
-    }
-
     private void handleArchiveFile(final String entryName, final FileSystemEntryContainer entryContainer,
                                    final String filePath)
             throws IOException, Exception {
@@ -253,21 +181,6 @@ public class JavaJarFinder extends AbstractFinder {
         }
     }
 
-    private void handleArchiveNormalFile(final Archive archive, final String entryName,
-                                         final EntryContainer entryContainer, final String filePath)
-            throws IOException {
-        if (isCandidateLicenseFile(entryName)) {
-            archive.addLicenseCandidateFile(filePath);
-        }
-        try (final InputStream inputStream = entryContainer.getInputStream()) {
-            final Collection<License> licenses = checkFileForLicenses(inputStream, entryName, getLicenseStoreData());
-            addLicenses(archive, licenses, filePath);
-        }
-        if (isPomFile(entryName)) {
-            addLicensesFromPom(entryContainer, archive, filePath);
-        }
-    }
-
     private Archive createAndAddArchive(final String fileName, final ArchiveMetaInformation archiveMetaInformation,
                                         final String filePath) {
         String version = null;
@@ -279,73 +192,6 @@ public class JavaJarFinder extends AbstractFinder {
         final Archive foundArchive = createAndAddArchive(fileName, version, filePath);
         foundArchive.setVendor(vendor);
         return foundArchive;
-    }
-
-    private Archive createAndAddArchive(final String fileName, final String versionParam, final String filePath) {
-        final String version = getVersionNotNull(versionParam);
-        final Archive foundArchive = new Archive(JAVA, fileName, version, filePath);
-        addToArchiveFiles(foundArchive);
-        return foundArchive;
-    }
-
-    private void addLicensesFromPom(final EntryContainer entryContainer, final Archive archive, final String filePath)
-            throws IOException {
-        try (final InputStream inputStream = entryContainer.getInputStream()) {
-            artifactServerUtil.addLicensesFromPom(inputStream, archive, filePath, getLicenseStoreData());
-        }
-    }
-
-    private String getSimpleName(final String entryName) {
-        final int pos = entryName.lastIndexOf('/');
-        if (pos >= 0) {
-            return entryName.substring(pos + 1);
-        }
-        return entryName;
-    }
-
-    private <C extends EntryContainer> void addMessageDigest(final FinderHandler<?, C, ?> finderHandler,
-                                                             final C entryContainer, final Archive archive)
-            throws IOException {
-        final LSMessageDigest md = finderHandler.calculateMessageDigest(entryContainer);
-        archive.setMessageDigest(md);
-    }
-
-    private String getVersionNotNull(String version) {
-        if (version == null) {
-            return "";
-        }
-        return version;
-    }
-
-    private void addLicenseFromManifest(final Archive archive, final ArchiveMetaInformation archiveMetaInformation,
-                                        final String filePath) {
-        String licenseUrl = archiveMetaInformation.getLicenseUrl();
-        if (licenseUrl != null) {
-            licenseUrl = licenseUrl.trim();
-            final String[] licenseUrls = licenseUrl.split(",");
-            boolean licenseFound = false;
-            final String licenseFileName = filePath + "/META-INF/MANIFEST.MF";
-            for (String licenseUrl2 : licenseUrls) {
-                licenseUrl2 = licenseUrl2.trim();
-                licenseFound |= LicenseUtil.handleLicenseUrl(licenseUrl2, archive, licenseFileName,
-                        getLicenseStoreData(), getLog());
-            }
-            if (!licenseFound) {
-                getLog().warn("License not found by URL: " + licenseUrl);
-            }
-        }
-    }
-
-    /**
-     * Checks if is archive by checking if the name contains "jar".
-     * 
-     * <p>Note: this method only relies on the filename. It does not check containing files that indicate an archive.</p>
-     * 
-     * @param fileName the file name
-     * @return true, if is archive
-     */
-    private static boolean isArchiveName(final String fileName) {
-        return fileName.endsWith(".jar");
     }
 
     /**
@@ -386,286 +232,5 @@ public class JavaJarFinder extends AbstractFinder {
 
     private boolean isSpecialArchive(final String name) {
         return specialArchiveNames.contains(name);
-    }
-
-    private boolean isPomFile(final String name) {
-        return name.endsWith("pom.xml");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isPomResolutionUsed() {
-        return artifactServerUtil.isCachedCheckAccess();
-    }
-
-    /**
-     * Representation of a file or file entry (in a JAR file).
-     * 
-     * <p>This is used to handle files from traversing the file system and entries from reading
-     * a JAR file in the same abstract way.</p>
-     * 
-     * @see FileSystemEntryContainer
-     * @see JarEntryContainer
-     */
-    @FunctionalInterface
-    private static interface EntryContainer {
-
-        /**
-         * Obtains an Input stream.
-         * 
-         * @return an Input stream
-         * @throws IOException
-         */
-        public InputStream getInputStream() throws IOException;
-    }
-
-    /**
-     * Represents a file from the file system.
-     * 
-     * <p>Holds a reference to the file object.</p>
-     *
-     * @see JarEntryContainer
-     */
-    private static class FileSystemEntryContainer implements EntryContainer {
-
-        private final File file;
-
-        /**
-         * Constructor.
-         * @param file a file
-         */
-        public FileSystemEntryContainer(final File file) {
-            this.file = file;
-        }
-
-        /**
-         * @return the file
-         */
-        public final File getFile() {
-            return file;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public final InputStream getInputStream() throws IOException {
-            return new FileInputStream(getFile());
-        }
-
-    }
-
-    /**
-     * Represents an entry from a JAR file.
-     * 
-     * <p>Holds the content of the entry in a byte array.</p>
-     * 
-     * @see FileSystemEntryContainer
-     */
-    private static class JarEntryContainer implements EntryContainer {
-
-        private final byte[] contents;
-
-        /**
-         * Constructor.
-         * @param contents
-         */
-        public JarEntryContainer(final byte[] contents) {
-            if (contents.length == 0) {
-                throw new IllegalArgumentException("contents length must not be zero");
-            }
-            this.contents = contents;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public final InputStream getInputStream() {
-            return new ByteArrayInputStream(contents);
-        }
-    }
-
-    private static interface FinderHandler<F, C extends EntryContainer, I> {
-
-        /**
-         * Checks if the algorithm should go into a recursion for non-archive directories.
-         * 
-         * @return true if directory recursion should be used, false otherwise
-         */
-        public boolean isUseDirectoryRecursion();
-
-        public String getEntryName(F entry);
-
-        public boolean isFile(F file);
-
-        public boolean isDirectory(F file);
-
-        public C createEntryContainer(I ecBase) throws IOException;
-
-        public ArchiveMetaInformation getArchiveMetaInformationFromManifest(C entryContainer) throws IOException;
-
-        public LSMessageDigest calculateMessageDigest(C entryContainer) throws IOException;
-
-    }
-
-    private abstract static class AbstractFinderHandler<F, C extends EntryContainer, I>
-            implements FinderHandler<F, C, I> {
-
-        private final ILFLog log;
-
-        /**
-         * Constructor.
-         * 
-         * @param log the logger
-         */
-        protected AbstractFinderHandler(final ILFLog log) {
-            this.log = log;
-        }
-
-        /**
-         * @return the log
-         */
-        protected final ILFLog getLog() {
-            return log;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public LSMessageDigest calculateMessageDigest(final C entryContainer) throws IOException {
-            try (final InputStream inputStream = entryContainer.getInputStream()) {
-                return CryptUtil.calculateMessageDigest(inputStream);
-            }
-        }
-
-    }
-
-    private static class FilesystemFinderHandler extends AbstractFinderHandler<File, FileSystemEntryContainer, File> {
-
-        /**
-         * Constructor.
-         * 
-         * @param log the logger
-         */
-        public FilesystemFinderHandler(ILFLog log) {
-            super(log);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isUseDirectoryRecursion() {
-            return true;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getEntryName(final File entry) {
-            return entry.getName();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isFile(final File file) {
-            return file.isFile();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isDirectory(final File file) {
-            return file.isDirectory();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public FileSystemEntryContainer createEntryContainer(final File ecBase) throws IOException {
-            return new FileSystemEntryContainer(ecBase);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public ArchiveMetaInformation getArchiveMetaInformationFromManifest(final FileSystemEntryContainer entryContainer)
-                throws IOException {
-            return JarUtil.getArchiveMetaInformationFromManifest(entryContainer.getFile(), getLog());
-        }
-
-    }
-
-    private static class JarFinderHandler extends AbstractFinderHandler<JarEntry, JarEntryContainer, JarInputStream> {
-
-        /**
-         * @param log the logger
-         */
-        public JarFinderHandler(final ILFLog log) {
-            super(log);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isUseDirectoryRecursion() {
-            return false;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getEntryName(final JarEntry entry) {
-            return entry.getName();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isFile(final JarEntry entry) {
-            return !entry.isDirectory();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isDirectory(final JarEntry entry) {
-            return entry.isDirectory();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public JarEntryContainer createEntryContainer(final JarInputStream ecBase) throws IOException {
-            final byte[] archiveBytes = IOUtils.toByteArray(ecBase);
-            return new JarEntryContainer(archiveBytes);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public ArchiveMetaInformation getArchiveMetaInformationFromManifest(final JarEntryContainer entryContainer)
-                throws IOException {
-            try (final InputStream inputStream = entryContainer.getInputStream()) {
-                return JarUtil.getArchiveMetaInformationFromManifest(inputStream, getLog());
-            }
-        }
-
     }
 }

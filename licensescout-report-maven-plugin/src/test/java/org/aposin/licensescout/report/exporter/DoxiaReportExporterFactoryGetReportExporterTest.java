@@ -57,6 +57,10 @@ public class DoxiaReportExporterFactoryGetReportExporterTest
         });
     }
 
+    /**
+     * Parameters.
+     * @return the parameters for the test case
+     */
     @Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][] { //

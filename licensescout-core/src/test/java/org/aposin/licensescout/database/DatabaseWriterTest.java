@@ -26,7 +26,7 @@ import java.util.List;
 import org.aposin.licensescout.archive.Archive;
 import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.configuration.BuildInfo;
-import org.aposin.licensescout.configuration.DatabaseConfiguration;
+import org.aposin.licensescout.configuration.ExecutionDatabaseConfiguration;
 import org.aposin.licensescout.core.test.util.TestUtil;
 import org.aposin.licensescout.license.DetectionStatus;
 import org.aposin.licensescout.license.LegalStatus;
@@ -108,7 +108,7 @@ public class DatabaseWriterTest extends DBTestCase {
     }
 
     /**
-     * Tests {@link DatabaseWriter#writeToDatabase(BuildInfo, List, DatabaseConfiguration, ILFLog)}.
+     * Tests {@link DatabaseWriter#writeToDatabase(BuildInfo, List, ExecutionDatabaseConfiguration, ILFLog)}.
      * 
      * @throws Exception
      */
@@ -124,7 +124,7 @@ public class DatabaseWriterTest extends DBTestCase {
         final Archive archive2 = createArchive2();
         archives.add(archive2);
 
-        final DatabaseConfiguration databaseConfiguration = createDatabaseConfiguration();
+        final ExecutionDatabaseConfiguration databaseConfiguration = createDatabaseConfiguration();
         DatabaseWriter.writeToDatabase(buildInfo, archives, databaseConfiguration, log);
 
         final List<String> tablesNamesToCheck = Arrays.asList("Builds", "LibraryData", "DetectedLicenses");
@@ -135,7 +135,8 @@ public class DatabaseWriterTest extends DBTestCase {
     }
 
     /**
-     * @return
+     * Creates a build info object for testing.
+     * @return a build info object
      */
     private BuildInfo createBuildInformation() {
         final BuildInfo buildInfo = new BuildInfo("name", "version", "date", "buildUrl", "licenseReportCsvUrl",
@@ -144,8 +145,8 @@ public class DatabaseWriterTest extends DBTestCase {
     }
 
     /**
-     * @param licenseStoreData
-     * @return
+     * @param licenseStoreData the data object containing information on licenses
+     * @return an archive object for testing
      */
     private Archive createArchive1(final LicenseStoreData licenseStoreData) {
         final Archive archive = new Archive(ArchiveType.JAVA, "fileName1", "version1", "path1");
@@ -160,7 +161,7 @@ public class DatabaseWriterTest extends DBTestCase {
     }
 
     /**
-     * @return
+     * @return an archive object for testing
      */
     private Archive createArchive2() {
         final Archive archive = new Archive(ArchiveType.JAVA, "fileName2", "version2", "path2");
@@ -230,8 +231,8 @@ public class DatabaseWriterTest extends DBTestCase {
      * Obtains a database configuration.
      * @return a database configuration
      */
-    private DatabaseConfiguration createDatabaseConfiguration() {
-        final DatabaseConfiguration databaseConfiguration = new DatabaseConfiguration();
+    private ExecutionDatabaseConfiguration createDatabaseConfiguration() {
+        final ExecutionDatabaseConfiguration databaseConfiguration = new ExecutionDatabaseConfiguration();
         databaseConfiguration.setJdbcUrl(JDBC_URL);
         databaseConfiguration.setUsername(USERNAME);
         databaseConfiguration.setPassword(PASSWORD);

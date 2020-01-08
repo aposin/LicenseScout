@@ -32,10 +32,10 @@ import org.aposin.licensescout.archive.Archive;
 import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.configuration.BuildInfo;
 import org.aposin.licensescout.configuration.ConfigFileHandler;
-import org.aposin.licensescout.configuration.DatabaseConfiguration;
-import org.aposin.licensescout.configuration.Output;
+import org.aposin.licensescout.configuration.ExecutionDatabaseConfiguration;
+import org.aposin.licensescout.configuration.ExecutionOutput;
 import org.aposin.licensescout.configuration.OutputFileType;
-import org.aposin.licensescout.configuration.RunParameters;
+import org.aposin.licensescout.configuration.FinderParameters;
 import org.aposin.licensescout.database.DatabaseWriter;
 import org.aposin.licensescout.exporter.GeneralStatistics;
 import org.aposin.licensescout.exporter.IDetectionStatusStatistics;
@@ -149,11 +149,10 @@ public class Executor {
 
         logNpmExcludedDirectoryNames(getLog());
         ArchiveType archiveType = getExecutionParameters().getArchiveType();
-        final RunParameters runParameters = new RunParameters();
-        runParameters.setNexusCentralBaseUrl(getExecutionParameters().getNexusCentralBaseUrl());
-        runParameters.setConnectTimeout(getExecutionParameters().getConnectTimeout());
+        final FinderParameters finderParameters = new FinderParameters();
+        finderParameters.setArtifactServerUtil(getExecutionParameters().getArtifactServerUtil());
         final AbstractFinder finder = FinderFactory.getInstance().createFinder(executionParameters, licenseStoreData,
-                runParameters);
+                finderParameters);
         getLog().info("Starting scan on " + getExecutionParameters().getScanDirectory().getAbsolutePath() + "...");
 
         OutputResult outputResult;
@@ -196,7 +195,7 @@ public class Executor {
     private void handleFailOnError(final OutputResult outputResult) throws LicenseScoutFailOnErrorException {
         List<Alarm> alarms = collectAlarms(outputResult);
         if (!alarms.isEmpty()) {
-            final StringBuffer message = new StringBuffer();
+            final StringBuilder message = new StringBuilder();
             message.append("artifacts have unaccepted states: ");
             for (final Alarm alarm : alarms) {
                 final Archive archive = alarm.getArchive();
@@ -233,11 +232,11 @@ public class Executor {
     }
 
     /**
-     * @param log
+     * @param log the logger
      */
     private void prepareOutput(final ILFLog log) {
         MiscUtil.createDirectoryIfNotExists(getExecutionParameters().getOutputDirectory(), getLog());
-        for (final Output output : getExecutionParameters().getOutputs()) {
+        for (final ExecutionOutput output : getExecutionParameters().getOutputs()) {
             final File outputFile = new File(getExecutionParameters().getOutputDirectory(),
                     OutputFileHelper.getOutputFilename(output));
             log.info("using " + output.getType() + " output file: " + outputFile.getAbsolutePath());
@@ -260,7 +259,7 @@ public class Executor {
         String licenseReportCsvUrl = null;
         String licenseReportHtmlUrl = null;
         String licenseReportTxtUrl = null;
-        for (final Output output : getExecutionParameters().getOutputs()) {
+        for (final ExecutionOutput output : getExecutionParameters().getOutputs()) {
             switch (output.getType()) {
                 case CSV:
                     licenseReportCsvUrl = output.getUrl();
@@ -361,7 +360,7 @@ public class Executor {
                     && !getExecutionParameters().isWriteResultsToDatabaseForSnapshotBuilds()) {
                 getLog().info("Not writing results to database because is snapshot version");
             } else {
-                DatabaseConfiguration resultDatabaseConfiguration = getExecutionParameters()
+                ExecutionDatabaseConfiguration resultDatabaseConfiguration = getExecutionParameters()
                         .getResultDatabaseConfiguration();
                 if (getExecutionParameters().getResultDatabaseConfiguration() != null
                         && resultDatabaseConfiguration.getJdbcUrl() != null) {
@@ -378,7 +377,7 @@ public class Executor {
     }
 
     /**
-     * @param log
+     * @param log the logger
      * @param outputResult
      * @param reportConfiguration
      * @throws Exception
@@ -386,7 +385,7 @@ public class Executor {
     private void doOutput(final ILFLog log, final OutputResult outputResult,
                           final ReportConfiguration reportConfiguration)
             throws Exception {
-        for (final Output output : getExecutionParameters().getOutputs()) {
+        for (final ExecutionOutput output : getExecutionParameters().getOutputs()) {
             final File outputFile = new File(getExecutionParameters().getOutputDirectory(),
                     OutputFileHelper.getOutputFilename(output));
             final OutputFileType outputFileType = output.getType();
@@ -451,10 +450,10 @@ public class Executor {
     }
 
     /**
+     * @param notices the data object containing information on notices
      * @param log the logger
      * @return a license store data object
      * @throws LicenseScoutExecutionException 
-     * @throws LicenseScoutExecutionException
      */
     private LicenseStoreData init(final Notices notices, final ILFLog log) throws LicenseScoutExecutionException {
 
@@ -469,7 +468,7 @@ public class Executor {
 
     /**
      * @param log the logger
-     * @param licenseStoreData
+     * @param licenseStoreData the data object containing information on licenses
      * @return a list of licenses that should not appear in cleaned output
      */
     protected List<License> createCleanOutputLicenseList(final ILFLog log, final LicenseStoreData licenseStoreData) {
@@ -509,7 +508,7 @@ public class Executor {
     }
 
     /**
-     * @param licenseStoreData
+     * @param licenseStoreData the data object containing information on licenses
      * @param log the logger
      * @throws LicenseScoutExecutionException
      */
@@ -525,7 +524,7 @@ public class Executor {
     }
 
     /**
-     * @param licenseStoreData
+     * @param licenseStoreData the data object containing information on licenses
      * @param log the logger
      * @throws LicenseScoutExecutionException
      */
@@ -558,7 +557,7 @@ public class Executor {
     }
 
     /**
-     * @param notices 
+     * @param notices the data object containing information on notices
      * @param log the logger
      * @return a license store data object
      * @throws LicenseScoutExecutionException 
@@ -623,9 +622,9 @@ public class Executor {
     }
 
     /**
-     * @param licenseStoreData
-     * @param notices 
-     * @param providers 
+     * @param licenseStoreData the data object containing information on licenses
+     * @param notices the data object containing information on notices
+     * @param providers the data object containing information on providers
      * @param log the logger
      * @return an object containing information on manually checked archives
      * @throws LicenseScoutExecutionException
@@ -669,7 +668,7 @@ public class Executor {
     /**
      * Reads a CSV file containing vendor names to filter out.
      * 
-     * @param inputStream an input stream
+     * @param inputStream an input stream to read the file contents from
      * @param log the logger
      * @return a list of strings
      * @throws IOException if an error occurred while reading from the file

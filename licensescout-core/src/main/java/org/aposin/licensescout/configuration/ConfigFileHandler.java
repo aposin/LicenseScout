@@ -23,21 +23,63 @@ import java.io.InputStream;
  * 
  */
 // TODO: use org.apache.maven.shared.utils.ReaderFactory.newXmlReader(InputStream)
+// or org.apache.commons.io.input.XmlStreamReader
+// for correct handling of XML encoding
 public interface ConfigFileHandler {
 
+    /**
+     * Provides an InputStream for reading the providers configuration file.
+     * @return an InputStream for reading the providers configuration file
+     * @throws IOException
+     */
     public InputStream getProvidersInputStream() throws IOException;
 
+    /**
+     * Provides an InputStream for reading the notices configuration file.
+     * @return an InputStream for reading the notices configuration file
+     * @throws IOException
+     */
     public InputStream getNoticesInputStream() throws IOException;
 
+    /**
+     * Provides an InputStream for reading the licenses configuration file.
+     * @return an InputStream for reading the licenses configuration file
+     * @throws IOException
+     */
     public InputStream getLicensesInputStream() throws IOException;
 
+    /**
+     * Provides an InputStream for reading the URL mapping configuration file.
+     * @return an InputStream for reading the URL mapping configuration file
+     * @throws IOException
+     */
     public InputStream getLicenseUrlMappingsInputStream() throws IOException;
 
+    /**
+     * Provides an InputStream for reading the name mapping configuration file.
+     * @return an InputStream for reading the name mapping configuration file
+     * @throws IOException
+     */
     public InputStream getLicenseNameMappingsInputStream() throws IOException;
 
+    /**
+     * Provides an InputStream for reading the global filters configuration file.
+     * @return an InputStream for reading the global filters configuration file
+     * @throws IOException
+     */
     public InputStream getGlobalFiltersInputStream() throws IOException;
 
+    /**
+     * Provides an InputStream for reading the checked archives configuration file.
+     * @return an InputStream for reading the checked archives configuration file
+     * @throws IOException
+     */
     public InputStream getCheckedArchivesInputStream() throws IOException;
 
+    /**
+     * Provides an InputStream for reading the filtered vendor names configuration file.
+     * @return an InputStream for reading the filtered vendor names configuration file
+     * @throws IOException
+     */
     public InputStream getFilteredVendorNamesInputStream() throws IOException;
 }

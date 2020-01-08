@@ -215,7 +215,6 @@
 				<groupId>org.apache.maven.plugin-tools</groupId>
 				<artifactId>maven-plugin-annotations</artifactId>
 				<version>${maven-plugin-annotations.version}</version>
-				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.maven.reporting</groupId>
@@ -357,6 +356,7 @@
 							<exclude>**/*.xml</exclude>
 							<exlucde>**/*.txt</exlucde>
 							<exclude>**/*.csv</exclude>
+							<exclude>**/*.pom</exclude>
 						</excludes>
 						<properties>
 							<year>2019</year>
@@ -460,6 +460,7 @@
 							<pomInclude>**/pom.xml</pomInclude>
 						</pomIncludes>
 						<postBuildHookScript>verify</postBuildHookScript>
+						<settingsFile>src/it/settings.xml</settingsFile>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -492,6 +493,9 @@
 					<artifactId>maven-plugin-plugin</artifactId>
 					<version>${maven-plugin-plugin.version}</version>
 					<configuration>
+						<extractors>
+							<extractor>java-annotations</extractor>
+						</extractors>
 						<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
 					</configuration>
 				</plugin>
@@ -558,6 +562,7 @@
 							<goals>
 								<goal>attach-descriptor</goal>
 							</goals>
+							<phase>pre-site</phase>
 						</execution>
 					</executions>
 				</plugin>
