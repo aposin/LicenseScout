@@ -31,7 +31,7 @@ import org.aposin.licensescout.core.test.util.TestUtil;
 import org.aposin.licensescout.license.IArtifactServerUtil;
 import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseStoreData;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -54,7 +54,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
      */
     @Test
     public void testPomResolutionUsed() {
-        final ILFLog log = TestUtil.createTestLog();
+        final ILSLog log = TestUtil.createTestLog();
         LicenseStoreData licenseStoreData = null;
         final IArtifactServerUtil artifactServerUtil = new TestArtifactServerUtil();
         final AbstractJavaFinder finder = new JavaJarFinder(licenseStoreData, artifactServerUtil, log);

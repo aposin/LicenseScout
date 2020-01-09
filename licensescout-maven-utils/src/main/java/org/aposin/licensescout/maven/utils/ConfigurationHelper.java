@@ -24,7 +24,7 @@ import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.aposin.licensescout.configuration.ExecutionDatabaseConfiguration;
 import org.aposin.licensescout.configuration.ExecutionOutput;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 
 /**
  * Helper class for handling database configurations and outputs.
@@ -61,7 +61,7 @@ public class ConfigurationHelper {
      */
     public static ExecutionDatabaseConfiguration getExecutionDatabaseConfiguration(final DatabaseConfiguration databaseConfiguration,
                                                                                    final Settings settings,
-                                                                                   final ILFLog log)
+                                                                                   final ILSLog log)
             throws MojoExecutionException {
         if (databaseConfiguration == null) {
             return null;

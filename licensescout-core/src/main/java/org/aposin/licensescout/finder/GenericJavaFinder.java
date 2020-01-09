@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.aposin.licensescout.license.IArtifactServerUtil;
 import org.aposin.licensescout.license.LicenseStoreData;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 
 /**
  * Unfinished skeleton for a new Finder that processes JAR files, but the collection is based on a Maven dependency tree.
@@ -35,7 +35,7 @@ public class GenericJavaFinder extends AbstractJavaFinder {
      * @param log the logger 
      */
     public GenericJavaFinder(final LicenseStoreData licenseStoreData, final IArtifactServerUtil artifactServerUtil,
-            final ILFLog log) {
+            final ILSLog log) {
         super(licenseStoreData, artifactServerUtil, log);
     }
 
@@ -54,7 +54,7 @@ public class GenericJavaFinder extends AbstractJavaFinder {
     protected void findLicensesImpl() throws Exception {
         if (entryContainers != null) {
             for (EntryContainer entryContainer : entryContainers) {
-                // TODO: implementation
+                // TODO: implementation -
                 entryContainer.toString();
             }
         }

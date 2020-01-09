@@ -20,7 +20,7 @@ import java.io.InputStream;
 
 import org.aposin.licensescout.model.LSMessageDigest;
 import org.aposin.licensescout.util.CryptUtil;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 
 /**
  * Base class for implementations of finder handlers.
@@ -31,21 +31,21 @@ import org.aposin.licensescout.util.ILFLog;
  */
 public abstract class AbstractFinderHandler<F, C extends EntryContainer, I> implements FinderHandler<F, C, I> {
 
-    private final ILFLog log;
+    private final ILSLog log;
 
     /**
      * Constructor.
      * 
      * @param log the logger
      */
-    protected AbstractFinderHandler(final ILFLog log) {
+    protected AbstractFinderHandler(final ILSLog log) {
         this.log = log;
     }
 
     /**
      * @return the log
      */
-    protected final ILFLog getLog() {
+    protected final ILSLog getLog() {
         return log;
     }
 

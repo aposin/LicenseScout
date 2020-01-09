@@ -19,7 +19,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Unit tests for implementations of {@link ILFLog}.
+ * Unit tests for implementations of {@link ILSLog}.
  * 
  */
 public abstract class AbstractLogTest {
@@ -27,30 +27,30 @@ public abstract class AbstractLogTest {
     private static final String MESSAGE = "message";
     private static final Throwable THROWABLE = new IllegalArgumentException();
 
-    private ILFLog log;
+    private ILSLog log;
 
     /**
      * @return the log
      */
-    protected final ILFLog getLog() {
+    protected final ILSLog getLog() {
         return log;
     }
 
     /**
      * @param log the log to set
      */
-    protected final void setLog(ILFLog log) {
+    protected final void setLog(ILSLog log) {
         this.log = log;
     }
 
     /**
-     * Expected value for for {@link ILFLog#isInfoEnabled()}, {@link ILFLog#isWarnEnabled()} and {@link ILFLog#isErrorEnabled()}.
+     * Expected value for for {@link ILSLog#isInfoEnabled()}, {@link ILSLog#isWarnEnabled()} and {@link ILSLog#isErrorEnabled()}.
      * @return the expected value
      */
     protected abstract boolean getExpectedEnabled();
 
     /**
-     * Expected value for {@link ILFLog#isDebugEnabled()}.
+     * Expected value for {@link ILSLog#isDebugEnabled()}.
      * @return the expected value
      */
     protected abstract boolean getExpectedDebugEnabled();

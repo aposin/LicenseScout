@@ -23,7 +23,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.IOUtils;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 
 /**
  * Handler for licensescout configuration files read from a ZIP file.
@@ -40,7 +40,7 @@ public class ZipConfigFileHandler extends AbstractConfigFileHandler {
      * @param configFileParameters
      * @param log the logger
      */
-    public ZipConfigFileHandler(File artifactFile, ConfigFileParameters configFileParameters, final ILFLog log) {
+    public ZipConfigFileHandler(File artifactFile, ConfigFileParameters configFileParameters, final ILSLog log) {
         super(configFileParameters, log);
         this.artifactFile = artifactFile;
     }

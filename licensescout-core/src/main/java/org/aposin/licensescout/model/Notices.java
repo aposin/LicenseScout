@@ -25,7 +25,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.lang3.StringUtils;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 import org.aposin.licensescout.util.sax.AbstractSaxHandler;
 import org.aposin.licensescout.util.sax.IElementHandler;
 import org.aposin.licensescout.util.sax.NopElementHandler;
@@ -40,7 +40,7 @@ import org.xml.sax.XMLReader;
  * <p>Initialisation:</p>
  * <ol>
  * <li>Create an instance</li>
- * <li>Call {@link #readNotices(InputStream, boolean, ILFLog)} to read in the notices from a file</li>
+ * <li>Call {@link #readNotices(InputStream, boolean, ILSLog)} to read in the notices from a file</li>
  * </ol>
  */
 public class Notices {
@@ -57,7 +57,7 @@ public class Notices {
         // DO NOTHING
     }
 
-    private void addToStore(final Notice notice, final ILFLog log) {
+    private void addToStore(final Notice notice, final ILSLog log) {
         final String identifier = notice.getIdentifier();
         if (!StringUtils.isEmpty(identifier)) {
             final Notice existingNotice = store.get(identifier);
@@ -88,7 +88,7 @@ public class Notices {
      * @throws SAXException 
      * @throws ParserConfigurationException 
      */
-    public void readNotices(final InputStream inputStream, boolean validateXml, final ILFLog log)
+    public void readNotices(final InputStream inputStream, boolean validateXml, final ILSLog log)
             throws IOException, ParserConfigurationException, SAXException {
 
         final SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -114,7 +114,7 @@ public class Notices {
          * Constructor.
          * @param log the logger
          */
-        public NoticeSaxHandler(final ILFLog log) {
+        public NoticeSaxHandler(final ILSLog log) {
             super(log);
             setElementHandler(new NopElementHandler(ELEMENT_NOTICES));
             setElementHandler(new StandardNoticeHandler());

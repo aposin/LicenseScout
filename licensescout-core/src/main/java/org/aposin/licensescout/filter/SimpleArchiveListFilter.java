@@ -22,7 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.aposin.licensescout.archive.Archive;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 
 /**
  * Filter implementation that allows to define a single method containing a predicate related to an archive.
@@ -34,7 +34,7 @@ public abstract class SimpleArchiveListFilter extends AbstractArchiveListFilter 
      * @param log the logger
      * @param filterActive true if the filter should be active, false otherwise
      */
-    public SimpleArchiveListFilter(final ILFLog log, boolean filterActive) {
+    public SimpleArchiveListFilter(final ILSLog log, boolean filterActive) {
         super(log);
         setFilterActive(filterActive);
     }

@@ -25,7 +25,7 @@ import org.aposin.licensescout.core.test.util.TestUtil;
 import org.aposin.licensescout.license.IArtifactServerUtil;
 import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseStoreData;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,7 +39,7 @@ public class ArtifactServerUtilTest {
 
     /**
      * Test method for
-     * {@link ArtifactServerUtil#ArtifactServerUtil(java.lang.String, int, org.aposin.licensescout.util.ILFLog)}.
+     * {@link ArtifactServerUtil#ArtifactServerUtil(java.lang.String, int, org.aposin.licensescout.util.ILSLog)}.
      */
     @Test
     public void testIsCachedCheckAccessRemoteRepo() {
@@ -50,7 +50,7 @@ public class ArtifactServerUtilTest {
 
     /**
      * Test method for
-     * {@link ArtifactServerUtil#ArtifactServerUtil(java.lang.String, int, org.aposin.licensescout.util.ILFLog)}.
+     * {@link ArtifactServerUtil#ArtifactServerUtil(java.lang.String, int, org.aposin.licensescout.util.ILSLog)}.
      */
     @Test
     public void testIsCachedCheckAccessLocalFile() {
@@ -113,7 +113,7 @@ public class ArtifactServerUtilTest {
      * @throws Exception 
      */
     private void assertAddLicensesFromPom(final String pomFilename, final int expectedLicenseCount) throws Exception {
-        final ILFLog log = TestUtil.createTestLog();
+        final ILSLog log = TestUtil.createTestLog();
         final IArtifactServerUtil artifactServerUtil = createArtifactServerUtil();
         final Archive archive = new Archive(ArchiveType.JAVA, "fileName", "version", "path");
         final LicenseStoreData licenseStoreData = TestUtil.readLicenseStoreData(log);

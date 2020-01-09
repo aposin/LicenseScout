@@ -25,7 +25,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.lang3.StringUtils;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 import org.aposin.licensescout.util.sax.AbstractSaxHandler;
 import org.aposin.licensescout.util.sax.IElementHandler;
 import org.aposin.licensescout.util.sax.NopElementHandler;
@@ -39,7 +39,7 @@ import org.xml.sax.XMLReader;
 
  * <ol>
  * <li>Create an instance</li>
- * <li>Call {@link #readProviders(InputStream, boolean, ILFLog)} to read in the providers from a file</li>
+ * <li>Call {@link #readProviders(InputStream, boolean, ILSLog)} to read in the providers from a file</li>
  * </ol>
  */
 public class Providers {
@@ -56,7 +56,7 @@ public class Providers {
         // DO NOTHING
     }
 
-    private void addToStore(final Provider provider, final ILFLog log) { // NOSONAR
+    private void addToStore(final Provider provider, final ILSLog log) { // NOSONAR
         final String identifier = provider.getIdentifier();
         if (!StringUtils.isEmpty(identifier)) {
             final Provider existingProvider = store.get(identifier);
@@ -87,7 +87,7 @@ public class Providers {
      * @throws SAXException 
      * @throws ParserConfigurationException 
      */
-    public void readProviders(final InputStream inputStream, boolean validateXml, final ILFLog log)
+    public void readProviders(final InputStream inputStream, boolean validateXml, final ILSLog log)
             throws IOException, ParserConfigurationException, SAXException {
 
         final SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -114,7 +114,7 @@ public class Providers {
          * Constructor.
          * @param log the logger
          */
-        public ProviderSaxHandler(final ILFLog log) {
+        public ProviderSaxHandler(final ILSLog log) {
             super(log);
             setElementHandler(new NopElementHandler(ELEMENT_PROVIDERS));
             setElementHandler(new StandardProviderHandler());

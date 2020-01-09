@@ -66,7 +66,7 @@ public class MiscUtil {
      * @param directory
      * @param log the logger
      */
-    public static void createDirectoryIfNotExists(final File directory, final ILFLog log) {
+    public static void createDirectoryIfNotExists(final File directory, final ILSLog log) {
         if (!directory.exists()) {
             directory.mkdirs();
             log.info("created directory " + directory.getAbsoluteFile());

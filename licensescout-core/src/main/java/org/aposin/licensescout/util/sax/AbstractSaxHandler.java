@@ -18,7 +18,7 @@ package org.aposin.licensescout.util.sax;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
@@ -33,7 +33,7 @@ public class AbstractSaxHandler extends DefaultHandler {
     protected static final String ATTRIBUTE_IDREF = "idref";
     protected static final String ATTRIBUTE_TYPE = "type";
 
-    private final ILFLog log;
+    private final ILSLog log;
     private final Map<String, IElementHandler> elementHandlers = new HashMap<>();
     private StringBuilder characterCollector;
     private Locator locator;
@@ -42,14 +42,14 @@ public class AbstractSaxHandler extends DefaultHandler {
      * Constructor.
      * @param log the logger
      */
-    public AbstractSaxHandler(final ILFLog log) {
+    public AbstractSaxHandler(final ILSLog log) {
         this.log = log;
     }
 
     /**
      * @return the log
      */
-    protected final ILFLog getLog() {
+    protected final ILSLog getLog() {
         return log;
     }
 

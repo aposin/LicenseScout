@@ -19,7 +19,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.aposin.licensescout.util.ArchiveMetaInformation;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 import org.aposin.licensescout.util.JarUtil;
 
 /**
@@ -33,7 +33,7 @@ public class FilesystemFinderHandler extends AbstractFinderHandler<File, FileSys
      * 
      * @param log the logger
      */
-    public FilesystemFinderHandler(ILFLog log) {
+    public FilesystemFinderHandler(ILSLog log) {
         super(log);
     }
 

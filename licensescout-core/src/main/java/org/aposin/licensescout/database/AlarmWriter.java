@@ -24,7 +24,7 @@ import org.aposin.licensescout.archive.Archive;
 import org.aposin.licensescout.configuration.BuildInfo;
 import org.aposin.licensescout.configuration.ExecutionDatabaseConfiguration;
 import org.aposin.licensescout.model.Alarm;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 
 /**
  * Writes alarms to a database.
@@ -47,7 +47,7 @@ public class AlarmWriter {
      * @param log the logger
      */
     public static void writeAlarms(final BuildInfo buildInfo, final List<Alarm> alarms,
-                                   final ExecutionDatabaseConfiguration databaseConfiguration, final ILFLog log) {
+                                   final ExecutionDatabaseConfiguration databaseConfiguration, final ILSLog log) {
         try (final Connection connection = DatabaseUtil.getConnection(databaseConfiguration);
                 final Statement statement = connection.createStatement();) {
             for (final Alarm alarm : alarms) {

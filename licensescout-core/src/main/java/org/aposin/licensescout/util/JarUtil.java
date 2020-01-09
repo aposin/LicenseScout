@@ -56,10 +56,10 @@ public class JarUtil {
      *         is never <code>null</code>.
      * @throws IOException
      * 
-     * @see #getArchiveMetaInformationFromManifest(File, ILFLog)
-     * @see #getArchiveMetaInformationFromManifest(InputStream, ILFLog)
+     * @see #getArchiveMetaInformationFromManifest(File, ILSLog)
+     * @see #getArchiveMetaInformationFromManifest(InputStream, ILSLog)
      */
-    public static ArchiveMetaInformation getArchiveMetaInformationFromManifestFile(final File file, final ILFLog log)
+    public static ArchiveMetaInformation getArchiveMetaInformationFromManifestFile(final File file, final ILSLog log)
             throws IOException {
         try (final InputStream is = new FileInputStream(file)) {
             final Manifest manifest = new Manifest(is);
@@ -86,10 +86,10 @@ public class JarUtil {
      *         is never <code>null</code>.
      * @throws IOException
      * 
-     * @see #getArchiveMetaInformationFromManifestFile(File, ILFLog)
-     * @see #getArchiveMetaInformationFromManifest(InputStream, ILFLog)
+     * @see #getArchiveMetaInformationFromManifestFile(File, ILSLog)
+     * @see #getArchiveMetaInformationFromManifest(InputStream, ILSLog)
      */
-    public static ArchiveMetaInformation getArchiveMetaInformationFromManifest(final File file, final ILFLog log)
+    public static ArchiveMetaInformation getArchiveMetaInformationFromManifest(final File file, final ILSLog log)
             throws IOException {
         final String sourceForErrorText = file.getAbsolutePath();
         try (final JarFile jarFile = new JarFile(file)) {
@@ -117,11 +117,11 @@ public class JarUtil {
      *         is never <code>null</code>.
      * @throws IOException
      * 
-     * @see #getArchiveMetaInformationFromManifestFile(File, ILFLog)
-     * @see #getArchiveMetaInformationFromManifest(File, ILFLog)
+     * @see #getArchiveMetaInformationFromManifestFile(File, ILSLog)
+     * @see #getArchiveMetaInformationFromManifest(File, ILSLog)
      */
     public static ArchiveMetaInformation getArchiveMetaInformationFromManifest(final InputStream inputStream,
-                                                                               final ILFLog log)
+                                                                               final ILSLog log)
             throws IOException {
         final String sourceForErrorText = "input stream";
         try (final JarInputStream jarFile = new JarInputStream(inputStream)) {
@@ -131,7 +131,7 @@ public class JarUtil {
     }
 
     private static ArchiveMetaInformation getArchiveMetaInformationFromManifestObject(final Manifest manifest,
-                                                                                      final ILFLog log,
+                                                                                      final ILSLog log,
                                                                                       final String sourceForErrorText) {
         if (manifest != null) {
             final String version = getVersionFromManifest(manifest, log);
@@ -161,7 +161,7 @@ public class JarUtil {
      * @return a string containing a version number or <code>null</code>
      * 
      */
-    private static String getVersionFromManifest(final Manifest manifest, final ILFLog log) {
+    private static String getVersionFromManifest(final Manifest manifest, final ILSLog log) {
         final Attributes mainAttributes = manifest.getMainAttributes();
         final String bundleVersion = mainAttributes.getValue("Bundle-Version");
         log.debug("Bundle-Version: " + bundleVersion);
@@ -196,7 +196,7 @@ public class JarUtil {
      * @param log a logger
      * @return a string containing a license URL or <code>null</code>
      */
-    private static String getLicenseFromManifest(final Manifest manifest, final ILFLog log) {
+    private static String getLicenseFromManifest(final Manifest manifest, final ILSLog log) {
         final Attributes mainAttributes = manifest.getMainAttributes();
         final String bundleLicense = mainAttributes.getValue("Bundle-License");
         log.debug("Bundle-License: " + bundleLicense);
@@ -216,7 +216,7 @@ public class JarUtil {
      * @param log a logger
      * @return a string containing a vendor name or <code>null</code>
      */
-    private static String getVendorFromManifest(final Manifest manifest, final ILFLog log) {
+    private static String getVendorFromManifest(final Manifest manifest, final ILSLog log) {
         final Attributes mainAttributes = manifest.getMainAttributes();
         final String bundleVendor = mainAttributes.getValue("Bundle-Vendor");
         log.debug("Bundle-Vendor: " + bundleVendor);

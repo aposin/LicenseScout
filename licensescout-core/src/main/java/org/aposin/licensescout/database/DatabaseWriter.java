@@ -29,7 +29,7 @@ import org.aposin.licensescout.configuration.ExecutionDatabaseConfiguration;
 import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseUtil;
 import org.aposin.licensescout.model.Provider;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 
 /**
  * Writes information on build, library data and licenses to a database.
@@ -60,7 +60,7 @@ public class DatabaseWriter {
      * @param log the logger
      */
     public static void writeToDatabase(final BuildInfo buildInfo, final List<Archive> archives,
-                                       final ExecutionDatabaseConfiguration databaseConfiguration, final ILFLog log) {
+                                       final ExecutionDatabaseConfiguration databaseConfiguration, final ILSLog log) {
         // for debugging
         if (log.isDebugEnabled()) {
             DatabaseUtil.dumpDrivers(log);

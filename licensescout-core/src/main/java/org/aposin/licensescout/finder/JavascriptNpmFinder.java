@@ -37,14 +37,14 @@ import org.aposin.licensescout.license.LicenseStoreData;
 import org.aposin.licensescout.license.LicenseUtil;
 import org.aposin.licensescout.model.Author;
 import org.aposin.licensescout.model.LicenseText;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 import org.aposin.licensescout.util.JsonUtil;
 
 /**
  * Scan for licenses in an NPM cache directory.
  * 
  * <p>Certain directories can be excluded from being recognized as an archive by giving their exact name as an element in the exclude list
- * passed to the constructor (see {@link #JavascriptNpmFinder(LicenseStoreData, ILFLog, List)}).</p>
+ * passed to the constructor (see {@link #JavascriptNpmFinder(LicenseStoreData, ILSLog, List)}).</p>
  *  
  */
 public class JavascriptNpmFinder extends AbstractFinder {
@@ -58,7 +58,7 @@ public class JavascriptNpmFinder extends AbstractFinder {
      * @param log the logger
      * @param npmExcludedDirectoryNames list of directory names to ignore in scan of NPM directory
      */
-    public JavascriptNpmFinder(final LicenseStoreData licenseStoreData, final ILFLog log,
+    public JavascriptNpmFinder(final LicenseStoreData licenseStoreData, final ILSLog log,
             final List<String> npmExcludedDirectoryNames) {
         super(licenseStoreData, log);
         this.dirNameExcludeList.addAll(npmExcludedDirectoryNames);

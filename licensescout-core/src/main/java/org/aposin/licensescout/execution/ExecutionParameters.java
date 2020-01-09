@@ -23,7 +23,7 @@ import org.aposin.licensescout.configuration.ExecutionDatabaseConfiguration;
 import org.aposin.licensescout.configuration.ExecutionOutput;
 import org.aposin.licensescout.license.IArtifactServerUtil;
 import org.aposin.licensescout.license.LegalStatus;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 
 /**
  * Parameter object containing all information for a LicenseScout execution.
@@ -207,7 +207,7 @@ public class ExecutionParameters {
      * NOTE: is not simply called 'log' because in this case {@code BeanUtils#copyProperties(Object, Object)} would use the value of AbstractMojo.getLog()
      * to initialize this value, however, they have incompatible types and this leads to a runtime error.
      */
-    private ILFLog lsLog;
+    private ILSLog lsLog;
 
     private List<IReportExporterFactory> exporterFactories;
 
@@ -566,14 +566,14 @@ public class ExecutionParameters {
     /**
      * @return the log
      */
-    public final ILFLog getLsLog() {
+    public final ILSLog getLsLog() {
         return lsLog;
     }
 
     /**
      * @param lsLog the log to set
      */
-    public final void setLsLog(ILFLog lsLog) {
+    public final void setLsLog(ILSLog lsLog) {
         this.lsLog = lsLog;
     }
 

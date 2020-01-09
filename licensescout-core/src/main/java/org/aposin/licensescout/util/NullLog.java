@@ -19,7 +19,7 @@ package org.aposin.licensescout.util;
  * Does not log anything - similar to /dev/null - use for test cases.
  * 
  */
-public class NullLog implements ILFLog {
+public class NullLog implements ILSLog {
 
     /**
      * Constructor.

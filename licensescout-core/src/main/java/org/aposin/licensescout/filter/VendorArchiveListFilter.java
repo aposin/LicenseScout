@@ -21,7 +21,7 @@ package org.aposin.licensescout.filter;
 import java.util.List;
 
 import org.aposin.licensescout.archive.Archive;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 
 /**
  * Filters out by vendors given in the MANIFEST.MF or package.json.
@@ -36,7 +36,7 @@ public class VendorArchiveListFilter extends SimpleArchiveListFilter {
      * @param log the logger
      * @param filterActive true if the filter should be active, false otherwise
      */
-    public VendorArchiveListFilter(final List<String> filteredVendorNames, final ILFLog log,
+    public VendorArchiveListFilter(final List<String> filteredVendorNames, final ILSLog log,
             final boolean filterActive) {
         super(log, filterActive);
         this.filteredVendorNames = filteredVendorNames;

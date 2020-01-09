@@ -32,7 +32,7 @@ import org.aposin.licensescout.license.DetectionStatus;
 import org.aposin.licensescout.license.LegalStatus;
 import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseStoreData;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 import org.dbunit.Assertion;
 import org.dbunit.DBTestCase;
 import org.dbunit.DatabaseUnitException;
@@ -108,14 +108,14 @@ public class DatabaseWriterTest extends DBTestCase {
     }
 
     /**
-     * Tests {@link DatabaseWriter#writeToDatabase(BuildInfo, List, ExecutionDatabaseConfiguration, ILFLog)}.
+     * Tests {@link DatabaseWriter#writeToDatabase(BuildInfo, List, ExecutionDatabaseConfiguration, ILSLog)}.
      * 
      * @throws Exception
      */
     @Test
     public void testWriteDatabase() throws Exception {
 
-        final ILFLog log = TestUtil.createJavaUtilGlobalLog();
+        final ILSLog log = TestUtil.createJavaUtilGlobalLog();
         final LicenseStoreData licenseStoreData = TestUtil.readLicenseStoreData(log);
         final BuildInfo buildInfo = createBuildInformation();
         final List<Archive> archives = new ArrayList<>();

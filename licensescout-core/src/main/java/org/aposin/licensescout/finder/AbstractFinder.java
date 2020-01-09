@@ -28,7 +28,7 @@ import org.aposin.licensescout.archive.Archive;
 import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseStoreData;
 import org.aposin.licensescout.license.LicenseUtil;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 
 /**
  * Base class for implementations that scan a directory for artifacts that need a license.
@@ -40,7 +40,7 @@ public abstract class AbstractFinder {
 
     private final LicenseStoreData licenseStoreData;
 
-    private final ILFLog log;
+    private final ILSLog log;
 
     private File scanDirectory;
 
@@ -61,7 +61,7 @@ public abstract class AbstractFinder {
      * @param licenseStoreData the data object containing information on licenses
      * @param log the logger 
      */
-    public AbstractFinder(final LicenseStoreData licenseStoreData, final ILFLog log) {
+    public AbstractFinder(final LicenseStoreData licenseStoreData, final ILSLog log) {
         this.licenseStoreData = licenseStoreData;
         this.log = log;
     }
@@ -78,9 +78,9 @@ public abstract class AbstractFinder {
      * 
      * @return the logger
      * 
-     * @see #AbstractFinder(LicenseStoreData, ILFLog)
+     * @see #AbstractFinder(LicenseStoreData, ILSLog)
      */
-    protected final ILFLog getLog() {
+    protected final ILSLog getLog() {
         return log;
     }
 

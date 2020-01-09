@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 
 import org.aposin.licensescout.configuration.FinderParameters;
 import org.aposin.licensescout.license.LicenseStoreData;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 import org.aposin.licensescout.util.JavaUtilLog;
 import org.aposin.licensescout.util.NullLog;
 
@@ -51,7 +51,7 @@ public abstract class TestUtil {
      * @return a LicenseStoreData for testing
      * @throws Exception
      */
-    public static LicenseStoreData readLicenseStoreData(final ILFLog log) throws Exception {
+    public static LicenseStoreData readLicenseStoreData(final ILSLog log) throws Exception {
         LicenseStoreData licenseStoreData = new LicenseStoreData();
         licenseStoreData.readLicenses(new FileInputStream("src/test/resources/configuration/licenses.xml"), null, false,
                 log);
@@ -62,7 +62,7 @@ public abstract class TestUtil {
      * Obtains a logger for testing that uses the java.util global logger.
      * @return an initialized log instance for testing
      */
-    public static ILFLog createJavaUtilGlobalLog() {
+    public static ILSLog createJavaUtilGlobalLog() {
         return new JavaUtilLog(Logger.getGlobal());
     }
 
@@ -70,7 +70,7 @@ public abstract class TestUtil {
      * Obtains a logger for testing that sinks all logging.
      * @return a logger
      */
-    public static ILFLog createNullLog() {
+    public static ILSLog createNullLog() {
         return new NullLog();
     }
 
@@ -78,7 +78,7 @@ public abstract class TestUtil {
      * Obtains a logger for testing depending on a flag.
      * @return a logger
      */
-    public static ILFLog createTestLog() {
+    public static ILSLog createTestLog() {
         return DO_LOGGING ? createJavaUtilGlobalLog() : createNullLog();
     }
 

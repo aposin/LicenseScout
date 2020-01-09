@@ -32,7 +32,7 @@ import org.aposin.licensescout.license.LicenseStoreData;
 import org.aposin.licensescout.license.LicenseUtil;
 import org.aposin.licensescout.model.LSMessageDigest;
 import org.aposin.licensescout.util.ArchiveMetaInformation;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 
 /**
  * Base class for implementations that scan a JAR files.
@@ -50,7 +50,7 @@ public abstract class AbstractJavaFinder extends AbstractFinder {
      * @param log the logger 
      */
     public AbstractJavaFinder(final LicenseStoreData licenseStoreData, final IArtifactServerUtil artifactServerUtil,
-            final ILFLog log) {
+            final ILSLog log) {
         super(licenseStoreData, log);
         this.artifactServerUtil = artifactServerUtil;
         jarFinderHandler = new JarFinderHandler(log);

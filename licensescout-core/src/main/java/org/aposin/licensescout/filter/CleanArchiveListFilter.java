@@ -24,7 +24,7 @@ import java.util.Set;
 import org.aposin.licensescout.archive.Archive;
 import org.aposin.licensescout.license.LegalStatus;
 import org.aposin.licensescout.license.License;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 
 /**
  */
@@ -39,7 +39,7 @@ public class CleanArchiveListFilter extends SimpleArchiveListFilter {
      * @param legalStatesToFilterOut 
      * @param licensesToFilterOut 
      */
-    public CleanArchiveListFilter(final ILFLog log, final boolean filterActive,
+    public CleanArchiveListFilter(final ILSLog log, final boolean filterActive,
             final List<LegalStatus> legalStatesToFilterOut, List<License> licensesToFilterOut) {
         super(log, filterActive);
         this.legalStatesToFilterOut = legalStatesToFilterOut;

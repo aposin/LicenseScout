@@ -22,7 +22,7 @@ import java.util.jar.JarInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.aposin.licensescout.util.ArchiveMetaInformation;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 import org.aposin.licensescout.util.JarUtil;
 
 /**
@@ -34,7 +34,7 @@ public class JarFinderHandler extends AbstractFinderHandler<JarEntry, JarEntryCo
     /**
      * @param log the logger
      */
-    public JarFinderHandler(final ILFLog log) {
+    public JarFinderHandler(final ILSLog log) {
         super(log);
     }
 

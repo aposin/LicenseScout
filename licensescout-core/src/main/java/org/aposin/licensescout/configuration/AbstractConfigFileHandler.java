@@ -15,7 +15,7 @@
  */
 package org.aposin.licensescout.configuration;
 
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 
 /**
  * Base class for implementations of {@link ConfigFileHandler}.
@@ -23,7 +23,7 @@ import org.aposin.licensescout.util.ILFLog;
 public abstract class AbstractConfigFileHandler implements ConfigFileHandler {
 
     private final ConfigFileParameters configFileParameters;
-    private final ILFLog log;
+    private final ILSLog log;
 
     /**
      * Constructor.
@@ -31,7 +31,7 @@ public abstract class AbstractConfigFileHandler implements ConfigFileHandler {
      * @param configFileParameters
      * @param log the logger
      */
-    protected AbstractConfigFileHandler(final ConfigFileParameters configFileParameters, final ILFLog log) {
+    protected AbstractConfigFileHandler(final ConfigFileParameters configFileParameters, final ILSLog log) {
         this.configFileParameters = configFileParameters;
         this.log = log;
     }
@@ -46,7 +46,7 @@ public abstract class AbstractConfigFileHandler implements ConfigFileHandler {
     /**
      * @return the log
      */
-    protected final ILFLog getLog() {
+    protected final ILSLog getLog() {
         return log;
     }
 }

@@ -46,7 +46,7 @@ import org.aposin.licensescout.exporter.ILegalStatusStatistics;
 import org.aposin.licensescout.exporter.LegalStatusStatistics;
 import org.aposin.licensescout.model.Notice;
 import org.aposin.licensescout.model.Provider;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 
 /**
  *
@@ -540,7 +540,7 @@ public class LicenseUtil {
      * @return true if licenses have been added to the archive, false otherwise
      */
     public static boolean handleLicenseUrl(final String licenseUrl, final Archive archive, final String licenseFileName,
-                                           final LicenseStoreData licenseStoreData, final ILFLog log) {
+                                           final LicenseStoreData licenseStoreData, final ILSLog log) {
         boolean licenseFound = false;
         final License license = licenseStoreData.getLicenseByPublicUrl(licenseUrl);
         if (license != null) {
@@ -572,7 +572,7 @@ public class LicenseUtil {
      */
     public static boolean handleLicenseName(final String licenseName, final Archive archive,
                                             final String licenseFileName, LicenseStoreData licenseStoreData,
-                                            final ILFLog log) {
+                                            final ILSLog log) {
         boolean licenseFound = false;
         final License license = licenseStoreData.getLicenseBySpdxIdentifier(licenseName);
         if (license != null) {

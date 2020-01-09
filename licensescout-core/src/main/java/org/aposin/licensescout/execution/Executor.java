@@ -60,7 +60,7 @@ import org.aposin.licensescout.model.AlarmCause;
 import org.aposin.licensescout.model.Notices;
 import org.aposin.licensescout.model.Providers;
 import org.aposin.licensescout.util.CryptUtil;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 import org.aposin.licensescout.util.MiscUtil;
 import org.aposin.licensescout.util.OutputFileHelper;
 import org.xml.sax.SAXException;
@@ -98,7 +98,7 @@ public class Executor {
         return configFileHandler;
     }
 
-    protected final ILFLog getLog() {
+    protected final ILSLog getLog() {
         return getExecutionParameters().getLsLog();
     }
 
@@ -234,7 +234,7 @@ public class Executor {
     /**
      * @param log the logger
      */
-    private void prepareOutput(final ILFLog log) {
+    private void prepareOutput(final ILSLog log) {
         MiscUtil.createDirectoryIfNotExists(getExecutionParameters().getOutputDirectory(), getLog());
         for (final ExecutionOutput output : getExecutionParameters().getOutputs()) {
             final File outputFile = new File(getExecutionParameters().getOutputDirectory(),
@@ -354,7 +354,7 @@ public class Executor {
         }
     }
 
-    private void writeResultsToDatabase(final BuildInfo buildInfo, final List<Archive> archives, final ILFLog log) {
+    private void writeResultsToDatabase(final BuildInfo buildInfo, final List<Archive> archives, final ILSLog log) {
         if (getExecutionParameters().isWriteResultsToDatabase()) {
             if (isSnapshotVersion(getExecutionParameters().getBuildVersion())
                     && !getExecutionParameters().isWriteResultsToDatabaseForSnapshotBuilds()) {
@@ -382,7 +382,7 @@ public class Executor {
      * @param reportConfiguration
      * @throws Exception
      */
-    private void doOutput(final ILFLog log, final OutputResult outputResult,
+    private void doOutput(final ILSLog log, final OutputResult outputResult,
                           final ReportConfiguration reportConfiguration)
             throws Exception {
         for (final ExecutionOutput output : getExecutionParameters().getOutputs()) {
@@ -436,7 +436,7 @@ public class Executor {
         return outputResult;
     }
 
-    private void checkParameters(final ILFLog log) throws LicenseScoutExecutionException {
+    private void checkParameters(final ILSLog log) throws LicenseScoutExecutionException {
         final File scanDirectory = getExecutionParameters().getScanDirectory();
         if (scanDirectory != null) {
             if (!scanDirectory.exists()) {
@@ -455,7 +455,7 @@ public class Executor {
      * @return a license store data object
      * @throws LicenseScoutExecutionException 
      */
-    private LicenseStoreData init(final Notices notices, final ILFLog log) throws LicenseScoutExecutionException {
+    private LicenseStoreData init(final Notices notices, final ILSLog log) throws LicenseScoutExecutionException {
 
         final LicenseStoreData licenseStoreData = readLicenses(notices, log);
         if (licenseStoreData != null) {
@@ -471,7 +471,7 @@ public class Executor {
      * @param licenseStoreData the data object containing information on licenses
      * @return a list of licenses that should not appear in cleaned output
      */
-    protected List<License> createCleanOutputLicenseList(final ILFLog log, final LicenseStoreData licenseStoreData) {
+    protected List<License> createCleanOutputLicenseList(final ILSLog log, final LicenseStoreData licenseStoreData) {
 
         log.info("Clean output: " + (getExecutionParameters().isCleanOutputActive() ? "active" : "not active"));
         final List<License> cleanOutputLicenses = new ArrayList<>();
@@ -512,7 +512,7 @@ public class Executor {
      * @param log the logger
      * @throws LicenseScoutExecutionException
      */
-    protected void readLicenseUrlMappings(final LicenseStoreData licenseStoreData, final ILFLog log)
+    protected void readLicenseUrlMappings(final LicenseStoreData licenseStoreData, final ILSLog log)
             throws LicenseScoutExecutionException {
         try (final InputStream inputStream = getConfigFileHandler().getLicenseUrlMappingsInputStream()) {
             if (inputStream != null) {
@@ -528,7 +528,7 @@ public class Executor {
      * @param log the logger
      * @throws LicenseScoutExecutionException
      */
-    protected void readLicenseNameMappings(final LicenseStoreData licenseStoreData, final ILFLog log)
+    protected void readLicenseNameMappings(final LicenseStoreData licenseStoreData, final ILSLog log)
             throws LicenseScoutExecutionException {
         try (final InputStream inputStream = getConfigFileHandler().getLicenseNameMappingsInputStream()) {
             if (inputStream != null) {
@@ -544,7 +544,7 @@ public class Executor {
      * @return a global filters object
      * @throws LicenseScoutExecutionException
      */
-    protected GlobalFilters readGlobalFilters(final ILFLog log) throws LicenseScoutExecutionException {
+    protected GlobalFilters readGlobalFilters(final ILSLog log) throws LicenseScoutExecutionException {
         final GlobalFilters globalFilters = new GlobalFilters();
         try (final InputStream inputStream = getConfigFileHandler().getGlobalFiltersInputStream()) {
             if (inputStream != null) {
@@ -562,7 +562,7 @@ public class Executor {
      * @return a license store data object
      * @throws LicenseScoutExecutionException 
      */
-    protected LicenseStoreData readLicenses(final Notices notices, final ILFLog log)
+    protected LicenseStoreData readLicenses(final Notices notices, final ILSLog log)
             throws LicenseScoutExecutionException {
         try (final InputStream inputStream = getConfigFileHandler().getLicensesInputStream()) {
             if (inputStream != null) {
@@ -586,7 +586,7 @@ public class Executor {
      * @return a providers data object
      * @throws LicenseScoutExecutionException
      */
-    protected Providers readProviders(final ConfigFileHandler configFileHandler, final ILFLog log)
+    protected Providers readProviders(final ConfigFileHandler configFileHandler, final ILSLog log)
             throws LicenseScoutExecutionException {
         try (InputStream inputStream = configFileHandler.getProvidersInputStream()) {
             if (inputStream != null) {
@@ -607,7 +607,7 @@ public class Executor {
      * @return a notices data object
      * @throws LicenseScoutExecutionException
      */
-    protected Notices readNotices(final ConfigFileHandler configFileHandler, final ILFLog log)
+    protected Notices readNotices(final ConfigFileHandler configFileHandler, final ILSLog log)
             throws LicenseScoutExecutionException {
         try (InputStream inputStream = configFileHandler.getNoticesInputStream()) {
             if (inputStream != null) {
@@ -630,7 +630,7 @@ public class Executor {
      * @throws LicenseScoutExecutionException
      */
     protected LicenseCheckedList readCheckedArchives(final LicenseStoreData licenseStoreData, final Notices notices,
-                                                     final Providers providers, final ILFLog log)
+                                                     final Providers providers, final ILSLog log)
             throws LicenseScoutExecutionException {
         final LicenseCheckedList checkedArchives = new LicenseCheckedList();
         try (final InputStream inputStream = getConfigFileHandler().getCheckedArchivesInputStream()) {
@@ -648,7 +648,7 @@ public class Executor {
      * @return a list of vendor names to filter out
      * @throws LicenseScoutExecutionException
      */
-    protected List<String> readAndCollectFilteredVendorNames(final ILFLog log) throws LicenseScoutExecutionException {
+    protected List<String> readAndCollectFilteredVendorNames(final ILSLog log) throws LicenseScoutExecutionException {
         final List<String> resultFilteredVendorNames = new ArrayList<>();
         for (final String vendorName : getExecutionParameters().getFilteredVendorNames()) {
             resultFilteredVendorNames.add(vendorName);
@@ -673,7 +673,7 @@ public class Executor {
      * @return a list of strings
      * @throws IOException if an error occurred while reading from the file
      */
-    protected static List<String> readFilteredVendorNamesFromFile(final InputStream inputStream, final ILFLog log)
+    protected static List<String> readFilteredVendorNamesFromFile(final InputStream inputStream, final ILSLog log)
             throws IOException {
         final List<String> resultList = new ArrayList<>();
         String line = "";
@@ -698,7 +698,7 @@ public class Executor {
      * @param log the logger
      */
     protected static void filterGlobal(final List<Archive> archiveFiles, final GlobalFilters globalFilters,
-                                       final ILFLog log) {
+                                       final ILSLog log) {
         final Iterator<Archive> iter = archiveFiles.iterator();
         while (iter.hasNext()) {
             final Archive archive = iter.next();
@@ -712,7 +712,7 @@ public class Executor {
     /**
      * @param log the logger
      */
-    protected void logNpmExcludedDirectoryNames(final ILFLog log) {
+    protected void logNpmExcludedDirectoryNames(final ILSLog log) {
         if (getExecutionParameters().getArchiveType() == ArchiveType.JAVASCRIPT) {
             if (getExecutionParameters().getNpmExcludedDirectoryNames().isEmpty()) {
                 log.info("No directory name to exclude in NPM scan configured.");

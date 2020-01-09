@@ -15,7 +15,7 @@
  */
 package org.aposin.licensescout.filter;
 
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 
 /**
  * Base class for implementations of archive list filters.
@@ -23,7 +23,7 @@ import org.aposin.licensescout.util.ILFLog;
  */
 public abstract class AbstractArchiveListFilter implements IArchiveListFilter {
 
-    private final ILFLog log;
+    private final ILSLog log;
     private boolean filterActive;
 
     /**
@@ -31,7 +31,7 @@ public abstract class AbstractArchiveListFilter implements IArchiveListFilter {
      * 
      * @param log the logger
      */
-    protected AbstractArchiveListFilter(final ILFLog log) {
+    protected AbstractArchiveListFilter(final ILSLog log) {
         this.log = log;
     }
 
@@ -41,7 +41,7 @@ public abstract class AbstractArchiveListFilter implements IArchiveListFilter {
      * @param log the logger
      * @param filterActive 
      */
-    protected AbstractArchiveListFilter(final ILFLog log, final boolean filterActive) {
+    protected AbstractArchiveListFilter(final ILSLog log, final boolean filterActive) {
         this(log);
         setFilterActive(filterActive);
     }
@@ -49,7 +49,7 @@ public abstract class AbstractArchiveListFilter implements IArchiveListFilter {
     /**
      * @return the logger
      */
-    protected final ILFLog getLog() {
+    protected final ILSLog getLog() {
         return log;
     }
 

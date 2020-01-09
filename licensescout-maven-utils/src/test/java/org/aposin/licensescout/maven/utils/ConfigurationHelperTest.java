@@ -30,7 +30,7 @@ import org.aposin.licensescout.configuration.ExecutionDatabaseConfiguration;
 import org.aposin.licensescout.configuration.ExecutionOutput;
 import org.aposin.licensescout.configuration.OutputFileType;
 import org.aposin.licensescout.core.test.util.TestUtil;
-import org.aposin.licensescout.util.ILFLog;
+import org.aposin.licensescout.util.ILSLog;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -41,7 +41,7 @@ import org.junit.Test;
 public class ConfigurationHelperTest {
 
     /**
-     * Test case for the method {@link ConfigurationHelper#getExecutionDatabaseConfiguration(DatabaseConfiguration, Settings, ILFLog)}.
+     * Test case for the method {@link ConfigurationHelper#getExecutionDatabaseConfiguration(DatabaseConfiguration, Settings, ILSLog)}.
      * @throws Exception 
      */
     @Test
@@ -56,7 +56,7 @@ public class ConfigurationHelperTest {
     }
 
     /**
-     * Test case for the method {@link ConfigurationHelper#getExecutionDatabaseConfiguration(DatabaseConfiguration, Settings, ILFLog)}.
+     * Test case for the method {@link ConfigurationHelper#getExecutionDatabaseConfiguration(DatabaseConfiguration, Settings, ILSLog)}.
      * @throws Exception 
      */
     @Test
@@ -69,7 +69,7 @@ public class ConfigurationHelperTest {
     }
 
     /**
-     * Test case for the method {@link ConfigurationHelper#getExecutionDatabaseConfiguration(DatabaseConfiguration, Settings, ILFLog)}.
+     * Test case for the method {@link ConfigurationHelper#getExecutionDatabaseConfiguration(DatabaseConfiguration, Settings, ILSLog)}.
      * @throws Exception 
      */
     @Test(expected = MojoExecutionException.class)
