@@ -137,14 +137,12 @@ To do a release take the following steps:
 > cd licensescout-parent
 > mvn -s .../settings-licensescout-minimal.xml -Prelease,release-modules -Drevision=0.RC1 clean deploy <1>
 ----
-<1> this creates a release with version 1.4.0.RC1
-
-TODO: this is unfinished
-
-* mvn scm:tag
+<1> this creates a release with version 1.4.0.RC1 and tag name `V1.4.0.RC1`.
 
 NOTE: the release version number is composed of the part in the POM ('1.4.') and the property 'revision' provided on the command line (example: '0.RC1').
 This results in the actual version number (example: '1.4.0.RC1').
+
+NOTE: a GIT tag is created automatically, too.
 
 == Profiles overview
 
