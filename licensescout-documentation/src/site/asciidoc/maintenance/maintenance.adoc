@@ -115,8 +115,8 @@ To do a snapshot release take the following steps:
 
 [source, bash]
 ----
-> cd org.aposin.licensescout.release-aggrgator
-> mvn -s .../settings-licensescout-minimal.xml -Psnapshot-release clean deploy
+> cd licensescout-parent
+> mvn -s .../settings-licensescout-minimal.xml -Psnapshot-release,release-modules clean deploy
 ----
 
 IMPORTANT: The command will also work without the profile, but sources will not be included and the artifacts will not be signed.
@@ -134,16 +134,17 @@ To do a release take the following steps:
 
 [source, bash]
 ----
-> cd org.aposin.licensescout.release-aggrgator
-> mvn -s .../settings-licensescout-minimal.xml -Prelease -Drevision=1.005 clean deploy
+> cd licensescout-parent
+> mvn -s .../settings-licensescout-minimal.xml -Prelease,release-modules -Drevision=0.RC1 clean deploy <1>
 ----
+<1> this creates a release with version 1.4.0.RC1
 
 TODO: this is unfinished
 
 * mvn scm:tag
 
-NOTE: the release version number is composed of the part in the POM ('1.4.') and the property 'revision' provided on the command line (example: '1.005').
-This results in the actual version number (example: '1.4.1.005').
+NOTE: the release version number is composed of the part in the POM ('1.4.') and the property 'revision' provided on the command line (example: '0.RC1').
+This results in the actual version number (example: '1.4.0.RC1').
 
 == Profiles overview
 

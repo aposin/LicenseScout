@@ -130,7 +130,7 @@ public class ArtifactHelperTest {
 
     private List<RemoteRepository> createRemoteRepositories() {
         final RemoteRepository remoteRepository = new RemoteRepository.Builder("maven-central", "default",
-                "http://repo1.maven.org/maven2/").build();
+                "https://repo1.maven.org/maven2/").build();
         return Arrays.asList(remoteRepository);
     }
 }
