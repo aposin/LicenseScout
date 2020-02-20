@@ -189,14 +189,14 @@
 
 	<scm>
 		<url>https://github.com/aposin/LicenseScout/tree/master</url>
-		<connection>scm:git:git://github.com/aposin/LicenseScout.git</connection>
+		<connection>scm:git:https://github.com/aposin/LicenseScout.git</connection>
 		<developerConnection>scm:git:git@github.com:aposin/LicenseScout.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 
 	<dependencyManagement>
 		<dependencies>
-		<!-- groupId: org.apache.maven -->
+			<!-- groupId: org.apache.maven -->
 			<dependency>
 				<groupId>org.apache.maven</groupId>
 				<artifactId>maven-core</artifactId>
@@ -551,7 +551,7 @@
 					<artifactId>maven-scm-plugin</artifactId>
 					<version>${maven-scm-plugin.version}</version>
 					<configuration>
-						<tag>${project.artifactId}-${project.version}</tag>
+						<connectionType>connection</connectionType>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -787,6 +787,19 @@
 
 			<build>
 				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>parse-version</goal>
+								</goals>
+								<phase>initialize</phase>
+							</execution>
+						</executions>
+					</plugin>
+
 					<!-- Build a source JAR. -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -828,6 +841,25 @@
 						<artifactId>flatten-maven-plugin</artifactId>
 					</plugin>
 
+					<!-- tag the GIT repository -->
+					<plugin>
+						<artifactId>maven-scm-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>release-tag</id>
+								<phase>deploy</phase>
+								<goals>
+									<goal>tag</goal>
+								</goals>
+								<!-- NOTE: not inherited to child POMs to make sure the tagging is 
+									executed only once. -->
+								<inherited>false</inherited>
+								<configuration>
+									<tag>V${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${revision}</tag>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 				</plugins>
 			</build>
 		</profile>
