@@ -76,6 +76,9 @@ public class JarFinderHandler extends AbstractFinderHandler<JarEntry, JarEntryCo
     @Override
     public JarEntryContainer createEntryContainer(final JarInputStream ecBase) throws IOException {
         final byte[] archiveBytes = IOUtils.toByteArray(ecBase);
+        if (archiveBytes.length == 0) {
+            getLog().warn("file has length of zero bytes");
+        }
         return new JarEntryContainer(archiveBytes);
     }
 
