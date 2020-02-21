@@ -33,9 +33,6 @@ public class JarEntryContainer implements EntryContainer {
      * @param contents
      */
     public JarEntryContainer(final byte[] contents) {
-        if (contents.length == 0) {
-            throw new IllegalArgumentException("contents length must not be zero");
-        }
         this.contents = contents;
     }
 
