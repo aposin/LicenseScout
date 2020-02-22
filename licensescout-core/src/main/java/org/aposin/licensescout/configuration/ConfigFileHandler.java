@@ -22,9 +22,6 @@ import java.io.InputStream;
  * Handler for reading configuration files.
  * 
  */
-// TODO: use org.apache.maven.shared.utils.ReaderFactory.newXmlReader(InputStream)
-// or org.apache.commons.io.input.XmlStreamReader
-// for correct handling of XML encoding
 public interface ConfigFileHandler {
 
     /**

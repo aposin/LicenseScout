@@ -15,6 +15,7 @@
  */
 package org.aposin.licensescout.util;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
@@ -29,7 +30,7 @@ import org.aposin.licensescout.model.LSMessageDigest;
  */
 public class CryptUtil {
 
-    private static final String DEFAULT_MD_ALGORITHM = "SHA-256";
+    public static final String DEFAULT_MD_ALGORITHM = "SHA-256";
 
     private static String messageDigestAlgorithm = DEFAULT_MD_ALGORITHM;
 
@@ -61,17 +62,39 @@ public class CryptUtil {
     }
 
     /**
-     * @return the messageDigestAlgorithm
+     * Obtains the message digest algorithm.
+     * @return the name of the message digest algorithm
      */
     public static final String getMessageDigestAlgorithm() {
         return messageDigestAlgorithm;
     }
 
     /**
-     * @param messageDigestAlgorithm the messageDigestAlgorithm to set
+     * Sets the message digest algorithm.
+     * @param messageDigestAlgorithm the name of the message digest algorithm to set
      */
     public static final void setMessageDigestAlgorithm(final String messageDigestAlgorithm) {
         CryptUtil.messageDigestAlgorithm = messageDigestAlgorithm;
+    }
+
+    /**
+     * Obtains the length of a message digest in bytes.
+     * @return the length of a message digest in bytes
+     */
+    public static int getMessageDigestLength() {
+        try {
+            return calculateMessageDigest(new ByteArrayInputStream(new byte[0])).getBytes().length;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Obtains the default message digest algorithm.
+     * @return the name of the default message digest algorithm
+     */
+    public static final String getDefaultMessageDigestAlgorithm() {
+        return DEFAULT_MD_ALGORITHM;
     }
 
 }

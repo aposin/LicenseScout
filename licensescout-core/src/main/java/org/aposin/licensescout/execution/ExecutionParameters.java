@@ -214,6 +214,16 @@ public class ExecutionParameters {
     private IArtifactServerUtil artifactServerUtil;
 
     /**
+     * Algorithm to use for message digests.
+     * 
+     * <p>The configured name is passed to the Java Cryptography extension (JCE) to obtain an algorithm implementation.
+     * Therefore, the name should match an algorithm name supported by one of the configured cryptography providers.</p>
+     * 
+     * @since 1.4.0
+     */
+    private String messageDigestAlgorithm;
+
+    /**
      * @return the archiveType
      */
     public final ArchiveType getArchiveType() {
@@ -603,6 +613,20 @@ public class ExecutionParameters {
      */
     public final void setArtifactServerUtil(IArtifactServerUtil artifactServerUtil) {
         this.artifactServerUtil = artifactServerUtil;
+    }
+
+    /**
+     * @return the messageDigestAlgorithm
+     */
+    public final String getMessageDigestAlgorithm() {
+        return messageDigestAlgorithm;
+    }
+
+    /**
+     * @param messageDigestAlgorithm the messageDigestAlgorithm to set
+     */
+    public final void setMessageDigestAlgorithm(String messageDigestAlgorithm) {
+        this.messageDigestAlgorithm = messageDigestAlgorithm;
     }
 
 }

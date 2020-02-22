@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import org.aposin.licensescout.core.test.util.TestUtil;
 import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseStoreData;
+import org.aposin.licensescout.util.CryptUtil;
 import org.aposin.licensescout.util.ILSLog;
 import org.junit.Assert;
 import org.junit.Before;
@@ -49,6 +50,7 @@ public abstract class BaseFinderTest {
         Handler consoleHandler = new ConsoleHandler();
         consoleHandler.setLevel(Level.FINEST);
         Logger.getGlobal().addHandler(consoleHandler);
+        CryptUtil.setMessageDigestAlgorithm(CryptUtil.getDefaultMessageDigestAlgorithm());
     }
 
     /**

@@ -16,10 +16,15 @@
 package org.aposin.licensescout.util;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.apache.commons.io.input.XmlStreamReader;
 import org.aposin.licensescout.model.LSMessageDigest;
+import org.xml.sax.InputSource;
 
 /**
  * Miscellaneous utility methods.
@@ -71,6 +76,21 @@ public class MiscUtil {
             directory.mkdirs();
             log.info("created directory " + directory.getAbsoluteFile());
         }
+    }
+
+    /**
+     * Creates an XML InputSource from an InputStream with the correct
+     * encoding.
+     * 
+     * @param inputStream
+     * @return an input source for an XML parser
+     * @throws IOException
+     * 
+     * @see {@link XmlStreamReader}
+     */
+    public static InputSource getInputSource(final InputStream inputStream) throws IOException {
+        final Reader reader = new XmlStreamReader(inputStream);
+        return new InputSource(reader);
     }
 
 }
