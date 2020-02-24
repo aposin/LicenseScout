@@ -34,11 +34,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.aposin.licensescout.model.Notice;
 import org.aposin.licensescout.model.Notices;
 import org.aposin.licensescout.util.ILSLog;
+import org.aposin.licensescout.util.MiscUtil;
 import org.aposin.licensescout.util.sax.AbstractSaxHandler;
 import org.aposin.licensescout.util.sax.IElementHandler;
 import org.aposin.licensescout.util.sax.NopElementHandler;
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -179,7 +179,7 @@ public class LicenseStoreData {
         final SAXParser saxParser = spf.newSAXParser();
         final XMLReader xmlReader = saxParser.getXMLReader();
         xmlReader.setContentHandler(new LicenseSaxHandler(notices, log));
-        xmlReader.parse(new InputSource(inputStream));
+        xmlReader.parse(MiscUtil.getInputSource(inputStream));
 
         addNoManualInformationLicense(log);
     }

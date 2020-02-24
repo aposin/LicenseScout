@@ -24,24 +24,73 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Tests for {@link CryptUtil}.
+ * Unit tests for {@link CryptUtil}.
  * 
  */
 public class CryptUtilTest {
 
-    private static final String EXPECTED_MESSAGE_DIGEST_STRING = "83A2CA29DBAA80C0D6B6369448D0EDC0ACF30CA6E35C86F1E4C43A4915179F0D";
+    private static final String ALGORITHM_NAME_SHA_256 = "SHA-256";
+    private static final String ALGORITHM_NAME_SHA3_512 = "SHA3-512";
+
+    private static final String EXPECTED_MESSAGE_DIGEST_STRING_SHA_256 = "83A2CA29DBAA80C0D6B6369448D0EDC0ACF30CA6E35C86F1E4C43A4915179F0D";
+    private static final String EXPECTED_MESSAGE_DIGEST_STRING_SHA3_512 = "B836B1356DE23CA4750FCC5CBA8AC827F39C48466EC08262E9C4C88829078087AC84D1E29CBE61EC8D3E4612F3A0A7B8CD94D4883EB6F21D77E1B2949F3BC5FF";
 
     /**
-     * Test for {@link CryptUtil#calculateMessageDigest(InputStream)}.
+     * Test for {@link CryptUtil#getMessageDigestLength()} with algorithm 'SHA-256'.
+     */
+    @Test
+    public void testGetMessageDigestLengthSha256() {
+        String algorithmName = ALGORITHM_NAME_SHA_256;
+        final int expectedMessageDigestLength = 32;
+        assertGetMessageDigestLength(algorithmName, expectedMessageDigestLength);
+    }
+
+    /**
+     * Test for {@link CryptUtil#getMessageDigestLength()} with algorithm 'SHA3-512'.
+     */
+    @Test
+    public void testGetMessageDigestLengthSha3D512() {
+        String algorithmName = ALGORITHM_NAME_SHA3_512;
+        final int expectedMessageDigestLength = 64;
+        assertGetMessageDigestLength(algorithmName, expectedMessageDigestLength);
+    }
+
+    private void assertGetMessageDigestLength(String algorithmName, final int expectedMessageDigestLength) {
+        CryptUtil.setMessageDigestAlgorithm(algorithmName);
+        int result = CryptUtil.getMessageDigestLength();
+        Assert.assertEquals("Message digest length", expectedMessageDigestLength, result);
+    }
+
+    /**
+     * Test for {@link CryptUtil#calculateMessageDigest(InputStream)} with algorithm 'SHA-256'.
      * 
      * @throws IOException
      */
     @Test
-    public void testCalculateMessageDigest() throws IOException {
+    public void testCalculateMessageDigestSha256() throws IOException {
+        final String algorithmName = ALGORITHM_NAME_SHA_256;
+        final String referenceString = EXPECTED_MESSAGE_DIGEST_STRING_SHA_256;
+        assertCalculateMessageDigest(algorithmName, referenceString);
+    }
+
+    /**
+     * Test for {@link CryptUtil#calculateMessageDigest(InputStream)} with algorithm 'SHA3-512'.
+     * 
+     * @throws IOException
+     */
+    @Test
+    public void testCalculateMessageDigestSha3D512() throws IOException {
+        final String algorithmName = ALGORITHM_NAME_SHA3_512;
+        final String referenceString = EXPECTED_MESSAGE_DIGEST_STRING_SHA3_512;
+        assertCalculateMessageDigest(algorithmName, referenceString);
+    }
+
+    private void assertCalculateMessageDigest(final String algorithmName, final String referenceString)
+            throws IOException {
+        CryptUtil.setMessageDigestAlgorithm(algorithmName);
         final File file = new File("src/test/resources/licensetexts/apache2/LICENSE-2.0-without-newlines.txt");
         try (final FileInputStream fis = new FileInputStream(file)) {
             final byte[] result = CryptUtil.calculateMessageDigest(fis).getBytes();
-            final String referenceString = EXPECTED_MESSAGE_DIGEST_STRING;
             final byte[] reference = getByteArrayFromHexString(referenceString);
             Assert.assertArrayEquals(reference, result);
         }

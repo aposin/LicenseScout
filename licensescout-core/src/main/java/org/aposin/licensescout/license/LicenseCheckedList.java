@@ -79,10 +79,10 @@ public class LicenseCheckedList {
     private static final int LICENSE_NAMES_OFFSET = 6;
 
     /**
-     * Note: this value is valid for SHA-256, should corresponds to the algorithm returned by {@link CryptUtil#getMessageDigestAlgorithm()}.
-     * (Note that the algorithm can be changed by the method {@link CryptUtil#setMessageDigestAlgorithm(String)}, but this length of the hash is always hard-coded.)
+     * Note: this value depends on the algorithm set by {@link CryptUtil#setMessageDigestAlgorithm(String)}.
+     * Therefore it is calculated dynamically.
      */
-    private static final int MESSAGE_DIGEST_NUM_BYTES = 32;
+    private static final int MESSAGE_DIGEST_NUM_BYTES = CryptUtil.getMessageDigestLength();
     private static final int MESSAGE_DIGEST_NUM_CODED_CHARACTERS = MESSAGE_DIGEST_NUM_BYTES * 2;
 
     private Map<ArchiveIdentifier, LicenseResult> manualArchives = new HashMap<>();

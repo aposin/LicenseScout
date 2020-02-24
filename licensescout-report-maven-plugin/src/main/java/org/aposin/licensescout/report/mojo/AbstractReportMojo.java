@@ -47,6 +47,7 @@ import org.aposin.licensescout.maven.utils.IRepositoryParameters;
 import org.aposin.licensescout.maven.utils.MavenLog;
 import org.aposin.licensescout.report.exporter.DoxiaReportExporterFactory;
 import org.aposin.licensescout.report.exporter.ISinkProvider;
+import org.aposin.licensescout.util.CryptUtil;
 import org.aposin.licensescout.util.ILSLog;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -288,6 +289,17 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
      */
     @Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
     private RepositorySystemSession repositorySystemSession;
+
+    /**
+     * Algorithm to use for message digests.
+     * 
+     * <p>The configured name is passed to the Java Cryptography extension (JCE) to obtain an algorithm implementation.
+     * Therefore, the name should match an algorithm name supported by one of the configured cryptography providers.</p>
+     * 
+     * @since 1.4.0
+     */
+    @Parameter(defaultValue = CryptUtil.DEFAULT_MD_ALGORITHM, property = "messageDigestAlgorithm", required = false)
+    private String messageDigestAlgorithm;
 
     /**
      * {@inheritDoc}
@@ -542,6 +554,14 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
     @Override
     public final RepositorySystemSession getRepositorySystemSession() {
         return repositorySystemSession;
+    }
+
+    /**
+     * Obtains the name of the message digest algorithm to use.
+     * @return the name of the message digest algorithm to use
+     */
+    public String getMessageDigestAlgorithm() {
+        return messageDigestAlgorithm;
     }
 
 }

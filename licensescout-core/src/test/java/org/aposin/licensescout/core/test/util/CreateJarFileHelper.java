@@ -32,7 +32,7 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.IOUtils;
 
 /**
- * Utility methods for creating JAR files. 
+ * Utility methods for creating JAR files.
  */
 public class CreateJarFileHelper {
 

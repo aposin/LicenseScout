@@ -134,6 +134,8 @@ public class Executor {
      */
     public void execute() throws LicenseScoutExecutionException, LicenseScoutFailOnErrorException {
 
+        CryptUtil.setMessageDigestAlgorithm(getExecutionParameters().getMessageDigestAlgorithm());
+
         final Providers providers = readProviders(getConfigFileHandler(), getLog());
         final Notices notices = readNotices(getConfigFileHandler(), getLog());
         final LicenseStoreData licenseStoreData = init(notices, getLog());
