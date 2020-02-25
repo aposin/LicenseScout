@@ -204,9 +204,22 @@ public class JavaJarFinder extends AbstractJavaFinder {
         if (!dir.isDirectory()) {
             return false;
         }
-        final String[] entries = dir.list();
-        final List<String> entriesList = Arrays.asList(entries);
-        return entriesList.contains("META-INF");
+        final File metaInfEntry = findEntry(dir, "META-INF");
+        if (metaInfEntry == null || !metaInfEntry.isDirectory()) {
+            return false;
+        }
+        final File manifestEntry = findEntry(metaInfEntry, "MANIFEST.MF");
+        return manifestEntry != null && manifestEntry.isFile();
+    }
+
+    private static File findEntry(File parentDirectory, final String searchedEntryName) {
+        final File[] entries = parentDirectory.listFiles();
+        for (final File entry : entries) {
+            if (searchedEntryName.equals(entry.getName())) {
+                return entry;
+            }
+        }
+        return null;
     }
 
     /**
