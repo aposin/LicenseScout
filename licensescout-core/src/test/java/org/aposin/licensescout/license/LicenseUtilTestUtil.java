@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.aposin.licensescout.core.test.util.TestUtil;
 import org.aposin.licensescout.model.Notices;
 import org.aposin.licensescout.model.Providers;
 import org.aposin.licensescout.util.NullLog;
@@ -60,6 +61,7 @@ public class LicenseUtilTestUtil {
      */
     public static LicenseCheckedList createLicenseCheckedList(final LicenseStoreData licenseStoreData)
             throws IOException {
+        TestUtil.setDefaultMessageDigestAlgorithm();
         final LicenseCheckedList checkedArchives = new LicenseCheckedList();
         final File checkedArchivesPathname = new File(CHECKEDARCHIVES_PATH);
         try (final InputStream inputStream = new FileInputStream(checkedArchivesPathname)) {

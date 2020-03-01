@@ -28,6 +28,7 @@ import org.aposin.licensescout.configuration.OutputFileType;
 import org.aposin.licensescout.core.test.util.TestArtifactServerUtil;
 import org.aposin.licensescout.core.test.util.TestUtil;
 import org.aposin.licensescout.license.LegalStatus;
+import org.aposin.licensescout.util.CryptUtil;
 import org.junit.Test;
 
 /**
@@ -341,6 +342,7 @@ public class SimpleExecutionTest {
         }
         executionParameters.setValidateLicenseXml(false);
         executionParameters.setArtifactServerUtil(new TestArtifactServerUtil());
+        executionParameters.setMessageDigestAlgorithm(CryptUtil.DEFAULT_MD_ALGORITHM);
         return executionParameters;
     }
 

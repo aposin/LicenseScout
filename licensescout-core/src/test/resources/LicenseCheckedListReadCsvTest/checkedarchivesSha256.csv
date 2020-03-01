@@ -1,0 +1,15 @@
+Type,Filename or Regex,Version or Message digest,Documentation URL,Provider,Notice,License 1,License 2, License 3
+#Comment
+
+JAVASCRIPT,testarchive1,0.0.4,,,,MIT,,
+JAVA,testarchive2,D11CDFDDC6F3CF3B48560004AA50795222F4ED8A44983651BBC9302A96AD4F46,,,,DOM4J,,
+JAVASCRIPT,testarchive3,0.0.4,,,,MIT,,
+JAVA,testarchive4,D11CDFDDC6F3CF3B48560004AA50795222F4ED8A44983651BBC9302A96AD4F46,,,,DOM4J,,
+# no license names
+JAVASCRIPT,testarchive5,0.0.4,,,,MIT,,
+# path pattern
+JAVASCRIPT,=testarchive6,0.0.4,,,,MIT,,
+# filename pattern
+JAVASCRIPT,==testarchive7,0.0.4,,,,MIT,,
+# error case
+JAVASCRIPT,testarchive8,,,,,MIT,,
