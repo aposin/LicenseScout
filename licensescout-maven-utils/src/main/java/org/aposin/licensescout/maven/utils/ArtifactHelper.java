@@ -16,13 +16,27 @@
 package org.aposin.licensescout.maven.utils;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.DependencyRequest;
+import org.eclipse.aether.resolution.DependencyResolutionException;
+import org.eclipse.aether.resolution.DependencyResult;
+import org.eclipse.aether.util.filter.DependencyFilterUtils;
 
 /**
  * Helper class for handling artifacts.
@@ -55,8 +69,9 @@ public class ArtifactHelper {
     }
 
     private static Artifact createDefaultArtifact(final ArtifactItem artifactItem) {
+        final String type = StringUtils.isEmpty(artifactItem.getType()) ? "jar" : artifactItem.getType();
         return new DefaultArtifact(artifactItem.getGroupId(), artifactItem.getArtifactId(),
-                artifactItem.getClassifier(), artifactItem.getType(), artifactItem.getVersion());
+                artifactItem.getClassifier(), type, artifactItem.getVersion());
     }
 
     /**
@@ -80,4 +95,36 @@ public class ArtifactHelper {
             throw new MojoExecutionException(e.getMessage(), e);
         }
     }
+
+    /**
+     * Calculates the set of transitive dependencies of the passed artifacts.
+     * 
+     * @param repositoryParameters
+     * @param artifacts
+     * @param artifactScope
+     * @return a list of File locations where the JARs of the dependencies are located in the local file system
+     * @throws DependencyResolutionException
+     */
+    public static List<File> getDependencies(final IRepositoryParameters repositoryParameters,
+                                             final List<ArtifactItem> artifacts, final ArtifactScope artifactScope)
+            throws DependencyResolutionException {
+        final RepositorySystem system = repositoryParameters.getRepositorySystem();
+        final RepositorySystemSession session = repositoryParameters.getRepositorySystemSession();
+        final DependencyFilter classpathFlter = DependencyFilterUtils.classpathFilter(artifactScope.getScopeValue());
+        final Set<File> artifactFiles = new HashSet<>();
+        for (final ArtifactItem artifactItem : artifacts) {
+            Artifact artifact = createDefaultArtifact(artifactItem);
+            final CollectRequest collectRequest = new CollectRequest();
+            collectRequest.setRoot(new Dependency(artifact, artifactScope.getScopeValue()));
+            collectRequest.setRepositories(repositoryParameters.getRemoteRepositories());
+            final DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, classpathFlter);
+            final DependencyResult dependencyResult = system.resolveDependencies(session, dependencyRequest);
+            final List<ArtifactResult> artifactResults = dependencyResult.getArtifactResults();
+            for (final ArtifactResult artifactResult : artifactResults) {
+                artifactFiles.add(artifactResult.getArtifact().getFile());
+            }
+        }
+        return new ArrayList<>(artifactFiles);
+    }
+
 }

@@ -55,6 +55,16 @@ public class CryptUtilTest {
         assertGetMessageDigestLength(algorithmName, expectedMessageDigestLength);
     }
 
+    /**
+     * Test for {@link CryptUtil#getMessageDigestLength()} not existing algorithm.
+     */
+    @Test(expected = RuntimeException.class)
+    public void testGetMessageDigestLengthNotExistingAlgorithm() {
+        String algorithmName = "not_existing";
+        final int expectedMessageDigestLength = 64;
+        assertGetMessageDigestLength(algorithmName, expectedMessageDigestLength);
+    }
+
     private void assertGetMessageDigestLength(String algorithmName, final int expectedMessageDigestLength) {
         CryptUtil.setMessageDigestAlgorithm(algorithmName);
         int result = CryptUtil.getMessageDigestLength();
@@ -82,6 +92,18 @@ public class CryptUtilTest {
     public void testCalculateMessageDigestSha3D512() throws IOException {
         final String algorithmName = ALGORITHM_NAME_SHA3_512;
         final String referenceString = EXPECTED_MESSAGE_DIGEST_STRING_SHA3_512;
+        assertCalculateMessageDigest(algorithmName, referenceString);
+    }
+
+    /**
+     * Test for {@link CryptUtil#calculateMessageDigest(InputStream)} with not existing algorithm.
+     * 
+     * @throws IOException
+     */
+    @Test(expected = RuntimeException.class)
+    public void testCalculateMessageDigestNotExistingAlgorithm() throws IOException {
+        final String algorithmName = "not_existing";
+        final String referenceString = "";
         assertCalculateMessageDigest(algorithmName, referenceString);
     }
 

@@ -155,7 +155,7 @@ public class Executor {
         finderParameters.setArtifactServerUtil(getExecutionParameters().getArtifactServerUtil());
         final AbstractFinder finder = FinderFactory.getInstance().createFinder(executionParameters, licenseStoreData,
                 finderParameters);
-        getLog().info("Starting scan on " + getExecutionParameters().getScanDirectory().getAbsolutePath() + "...");
+        getLog().info("Starting scan on " + getExecutionParameters().getScanLocation().toLogString() + "...");
 
         OutputResult outputResult;
         try {
@@ -439,15 +439,26 @@ public class Executor {
     }
 
     private void checkParameters(final ILSLog log) throws LicenseScoutExecutionException {
-        final File scanDirectory = getExecutionParameters().getScanDirectory();
-        if (scanDirectory != null) {
-            if (!scanDirectory.exists()) {
-                throw new LicenseScoutExecutionException(
-                        "This scan directory does not exist: " + scanDirectory.getAbsolutePath());
+        final ScanLocation scanLocation = getExecutionParameters().getScanLocation();
+        if (scanLocation != null) {
+            List<File> scanFiles = scanLocation.getScanFiles();
+            if (scanFiles != null && !scanFiles.isEmpty()) {
+                // OK
+                log.info("using scan files: " + scanFiles);
+            } else {
+                final File scanDirectory = scanLocation.getScanDirectory();
+                if (scanDirectory != null) {
+                    if (!scanDirectory.exists()) {
+                        throw new LicenseScoutExecutionException(
+                                "This scan directory does not exist: " + scanDirectory.getAbsolutePath());
+                    }
+                    log.info("using scan directory: " + scanDirectory.getAbsolutePath());
+                } else {
+                    throw new LicenseScoutExecutionException("neither scanFiles nor scanDirectory configured");
+                }
             }
-            log.info("using scan directory: " + scanDirectory.getAbsolutePath());
         } else {
-            throw new LicenseScoutExecutionException("scanDirectory not configured");
+            throw new LicenseScoutExecutionException("scan location not configured");
         }
     }
 

@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.aposin.licensescout.core.test.util.TestUtil;
+import org.aposin.licensescout.execution.ScanLocation;
 import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseStoreData;
 import org.aposin.licensescout.util.CryptUtil;
@@ -79,15 +80,25 @@ public abstract class BaseFinderTest {
     private LicenseStoreData createLicenseStoreData() throws Exception {
         final LicenseStoreData licenseStoreData = new LicenseStoreData();
         final File file = new File("src/test/resources/scans/licenses.xml");
-     try (   final FileInputStream inputStream = new FileInputStream(file))
-     {
-        licenseStoreData.readLicenses(inputStream, null, false, getLog());
-        return licenseStoreData;
-    }}
+        try (final FileInputStream inputStream = new FileInputStream(file)) {
+            licenseStoreData.readLicenses(inputStream, null, false, getLog());
+            return licenseStoreData;
+        }
+    }
 
     protected final LicenseStoreData getLicenseStoreData() {
         return licenseStoreData;
     }
+
+    /**
+     * Creates an initializes a finder class.
+     * 
+     * <p>Subclasses are required to implement this
+     * method to create an instance of a specific finder class.</p>
+     * 
+     * @return a finder class instance
+     */
+    protected abstract AbstractFinder createFinder();
 
     /**
      * Creates a finder and executes the license scan.
@@ -102,23 +113,34 @@ public abstract class BaseFinderTest {
     }
 
     /**
-     * Creates an initializes a finder class.
-     * 
-     * <p>Subclasses are required to implement this
-     * method to create an instance of a specific finder class.</p>
-     * 
-     * @return a finder class instance
-     */
-    protected abstract AbstractFinder createFinder();
-
-    /**
      * @param finder a finder instance
      * @param scanDirectory
      * @return the finder result
      * @throws Exception
      */
     protected FinderResult doScan(final AbstractFinder finder, final File scanDirectory) throws Exception {
-        finder.setScanDirectory(scanDirectory);
+        final ScanLocation scanLocation = createScanLocation(scanDirectory);
+        return doScan(finder, scanLocation);
+    }
+
+    /**
+     * Subclasses can override this method to create a {@link ScanLocation} based on a list of files.
+     * 
+     * @param scanDirectory
+     * @return
+     */
+    protected ScanLocation createScanLocation(final File scanDirectory) {
+        return new ScanLocation(scanDirectory);
+    }
+
+    /**
+     * @param finder a finder instance
+     * @param scanLocation the scan location
+     * @return the finder result
+     * @throws Exception
+     */
+    protected FinderResult doScan(final AbstractFinder finder, final ScanLocation scanLocation) throws Exception {
+        finder.setScanLocation(scanLocation);
         return finder.findLicenses();
     }
 
@@ -128,7 +150,15 @@ public abstract class BaseFinderTest {
      * @param expectedScanDirectory
      */
     protected void assertScanDirectory(final FinderResult finderResult, final File expectedScanDirectory) {
-        Assert.assertEquals("scanDirectory", expectedScanDirectory, finderResult.getScanDirectory());
+        Assert.assertEquals("scanDirectory", getExpectedScanDirectory(expectedScanDirectory), finderResult.getScanDirectory());
+    }
+
+    /**
+     * @param expectedScanDirectory
+     * @return
+     */
+    protected File getExpectedScanDirectory(final File expectedScanDirectory) {
+        return expectedScanDirectory;
     }
 
     /**

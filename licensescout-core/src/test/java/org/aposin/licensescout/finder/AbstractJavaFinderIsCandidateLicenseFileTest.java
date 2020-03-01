@@ -1,0 +1,102 @@
+/**
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.aposin.licensescout.finder;
+
+import java.util.Arrays;
+
+import org.aposin.licensescout.configuration.FinderParameters;
+import org.aposin.licensescout.execution.ExecutionParameters;
+import org.aposin.licensescout.license.LicenseStoreData;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+
+/**
+ * Unit test for {@link AbstractJavaFinder#isCandidateLicenseFile(String)}.
+ *
+ */
+@RunWith(Parameterized.class)
+public class AbstractJavaFinderIsCandidateLicenseFileTest {
+
+    private final String filename;
+    private final boolean expectedLicenseCandidate;
+
+    /**
+     * Constructor.
+     * @param filename
+     * @param expectedLicenseCandidate
+     */
+    public AbstractJavaFinderIsCandidateLicenseFileTest(String filename, boolean expectedLicenseCandidate) {
+        this.filename = filename;
+        this.expectedLicenseCandidate = expectedLicenseCandidate;
+    }
+
+    /**
+     * Test case for the method {@link FinderFactory#createFinder(ExecutionParameters, LicenseStoreData, FinderParameters)}.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testIsCandidateLicenseFile() throws Exception {
+        final AbstractJavaFinder finder = new TestAbstractJavaFinder();
+        Assert.assertEquals("isCandidateLicenseFile()", expectedLicenseCandidate,
+                finder.isCandidateLicenseFile(filename));
+    }
+
+    /**
+     * @return the parameters
+     */
+    @Parameters(name = "{index}: filename {0}")
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(new Object[][] { //
+                { "", false }, //
+                { "abc", false }, //
+                { "abc.txt", true }, //
+                { "abc.txt", true }, //
+                { "abc.html", true }, //
+                { "abc.htm", true }, //
+                { "abc.class", false }, //
+                { "LLicense", true }, //
+                { "LICENSE", true }, //
+                { "LLicence", true }, //
+                { "LICENCE123", true }, //
+                { "license.class", false }, //
+                { "Notice", true }, //
+                { "NOTICE", true }, //
+                { "Notice.class", false }, //
+        });
+    }
+
+    private class TestAbstractJavaFinder extends AbstractJavaFinder {
+
+        public TestAbstractJavaFinder() {
+            super(null, null, null);
+        }
+
+        @Override
+        public boolean isCandidateLicenseFile(String fileName) {
+            return super.isCandidateLicenseFile(fileName);
+        }
+
+        @Override
+        protected void findLicensesImpl() throws Exception {
+            // DO NOTHING
+        }
+
+    }
+}

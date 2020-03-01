@@ -22,6 +22,7 @@ import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.configuration.FinderParameters;
 import org.aposin.licensescout.core.test.util.TestUtil;
 import org.aposin.licensescout.execution.ExecutionParameters;
+import org.aposin.licensescout.execution.LicenseScoutExecutionException;
 import org.aposin.licensescout.license.LicenseStoreData;
 import org.junit.Assert;
 import org.junit.Test;
@@ -61,9 +62,19 @@ public class FinderFactoryTest {
         executionParameters.setLsLog(TestUtil.createTestLog());
         executionParameters.setNpmExcludedDirectoryNames(new ArrayList<>());
         final FinderParameters finderParameters = TestUtil.createFinderParameters();
-        final AbstractFinder finder = FinderFactory.getInstance().createFinder(executionParameters, null,
-                finderParameters);
-        Assert.assertEquals("class type returned by createFinder()", expectedFinderClass, finder.getClass());
+        if (expectedFinderClass != null) {
+            final AbstractFinder finder = FinderFactory.getInstance().createFinder(executionParameters, null,
+                    finderParameters);
+            Assert.assertEquals("class type returned by createFinder()", expectedFinderClass, finder.getClass());
+        } else {
+            // expecting exception
+            try {
+                FinderFactory.getInstance().createFinder(executionParameters, null, finderParameters);
+                Assert.fail("expecting LicenseScoutExecutionException");
+            } catch (LicenseScoutExecutionException e) {
+                // expected
+            }
+        }
     }
 
     /**
@@ -74,6 +85,7 @@ public class FinderFactoryTest {
         return Arrays.asList(new Object[][] { //
                 { ArchiveType.JAVA, JavaJarFinder.class }, //
                 { ArchiveType.JAVASCRIPT, JavascriptNpmFinder.class }, //
+                { null, null }, //
         });
     }
 }

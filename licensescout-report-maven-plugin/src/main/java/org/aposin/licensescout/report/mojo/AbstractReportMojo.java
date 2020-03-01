@@ -39,9 +39,11 @@ import org.aposin.licensescout.execution.Executor;
 import org.aposin.licensescout.execution.IReportExporterFactory;
 import org.aposin.licensescout.execution.LicenseScoutExecutionException;
 import org.aposin.licensescout.execution.LicenseScoutFailOnErrorException;
+import org.aposin.licensescout.execution.ScanLocation;
 import org.aposin.licensescout.license.LegalStatus;
 import org.aposin.licensescout.maven.utils.ArtifactHelper;
 import org.aposin.licensescout.maven.utils.ArtifactItem;
+import org.aposin.licensescout.maven.utils.ArtifactScope;
 import org.aposin.licensescout.maven.utils.ArtifactServerUtilHelper;
 import org.aposin.licensescout.maven.utils.IRepositoryParameters;
 import org.aposin.licensescout.maven.utils.MavenLog;
@@ -52,6 +54,7 @@ import org.aposin.licensescout.util.ILSLog;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.DependencyResolutionException;
 
 /**
  * Creates a report integrated into a Maven site report of license information found by the LicenseScout.
@@ -63,11 +66,35 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
      * Directory to scan for archives.
      * <p>This is the directory where the LicenseScout will start to traverse directories recursively.
      * If the directory does not exist, the LicenseScout will be terminated with an exception.</p>
+     * <p>Either this parameter or {@link #scanArtifacts} is required.</p>
      * 
      * @since 1.1
      */
     @Parameter(property = "scanDirectory", required = true)
     private File scanDirectory;
+
+    /**
+     * List of artifacts that should be scanned for dependencies.
+     * <p>If this parameter is configured, the LicenseScout does a Maven dependency resolution of the given artifacts using the scope configured with {@link #scanArtifactScope}.
+     * The resulting set of artifacts are scanned for license information.</p>
+     * <p>Either this parameter or {@link #scanDirectory} is required.</p>
+     * 
+     * @since 1.4.0
+     */
+    @Parameter(property = "scanArtifacts", required = false)
+    private List<ArtifactItem> scanArtifacts;
+
+    /**
+     * Resolution scope for scanned artifacts.
+     * 
+     * <p>If artifacts to scan are given (by specifying {@link #scanArtifacts}), this determines the scope 
+     * of resolving their dependencies that are taken into account.
+     * If {@link #scanDirectory} is used, the value given has no effect.</p>
+     * 
+     * @since 1.4.0
+     */
+    @Parameter(property = "scanArtifactScope", required = false, defaultValue = "compile")
+    private ArtifactScope scanArtifactScope;
 
     /**
      * Name of the file to read known licenses from.
@@ -400,10 +427,21 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
     }
 
     /**
-     * @return the scanDirectory
+     * @return the scan location
      */
-    public final File getScanDirectory() {
-        return scanDirectory;
+    public final ScanLocation getScanLocation() {
+        if (scanDirectory != null) {
+            return new ScanLocation(scanDirectory);
+        } else if (scanArtifacts != null) {
+            try {
+                List<File> scanFiles = ArtifactHelper.getDependencies(this, scanArtifacts, scanArtifactScope);
+                return new ScanLocation(scanFiles);
+            } catch (DependencyResolutionException e) {
+                throw new IllegalStateException(e);
+            }
+        } else {
+            return null;
+        }
     }
 
     /**

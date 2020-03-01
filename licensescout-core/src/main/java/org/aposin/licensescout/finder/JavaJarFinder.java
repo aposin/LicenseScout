@@ -37,19 +37,7 @@ import org.aposin.licensescout.util.JarUtil;
  * a starting point.</p>
  *  
  */
-// TODO: rename to JavaDirectoryFinder
 public class JavaJarFinder extends AbstractJavaFinder {
-
-    protected enum ScanMode {
-        /**
-         * In a directory in the file system that is not an archive.
-         */
-        DIRECTORY(),
-        /**
-         * In a directory in the file system that is an archive (i.e. in an unpacked archive).
-         */
-        UNPACKED_ARCHIVE();
-    }
 
     private final List<String> specialArchiveNames = new ArrayList<>();
     private final FinderHandler<File, FileSystemEntryContainer, File> fileSystemFinderHandler;
@@ -78,9 +66,17 @@ public class JavaJarFinder extends AbstractJavaFinder {
      */
     @Override
     protected void findLicensesImpl() throws Exception {
-        final File root = getScanDirectory();
-        final String filePath = "";
-        parseFile(root, filePath);
+        final File rootDirectory = getScanDirectory();
+        if (rootDirectory != null) {
+            final String filePath = "";
+            parseFile(rootDirectory, filePath);
+        } else {
+            final List<File> rootFiles = getScanFiles();
+            for (final File rootFile : rootFiles) {
+                final String filePath = "";
+                parseFile(rootFile, filePath);
+            }
+        }
     }
 
     /**
@@ -201,9 +197,6 @@ public class JavaJarFinder extends AbstractJavaFinder {
      * @return true, if is archive
      */
     private static boolean isArchiveDirectory(final File dir) {
-        if (!dir.isDirectory()) {
-            return false;
-        }
         final File metaInfEntry = findEntry(dir, "META-INF");
         if (metaInfEntry == null || !metaInfEntry.isDirectory()) {
             return false;

@@ -27,12 +27,9 @@ import org.aposin.licensescout.archive.Archive;
 import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.core.test.util.CreateJarFileHelper;
 import org.aposin.licensescout.core.test.util.TestArtifactServerUtil;
-import org.aposin.licensescout.core.test.util.TestUtil;
 import org.aposin.licensescout.license.IArtifactServerUtil;
 import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseStoreData;
-import org.aposin.licensescout.util.ILSLog;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -44,22 +41,10 @@ import org.junit.Test;
  * <p>For tests that test packed JAR files, these JAR files are created during runtime from directories with the unpacked contents of the JAR. In case 
  * of packed JARs with an inner JAR, first the inner JAR is created, then the outer one.</p>
  */
-public class JavaJarFinderTest extends BaseFinderTest {
+public abstract class JavaJarFinderTest extends BaseFinderTest {
 
     private static final String BASE_PATH = "src/test/resources/scans/";
     private static final int EXPECTED_MESSAGE_DIGEST_STRING_LENGTH = 64;
-
-    /**
-     * Test method for {@link JavaJarFinder#isPomResolutionUsed()}.
-     */
-    @Test
-    public void testPomResolutionUsed() {
-        final ILSLog log = TestUtil.createTestLog();
-        LicenseStoreData licenseStoreData = null;
-        final IArtifactServerUtil artifactServerUtil = new TestArtifactServerUtil();
-        final AbstractJavaFinder finder = new JavaJarFinder(licenseStoreData, artifactServerUtil, log);
-        Assert.assertFalse("isPomResolutionUsed()", finder.isPomResolutionUsed());
-    }
 
     /**
      * Test method for {@link JavaJarFinder#findLicenses()}.

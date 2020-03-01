@@ -126,7 +126,7 @@ public class ConfigurationHelperTest {
     private void assertGetExecutionOutputs(final Output output, final String expectedUrl) {
         final List<Output> outputs = Arrays.asList(output);
         final String artifactBaseUrl = "http://server/repo/";
-        final LSArtifact artifact = new LSArtifact("group.id", "artifactId", "version", "type", "");
+        final LSArtifact artifact = new LSArtifact("group.id", "artifactId", "version", "");
         final List<ExecutionOutput> executionOutputs = ConfigurationHelper.getExecutionOutputs(outputs, artifactBaseUrl,
                 artifact);
         Assert.assertEquals("resulting output count", 1, executionOutputs.size());

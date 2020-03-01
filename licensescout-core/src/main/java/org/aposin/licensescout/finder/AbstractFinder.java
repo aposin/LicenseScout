@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.aposin.licensescout.archive.Archive;
+import org.aposin.licensescout.execution.ScanLocation;
 import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseStoreData;
 import org.aposin.licensescout.license.LicenseUtil;
@@ -42,7 +43,7 @@ public abstract class AbstractFinder {
 
     private final ILSLog log;
 
-    private File scanDirectory;
+    private ScanLocation scanLocation;
 
     /**
      * List of archives found during the scanning.
@@ -85,21 +86,46 @@ public abstract class AbstractFinder {
     }
 
     /**
-     * Sets the directory to scan.
+     * Sets the scan location.
      * 
-     * @param scanDirectory the directory to scan
+     * @param scanLocation the location to scan
      */
-    public final void setScanDirectory(final File scanDirectory) {
-        this.scanDirectory = scanDirectory;
+    public final void setScanLocation(final ScanLocation scanLocation) {
+        this.scanLocation = scanLocation;
+    }
+
+    /**
+     * Obtains the scan location.
+     * 
+     * <p>Is intended to be used for logging. For processing, {@link #getScanDirectory()}
+     * and {@link #getScanFiles()} should be used.</p>
+     * 
+     * @return the scan location
+     */
+    protected final ScanLocation getScanLocation() {
+        return scanLocation;
     }
 
     /**
      * Obtains the directory to scan.
      * 
      * @return the scanDirectory
+     * 
+     * @see #getScanFiles()
      */
     protected final File getScanDirectory() {
-        return scanDirectory;
+        return scanLocation.getScanDirectory();
+    }
+
+    /**
+     * Obtains the files to scan.
+     * 
+     * @return the scanDirectory
+     * 
+     * @see #getScanDirectory()
+     */
+    protected final List<File> getScanFiles() {
+        return scanLocation.getScanFiles();
     }
 
     /**
@@ -121,7 +147,8 @@ public abstract class AbstractFinder {
         if (debug) {
             printArchiveList(archiveFiles);
         }
-        getLog().info("Finished scanning for licenses in " + getScanDirectory().getAbsolutePath());
+        getLog().info("Finished scanning for licenses in " + getScanLocation().toLogString());
+        // TODO: add alternative solution in case of artifacts scan
         return new FinderResult(getScanDirectory(), archiveFiles);
     }
 

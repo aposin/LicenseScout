@@ -22,8 +22,8 @@ import java.util.Arrays;
 import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.configuration.ConfigFileHandler;
 import org.aposin.licensescout.configuration.ConfigFileParameters;
-import org.aposin.licensescout.configuration.FilesystemConfigFileHandler;
 import org.aposin.licensescout.configuration.ExecutionOutput;
+import org.aposin.licensescout.configuration.FilesystemConfigFileHandler;
 import org.aposin.licensescout.configuration.OutputFileType;
 import org.aposin.licensescout.core.test.util.TestArtifactServerUtil;
 import org.aposin.licensescout.core.test.util.TestUtil;
@@ -325,10 +325,11 @@ public class SimpleExecutionTest {
     private ExecutionParameters createExecutionParameters(final ArchiveType archiveType, final File scanDirectory,
                                                           final ArrayList<ExecutionOutput> outputs,
                                                           final boolean withStandardReportExporterFactory) {
+        final ScanLocation scanLocation = new ScanLocation(scanDirectory);
         final ExecutionParameters executionParameters = new ExecutionParameters();
         executionParameters.setArchiveType(archiveType);
         executionParameters.setFilteredVendorNames(new ArrayList<>());
-        executionParameters.setScanDirectory(scanDirectory);
+        executionParameters.setScanLocation(scanLocation);
         executionParameters.setOutputDirectory(new File("target"));
         executionParameters.setOutputs(outputs);
         executionParameters.setCleanOutputActive(false);
@@ -340,6 +341,7 @@ public class SimpleExecutionTest {
             executionParameters.setExporterFactories(Arrays.asList(new StandardReportExporterFactory()));
         }
         executionParameters.setValidateLicenseXml(false);
+        executionParameters.setShowDocumentationUrl(false);
         executionParameters.setArtifactServerUtil(new TestArtifactServerUtil());
         return executionParameters;
     }
