@@ -41,6 +41,7 @@ import org.aposin.licensescout.execution.ExecutionParameters;
 import org.aposin.licensescout.execution.Executor;
 import org.aposin.licensescout.execution.LicenseScoutExecutionException;
 import org.aposin.licensescout.execution.LicenseScoutFailOnErrorException;
+import org.aposin.licensescout.execution.ScanLocation;
 import org.aposin.licensescout.execution.StandardReportExporterFactory;
 import org.aposin.licensescout.license.LegalStatus;
 import org.aposin.licensescout.maven.utils.ArtifactHelper;
@@ -544,10 +545,10 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
     }
 
     /**
-     * @return the scanDirectory
+     * @return the scan location
      */
-    public final File getScanDirectory() {
-        return scanDirectory;
+    public final ScanLocation getScanLocation() {
+        return new ScanLocation(scanDirectory);
     }
 
     /**

@@ -155,7 +155,8 @@ public class Executor {
         finderParameters.setArtifactServerUtil(getExecutionParameters().getArtifactServerUtil());
         final AbstractFinder finder = FinderFactory.getInstance().createFinder(executionParameters, licenseStoreData,
                 finderParameters);
-        getLog().info("Starting scan on " + getExecutionParameters().getScanDirectory().getAbsolutePath() + "...");
+        getLog().info("Starting scan on "
+                + getExecutionParameters().getScanLocation().getScanDirectory().getAbsolutePath() + "...");
 
         OutputResult outputResult;
         try {
@@ -440,7 +441,7 @@ public class Executor {
     }
 
     private void checkParameters(final ILSLog log) throws LicenseScoutExecutionException {
-        final File scanDirectory = getExecutionParameters().getScanDirectory();
+        final File scanDirectory = getExecutionParameters().getScanLocation().getScanDirectory();
         if (scanDirectory != null) {
             if (!scanDirectory.exists()) {
                 throw new LicenseScoutExecutionException(

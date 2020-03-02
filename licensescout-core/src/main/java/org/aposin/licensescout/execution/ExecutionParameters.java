@@ -37,7 +37,7 @@ public class ExecutionParameters {
     /**
      * Directory to scan for archives.
      */
-    private File scanDirectory;
+    private ScanLocation scanLocation;
 
     /**
      * Location of the output file (will be combined with output filename).
@@ -238,17 +238,17 @@ public class ExecutionParameters {
     }
 
     /**
-     * @return the scanDirectory
+     * @return the scan location
      */
-    public final File getScanDirectory() {
-        return scanDirectory;
+    public final ScanLocation getScanLocation() {
+        return scanLocation;
     }
 
     /**
-     * @param scanDirectory the scanDirectory to set
+     * @param scanLocation the scan location to set
      */
-    public final void setScanDirectory(File scanDirectory) {
-        this.scanDirectory = scanDirectory;
+    public final void setScanLocation(ScanLocation scanLocation) {
+        this.scanLocation = scanLocation;
     }
 
     /**

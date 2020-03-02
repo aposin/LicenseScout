@@ -39,6 +39,7 @@ import org.aposin.licensescout.execution.Executor;
 import org.aposin.licensescout.execution.IReportExporterFactory;
 import org.aposin.licensescout.execution.LicenseScoutExecutionException;
 import org.aposin.licensescout.execution.LicenseScoutFailOnErrorException;
+import org.aposin.licensescout.execution.ScanLocation;
 import org.aposin.licensescout.license.LegalStatus;
 import org.aposin.licensescout.maven.utils.ArtifactHelper;
 import org.aposin.licensescout.maven.utils.ArtifactItem;
@@ -400,10 +401,10 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
     }
 
     /**
-     * @return the scanDirectory
+     * @return the scan location
      */
-    public final File getScanDirectory() {
-        return scanDirectory;
+    public final ScanLocation getScanLocation() {
+        return new ScanLocation(scanDirectory);
     }
 
     /**
