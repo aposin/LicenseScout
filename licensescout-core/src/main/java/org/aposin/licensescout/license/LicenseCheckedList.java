@@ -78,13 +78,6 @@ public class LicenseCheckedList {
     private static final int NOTICE_INDEX = 5;
     private static final int LICENSE_NAMES_OFFSET = 6;
 
-    /**
-     * Note: this value depends on the algorithm set by {@link CryptUtil#setMessageDigestAlgorithm(String)}.
-     * Therefore it is calculated dynamically.
-     */
-    private static final int MESSAGE_DIGEST_NUM_BYTES = CryptUtil.getMessageDigestLength();
-    private static final int MESSAGE_DIGEST_NUM_CODED_CHARACTERS = MESSAGE_DIGEST_NUM_BYTES * 2;
-
     private Map<ArchiveIdentifier, LicenseResult> manualArchives = new HashMap<>();
     private Map<ArchiveIdentifierPattern, LicenseResult> manualPatternArchives = new HashMap<>();
 
@@ -108,6 +101,12 @@ public class LicenseCheckedList {
     public void readCsv(final InputStream inputStream, final LicenseStoreData licenseStoreData,
                         final Providers providers, final Notices notices, final ILSLog log)
             throws IOException {
+        /*
+         * Note: this value depends on the algorithm set by {@link CryptUtil#setMessageDigestAlgorithm(String)}.
+         * Therefore it is calculated dynamically.
+         */
+        final int messageDigestNumCodedCharacters = CryptUtil.getMessageDigestLength() * 2;
+
         String line = "";
         String cvsSplitBy = ",";
         int lineNumber = 0;
@@ -138,8 +137,8 @@ public class LicenseCheckedList {
                     }
                     final String regex = name.substring(patternStartIndex);
                     archiveIdentifier = new ArchiveIdentifierPattern(archiveType, patternType, regex);
-                } else if (id.length() >= 0) {
-                    if (id.length() == MESSAGE_DIGEST_NUM_CODED_CHARACTERS) {
+                } else if (id.length() > 0) {
+                    if (id.length() == messageDigestNumCodedCharacters) {
                         archiveIdentifier = new ArchiveIdentifierMessageDigest(archiveType, name, id);
                     } else {
                         archiveIdentifier = new ArchiveIdentifierVersion(archiveType, name, id);

@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 
 import org.aposin.licensescout.configuration.FinderParameters;
 import org.aposin.licensescout.license.LicenseStoreData;
+import org.aposin.licensescout.util.CryptUtil;
 import org.aposin.licensescout.util.ILSLog;
 import org.aposin.licensescout.util.JavaUtilLog;
 import org.aposin.licensescout.util.NullLog;
@@ -80,6 +81,13 @@ public abstract class TestUtil {
      */
     public static ILSLog createTestLog() {
         return DO_LOGGING ? createJavaUtilGlobalLog() : createNullLog();
+    }
+
+    /**
+     * Sets the message digest algorithm to the default value (SHA-256).
+     */
+    public static void setDefaultMessageDigestAlgorithm() {
+        CryptUtil.setMessageDigestAlgorithm(CryptUtil.DEFAULT_MD_ALGORITHM);
     }
 
 }

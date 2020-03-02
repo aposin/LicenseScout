@@ -27,10 +27,11 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({ //
+        LicenseCheckedListReadCsvTest.class, //
         LicenseUtilDetectLicensesTest.class, //
         LicenseUtilEvaluateLicensesTest.class, //
         LicenseUtilGetMatchedVersionFromLineTest.class, //
-        LicenseUtilMiscTest.class,
+        LicenseUtilMiscTest.class, //
         LicenseUtilStatisticsTest.class//
 })
 public class AllLicenseUtilTests {
