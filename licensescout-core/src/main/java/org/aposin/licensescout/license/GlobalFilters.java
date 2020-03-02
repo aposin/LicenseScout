@@ -63,7 +63,7 @@ public class GlobalFilters {
                 if (line.startsWith("#") || StringUtils.isEmpty(line)) {
                     continue;
                 }
-                ArchiveIdentifier archiveIdentifier = null;
+                final ArchiveIdentifier archiveIdentifier;
                 final ArchiveType archiveType = ArchiveType.JAVA;
                 // use comma as separator
                 final String name = line;
