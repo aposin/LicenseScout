@@ -283,6 +283,7 @@ public class Executor {
                     break;
                 default:
                     getLog().warn("Unhandled output type: " + output.getType());
+                    break;
             }
         }
         // Note: date is used from the database
