@@ -147,6 +147,13 @@ public class AbstractSaxHandler extends DefaultHandler {
 	        startElementHook(uri, localName, qName, attributes);
 	    }
 	
+	    /**
+	     * Hook method called on element start.
+	     * @param uri
+	     * @param localName
+	     * @param qName
+	     * @param attributes
+	     */
 	    protected void startElementHook(final String uri, final String localName, final String qName,
 	                                    final Attributes attributes) {
 	        // DO NOTHING

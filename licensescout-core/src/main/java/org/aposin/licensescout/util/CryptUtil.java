@@ -30,6 +30,9 @@ import org.aposin.licensescout.model.LSMessageDigest;
  */
 public class CryptUtil {
 
+    /**
+     * The name of the default message digest algorithm (SHA-256).
+     */
     public static final String DEFAULT_MD_ALGORITHM = "SHA-256";
 
     private static String messageDigestAlgorithm = DEFAULT_MD_ALGORITHM;

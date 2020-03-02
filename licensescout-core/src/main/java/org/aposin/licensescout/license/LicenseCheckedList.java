@@ -118,7 +118,7 @@ public class LicenseCheckedList {
                 if (line.startsWith("#") || StringUtils.isEmpty(line) || line.startsWith("Type")) {
                     continue;
                 }
-                ArchiveIdentifier archiveIdentifier = null;
+                final ArchiveIdentifier archiveIdentifier;
                 // use comma as separator
                 final String[] values = line.split(cvsSplitBy);
                 final ArchiveType archiveType = getArchiveType(values[TYPE_INDEX].trim());
