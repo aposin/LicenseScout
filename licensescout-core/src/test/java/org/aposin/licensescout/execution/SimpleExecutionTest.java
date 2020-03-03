@@ -329,7 +329,7 @@ public class SimpleExecutionTest {
         final ExecutionParameters executionParameters = new ExecutionParameters();
         executionParameters.setArchiveType(archiveType);
         executionParameters.setFilteredVendorNames(new ArrayList<>());
-        executionParameters.setScanDirectory(scanDirectory);
+        executionParameters.setScanLocation(new ScanLocation(scanDirectory));
         executionParameters.setOutputDirectory(new File("target"));
         executionParameters.setOutputs(outputs);
         executionParameters.setCleanOutputActive(false);

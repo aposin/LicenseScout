@@ -69,7 +69,7 @@ public class FinderFactory {
             throw new LicenseScoutExecutionException(
                     "Cannot create finder instance for type: " + executionParameters.getArchiveType());
         }
-        finder.setScanDirectory(executionParameters.getScanDirectory());
+        finder.setScanDirectory(executionParameters.getScanLocation().getScanDirectory());
         return finder;
     }
 

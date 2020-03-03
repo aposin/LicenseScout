@@ -15,6 +15,7 @@
  */
 package org.aposin.licensescout.finder;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -22,6 +23,7 @@ import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.configuration.FinderParameters;
 import org.aposin.licensescout.core.test.util.TestUtil;
 import org.aposin.licensescout.execution.ExecutionParameters;
+import org.aposin.licensescout.execution.ScanLocation;
 import org.aposin.licensescout.license.LicenseStoreData;
 import org.junit.Assert;
 import org.junit.Test;
@@ -60,6 +62,7 @@ public class FinderFactoryTest {
         executionParameters.setArchiveType(archiveType);
         executionParameters.setLsLog(TestUtil.createTestLog());
         executionParameters.setNpmExcludedDirectoryNames(new ArrayList<>());
+        executionParameters.setScanLocation(new ScanLocation(new File(".")));
         final FinderParameters finderParameters = TestUtil.createFinderParameters();
         final AbstractFinder finder = FinderFactory.getInstance().createFinder(executionParameters, null,
                 finderParameters);
