@@ -826,7 +826,7 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
     private LSArtifact getAttachArtifact() {
         final Artifact artifact = mavenProject.getArtifact();
         return new LSArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(),
-                artifact.getType(), attachReportsClassifier);
+                attachReportsClassifier);
     }
 
 }

@@ -32,7 +32,7 @@ public class NexusArtifactUrlBuilderTest {
     public void testBuildWithoutClassifier() {
         final IArtifactUrlBuilder artifactUrlBuilder = new NexusArtifactUrlBuilder();
         final String artifactBaseUrl = "http://server/repo/";
-        final LSArtifact artifact = new LSArtifact("group.id", "artifactId", "version", "type", "");
+        final LSArtifact artifact = new LSArtifact("group.id", "artifactId", "version", "");
         final String type = "html";
         final String result = artifactUrlBuilder.buildArtifactUrl(artifactBaseUrl, artifact, type);
         Assert.assertEquals("url", "http://server/repo/group/id/artifactId/version/artifactId-version.html", result);
@@ -46,7 +46,7 @@ public class NexusArtifactUrlBuilderTest {
     public void testBuildWithClassifier() {
         final IArtifactUrlBuilder artifactUrlBuilder = new NexusArtifactUrlBuilder();
         final String artifactBaseUrl = "http://server/repo/";
-        final LSArtifact artifact = new LSArtifact("group.id", "artifactId", "version", "type", "classifier");
+        final LSArtifact artifact = new LSArtifact("group.id", "artifactId", "version", "classifier");
         final String type = "html";
         final String result = artifactUrlBuilder.buildArtifactUrl(artifactBaseUrl, artifact, type);
         Assert.assertEquals("url", "http://server/repo/group/id/artifactId/version/artifactId-version-classifier.html",

@@ -36,12 +36,6 @@ public class LSArtifact {
     private final String version;
 
     /**
-     * Type of Artifact (War,Jar,etc)
-     *
-     */
-    private final String type;
-
-    /**
      * Classifier for Artifact (tests,sources,etc)
      *
      */
@@ -52,15 +46,12 @@ public class LSArtifact {
      * @param groupId
      * @param artifactId
      * @param version
-     * @param type
      * @param classifier
      */
-    public LSArtifact(final String groupId, final String artifactId, final String version, final String type,
-            final String classifier) {
+    public LSArtifact(final String groupId, final String artifactId, final String version, final String classifier) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
-        this.type = type;
         this.classifier = classifier;
     }
 
@@ -83,13 +74,6 @@ public class LSArtifact {
      */
     public final String getVersion() {
         return version;
-    }
-
-    /**
-     * @return the type
-     */
-    public final String getType() {
-        return type;
     }
 
     /**
