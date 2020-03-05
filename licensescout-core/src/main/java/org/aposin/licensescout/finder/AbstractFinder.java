@@ -134,7 +134,7 @@ public abstract class AbstractFinder {
             printArchiveList(archiveFiles);
         }
         getLog().info("Finished scanning for licenses in " + getScanDirectory().getAbsolutePath());
-        return new FinderResult(getScanDirectory(), archiveFiles);
+        return new FinderResult(getScanLocation(), archiveFiles);
     }
 
     /**

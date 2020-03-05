@@ -28,6 +28,7 @@ import org.apache.commons.io.IOUtils;
 import org.aposin.licensescout.archive.Archive;
 import org.aposin.licensescout.archive.ArchiveType;
 import org.aposin.licensescout.configuration.OutputFileType;
+import org.aposin.licensescout.execution.ScanLocation;
 import org.aposin.licensescout.finder.FinderResult;
 import org.aposin.licensescout.license.DetectionStatus;
 import org.aposin.licensescout.license.LegalStatus;
@@ -45,6 +46,7 @@ public abstract class AbstractExporterTest {
      * Variant of the test case.
      */
     protected enum TestVariant {
+
         /**
          * 
          */
@@ -113,6 +115,7 @@ public abstract class AbstractExporterTest {
      * Variant of the test case regarding report template.
      */
     protected enum TemplateVariant {
+
         /**
          * 
          */
@@ -305,8 +308,8 @@ public abstract class AbstractExporterTest {
     }
 
     private FinderResult createFinderResult(final List<Archive> archiveFiles) {
-        final File scanDirectory = new File(".");
-        return new FinderResult(scanDirectory, archiveFiles);
+        final ScanLocation scanLocation = new ScanLocation(new File("."));
+        return new FinderResult(scanLocation, archiveFiles);
     }
 
     /**
