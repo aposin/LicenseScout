@@ -32,7 +32,7 @@ import org.aposin.licensescout.util.JarUtil;
 /**
  * Scan for licenses in an Eclipse plugins directory.
  * 
- * <p>The implementation does a recursive search through the file system starting with the directory set with {@link #setScanDirectory(File)} as
+ * <p>The implementation does a recursive search through the file system starting with the directory set with {@link #setScanLocation(ScanLocation)} as
  * a starting point.</p>
  *  
  */

@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.aposin.licensescout.core.test.util.TestUtil;
+import org.aposin.licensescout.execution.ScanLocation;
 import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseStoreData;
 import org.aposin.licensescout.util.ILSLog;
@@ -78,11 +79,11 @@ public abstract class BaseFinderTest {
     private LicenseStoreData createLicenseStoreData() throws Exception {
         final LicenseStoreData licenseStoreData = new LicenseStoreData();
         final File file = new File("src/test/resources/scans/licenses.xml");
-     try (   final FileInputStream inputStream = new FileInputStream(file))
-     {
-        licenseStoreData.readLicenses(inputStream, null, false, getLog());
-        return licenseStoreData;
-    }}
+        try (final FileInputStream inputStream = new FileInputStream(file)) {
+            licenseStoreData.readLicenses(inputStream, null, false, getLog());
+            return licenseStoreData;
+        }
+    }
 
     protected final LicenseStoreData getLicenseStoreData() {
         return licenseStoreData;
@@ -117,7 +118,7 @@ public abstract class BaseFinderTest {
      * @throws Exception
      */
     protected FinderResult doScan(final AbstractFinder finder, final File scanDirectory) throws Exception {
-        finder.setScanDirectory(scanDirectory);
+        finder.setScanLocation(new ScanLocation(scanDirectory));
         return finder.findLicenses();
     }
 

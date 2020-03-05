@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.aposin.licensescout.archive.Archive;
+import org.aposin.licensescout.execution.ScanLocation;
 import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseStoreData;
 import org.aposin.licensescout.license.LicenseUtil;
@@ -42,7 +43,7 @@ public abstract class AbstractFinder {
 
     private final ILSLog log;
 
-    private File scanDirectory;
+    private ScanLocation scanLocation;
 
     /**
      * List of archives found during the scanning.
@@ -87,19 +88,30 @@ public abstract class AbstractFinder {
     /**
      * Sets the directory to scan.
      * 
-     * @param scanDirectory the directory to scan
+     * @param scanLocation the directory to scan
      */
-    public final void setScanDirectory(final File scanDirectory) {
-        this.scanDirectory = scanDirectory;
+    public final void setScanLocation(final ScanLocation scanLocation) {
+        this.scanLocation = scanLocation;
+    }
+
+    /**
+     * Obtains the scan location.
+     * 
+     * @return the scan location
+     */
+    protected final ScanLocation getScanLocation() {
+        return scanLocation;
     }
 
     /**
      * Obtains the directory to scan.
      * 
      * @return the scanDirectory
+     * 
+     * @see #getScanFiles()
      */
     protected final File getScanDirectory() {
-        return scanDirectory;
+        return getScanLocation().getScanDirectory();
     }
 
     /**
@@ -122,7 +134,7 @@ public abstract class AbstractFinder {
             printArchiveList(archiveFiles);
         }
         getLog().info("Finished scanning for licenses in " + getScanDirectory().getAbsolutePath());
-        return new FinderResult(getScanDirectory(), archiveFiles);
+        return new FinderResult(getScanLocation(), archiveFiles);
     }
 
     /**

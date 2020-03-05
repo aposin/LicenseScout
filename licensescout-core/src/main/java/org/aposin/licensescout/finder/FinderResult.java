@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.List;
 
 import org.aposin.licensescout.archive.Archive;
+import org.aposin.licensescout.execution.ScanLocation;
 import org.aposin.licensescout.exporter.OutputResult;
 
 /**
@@ -26,7 +27,7 @@ import org.aposin.licensescout.exporter.OutputResult;
  * 
  * <p>Contains:</p>
  * <ul>
- * <li>The scanned base directory</li>
+ * <li>The scanned location</li>
  * <li>A list of archives found during the scanning</li>
  * </ul>
  * 
@@ -35,16 +36,16 @@ import org.aposin.licensescout.exporter.OutputResult;
  */
 public class FinderResult {
 
-    private final File scanDirectory;
+    private final ScanLocation scanLocation;
     private final List<Archive> archiveFiles;
 
     /**
-     * @param scanDirectory 
+     * @param scanLocation 
      * @param archiveFiles
      */
-    public FinderResult(final File scanDirectory, final List<Archive> archiveFiles) {
+    public FinderResult(final ScanLocation scanLocation, final List<Archive> archiveFiles) {
         super();
-        this.scanDirectory = scanDirectory;
+        this.scanLocation = scanLocation;
         this.archiveFiles = archiveFiles;
     }
 
@@ -52,7 +53,7 @@ public class FinderResult {
      * @return the scanDirectory
      */
     public final File getScanDirectory() {
-        return scanDirectory;
+        return scanLocation.getScanDirectory();
     }
 
     /**
