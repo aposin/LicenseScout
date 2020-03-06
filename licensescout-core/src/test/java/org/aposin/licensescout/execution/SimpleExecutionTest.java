@@ -56,11 +56,26 @@ public class SimpleExecutionTest {
      * @throws Exception
      */
     @Test
-    public void testExecutionJavaWithOutputs() throws Exception {
+    public void testExecutionJavaWithOutputsScanDirectory() throws Exception {
         final File scanDirectory = new File("src/test/resources/scans/empty");
         final ArrayList<ExecutionOutput> outputs = createTripleOutput();
         final ExecutionParameters executionParameters = createExecutionParameters(ArchiveType.JAVA, scanDirectory,
                 outputs);
+        assertExecution(executionParameters);
+    }
+
+    /**
+     * Test case for the method {@link Executor#execute()}.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testExecutionJavaWithOutputsScanFiles() throws Exception {
+        final File scanDirectory = new File("src/test/resources/scans/empty");
+        final ArrayList<ExecutionOutput> outputs = createTripleOutput();
+        final ExecutionParameters executionParameters = createExecutionParameters(ArchiveType.JAVA, scanDirectory,
+                outputs);
+        executionParameters.setScanLocation(new ScanLocation(Arrays.asList(scanDirectory)));
         assertExecution(executionParameters);
     }
 
@@ -240,6 +255,21 @@ public class SimpleExecutionTest {
         final File scanDirectory = new File("not_existing");
         final ExecutionParameters executionParameters = createExecutionParametersNoOutputs(ArchiveType.JAVA,
                 scanDirectory);
+        assertExecution(executionParameters);
+    }
+
+    /**
+     * Test case for the method {@link Executor#execute()}.
+     * 
+     * @throws Exception
+     */
+    @Test(expected = LicenseScoutExecutionException.class)
+    public void testExecutionJavaNoScanLocation() throws Exception {
+        // TODO: clean up
+        final File scanDirectory = new File("not_existing");
+        final ExecutionParameters executionParameters = createExecutionParametersNoOutputs(ArchiveType.JAVA,
+                scanDirectory);
+        executionParameters.setScanLocation(null);
         assertExecution(executionParameters);
     }
 

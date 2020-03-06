@@ -35,7 +35,7 @@ public class ExecutionParameters {
     private ArchiveType archiveType;
 
     /**
-     * Directory to scan for archives.
+     * Location to scan for archives.
      */
     private ScanLocation scanLocation;
 
