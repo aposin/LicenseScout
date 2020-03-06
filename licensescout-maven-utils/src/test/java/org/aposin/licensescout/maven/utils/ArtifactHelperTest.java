@@ -28,6 +28,7 @@ import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.impl.DefaultServiceLocator;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
@@ -44,7 +45,7 @@ import org.junit.Test;
 public class ArtifactHelperTest {
 
     /**
-     * Test case for the method {@link ArtifactHelper#getArtifactFile(org.aposin.licensescout.maven.utils.IRepositoryParameters, org.aposin.licensescout.maven.utils.ArtifactItem)}.
+     * Test case for the method {@link ArtifactHelper#getArtifactFile(IRepositoryParameters, ArtifactItem)}.
      * 
      * @throws Exception
      */
@@ -54,7 +55,7 @@ public class ArtifactHelperTest {
     }
 
     /**
-     * Test case for the method {@link ArtifactHelper#getArtifactFile(org.aposin.licensescout.maven.utils.IRepositoryParameters, org.aposin.licensescout.maven.utils.ArtifactItem)}.
+     * Test case for the method {@link ArtifactHelper#getArtifactFile(IRepositoryParameters, ArtifactItem)}.
      * 
      * @throws Exception
      */
@@ -67,7 +68,7 @@ public class ArtifactHelperTest {
     }
 
     /**
-     * Test case for the method {@link ArtifactHelper#getArtifactFile(org.aposin.licensescout.maven.utils.IRepositoryParameters, org.aposin.licensescout.maven.utils.ArtifactItem)}.
+     * Test case for the method {@link ArtifactHelper#getArtifactFile(IRepositoryParameters, ArtifactItem)}.
      * 
      * @throws Exception
      */
@@ -85,6 +86,19 @@ public class ArtifactHelperTest {
      * @throws MojoExecutionException
      */
     private File callGetArtifactFile(ArtifactItem artifactItem) throws MojoExecutionException {
+        final IRepositoryParameters repositoryParameters = createRepositoryParameters();
+        return ArtifactHelper.getArtifactFile(repositoryParameters, artifactItem);
+    }
+
+    private List<File> callGetDependencies(ArtifactItem artifactItem, final ArtifactScope artifactScope)
+            throws DependencyResolutionException {
+        final IRepositoryParameters repositoryParameters = createRepositoryParameters();
+        final List<File> resultFiles = ArtifactHelper.getDependencies(repositoryParameters, Arrays.asList(artifactItem),
+                artifactScope);
+        return resultFiles;
+    }
+
+    private IRepositoryParameters createRepositoryParameters() {
         RepositorySystem repositorySystem = newRepositorySystem();
         RepositorySystemSession repositorySystemSession = newSession(repositorySystem);
         List<RemoteRepository> remoteRepositories = createRemoteRepositories();
@@ -105,9 +119,66 @@ public class ArtifactHelperTest {
                 return remoteRepositories;
             }
         };
+        return repositoryParameters;
+    }
 
-        final File resultFile = ArtifactHelper.getArtifactFile(repositoryParameters, artifactItem);
-        return resultFile;
+    /**
+     * Test case for the method {@link ArtifactHelper#getDependencies(IRepositoryParameters, List, ArtifactScope)}.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testGetDependenciesCompileScope() throws Exception {
+        ArtifactItem artifactItem = new ArtifactItem("org.eclipse.aether", "aether-impl", "1.0.0.v20140518", "jar", "");
+        assertGetDependencies(artifactItem, ArtifactScope.compile, 4);
+    }
+
+    /**
+     * Test case for the method {@link ArtifactHelper#getDependencies(IRepositoryParameters, List, ArtifactScope)}.
+     * <p>Type of artifact (jar, ...) is not given explicitly.</p>
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testGetDependenciesCompilScopeDefaultType() throws Exception {
+        ArtifactItem artifactItem = new ArtifactItem("org.eclipse.aether", "aether-impl", "1.0.0.v20140518", "", "");
+        assertGetDependencies(artifactItem, ArtifactScope.compile, 4);
+    }
+
+    /**
+     * Test case for the method {@link ArtifactHelper#getDependencies(IRepositoryParameters, List, ArtifactScope)}.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testGetDependenciesTestScope() throws Exception {
+        ArtifactItem artifactItem = new ArtifactItem("org.eclipse.aether", "aether-impl", "1.1.0", "jar", "");
+        assertGetDependencies(artifactItem, ArtifactScope.test, 4);
+    }
+
+    /**
+     * Test case for the method {@link ArtifactHelper#getDependencies(IRepositoryParameters, List, ArtifactScope)}.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testGetDependenciesProvidedScope() throws Exception {
+        ArtifactItem artifactItem = new ArtifactItem("org.eclipse.aether", "aether-impl", "1.1.0", "jar", "");
+        assertGetDependencies(artifactItem, ArtifactScope.provided, 1);
+    }
+
+    /**
+     * @param artifactItem
+     * @param scope
+     * @param expectedDependencyCount
+     * @throws DependencyResolutionException
+     */
+    private void assertGetDependencies(final ArtifactItem artifactItem, final ArtifactScope scope,
+                                       final int expectedDependencyCount)
+            throws DependencyResolutionException {
+        final List<File> resultFiles = callGetDependencies(artifactItem, scope);
+        Assert.assertNotNull("result list of ependencies existing", resultFiles);
+        Assert.assertEquals("result list of dependencies size", expectedDependencyCount, resultFiles.size());
     }
 
     private static RepositorySystem newRepositorySystem() {
@@ -115,16 +186,13 @@ public class ArtifactHelperTest {
         locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
         locator.addService(TransporterFactory.class, FileTransporterFactory.class);
         locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
-
         return locator.getService(RepositorySystem.class);
     }
 
     private static RepositorySystemSession newSession(RepositorySystem system) {
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
-
         LocalRepository localRepo = new LocalRepository("target/local-repo");
         session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
-
         return session;
     }
 
