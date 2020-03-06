@@ -128,14 +128,21 @@ public class ArtifactHelperTest {
      * @throws Exception
      */
     @Test
-    public void testGetDependencies1() throws Exception {
-        final ArtifactScope scope = ArtifactScope.compile;
+    public void testGetDependenciesCompileScope() throws Exception {
         ArtifactItem artifactItem = new ArtifactItem("org.eclipse.aether", "aether-impl", "1.0.0.v20140518", "jar", "");
-        final int expectedDependencyCount = 4;
+        assertGetDependencies(artifactItem, ArtifactScope.compile, 4);
+    }
 
-        final List<File> resultFiles = callGetDependencies(artifactItem, scope);
-        Assert.assertNotNull(resultFiles);
-        Assert.assertEquals(expectedDependencyCount, resultFiles.size());
+    /**
+     * Test case for the method {@link ArtifactHelper#getDependencies(IRepositoryParameters, List, ArtifactScope)}.
+     * <p>Type of artifact (jar, ...) is not given explicitly.</p>
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testGetDependenciesCompilScopeDefaultType() throws Exception {
+        ArtifactItem artifactItem = new ArtifactItem("org.eclipse.aether", "aether-impl", "1.0.0.v20140518", "", "");
+        assertGetDependencies(artifactItem, ArtifactScope.compile, 4);
     }
 
     /**
@@ -144,14 +151,34 @@ public class ArtifactHelperTest {
      * @throws Exception
      */
     @Test
-    public void testGetDependencies2() throws Exception {
-        final ArtifactScope scope = ArtifactScope.compile;
-        ArtifactItem artifactItem = new ArtifactItem("org.eclipse.aether", "aether-impl", "1.0.0.v20140518", "", "");
-        final int expectedDependencyCount = 4;
+    public void testGetDependenciesTestScope() throws Exception {
+        ArtifactItem artifactItem = new ArtifactItem("org.eclipse.aether", "aether-impl", "1.1.0", "jar", "");
+        assertGetDependencies(artifactItem, ArtifactScope.test, 4);
+    }
 
+    /**
+     * Test case for the method {@link ArtifactHelper#getDependencies(IRepositoryParameters, List, ArtifactScope)}.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testGetDependenciesProvidedScope() throws Exception {
+        ArtifactItem artifactItem = new ArtifactItem("org.eclipse.aether", "aether-impl", "1.1.0", "jar", "");
+        assertGetDependencies(artifactItem, ArtifactScope.provided, 1);
+    }
+
+    /**
+     * @param artifactItem
+     * @param scope
+     * @param expectedDependencyCount
+     * @throws DependencyResolutionException
+     */
+    private void assertGetDependencies(final ArtifactItem artifactItem, final ArtifactScope scope,
+                                       final int expectedDependencyCount)
+            throws DependencyResolutionException {
         final List<File> resultFiles = callGetDependencies(artifactItem, scope);
-        Assert.assertNotNull(resultFiles);
-        Assert.assertEquals(expectedDependencyCount, resultFiles.size());
+        Assert.assertNotNull("result list of ependencies existing", resultFiles);
+        Assert.assertEquals("result list of dependencies size", expectedDependencyCount, resultFiles.size());
     }
 
     private static RepositorySystem newRepositorySystem() {
@@ -159,16 +186,13 @@ public class ArtifactHelperTest {
         locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
         locator.addService(TransporterFactory.class, FileTransporterFactory.class);
         locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
-
         return locator.getService(RepositorySystem.class);
     }
 
     private static RepositorySystemSession newSession(RepositorySystem system) {
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
-
         LocalRepository localRepo = new LocalRepository("target/local-repo");
         session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
-
         return session;
     }
 
