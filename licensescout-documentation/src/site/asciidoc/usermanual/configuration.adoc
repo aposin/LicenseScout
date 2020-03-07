@@ -84,7 +84,12 @@ In one execution, LicenseScout can either scan for Java artifacts or for Javascr
 
 === Scan Location
 
-The base directory where archives are searched for (recursively and also inside JARs) is configured by the parameter `scanDirectory`.
+The location to be scanned can either be:
+
+* a base directory where archives are searched for (recursively and also inside JARs). This is configured by the parameter `scanDirectory`.
+* a list of Maven artifacts. The configured artifacts and their (transitive) dependencies are scanned. This is configured by the parameter `scanArtifacts`.
+The parameter `scanArtifactScope` optionally allows to specify the 
+scope for dependency resolution.
 
 [[output-types-and-files]]
 === Output types and files
