@@ -1,4 +1,4 @@
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/cz.jirutka.rsql/rsql-parser/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.aposin.licensescout/licensescout-maven-plugin)
+[![Maven Central](https://img.shields.io/maven-central/v/org.aposin.licensescout/licensescout-maven-plugin.svg?label=Maven%20Central)](https://maven-badges.herokuapp.com/maven-central/org.aposin.licensescout/licensescout-maven-plugin)
 [![Build Status](https://travis-ci.org/aposin/LicenseScout.svg?branch=master)](https://travis-ci.org/aposin/LicenseScout)
 [![codecov](https://codecov.io/gh/aposin/LicenseScout/branch/master/graph/badge.svg)](https://codecov.io/gh/aposin/LicenseScout)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/68b073442bd540f4a0a0ca1b33e5181b)](https://www.codacy.com/app/aposin-bot/LicenseScout?utm_source=github.com&utm_medium=referral&utm_content=aposin/LicenseScout&utm_campaign=Badge_Grade)
