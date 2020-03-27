@@ -56,11 +56,26 @@ public class SimpleExecutionTest {
      * @throws Exception
      */
     @Test
-    public void testExecutionJavaWithOutputs() throws Exception {
+    public void testExecutionJavaWithOutputsScanDirectory() throws Exception {
         final File scanDirectory = new File("src/test/resources/scans/empty");
         final ArrayList<ExecutionOutput> outputs = createTripleOutput();
         final ExecutionParameters executionParameters = createExecutionParameters(ArchiveType.JAVA, scanDirectory,
                 outputs);
+        assertExecution(executionParameters);
+    }
+
+    /**
+     * Test case for the method {@link Executor#execute()}.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testExecutionJavaWithOutputsScanFiles() throws Exception {
+        final File scanDirectory = new File("src/test/resources/scans/empty");
+        final ScanLocation scanLocation = new ScanLocation(Arrays.asList(scanDirectory));
+        final ArrayList<ExecutionOutput> outputs = createTripleOutput();
+        final ExecutionParameters executionParameters = createExecutionParameters(ArchiveType.JAVA, scanLocation,
+                outputs, true);
         assertExecution(executionParameters);
     }
 
@@ -211,8 +226,9 @@ public class SimpleExecutionTest {
     @Test(expected = LicenseScoutExecutionException.class)
     public void testExecutionJavaNoReportExporterFactory() throws Exception {
         final File scanDirectory = new File("src/test/resources/scans/java-unpacked-license-manifest");
+        final ScanLocation scanLocation = new ScanLocation(scanDirectory);
         final ArrayList<ExecutionOutput> outputs = createTripleOutput();
-        final ExecutionParameters executionParameters = createExecutionParameters(ArchiveType.JAVA, scanDirectory,
+        final ExecutionParameters executionParameters = createExecutionParameters(ArchiveType.JAVA, scanLocation,
                 outputs, false);
         assertExecution(executionParameters);
     }
@@ -240,6 +256,18 @@ public class SimpleExecutionTest {
         final File scanDirectory = new File("not_existing");
         final ExecutionParameters executionParameters = createExecutionParametersNoOutputs(ArchiveType.JAVA,
                 scanDirectory);
+        assertExecution(executionParameters);
+    }
+
+    /**
+     * Test case for the method {@link Executor#execute()}.
+     * 
+     * @throws Exception
+     */
+    @Test(expected = LicenseScoutExecutionException.class)
+    public void testExecutionJavaNoScanLocation() throws Exception {
+        final ExecutionParameters executionParameters = createExecutionParametersNoOutputs(ArchiveType.JAVA,
+                (ScanLocation) null);
         assertExecution(executionParameters);
     }
 
@@ -311,25 +339,33 @@ public class SimpleExecutionTest {
         return createExecutionParameters(archiveType, scanDirectory, outputs);
     }
 
+    private ExecutionParameters createExecutionParametersNoOutputs(final ArchiveType archiveType,
+                                                                   final ScanLocation scanLocation) {
+        final ArrayList<ExecutionOutput> outputs = new ArrayList<>();
+        return createExecutionParameters(archiveType, scanLocation, outputs, true);
+    }
+
     private ExecutionParameters createExecutionParameters(final ArchiveType archiveType, final File scanDirectory,
                                                           final ArrayList<ExecutionOutput> outputs) {
-        return createExecutionParameters(archiveType, scanDirectory, outputs, true);
+        final ScanLocation scanLocation = new ScanLocation(scanDirectory);
+        return createExecutionParameters(archiveType, scanLocation, outputs, true);
     }
 
     /**
      * @param archiveType
-     * @param scanDirectory
+     * @param scanLocation the scan location
      * @param outputs
      * @param withStandardReportExporterFactory
-     * @return an execution parameters instance
+     * @return
      */
-    private ExecutionParameters createExecutionParameters(final ArchiveType archiveType, final File scanDirectory,
+    private ExecutionParameters createExecutionParameters(final ArchiveType archiveType,
+                                                          final ScanLocation scanLocation,
                                                           final ArrayList<ExecutionOutput> outputs,
                                                           final boolean withStandardReportExporterFactory) {
         final ExecutionParameters executionParameters = new ExecutionParameters();
         executionParameters.setArchiveType(archiveType);
         executionParameters.setFilteredVendorNames(new ArrayList<>());
-        executionParameters.setScanLocation(new ScanLocation(scanDirectory));
+        executionParameters.setScanLocation(scanLocation);
         executionParameters.setOutputDirectory(new File("target"));
         executionParameters.setOutputs(outputs);
         executionParameters.setCleanOutputActive(false);

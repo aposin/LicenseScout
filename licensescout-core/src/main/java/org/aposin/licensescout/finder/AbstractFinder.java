@@ -86,9 +86,9 @@ public abstract class AbstractFinder {
     }
 
     /**
-     * Sets the directory to scan.
+     * Sets the scan location.
      * 
-     * @param scanLocation the directory to scan
+     * @param scanLocation the location to scan
      */
     public final void setScanLocation(final ScanLocation scanLocation) {
         this.scanLocation = scanLocation;
@@ -96,6 +96,9 @@ public abstract class AbstractFinder {
 
     /**
      * Obtains the scan location.
+     * 
+     * <p>Is intended to be used for logging. For processing, {@link #getScanDirectory()}
+     * and {@link #getScanFiles()} should be used.</p>
      * 
      * @return the scan location
      */
@@ -112,6 +115,17 @@ public abstract class AbstractFinder {
      */
     protected final File getScanDirectory() {
         return getScanLocation().getScanDirectory();
+    }
+
+    /**
+     * Obtains the files to scan.
+     * 
+     * @return the scanDirectory
+     * 
+     * @see #getScanDirectory()
+     */
+    protected final List<File> getScanFiles() {
+        return scanLocation.getScanFiles();
     }
 
     /**
@@ -133,7 +147,7 @@ public abstract class AbstractFinder {
         if (debug) {
             printArchiveList(archiveFiles);
         }
-        getLog().info("Finished scanning for licenses in " + getScanDirectory().getAbsolutePath());
+        getLog().info("Finished scanning for licenses in " + getScanLocation().toLogString());
         return new FinderResult(getScanLocation(), archiveFiles);
     }
 

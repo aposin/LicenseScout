@@ -88,7 +88,8 @@ public abstract class AbstractVelocityExporter implements IReportExporter {
         final List<Archive> archiveFiles = getSortedArchives(outputResult);
         context.put("archiveFiles", archiveFiles);
 
-        context.put("sourcePath", outputResult.getFinderResult().getScanDirectory().getAbsolutePath());
+        final File scanDirectory = outputResult.getFinderResult().getScanDirectory();
+        context.put("sourcePath", scanDirectory != null ? scanDirectory.getAbsolutePath() : "");
         context.put("detectionStatusStatistics", outputResult.getDetectionStatusStatistics());
         context.put("legalStatusStatistics", outputResult.getLegalStatusStatistics());
         context.put("generalStatistics", outputResult.getGeneralStatistics());

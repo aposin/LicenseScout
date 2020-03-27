@@ -70,7 +70,7 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
      * 
      * @since 1.1
      */
-    @Parameter(property = "scanDirectory", required = true)
+    @Parameter(property = "scanDirectory", required = false)
     private File scanDirectory;
 
     /**
