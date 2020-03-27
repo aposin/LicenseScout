@@ -279,7 +279,7 @@ public abstract class AbstractExporterTest {
                 "urlPublic", "text", null);
         archive.addLicense(license, "licensepath");
         archive.setDocumentationUrl("docUrl01");
-        final Provider provider = new Provider("Foundation", "Foundation name", "Http://www.foundation.org/");
+        final Provider provider = new Provider("Foundation", "Foundation name", "http://www.foundation.org/");
         archive.setProvider(provider);
         return archive;
     }
