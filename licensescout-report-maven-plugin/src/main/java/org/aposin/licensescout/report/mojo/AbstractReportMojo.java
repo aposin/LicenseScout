@@ -250,6 +250,22 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
     private boolean showDocumentationUrl;
 
     /**
+     * Whether the candidate license files should be shown as a column in HTML reports.
+     * 
+     * @since 1.4.0
+     */
+    @Parameter(defaultValue = "false", property = "showLicenseCandidateFilesColumn", required = false)
+    private boolean showLicenseCandidateFilesColumn;
+
+    /**
+     * Whether the provider should be shown as a column in HTML reports.
+     * 
+     * @since 1.4.0
+     */
+    @Parameter(defaultValue = "false", property = "showProviderColumn", required = false)
+    private boolean showProviderColumn;
+
+    /**
      * The name of the build to use when writing database entries.
      * 
      * <p>Only used if {@link #writeResultsToDatabase} is true. </p>
@@ -424,6 +440,22 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
      */
     public final boolean isShowDocumentationUrl() {
         return showDocumentationUrl;
+    }
+
+    
+    /**
+     * @return the showLicenseCandidateFilesColumn
+     */
+    public final boolean isShowLicenseCandidateFilesColumn() {
+        return showLicenseCandidateFilesColumn;
+    }
+
+    
+    /**
+     * @return the showProviderColumn
+     */
+    public final boolean isShowProviderColumn() {
+        return showProviderColumn;
     }
 
     /**

@@ -413,10 +413,12 @@ public class Executor {
      */
     private ReportConfiguration createReportConfiguration(ArchiveType archiveType) {
         final ReportConfiguration reportConfiguration = new ReportConfiguration();
-        reportConfiguration.setShowLicenseCandidateFilesColumn(false);
+        reportConfiguration
+                .setShowLicenseCandidateFilesColumn(getExecutionParameters().isShowLicenseCandidateFilesColumn());
         reportConfiguration.setShowMessageDigestColumn(archiveType == ArchiveType.JAVA);
         reportConfiguration.setShowPathColumn(archiveType == ArchiveType.JAVA);
         reportConfiguration.setShowDocumentationUrl(getExecutionParameters().isShowDocumentationUrl());
+        reportConfiguration.setShowProviderColumn(getExecutionParameters().isShowProviderColumn());
         return reportConfiguration;
     }
 

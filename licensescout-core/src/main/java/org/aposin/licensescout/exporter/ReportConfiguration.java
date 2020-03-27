@@ -30,6 +30,7 @@ public class ReportConfiguration {
     private boolean showMessageDigestColumn;
     private boolean showPathColumn;
     private boolean showDocumentationUrl;
+    private boolean showProviderColumn;
     private File outputFile;
     private File templateFile;
     private String templateEncoding;
@@ -89,6 +90,20 @@ public class ReportConfiguration {
      */
     public final void setShowDocumentationUrl(final boolean showDocumentationUrl) {
         this.showDocumentationUrl = showDocumentationUrl;
+    }
+
+    /**
+     * @return the showProviderColumn
+     */
+    public final boolean isShowProviderColumn() {
+        return showProviderColumn;
+    }
+
+    /**
+     * @param showProviderColumn the showProviderColumn to set
+     */
+    public final void setShowProviderColumn(boolean showProviderColumn) {
+        this.showProviderColumn = showProviderColumn;
     }
 
     /**

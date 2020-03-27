@@ -304,6 +304,22 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
     private boolean showDocumentationUrl;
 
     /**
+     * Whether the candidate license files should be shown as a column in HTML reports.
+     * 
+     * @since 1.4.0
+     */
+    @Parameter(defaultValue = "false", property = "showLicenseCandidateFilesColumn", required = false)
+    private boolean showLicenseCandidateFilesColumn;
+
+    /**
+     * Whether the provider should be shown as a column in HTML reports.
+     * 
+     * @since 1.4.0
+     */
+    @Parameter(defaultValue = "false", property = "showProviderColumn", required = false)
+    private boolean showProviderColumn;
+
+    /**
      * Whether a skeleton archive XML file of all found archives should be written.
      * 
      * <p>If enabled, the file is written to {@link #archiveXmlSkeletonFile}.</p>
@@ -568,6 +584,22 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
      */
     public final boolean isShowDocumentationUrl() {
         return showDocumentationUrl;
+    }
+
+    
+    /**
+     * @return the showLicenseCandidateFilesColumn
+     */
+    public final boolean isShowLicenseCandidateFilesColumn() {
+        return showLicenseCandidateFilesColumn;
+    }
+
+    
+    /**
+     * @return the showProviderColumn
+     */
+    public final boolean isShowProviderColumn() {
+        return showProviderColumn;
     }
 
     /**

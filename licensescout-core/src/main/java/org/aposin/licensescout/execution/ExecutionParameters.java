@@ -106,9 +106,20 @@ public class ExecutionParameters {
     private boolean validateLicenseXml;
 
     /**
-     * Whether the license XML file should be validated while reading in.
+     * Whether the documentation URL should be shown as a column in HTML reports.
      */
+    // TODO: rename to ..Column
     private boolean showDocumentationUrl;
+
+    /**
+     * Whether the candidate license files should be shown as a column in HTML reports.
+     */
+    private boolean showLicenseCandidateFilesColumn;
+
+    /**
+     * Whether the provider should be shown as a column in HTML reports.
+     */
+    private boolean showProviderColumn;
 
     /**
      * Whether a skeleton archive XML file of all found archives should be written.
@@ -417,6 +428,34 @@ public class ExecutionParameters {
      */
     public final void setShowDocumentationUrl(boolean showDocumentationUrl) {
         this.showDocumentationUrl = showDocumentationUrl;
+    }
+
+    /**
+     * @return the showLicenseCandidateFilesColumn
+     */
+    public final boolean isShowLicenseCandidateFilesColumn() {
+        return showLicenseCandidateFilesColumn;
+    }
+
+    /**
+     * @param showLicenseCandidateFilesColumn the showLicenseCandidateFilesColumn to set
+     */
+    public final void setShowLicenseCandidateFilesColumn(boolean showLicenseCandidateFilesColumn) {
+        this.showLicenseCandidateFilesColumn = showLicenseCandidateFilesColumn;
+    }
+
+    /**
+     * @return the showProviderColumn
+     */
+    public final boolean isShowProviderColumn() {
+        return showProviderColumn;
+    }
+
+    /**
+     * @param showProviderColumn the showProviderColumn to set
+     */
+    public final void setShowProviderColumn(boolean showProviderColumn) {
+        this.showProviderColumn = showProviderColumn;
     }
 
     /**
