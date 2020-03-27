@@ -223,6 +223,8 @@ If `cleanOutputActive` is not configured or if no states or licenses to filter o
 
 === Report output configuration
 
+==== Documentation URL column
+
 The resulting output files (HTML, CSV and TXT) can be configured to contain or not contain specific Information.
 The documentation URL from the checked licenses list can be used in the output report. This can be activated with a switch (`showDocumentationUrl`) with values `true` or `false`.
 
@@ -236,7 +238,37 @@ The documentation URL from the checked licenses list can be used in the output r
 </configuration>
 ----
 
-If `showDocumentationUrl` is not configured the documentation URL is included into the output.
+If `showDocumentationUrl` is not configured the documentation URL is not included into the output.
+
+==== Provider column
+The provider of an archive from the checked licenses list can be used in the HTML output report. This can be activated with a switch (`showProviderColumn`) with values `true` or `false`.
+
+.Example
+[source, xml]
+----
+<configuration>
+  ...
+  <showProviderColumn>true</showProviderColumn>
+  ...
+</configuration>
+----
+
+If `showProviderColumn` is not configured the provider column is not shown in the HTML output.
+
+==== Candidate license file list column
+A list of files that has been checked for license detection strings can be used in the HTML output report. This can be activated with a switch (`showLicenseCandidateFilesColumn`) with values `true` or `false`.
+
+.Example
+[source, xml]
+----
+<configuration>
+  ...
+  <showLicenseCandidateFilesColumn>true</showLicenseCandidateFilesColumn>
+  ...
+</configuration>
+----
+
+If `showLicenseCandidateFilesColumn` is not configured the candidate license files list column is not shown in the HTML output.
 
 === Execution configuration
 
