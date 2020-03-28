@@ -166,7 +166,7 @@ public class Executor {
                 return;
             }
             getLog().info("Evaluating licenses...");
-            LicenseUtil.evaluateLicenses(checkedArchives, finderResult.getArchiveFiles(), licenseStoreData);
+            LicenseUtil.evaluateLicenses(checkedArchives, finderResult.getArchiveFiles());
             filterGlobal(finderResult.getArchiveFiles(), globalFilters, getLog());
 
             final IArchiveListFilter vendorFilter = new VendorArchiveListFilter(finalFilteredVendorNames, getLog(),

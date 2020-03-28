@@ -128,7 +128,7 @@ public class JavascriptNpmFinder extends AbstractFinder {
         final List<License> licenses = LicenseUtil.mapNpmLicenseName(npmArchiveLicenseName, getLicenseStoreData());
         if (licenses != null && !licenses.isEmpty()) {
             for (final License license : licenses) {
-                foundArchive.addLicense(license, packageJsonFilePath);
+                foundArchive.addDetectedLicense(license, packageJsonFilePath);
             }
         } else {
             getLog().warn("No licenses and no name mapping found for license name: '" + npmArchiveLicenseName + "'");
@@ -143,12 +143,12 @@ public class JavascriptNpmFinder extends AbstractFinder {
      * @param foundArchive
      */
     private void processLicenses(final Archive foundArchive) {
-        final boolean noLicenseInformationFound = foundArchive.getLicenses().isEmpty();
+        final boolean noLicenseInformationFound = foundArchive.getDetectedLicenses().isEmpty();
 
         // check for MIT license or no license and existing license text file
         if (foundArchive.getLicenseText() != null) {
             boolean containsMITLicense = false;
-            final Iterator<License> licenseIterator = foundArchive.getLicenses().iterator();
+            final Iterator<License> licenseIterator = foundArchive.getDetectedLicenses().iterator();
             while (licenseIterator.hasNext()) {
                 final License license = licenseIterator.next();
                 if (license.getSpdxIdentifier().equals("MIT")) {
@@ -163,7 +163,7 @@ public class JavascriptNpmFinder extends AbstractFinder {
                         "MIT_" + foundArchive.getFileName() + "_" + foundArchive.getVersion(),
                         "MIT License for " + foundArchive.getFileName() + " " + foundArchive.getVersion(),
                         LegalStatus.ACCEPTED, "", "", "", foundArchive.getLicenseText().getText(), null);
-                foundArchive.addLicense(additionalMitLicencse,
+                foundArchive.addDetectedLicense(additionalMitLicencse,
                         "generated from License file " + foundArchive.getLicenseText().getPath());
             } else if (noLicenseInformationFound) {
                 // create a new unknown license from the text found
@@ -171,7 +171,7 @@ public class JavascriptNpmFinder extends AbstractFinder {
                         "unknown_" + foundArchive.getFileName() + "_" + foundArchive.getVersion(),
                         "Unknown License for " + foundArchive.getFileName() + " " + foundArchive.getVersion(),
                         LegalStatus.UNKNOWN, "", "", "", foundArchive.getLicenseText().getText(), null);
-                foundArchive.addLicense(unknownLicencse,
+                foundArchive.addDetectedLicense(unknownLicencse,
                         "generated from License file " + foundArchive.getLicenseText().getPath());
             }
         }
@@ -203,8 +203,7 @@ public class JavascriptNpmFinder extends AbstractFinder {
         }
     }
 
-    private void parseArchiveDirForLicenseText(final Archive archive, final File parent)
-            throws IOException {
+    private void parseArchiveDirForLicenseText(final Archive archive, final File parent) throws IOException {
         getLog().debug("parseArchiveDir(): processing " + parent.getAbsolutePath());
         final File[] entries = parent.listFiles();
         for (final File entry : entries) {

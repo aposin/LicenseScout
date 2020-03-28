@@ -177,10 +177,8 @@ public class JavascriptNpmFinderTest extends BaseFinderTest {
         assertEquals("version", expectedVersion, archive.getVersion());
         assertEquals("vendor", "Unknown", archive.getVendor());
         assertEquals("detectionStatus", null, archive.getDetectionStatus());
-        assertEquals("detectedLicenses", null, archive.getDetectedLicenses());
-        final Set<License> licenses = archive.getLicenses();
+        final Set<License> licenses = archive.getDetectedLicenses();
         if (expectedLicense == null) {
-            // assertNull("licenses present", licenses);
             assertEquals("licenses size", 0, licenses.size());
         } else {
             assertNotNull("licenses not present", licenses);

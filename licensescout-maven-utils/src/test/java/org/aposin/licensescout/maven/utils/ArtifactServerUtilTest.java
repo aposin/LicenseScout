@@ -123,7 +123,7 @@ public class ArtifactServerUtilTest {
             Assert.assertEquals("licenses added", expectedLicenseCount > 0, licensesAdded);
 
         }
-        final Set<License> licenses = archive.getLicenses();
+        final Set<License> licenses = archive.getDetectedLicenses();
         Assert.assertEquals("licenses count", expectedLicenseCount, licenses.size());
     }
 
