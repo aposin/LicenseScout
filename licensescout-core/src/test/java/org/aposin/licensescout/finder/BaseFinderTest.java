@@ -17,6 +17,9 @@ package org.aposin.licensescout.finder;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -141,16 +144,58 @@ public abstract class BaseFinderTest {
     }
 
     /**
+     * Obtains a list of License instances to check against.
+     * 
+     * @param expectedLicenseVariant description of the expected licenses
+     * @return a list of licenses or null
+     */
+    protected List<License> getExpectedLicenses(final ExpectedLicenseVariant expectedLicenseVariant) {
+        final List<License> expectedLicenses;
+        switch (expectedLicenseVariant) {
+            case SINGLE:
+                final License expectedLicense = getExpectedLicense(true);
+                expectedLicenses = Arrays.asList(expectedLicense);
+                break;
+            case MULTIPLE:
+                expectedLicenses = new ArrayList<>();
+                expectedLicenses.add(getExpectedLicense(true));
+                expectedLicenses.add(getLicenseStoreData().getLicenseBySpdxIdentifier("EPL-2.0"));
+                break;
+            case NONE:
+            default:
+                expectedLicenses = null;
+                break;
+        }
+        return expectedLicenses;
+    }
+
+    /**
      * Obtains the License instance to check against.
      * 
      * @param expectLicense true if an Apache license is expected, false if no license is expected
      * @return  the License instance for Apache-2.0 or none
      */
     protected License getExpectedLicense(final boolean expectLicense) {
-        final License expectedLicenseInner = expectLicense
-                ? getLicenseStoreData().getLicenseBySpdxIdentifier("Apache-2.0")
+        final License expectedLicense = expectLicense ? getLicenseStoreData().getLicenseBySpdxIdentifier("Apache-2.0")
                 : null;
-        return expectedLicenseInner;
+        return expectedLicense;
     }
 
+    /**
+     * Description of the licenses expected as result of the test.
+     */
+    protected static enum ExpectedLicenseVariant {
+        /**
+         * Apache-2.0.
+         */
+        SINGLE,
+        /**
+         * Apache-2.0 and EPL-2.0.
+         */
+        MULTIPLE,
+        /**
+         * No license.
+         */
+        NONE;
+    }
 }
