@@ -93,7 +93,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
         final File scanDirectoryPacked = getFile("java-packed-license-file");
         createJarLib1(scanDirectoryUnpacked, scanDirectoryPacked);
         final FinderResult finderResult = doScan(scanDirectoryPacked);
-        assertSingleArchive(finderResult, scanDirectoryPacked, true, true, 1);
+        assertSingleArchive(finderResult, scanDirectoryPacked, true, ExpectedLicenseVariant.SINGLE, 1);
     }
 
     /**
@@ -110,7 +110,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
         final File scanDirectoryPacked = getFile("java-packed-license-included-pom");
         createJarLib1(scanDirectoryUnpacked, scanDirectoryPacked);
         final FinderResult finderResult = doScan(scanDirectoryPacked);
-        assertSingleArchive(finderResult, scanDirectoryPacked, true, true, 0);
+        assertSingleArchive(finderResult, scanDirectoryPacked, true, ExpectedLicenseVariant.SINGLE, 0);
     }
 
     /**
@@ -127,7 +127,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
         final File scanDirectoryPacked = getFile("java-packed-license-manifest");
         createJarLib1(scanDirectoryUnpacked, scanDirectoryPacked);
         final FinderResult finderResult = doScan(scanDirectoryPacked);
-        assertSingleArchive(finderResult, scanDirectoryPacked, true, true, 0);
+        assertSingleArchive(finderResult, scanDirectoryPacked, true, ExpectedLicenseVariant.SINGLE, 0);
     }
 
     /**
@@ -144,7 +144,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
         final File scanDirectoryPacked = getFile("java-packed-license-none");
         createJarLib1(scanDirectoryUnpacked, scanDirectoryPacked);
         final FinderResult finderResult = doScan(scanDirectoryPacked);
-        assertSingleArchive(finderResult, scanDirectoryPacked, true, false, 0);
+        assertSingleArchive(finderResult, scanDirectoryPacked, true, ExpectedLicenseVariant.NONE, 0);
     }
 
     /**
@@ -168,7 +168,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
         final File scanDirectoryPacked = getFile("java-packed-with-inner-license-file");
         createJarLib1(scanDirectoryUnpacked, scanDirectoryPacked);
         final FinderResult finderResult = doScan(scanDirectoryPacked);
-        assertArchiveWithInnerStandard(finderResult, scanDirectoryPacked, true, true, 1);
+        assertArchiveWithInnerStandard(finderResult, scanDirectoryPacked, true, ExpectedLicenseVariant.SINGLE, 1);
     }
 
     /**
@@ -192,7 +192,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
         final File scanDirectoryPacked = getFile("java-packed-with-inner-license-included-pom");
         createJarLib1(scanDirectoryUnpacked, scanDirectoryPacked);
         final FinderResult finderResult = doScan(scanDirectoryPacked);
-        assertArchiveWithInnerStandard(finderResult, scanDirectoryPacked, true, true, 0);
+        assertArchiveWithInnerStandard(finderResult, scanDirectoryPacked, true, ExpectedLicenseVariant.SINGLE, 0);
     }
 
     /**
@@ -216,7 +216,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
         final File scanDirectoryPacked = getFile("java-packed-with-inner-license-manifest");
         createJarLib1(scanDirectoryUnpacked, scanDirectoryPacked);
         final FinderResult finderResult = doScan(scanDirectoryPacked);
-        assertArchiveWithInnerStandard(finderResult, scanDirectoryPacked, true, true, 0);
+        assertArchiveWithInnerStandard(finderResult, scanDirectoryPacked, true, ExpectedLicenseVariant.SINGLE, 0);
     }
 
     /**
@@ -240,7 +240,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
         final File scanDirectoryPacked = getFile("java-packed-with-inner-license-none");
         createJarLib1(scanDirectoryUnpacked, scanDirectoryPacked);
         final FinderResult finderResult = doScan(scanDirectoryPacked);
-        assertArchiveWithInnerStandard(finderResult, scanDirectoryPacked, true, false, 0);
+        assertArchiveWithInnerStandard(finderResult, scanDirectoryPacked, true, ExpectedLicenseVariant.NONE, 0);
     }
 
     /**
@@ -255,7 +255,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
     public void testScanJavaUnpackedLicenseFile() throws Exception {
         final File scanDirectory = getFile("java-unpacked-license-file");
         final FinderResult finderResult = doScan(scanDirectory);
-        assertSingleArchive(finderResult, scanDirectory, false, true, 1);
+        assertSingleArchive(finderResult, scanDirectory, false, ExpectedLicenseVariant.SINGLE, 1);
     }
 
     /**
@@ -270,7 +270,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
     public void testScanJavaUnpackedLicenseIncludedPom() throws Exception {
         final File scanDirectory = getFile("java-unpacked-license-included-pom");
         final FinderResult finderResult = doScan(scanDirectory);
-        assertSingleArchive(finderResult, scanDirectory, false, true, 0);
+        assertSingleArchive(finderResult, scanDirectory, false, ExpectedLicenseVariant.SINGLE, 0);
     }
 
     /**
@@ -282,10 +282,25 @@ public class JavaJarFinderTest extends BaseFinderTest {
      * @throws Exception 
      */
     @Test
-    public void testScanJavaUnpackedLicenseManifest() throws Exception {
+    public void testScanJavaUnpackedLicenseManifestSingle() throws Exception {
         final File scanDirectory = getFile("java-unpacked-license-manifest");
         final FinderResult finderResult = doScan(scanDirectory);
-        assertSingleArchive(finderResult, scanDirectory, false, true, 0);
+        assertSingleArchive(finderResult, scanDirectory, false, ExpectedLicenseVariant.SINGLE, 0);
+    }
+
+    /**
+     * Test method for {@link JavaJarFinder#findLicenses()}.
+     * 
+     * <p>Tests with an unpacked JAR and license information in the MANIFEST.MF file.</p>
+     * <p>Uses scan directory 'src/test/resources/scans/java-unpacked-license-manifest-multiple'.</p>
+     * 
+     * @throws Exception 
+     */
+    @Test
+    public void testScanJavaUnpackedLicenseManifestMultiple() throws Exception {
+        final File scanDirectory = getFile("java-unpacked-license-manifest-multiple");
+        final FinderResult finderResult = doScan(scanDirectory);
+        assertSingleArchive(finderResult, scanDirectory, false, ExpectedLicenseVariant.MULTIPLE, 0);
     }
 
     /**
@@ -300,7 +315,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
     public void testScanJavaUnpackedLicenseNone() throws Exception {
         final File scanDirectory = getFile("java-unpacked-license-none");
         final FinderResult finderResult = doScan(scanDirectory);
-        assertSingleArchive(finderResult, scanDirectory, false, false, 0);
+        assertSingleArchive(finderResult, scanDirectory, false, ExpectedLicenseVariant.NONE, 0);
     }
 
     /**
@@ -320,7 +335,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
 
         final File scanDirectory = getFile("java-unpacked-with-inner-license-file");
         final FinderResult finderResult = doScan(scanDirectory);
-        assertArchiveWithInnerStandard(finderResult, scanDirectory, false, true, 1);
+        assertArchiveWithInnerStandard(finderResult, scanDirectory, false, ExpectedLicenseVariant.SINGLE, 1);
     }
 
     /**
@@ -340,7 +355,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
 
         final File scanDirectory = getFile("java-unpacked-with-inner-license-included-pom");
         final FinderResult finderResult = doScan(scanDirectory);
-        assertArchiveWithInnerStandard(finderResult, scanDirectory, false, true, 0);
+        assertArchiveWithInnerStandard(finderResult, scanDirectory, false, ExpectedLicenseVariant.SINGLE, 0);
     }
 
     /**
@@ -360,7 +375,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
 
         final File scanDirectory = getFile("java-unpacked-with-inner-license-manifest");
         final FinderResult finderResult = doScan(scanDirectory);
-        assertArchiveWithInnerStandard(finderResult, scanDirectory, false, true, 0);
+        assertArchiveWithInnerStandard(finderResult, scanDirectory, false, ExpectedLicenseVariant.SINGLE, 0);
     }
 
     /**
@@ -380,7 +395,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
 
         final File scanDirectory = getFile("java-unpacked-with-inner-license-none");
         final FinderResult finderResult = doScan(scanDirectory);
-        assertArchiveWithInnerStandard(finderResult, scanDirectory, false, false, 0);
+        assertArchiveWithInnerStandard(finderResult, scanDirectory, false, ExpectedLicenseVariant.NONE, 0);
     }
 
     /**
@@ -396,7 +411,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
     public void testScanJavaUnpackedWithInnerSpecial() throws Exception {
         final File scanDirectory = getFile("java-unpacked-with-inner-special");
         final FinderResult finderResult = doScan(scanDirectory);
-        assertArchiveWithInnerSpecial(finderResult, scanDirectory, false, true, 1);
+        assertArchiveWithInnerSpecial(finderResult, scanDirectory, false, ExpectedLicenseVariant.SINGLE, 1);
     }
 
     /**
@@ -450,16 +465,17 @@ public class JavaJarFinderTest extends BaseFinderTest {
      * 
      */
     private void assertSingleArchive(final FinderResult finderResult, final File scanDirectory, final boolean isJar,
-                                     final boolean expectLicense, final int expectedLicenseCandidateFilesCount) {
+                                     final ExpectedLicenseVariant expectLicense,
+                                     final int expectedLicenseCandidateFilesCount) {
         assertScanDirectory(finderResult, scanDirectory);
         assertArchiveFileCount(finderResult, 1);
-        final License expectedLicense = getExpectedLicense(expectLicense);
+        final List<License> expectedLicenses = getExpectedLicenses(expectLicense);
         final String expectedFileName0 = isJar ? "lib1.jar" : "lib1";
         final String expectedPath0 = isJar ? "/lib1.jar" : "/lib1";
         final Archive archive0 = finderResult.getArchiveFiles().get(0);
         final String expectedVendor = "Unknown";
-        assertArchive(archive0, "archive: ", expectedFileName0, expectedPath0, "0.0.2", expectedVendor, expectedLicense,
-                isJar, expectedLicenseCandidateFilesCount);
+        assertArchive(archive0, "archive: ", expectedFileName0, expectedPath0, "0.0.2", expectedVendor,
+                expectedLicenses, isJar, expectedLicenseCandidateFilesCount);
     }
 
     /**
@@ -472,7 +488,8 @@ public class JavaJarFinderTest extends BaseFinderTest {
      * @param expectedLicenseCandidateFilesCountInner
      */
     private void assertArchiveWithInnerStandard(final FinderResult finderResult, final File scanDirectory,
-                                                final boolean isJarOuter, final boolean expectLicenseInner,
+                                                final boolean isJarOuter,
+                                                final ExpectedLicenseVariant expectLicenseInner,
                                                 final int expectedLicenseCandidateFilesCountInner) {
         final String expectedFileNameInner = "lib2.jar";
         final String expectedPathInner = (isJarOuter ? "/lib1.jar!" : "/lib1") + "/lib/lib2.jar";
@@ -493,7 +510,8 @@ public class JavaJarFinderTest extends BaseFinderTest {
      * @param expectedLicenseCandidateFilesCountInner
      */
     private void assertArchiveWithInnerSpecial(final FinderResult finderResult, final File scanDirectory,
-                                               final boolean isJarOuter, final boolean expectLicenseInner,
+                                               final boolean isJarOuter,
+                                               final ExpectedLicenseVariant expectLicenseInner,
                                                final int expectedLicenseCandidateFilesCountInner) {
         final String expectedFileNameInner = "ckeditor";
         final String expectedPathInner = (isJarOuter ? "/lib1.jar!" : "/lib1") + "/ckeditor";
@@ -516,13 +534,13 @@ public class JavaJarFinderTest extends BaseFinderTest {
      * @param expectMessageDigestInner
      */
     private void assertArchiveWithInner(final FinderResult finderResult, final boolean isJarOuter,
-                                        final boolean expectLicenseInner,
+                                        final ExpectedLicenseVariant expectLicenseInner,
                                         final int expectedLicenseCandidateFilesCountInner,
                                         final String expectedFileNameInner, final String expectedPathInner,
                                         final String expectedVersionInner, final String expectedVendorInner,
                                         final boolean expectMessageDigestInner) {
         assertArchiveFileCount(finderResult, 2);
-        final License expectedLicenseInner = getExpectedLicense(expectLicenseInner);
+        final List<License> expectedLicensesInner = getExpectedLicenses(expectLicenseInner);
 
         // the outer
         final String expectedFileNameOuter = isJarOuter ? "lib1.jar" : "lib1";
@@ -534,7 +552,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
         // the inner
         final Archive archiveInner = finderResult.getArchiveFiles().get(1);
         assertArchive(archiveInner, "archive (inner): ", expectedFileNameInner, expectedPathInner, expectedVersionInner,
-                expectedVendorInner, expectedLicenseInner, expectMessageDigestInner,
+                expectedVendorInner, expectedLicensesInner, expectMessageDigestInner,
                 expectedLicenseCandidateFilesCountInner);
     }
 
@@ -547,13 +565,13 @@ public class JavaJarFinderTest extends BaseFinderTest {
      * @param expectedPath
      * @param expectedVersion
      * @param expectedVendor
-     * @param expectedLicense
+     * @param expectedLicenses
      * @param expectMessageDigest
      * @param expectedLicenseCandidateFilesCount
      */
     private void assertArchive(final Archive archive, final String messagePrefix, final String expectedFileName,
                                final String expectedPath, final String expectedVersion, final String expectedVendor,
-                               final License expectedLicense, final boolean expectMessageDigest,
+                               final List<License> expectedLicenses, final boolean expectMessageDigest,
                                final int expectedLicenseCandidateFilesCount) {
         assertEquals(messagePrefix + "archiveType", ArchiveType.JAVA, archive.getArchiveType());
         assertEquals(messagePrefix + "fileName", expectedFileName, archive.getFileName());
@@ -576,8 +594,10 @@ public class JavaJarFinderTest extends BaseFinderTest {
             assertEquals(messagePrefix + "licenses size", 0, licenses.size());
         } else {
             assertNotNull(messagePrefix + "licenses not present", licenses);
-            assertEquals(messagePrefix + "licenses size", 1, licenses.size());
-            assertEquals(messagePrefix + "licenses", true, licenses.contains(expectedLicense));
+            assertEquals(messagePrefix + "licenses size", expectedLicenses.size(), licenses.size());
+            for (License license : licenses) {
+                assertEquals(messagePrefix + "licenses", true, expectedLicenses.contains(license));
+            }
         }
     }
 
