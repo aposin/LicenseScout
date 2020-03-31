@@ -590,7 +590,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
                 archive.getLicenseCandidateFiles().size());
 
         final Set<License> licenses = archive.getDetectedLicenses();
-        if (expectedLicense == null) {
+        if (expectedLicenses == null) {
             assertEquals(messagePrefix + "licenses size", 0, licenses.size());
         } else {
             assertNotNull(messagePrefix + "licenses not present", licenses);
