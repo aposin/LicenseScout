@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Test
+Bundle-SymbolicName: lib1
+Bundle-Version: 0.0.2
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-ClassPath: .
+Bundle-Vendor: Unknown
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0, http://www.eclipse.org/legal/epl-2.0, https://www.gnu.
+ org/software/classpath/license.html, http://www.eclipse.org/org/docum
+ ents/edl-v10.php
