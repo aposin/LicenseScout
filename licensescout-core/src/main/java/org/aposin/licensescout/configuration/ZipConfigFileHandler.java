@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.aposin.licensescout.util.ILSLog;
 
@@ -52,6 +53,13 @@ public class ZipConfigFileHandler extends AbstractConfigFileHandler {
             //Read the zip input stream fully into memory
             byte[] buffer = IOUtils.toByteArray(zipInputStream);
             return new ByteArrayInputStream(buffer);
+        }
+    }
+
+    private boolean hasEntry(final String entryName) throws IOException {
+        try (ZipFile zipFile = new ZipFile(artifactFile)) {
+            ZipEntry entry = zipFile.getEntry(entryName);
+            return entry != null;
         }
     }
 
@@ -118,4 +126,24 @@ public class ZipConfigFileHandler extends AbstractConfigFileHandler {
     public InputStream getFilteredVendorNamesInputStream() throws IOException {
         return getInputStream("filteredvendornames.csv");
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasTemplateFile(String filename) throws IOException {
+        return hasEntry(filename);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public File getTemplateFile(String filename) throws IOException {
+        final InputStream is = getInputStream(filename);
+        final File tmpFile = File.createTempFile("template", ".vm");
+        FileUtils.copyInputStreamToFile(is, tmpFile);
+        return tmpFile;
+    }
+
 }

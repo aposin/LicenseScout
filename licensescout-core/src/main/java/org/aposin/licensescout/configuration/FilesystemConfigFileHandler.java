@@ -196,4 +196,32 @@ public class FilesystemConfigFileHandler extends AbstractConfigFileHandler {
         }
         return null;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasTemplateFile(String filename) throws IOException {
+        if (filename != null) {
+            final File templateFile = new File(filename);
+            return (templateFile.isFile() && templateFile.canRead());
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public File getTemplateFile(String filename) throws IOException {
+        if (filename != null) {
+            final File templateFile = new File(filename);
+            return templateFile;
+        } else {
+            return null;
+        }
+
+    }
+
 }

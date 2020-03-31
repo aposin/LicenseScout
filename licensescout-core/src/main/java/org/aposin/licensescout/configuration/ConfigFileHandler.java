@@ -15,6 +15,7 @@
  */
 package org.aposin.licensescout.configuration;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -79,4 +80,8 @@ public interface ConfigFileHandler {
      * @throws IOException
      */
     public InputStream getFilteredVendorNamesInputStream() throws IOException;
+
+    public boolean hasTemplateFile(String filename) throws IOException;
+
+    public File getTemplateFile(String filename) throws IOException;
 }

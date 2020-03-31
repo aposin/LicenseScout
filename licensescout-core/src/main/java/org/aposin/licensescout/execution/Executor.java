@@ -155,8 +155,7 @@ public class Executor {
         finderParameters.setArtifactServerUtil(getExecutionParameters().getArtifactServerUtil());
         final AbstractFinder finder = FinderFactory.getInstance().createFinder(executionParameters, licenseStoreData,
                 finderParameters);
-        getLog().info("Starting scan on "
-                + getExecutionParameters().getScanLocation().toLogString() + "...");
+        getLog().info("Starting scan on " + getExecutionParameters().getScanLocation().toLogString() + "...");
 
         OutputResult outputResult;
         try {
@@ -245,16 +244,24 @@ public class Executor {
             log.info("using " + output.getType() + " output file: " + outputFile.getAbsolutePath());
             final File templateFile = output.getTemplate();
             if (templateFile != null) {
-                if (templateFile.isFile() && templateFile.canRead()) {
-                    log.info("using template: " + templateFile.getAbsolutePath());
-                } else {
-                    log.warn("not using template because it is not a file or it cannot be read: "
+                try {
+                    if (getConfigFileHandler().hasTemplateFile(templateFile.getAbsolutePath())) {
+                        log.info("using template: " + templateFile.getAbsolutePath());
+                    } else {
+                        log.warn("not using template because it is not present or it cannot be read: "
+                                + templateFile.getAbsolutePath());
+                        // unset so that furthers steps only need to check for null
+                        output.setTemplate(null);
+                    }
+                } catch (IOException e) {
+                    log.warn("not using template because presence cannot be verified: "
                             + templateFile.getAbsolutePath());
                     // unset so that furthers steps only need to check for null
                     output.setTemplate(null);
                 }
             }
         }
+
     }
 
     private BuildInfo createBuildInfo() {
