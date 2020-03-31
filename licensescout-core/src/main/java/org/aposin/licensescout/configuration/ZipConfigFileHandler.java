@@ -49,17 +49,25 @@ public class ZipConfigFileHandler extends AbstractConfigFileHandler {
     private InputStream getInputStream(final String entryName) throws IOException {
         try (ZipFile zipFile = new ZipFile(artifactFile)) {
             ZipEntry entry = zipFile.getEntry(entryName);
-            InputStream zipInputStream = zipFile.getInputStream(entry);
-            //Read the zip input stream fully into memory
-            byte[] buffer = IOUtils.toByteArray(zipInputStream);
-            return new ByteArrayInputStream(buffer);
+            if (entry != null) {
+                InputStream zipInputStream = zipFile.getInputStream(entry);
+                //Read the zip input stream fully into memory
+                byte[] buffer = IOUtils.toByteArray(zipInputStream);
+                return new ByteArrayInputStream(buffer);
+            } else {
+                return null;
+            }
         }
     }
 
     private boolean hasEntry(final String entryName) throws IOException {
-        try (ZipFile zipFile = new ZipFile(artifactFile)) {
-            ZipEntry entry = zipFile.getEntry(entryName);
-            return entry != null;
+        if (entryName != null) {
+            try (ZipFile zipFile = new ZipFile(artifactFile)) {
+                ZipEntry entry = zipFile.getEntry(entryName);
+                return entry != null;
+            }
+        } else {
+            return false;
         }
     }
 
@@ -140,10 +148,18 @@ public class ZipConfigFileHandler extends AbstractConfigFileHandler {
      */
     @Override
     public File getTemplateFile(String filename) throws IOException {
-        final InputStream is = getInputStream(filename);
-        final File tmpFile = File.createTempFile("template", ".vm");
-        FileUtils.copyInputStreamToFile(is, tmpFile);
-        return tmpFile;
+        if (filename != null) {
+            final InputStream is = getInputStream(filename);
+            if (is != null) {
+                final File tmpFile = File.createTempFile("template", ".vm");
+                FileUtils.copyInputStreamToFile(is, tmpFile);
+                return tmpFile;
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 
 }

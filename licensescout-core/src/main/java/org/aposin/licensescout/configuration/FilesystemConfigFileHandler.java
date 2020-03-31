@@ -217,7 +217,11 @@ public class FilesystemConfigFileHandler extends AbstractConfigFileHandler {
     public File getTemplateFile(String filename) throws IOException {
         if (filename != null) {
             final File templateFile = new File(filename);
-            return templateFile;
+            if (templateFile.exists()) {
+                return templateFile;
+            } else {
+                return null;
+            }
         } else {
             return null;
         }

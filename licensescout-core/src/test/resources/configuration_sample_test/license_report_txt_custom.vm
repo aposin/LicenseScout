@@ -1,0 +1,75 @@
+#*
+ * Copyright 2019 Association for the promotion of open-source insurance software and for the establishment of open interface standards in the insurance industry (Verein zur Förderung quelloffener Versicherungssoftware und Etablierung offener Schnittstellenstandards in der Versicherungsbranche)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *#
+License Report
+
+In the following sections you can find 
+- List of used/linked software projects
+- Notices to the used artifacts
+- List of used artifacts with license info and vendor plugin names
+- License texts
+
+
+
+====================================================================
+
+This project contains software from the following providers:
+#foreach( $usedProvider in $usedProviders )
+* $usedProvider.name#if($usedProvider.url) ($usedProvider.url)#end
+
+#end
+
+====================================================================
+Notices
+====================================================================
+
+#foreach( $usedNotice in $usedNotices )
+$usedNotice.text
+
+#end
+
+====================================================================
+Artifacts by Licenses
+====================================================================
+
+#set ($map = $usedLicensesMap )
+#foreach ($mapEntry in $map.entrySet())
+#set ($license = $mapEntry.key )
+#set ($archives = $mapEntry.value )
+$license.name#if ($license.versionPresent) Version $license.version#end
+
+
+#foreach($archive in $archives)
+* $archive.fileName#if ($archive.provider) / $archive.provider.name#end
+
+#end
+
+
+#end
+
+
+
+====================================================================
+License texts
+====================================================================
+
+
+#foreach($license in $usedLicenses)
+$license.name#if ($license.versionPresent) Version $license.version#end
+
+
+$license.text
+
+#end
