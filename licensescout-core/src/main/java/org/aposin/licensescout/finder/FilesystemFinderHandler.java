@@ -73,7 +73,7 @@ public class FilesystemFinderHandler extends AbstractFinderHandler<File, FileSys
      * {@inheritDoc}
      */
     @Override
-    public FileSystemEntryContainer createEntryContainer(final File ecBase) throws IOException {
+    public FileSystemEntryContainer createEntryContainer(final File ecBase, String filePath) throws IOException {
         return new FileSystemEntryContainer(ecBase);
     }
 
