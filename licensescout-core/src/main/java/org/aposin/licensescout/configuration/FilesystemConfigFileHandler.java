@@ -205,9 +205,8 @@ public class FilesystemConfigFileHandler extends AbstractConfigFileHandler {
         if (filename != null) {
             final File templateFile = new File(filename);
             return (templateFile.isFile() && templateFile.canRead());
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -219,13 +218,9 @@ public class FilesystemConfigFileHandler extends AbstractConfigFileHandler {
             final File templateFile = new File(filename);
             if (templateFile.exists()) {
                 return templateFile;
-            } else {
-                return null;
             }
-        } else {
-            return null;
         }
-
+        return null;
     }
 
 }

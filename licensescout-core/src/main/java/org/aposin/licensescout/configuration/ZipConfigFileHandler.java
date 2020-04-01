@@ -54,9 +54,8 @@ public class ZipConfigFileHandler extends AbstractConfigFileHandler {
                 //Read the zip input stream fully into memory
                 byte[] buffer = IOUtils.toByteArray(zipInputStream);
                 return new ByteArrayInputStream(buffer);
-            } else {
-                return null;
             }
+            return null;
         }
     }
 
@@ -66,9 +65,8 @@ public class ZipConfigFileHandler extends AbstractConfigFileHandler {
                 ZipEntry entry = zipFile.getEntry(entryName);
                 return entry != null;
             }
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -154,12 +152,9 @@ public class ZipConfigFileHandler extends AbstractConfigFileHandler {
                 final File tmpFile = File.createTempFile("template", ".vm");
                 FileUtils.copyInputStreamToFile(is, tmpFile);
                 return tmpFile;
-            } else {
-                return null;
             }
-        } else {
-            return null;
         }
+        return null;
     }
 
 }

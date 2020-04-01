@@ -81,6 +81,12 @@ public interface ConfigFileHandler {
      */
     public InputStream getFilteredVendorNamesInputStream() throws IOException;
 
+    /**
+     * Checks if a template file is available.
+     * @param filename a filename of a template file
+     * @return true if the template file exists, false otherwise
+     * @throws IOException
+     */
     public boolean hasTemplateFile(String filename) throws IOException;
 
     public File getTemplateFile(String filename) throws IOException;
