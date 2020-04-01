@@ -89,6 +89,10 @@ public class TxtExporterTest extends AbstractStringCompareExporterTest {
         referenceContent.append("====================================================================" + nl);
         referenceContent.append(nl);
         referenceContent.append("This project contains software from the following providers:" + nl);
+        if (testVariant.isWithArchives()) {
+            referenceContent.append("* Foundation name (http://www.foundation.org/)" + nl);
+            referenceContent.append(nl);
+        }
         referenceContent.append(nl);
         referenceContent.append("====================================================================" + nl);
         referenceContent.append("Notices" + nl);
@@ -102,7 +106,7 @@ public class TxtExporterTest extends AbstractStringCompareExporterTest {
             referenceContent.append("name11 Version version" + nl);
             referenceContent.append(nl);
             referenceContent.append(nl);
-            referenceContent.append("* fileName01" + nl);
+            referenceContent.append("* fileName01 / Foundation name" + nl);
             referenceContent.append(nl);
             referenceContent.append(nl);
             referenceContent.append(nl);
