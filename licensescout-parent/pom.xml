@@ -89,6 +89,7 @@
 		<commons-beanutils.version>1.9.4</commons-beanutils.version>
 		<commons-codec.version>1.14</commons-codec.version>
 		<commons-collections4.version>4.4</commons-collections4.version>
+		<commons-csv.version>1.8</commons-csv.version>
 		<commons-lang3.version>3.9</commons-lang3.version>
 		<commons-io.version>2.6</commons-io.version>
 		<doxia-sink-api.version>1.9</doxia-sink-api.version>
@@ -286,6 +287,11 @@
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-collections4</artifactId>
 				<version>${commons-collections4.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-csv</artifactId>
+				<version>${commons-csv.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
