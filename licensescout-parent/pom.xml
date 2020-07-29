@@ -99,7 +99,6 @@
 		<jaxb-api.version>2.3.2</jaxb-api.version>
 		<junit.version>4.12</junit.version>
 		<json.version>20190722</json.version>
-		<mariadb-java-client.version>2.4.1</mariadb-java-client.version>
 		<maven-core.version>3.6.0</maven-core.version>
 		<maven-model.version>3.6.0</maven-model.version>
 		<maven-plugin-annotations.version>3.6.0</maven-plugin-annotations.version>
@@ -304,13 +303,6 @@
 				<groupId>org.apache.velocity</groupId>
 				<artifactId>velocity-engine-core</artifactId>
 				<version>${velocity.version}</version>
-			</dependency>
-
-			<!-- groupId: org.mariadb.jdbc -->
-			<dependency>
-				<groupId>org.mariadb.jdbc</groupId>
-				<artifactId>mariadb-java-client</artifactId>
-				<version>${mariadb-java-client.version}</version>
 			</dependency>
 
 			<!-- groupId: jakarta.xml.bind -->
