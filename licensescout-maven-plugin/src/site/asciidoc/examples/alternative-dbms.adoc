@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-= Using an alternative DBMS
+= Using a custom DBMS
 
 :encoding: utf-8
 :lang: en
@@ -23,7 +23,8 @@
 :toclevels: 4
 
 
-It is possible to use another DBMS than MySQL/MariaDB that is configured by default.
+It is possible to use different DBMS
+with the LicenseScout.
 This can be done in the following way:
 
 . Add a dependency for the JDBC driver of your DBMS to the `licensescout-maven-plugin`
@@ -37,6 +38,74 @@ If you have an old-style JDBC driver that requires a call to `Class.forName()` t
 its driver class using it is
 currently only possible by changing the source code of the LicenseScout.
 ====
+
+== Using Maria DB
+
+.Example using mariadb
+[source, xml]
+----
+<properties>
+  ...
+
+  <!-- LicenseScout database configuration -->
+  <licensescout.database.url>jdbc:mariadb:mariadb://localhost:3306/DB?user=root</licensescout.database.url>
+</properties>
+
+...
+<plugin>
+  <groupId>org.aposin.licensescout</groupId>
+  <artifactId>licensescout-maven-plugin</artifactId>
+  <configuration>
+    ...
+    <resultDatabaseConfiguration>
+      <jdbcUrl>${licensescout.database.url}</jdbcUrl>
+      ...
+    </resultDatabaseConfiguration>
+    ...
+  </configuration>
+  <dependencies>
+    <dependency>
+        <groupId>org.mariadb.jdbc</groupId>
+        <artifactId>mariadb-java-client</artifactId>
+      <version>2.4.1</version>
+    </dependency>
+  </dependencies>
+</plugin>
+----
+
+== Using MySQL
+
+.Example using MySQL
+[source, xml]
+----
+<properties>
+  ...
+
+  <!-- LicenseScout database configuration -->
+  <licensescout.database.url>jdbc:jdbc:mysql://localhost:3306/sonoo</licensescout.database.url>
+</properties>
+
+...
+<plugin>
+  <groupId>org.aposin.licensescout</groupId>
+  <artifactId>licensescout-maven-plugin</artifactId>
+  <configuration>
+    ...
+    <resultDatabaseConfiguration>
+      <jdbcUrl>${licensescout.database.url}</jdbcUrl>
+      ...
+    </resultDatabaseConfiguration>
+    ...
+  </configuration>
+  <dependencies>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>8.0.20</version>
+    </dependency>
+  </dependencies>
+</plugin>
+----
 
 == Using H2 DB
 
