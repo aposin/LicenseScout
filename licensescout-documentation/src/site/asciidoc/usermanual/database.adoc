@@ -34,10 +34,7 @@ The following files contains an SQL script that creates the tables in the databa
 
 == Database driver
 
-The LicenseScout uses the JDBC driver of MariaDB (++https://mariadb.org/++).
-This JDBC driver is compatible with the MySQL database engine. The version of the MariaDB driver used (2.4.1) is compatible with
-MySQL server 5.5.3 and later (see ++https://mariadb.com/kb/en/library/about-mariadb-connector-j/++).
-
-This JDBC driver is used because the standard JDBC driver of MySQL is licensed under the GNU General public license, which is incompatible with the Apache 2.0 license used for the LicenseScout.
-
-It is also possible too run LicenseScout with an alternative DBMS. See the link:../../licensescout-maven-plugin/examples/alternative-dbms.html[examples of `licensescout-maven-plugin`] on how to do this.
+The LicenseScout has no implicit dependency on JDBC drivers.
+To connect to a database, it is necessary to configure a dependency to
+a JDBC driver in the plugin's configuration.
+See the link:../../licensescout-maven-plugin/examples/alternative-dbms.html[examples of `licensescout-maven-plugin`] on how to do this.
