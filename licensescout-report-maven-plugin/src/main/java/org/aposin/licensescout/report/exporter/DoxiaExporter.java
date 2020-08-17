@@ -138,7 +138,7 @@ public class DoxiaExporter implements IReportExporter {
         createTableHeaderCell("Detection status");
         createTableHeaderCell("Legal status");
         createTableHeaderCell("Archive path");
-        if (reportConfiguration.isShowDocumentationUrl()) {
+        if (reportConfiguration.isShowDocumentationUrlColumn()) {
             createTableHeaderCell("Documentation");
         }
         createTableHeaderCell("Licenses");
@@ -155,7 +155,7 @@ public class DoxiaExporter implements IReportExporter {
         createTableCell(archive.getDetectionStatus().name());
         createTableCell(archive.getLegalStatus().name());
         createTableCell(archive.getPath());
-        if (reportConfiguration.isShowDocumentationUrl()) {
+        if (reportConfiguration.isShowDocumentationUrlColumn()) {
             final String documentationUrl = archive.getDocumentationUrl();
             createTableCell(documentationUrl);
         }

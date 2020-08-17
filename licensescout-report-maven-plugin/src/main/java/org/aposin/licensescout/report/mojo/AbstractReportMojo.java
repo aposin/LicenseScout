@@ -246,8 +246,8 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
      * 
      * @since 1.2.6
      */
-    @Parameter(defaultValue = "true", property = "showDocumentationUrl", required = false)
-    private boolean showDocumentationUrl;
+    @Parameter(defaultValue = "true", property = "showDocumentationUrlColumn", required = false)
+    private boolean showDocumentationUrlColumn;
 
     /**
      * Whether the candidate license files should be shown as a column in HTML reports.
@@ -436,10 +436,10 @@ public abstract class AbstractReportMojo extends AbstractMavenReport implements 
     // --------------getters -- NOTE: these are called by reflection from BeanUtils.copyProperties()
 
     /**
-     * @return the showDocumentationUrl
+     * @return the showDocumentationUrlColumn
      */
-    public final boolean isShowDocumentationUrl() {
-        return showDocumentationUrl;
+    public final boolean isShowDocumentationUrlColumn() {
+        return showDocumentationUrlColumn;
     }
 
     

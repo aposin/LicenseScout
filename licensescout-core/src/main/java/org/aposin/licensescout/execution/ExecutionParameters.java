@@ -108,8 +108,7 @@ public class ExecutionParameters {
     /**
      * Whether the documentation URL should be shown as a column in HTML reports.
      */
-    // TODO: rename to ..Column
-    private boolean showDocumentationUrl;
+    private boolean showDocumentationUrlColumn;
 
     /**
      * Whether the candidate license files should be shown as a column in HTML reports.
@@ -417,17 +416,17 @@ public class ExecutionParameters {
     }
 
     /**
-     * @return the showDocumentationUrl
+     * @return the showDocumentationUrlColumn
      */
-    public final boolean isShowDocumentationUrl() {
-        return showDocumentationUrl;
+    public final boolean isShowDocumentationUrlColumn() {
+        return showDocumentationUrlColumn;
     }
 
     /**
-     * @param showDocumentationUrl the showDocumentationUrl to set
+     * @param showDocumentationUrlColumn the showDocumentationUrlColumn to set
      */
-    public final void setShowDocumentationUrl(boolean showDocumentationUrl) {
-        this.showDocumentationUrl = showDocumentationUrl;
+    public final void setShowDocumentationUrlColumn(boolean showDocumentationUrlColumn) {
+        this.showDocumentationUrlColumn = showDocumentationUrlColumn;
     }
 
     /**

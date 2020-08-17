@@ -29,7 +29,7 @@ public class ReportConfiguration {
     private boolean showLicenseCandidateFilesColumn;
     private boolean showMessageDigestColumn;
     private boolean showPathColumn;
-    private boolean showDocumentationUrl;
+    private boolean showDocumentationUrlColumn;
     private boolean showProviderColumn;
     private File outputFile;
     private File templateFile;
@@ -79,17 +79,17 @@ public class ReportConfiguration {
     }
 
     /**
-     * @return the showDocumentationUrl
+     * @return the showDocumentationUrlColumn
      */
-    public final boolean isShowDocumentationUrl() {
-        return showDocumentationUrl;
+    public final boolean isShowDocumentationUrlColumn() {
+        return showDocumentationUrlColumn;
     }
 
     /**
-     * @param showDocumentationUrl the showDocumentationUrl to set
+     * @param showDocumentationUrlColumn the showDocumentationUrlColumn to set
      */
-    public final void setShowDocumentationUrl(final boolean showDocumentationUrl) {
-        this.showDocumentationUrl = showDocumentationUrl;
+    public final void setShowDocumentationUrlColumn(final boolean showDocumentationUrlColumn) {
+        this.showDocumentationUrlColumn = showDocumentationUrlColumn;
     }
 
     /**

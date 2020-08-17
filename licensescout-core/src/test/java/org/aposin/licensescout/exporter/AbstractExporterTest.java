@@ -331,7 +331,7 @@ public abstract class AbstractExporterTest {
             reportConfiguration.setTemplateEncoding(templateVariant.getTemplateCharset().name());
         }
         reportConfiguration.setOutputFile(getOutputFile());
-        reportConfiguration.setShowDocumentationUrl(testVariant.isWithDocumentationUrl());
+        reportConfiguration.setShowDocumentationUrlColumn(testVariant.isWithDocumentationUrl());
         reportConfiguration.setShowLicenseCandidateFilesColumn(false);
         reportConfiguration.setShowMessageDigestColumn(true);
         reportConfiguration.setShowPathColumn(true);

@@ -417,7 +417,7 @@ public class Executor {
                 .setShowLicenseCandidateFilesColumn(getExecutionParameters().isShowLicenseCandidateFilesColumn());
         reportConfiguration.setShowMessageDigestColumn(archiveType == ArchiveType.JAVA);
         reportConfiguration.setShowPathColumn(archiveType == ArchiveType.JAVA);
-        reportConfiguration.setShowDocumentationUrl(getExecutionParameters().isShowDocumentationUrl());
+        reportConfiguration.setShowDocumentationUrlColumn(getExecutionParameters().isShowDocumentationUrlColumn());
         reportConfiguration.setShowProviderColumn(getExecutionParameters().isShowProviderColumn());
         return reportConfiguration;
     }
