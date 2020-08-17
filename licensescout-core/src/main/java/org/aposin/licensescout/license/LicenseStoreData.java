@@ -30,6 +30,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.aposin.licensescout.model.Notice;
 import org.aposin.licensescout.model.Notices;
@@ -198,26 +201,20 @@ public class LicenseStoreData {
      * @throws IOException
      */
     public void readUrlMappings(final InputStream inputStream, final ILSLog log) throws IOException {
-        String line = "";
-        final String cvsSplitBy = ",";
-
+        final CSVFormat csvFormat = CSVFormat.DEFAULT.withDelimiter(',').withCommentMarker('#');
         try (final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"))) {
-
-            while ((line = br.readLine()) != null) {
-                if (StringUtils.isEmpty(line) || line.startsWith("#")) {
-                    continue;
-                }
-                final String[] values = line.split(cvsSplitBy);
-                final String url = values[0].trim();
-                final int numLicenseNames = values.length - 1;
+            final CSVParser csvParser = csvFormat.parse(br);
+            for (final CSVRecord record : csvParser) {
+                final String url = record.get(0).trim();
+                final int numLicenseIdentifiers = record.size() - 1;
                 final List<License> licenses = new ArrayList<>();
-                for (int i = 0; i < numLicenseNames; i++) {
-                    final String spdxIdentifier = values[i + 1].trim();
-                    final License license = getLicenseBySpdxIdentifier(spdxIdentifier);
+                for (int i = 0; i < numLicenseIdentifiers; i++) {
+                    final String licenseIdentifier = record.get(i + 1).trim();
+                    final License license = getLicenseBySpdxIdentifier(licenseIdentifier);
                     if (license != null) {
                         licenses.add(license);
                     } else {
-                        log.info("readUrlMappings: SPDX identifier not found: " + spdxIdentifier);
+                        log.info("readUrlMappings: license identifier not found: " + licenseIdentifier);
                     }
                 }
                 urlMappings.put(url, licenses);
@@ -233,26 +230,20 @@ public class LicenseStoreData {
      * @throws IOException
      */
     public void readNameMappings(final InputStream inputStream, final ILSLog log) throws IOException {
-        String line = "";
-        final String cvsSplitBy = ",";
-
+        final CSVFormat csvFormat = CSVFormat.DEFAULT.withDelimiter(',').withCommentMarker('#');
         try (final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"))) {
-
-            while ((line = br.readLine()) != null) {
-                if (StringUtils.isEmpty(line) || line.startsWith("#")) {
-                    continue;
-                }
-                final String[] values = line.split(cvsSplitBy);
-                final String mappedName = values[0].trim();
-                final int numLicenseNames = values.length - 1;
+            final CSVParser csvParser = csvFormat.parse(br);
+            for (final CSVRecord record : csvParser) {
+                final String mappedName = record.get(0).trim();
+                final int numLicenseIdentifiers = record.size() - 1;
                 final List<License> licenses = new ArrayList<>();
-                for (int i = 0; i < numLicenseNames; i++) {
-                    final String spdxIdentifier = values[i + 1].trim();
-                    final License license = getLicenseBySpdxIdentifier(spdxIdentifier);
+                for (int i = 0; i < numLicenseIdentifiers; i++) {
+                    final String licenseIdentifier = record.get(i + 1).trim();
+                    final License license = getLicenseBySpdxIdentifier(licenseIdentifier);
                     if (license != null) {
                         licenses.add(license);
                     } else {
-                        log.info("readNameMappings: SPDX identifier not found: " + spdxIdentifier);
+                        log.info("readNameMappings: license identifier not found: " + licenseIdentifier);
                     }
                 }
                 nameMappings.put(mappedName, licenses);
