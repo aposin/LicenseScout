@@ -92,7 +92,7 @@ public class JavaJarFinder extends AbstractJavaFinder {
         getLog().debug("parseFile(): processing " + file.getAbsolutePath());
         final FinderHandler<File, FileSystemEntryContainer, File> finderHandler = fileSystemFinderHandler;
         final String entryName = file.getName();
-        final FileSystemEntryContainer entryContainer = finderHandler.createEntryContainer(file);
+        final FileSystemEntryContainer entryContainer = finderHandler.createEntryContainer(file, filePath);
         if (finderHandler.isDirectory(file)) {
             if (isArchiveDirectory(file)) {
                 getLog().debug("parseFile(): recognized as archive directory");
@@ -129,8 +129,8 @@ public class JavaJarFinder extends AbstractJavaFinder {
         final File[] entries = parent.listFiles();
         for (final File entry : entries) {
             final String entryName = finderHandler.getEntryName(entry);
-            final FileSystemEntryContainer entryContainer = finderHandler.createEntryContainer(entry);
             final String newFilePath = filePath + '/' + entryName;
+            final FileSystemEntryContainer entryContainer = finderHandler.createEntryContainer(entry, newFilePath);
             getLog().debug("parseUnpackedJarArchive(): processing " + newFilePath);
             if (isSpecialArchive(entryName)) {
                 getLog().debug("parseUnpackedJarArchive(): recognized as special archive");

@@ -68,10 +68,11 @@ public interface FinderHandler<F, C extends EntryContainer, I> {
      * Creates an entry container object from an entry object.
      * 
      * @param ecBase the object the entry container is based on. Note that this is a File object in case of a file system handler or an InputStream in case of a JAR handler.
+     * @param filePath a file path (to be used for logging messages)
      * @return an entry container object
      * @throws IOException
      */
-    public C createEntryContainer(I ecBase) throws IOException;
+    public C createEntryContainer(I ecBase, String filePath) throws IOException;
 
     /**
      * Obtains information from the MANIFEST.MF of an entry container.
