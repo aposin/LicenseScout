@@ -116,7 +116,7 @@ public abstract class AbstractJavaFinder extends AbstractFinder {
                 getLog().debug("parsePackedJarArchive(): processing " + newFilePath);
                 if (isArchiveName(entryName)) {
                     final String newFilePath2 = newFilePath + "!";
-                    final JarEntryContainer entryContainer = finderHandler.createEntryContainer(jarInputStream);
+                    final JarEntryContainer entryContainer = finderHandler.createEntryContainer(jarInputStream, newFilePath);
                     final ArchiveMetaInformation archiveMetaInformation = finderHandler
                             .getArchiveMetaInformationFromManifest(entryContainer);
                     final File file = new File(parent, entryName);
@@ -136,7 +136,7 @@ public abstract class AbstractJavaFinder extends AbstractFinder {
                     }
                 } else {
                     if (finderHandler.isFile(entry)) {
-                        final JarEntryContainer entryContainer = finderHandler.createEntryContainer(jarInputStream);
+                        final JarEntryContainer entryContainer = finderHandler.createEntryContainer(jarInputStream, newFilePath);
                         handleArchiveNormalFile(archive, entryName, entryContainer, newFilePath);
                     }
                 }
