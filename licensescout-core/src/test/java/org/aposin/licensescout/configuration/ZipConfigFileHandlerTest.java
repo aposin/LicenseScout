@@ -44,4 +44,12 @@ public class ZipConfigFileHandlerTest extends AbstractConfigFileHandlerTest {
         return new ZipConfigFileHandler(configBundleFile, configFileParameters, TestUtil.createTestLog());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getTemplateFilename() {
+        return "license_report_txt_custom.vm";
+    }
+
 }

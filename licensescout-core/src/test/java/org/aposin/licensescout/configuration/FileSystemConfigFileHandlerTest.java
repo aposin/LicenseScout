@@ -47,4 +47,12 @@ public class FileSystemConfigFileHandlerTest extends AbstractConfigFileHandlerTe
         return new FilesystemConfigFileHandler(configFileParameters, TestUtil.createTestLog());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getTemplateFilename() {
+        return "src/test/resources/configuration_sample_test/license_report_txt_custom.vm";
+    }
+
 }
