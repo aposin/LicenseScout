@@ -33,6 +33,7 @@ import org.aposin.licensescout.finder.FinderResult;
 import org.aposin.licensescout.license.DetectionStatus;
 import org.aposin.licensescout.license.LegalStatus;
 import org.aposin.licensescout.license.License;
+import org.aposin.licensescout.model.Provider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -214,7 +215,7 @@ public abstract class AbstractExporterTest {
     protected abstract OutputFileType getExpectedOutputFileType();
 
     /**
-     * Test method for {@link IReportExporter#export(org.aposin.licensescout.exporter.OutputResult, org.aposin.licensescout.exporter.ReportConfiguration)}.
+     * Test method for {@link IReportExporter#export(OutputResult, ReportConfiguration)}.
      * @throws Exception 
      */
     @Test
@@ -223,7 +224,7 @@ public abstract class AbstractExporterTest {
     }
 
     /**
-     * Test method for {@link IReportExporter#export(org.aposin.licensescout.exporter.OutputResult, org.aposin.licensescout.exporter.ReportConfiguration)}.
+     * Test method for {@link IReportExporter#export(OutputResult, ReportConfiguration)}.
      * @throws Exception 
      */
     @Test
@@ -232,7 +233,7 @@ public abstract class AbstractExporterTest {
     }
 
     /**
-     * Test method for {@link IReportExporter#export(org.aposin.licensescout.exporter.OutputResult, org.aposin.licensescout.exporter.ReportConfiguration)}.
+     * Test method for {@link IReportExporter#export(OutputResult, ReportConfiguration)}.
      * @throws Exception 
      */
     @Test
@@ -278,6 +279,8 @@ public abstract class AbstractExporterTest {
                 "urlPublic", "text", null);
         archive.addLicense(license, "licensepath");
         archive.setDocumentationUrl("docUrl01");
+        final Provider provider = new Provider("Foundation", "Foundation name", "http://www.foundation.org/");
+        archive.setProvider(provider);
         return archive;
     }
 
@@ -328,10 +331,11 @@ public abstract class AbstractExporterTest {
             reportConfiguration.setTemplateEncoding(templateVariant.getTemplateCharset().name());
         }
         reportConfiguration.setOutputFile(getOutputFile());
-        reportConfiguration.setShowDocumentationUrl(testVariant.isWithDocumentationUrl());
+        reportConfiguration.setShowDocumentationUrlColumn(testVariant.isWithDocumentationUrl());
         reportConfiguration.setShowLicenseCandidateFilesColumn(false);
         reportConfiguration.setShowMessageDigestColumn(true);
         reportConfiguration.setShowPathColumn(true);
+        reportConfiguration.setShowProviderColumn(true);
         reportConfiguration.setOutputEncoding(testVariant.getOutputCharset().name());
         return reportConfiguration;
     }

@@ -104,7 +104,7 @@ public class CsvExporter implements IReportExporter {
         addQuotedString(buffer, archive.getLegalStatus().name());
         buffer.append(',');
         addQuotedString(buffer, archive.getPath());
-        if (reportConfiguration.isShowDocumentationUrl()) {
+        if (reportConfiguration.isShowDocumentationUrlColumn()) {
             buffer.append(',');
             final String documentationUrl = archive.getDocumentationUrl();
             addQuotedString(buffer, documentationUrl);
@@ -147,7 +147,7 @@ public class CsvExporter implements IReportExporter {
         addQuotedString(buffer, "Legal status");
         buffer.append(',');
         addQuotedString(buffer, "Archive path");
-        if (reportConfiguration.isShowDocumentationUrl()) {
+        if (reportConfiguration.isShowDocumentationUrlColumn()) {
             buffer.append(',');
             addQuotedString(buffer, "Documentation");
         }

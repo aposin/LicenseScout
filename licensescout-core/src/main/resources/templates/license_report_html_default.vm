@@ -215,7 +215,7 @@ table.tablesorter thead tr .tablesorter-headerDesc {
 			<th>Detection Status</th>
 			<th>Legal Status</th>
 			<th>Licenses</th>
-			#if($reportConfiguration.showDocumentationUrl)
+			#if($reportConfiguration.showDocumentationUrlColumn)
 			<th>Documentation</th>
 			#end
 			#if($reportConfiguration.showPathColumn)
@@ -226,6 +226,9 @@ table.tablesorter thead tr .tablesorter-headerDesc {
 			#end
 			#if($reportConfiguration.showLicenseCandidateFilesColumn)
 			<th>Candidate License files</th>
+			#end
+			#if($reportConfiguration.showProviderColumn)
+			<th>Provider</th>
 			#end
 		</tr>	
 	</thead>
@@ -278,7 +281,7 @@ table.tablesorter thead tr .tablesorter-headerDesc {
 			<br/>	
 		#end
 	</td>
-	#if($reportConfiguration.showDocumentationUrl)
+	#if($reportConfiguration.showDocumentationUrlColumn)
 	<td class="$style">
 	#if($archive.documentationUrl &&  !$archive.documentationUrl.empty)
 	<a href="$archive.documentationUrl" title="$archive.documentationUrl" target="_blank">Documentation</a>
@@ -296,6 +299,13 @@ table.tablesorter thead tr .tablesorter-headerDesc {
 		#foreach($candidateFilePath in $archive.licenseCandidateFiles)
 		$candidateFilePath <br/>
 		#end
+	</td>
+	#end
+	#if($reportConfiguration.showProviderColumn)
+	<td class="$style">
+		#if($archive.provider)
+			<a href="$archive.provider.url" title="$archive.provider.name" target="_blank">$archive.provider.name</a>
+		#end	
 	</td>
 	#end
 </tr>

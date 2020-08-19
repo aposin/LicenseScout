@@ -29,7 +29,8 @@ public class ReportConfiguration {
     private boolean showLicenseCandidateFilesColumn;
     private boolean showMessageDigestColumn;
     private boolean showPathColumn;
-    private boolean showDocumentationUrl;
+    private boolean showDocumentationUrlColumn;
+    private boolean showProviderColumn;
     private File outputFile;
     private File templateFile;
     private String templateEncoding;
@@ -78,17 +79,31 @@ public class ReportConfiguration {
     }
 
     /**
-     * @return the showDocumentationUrl
+     * @return the showDocumentationUrlColumn
      */
-    public final boolean isShowDocumentationUrl() {
-        return showDocumentationUrl;
+    public final boolean isShowDocumentationUrlColumn() {
+        return showDocumentationUrlColumn;
     }
 
     /**
-     * @param showDocumentationUrl the showDocumentationUrl to set
+     * @param showDocumentationUrlColumn the showDocumentationUrlColumn to set
      */
-    public final void setShowDocumentationUrl(final boolean showDocumentationUrl) {
-        this.showDocumentationUrl = showDocumentationUrl;
+    public final void setShowDocumentationUrlColumn(final boolean showDocumentationUrlColumn) {
+        this.showDocumentationUrlColumn = showDocumentationUrlColumn;
+    }
+
+    /**
+     * @return the showProviderColumn
+     */
+    public final boolean isShowProviderColumn() {
+        return showProviderColumn;
+    }
+
+    /**
+     * @param showProviderColumn the showProviderColumn to set
+     */
+    public final void setShowProviderColumn(boolean showProviderColumn) {
+        this.showProviderColumn = showProviderColumn;
     }
 
     /**
