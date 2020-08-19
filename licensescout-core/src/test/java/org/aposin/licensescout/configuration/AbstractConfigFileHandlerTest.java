@@ -15,6 +15,7 @@
  */
 package org.aposin.licensescout.configuration;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -115,6 +116,69 @@ public abstract class AbstractConfigFileHandlerTest {
             assertStream(inputStream, "getFilteredVendorNamesInputStream", 279);
         }
     }
+
+    /**
+     * @throws IOException  
+     */
+    @Test
+    public void testHasTemplateFileSuccess() throws IOException {
+        final boolean result = configFileHandler.hasTemplateFile(getTemplateFilename());
+        Assert.assertTrue("hasTemplateFile()", result);
+    }
+
+    /**
+     * @throws IOException  
+     */
+    @Test
+    public void testHasTemplateFileNull() throws IOException {
+        final boolean result = configFileHandler.hasTemplateFile(null);
+        Assert.assertFalse("hasTemplateFile()", result);
+    }
+
+    /**
+     * @throws IOException  
+     */
+    @Test
+    public void testHasTemplateFileNotExisting() throws IOException {
+        final boolean result = configFileHandler.hasTemplateFile("not_existing");
+        Assert.assertFalse("hasTemplateFile()", result);
+    }
+
+    /**
+     * @throws IOException  
+     */
+    @Test
+    public void testGetTemplateFileSuccess() throws IOException {
+        final File templateFile = configFileHandler.getTemplateFile(getTemplateFilename());
+        Assert.assertTrue("getTemplateFile(): file exists", templateFile.exists());
+        Assert.assertTrue("getTemplateFile(): file readable", templateFile.canRead());
+        Assert.assertEquals("getTemplateFile(): file length", 2316, templateFile.length());
+    }
+
+    /**
+     * @throws IOException  
+     */
+    @Test
+    public void testGetTemplateFileNull() throws IOException {
+        final File templateFile = configFileHandler.getTemplateFile(null);
+        Assert.assertNull("getTemplateFile()", templateFile);
+    }
+
+    /**
+     * @throws IOException  
+     */
+    @Test
+    public void testGetTemplateFileNotExisting() throws IOException {
+        final File templateFile = configFileHandler.getTemplateFile("not_existing");
+        Assert.assertNull("getTemplateFile()", templateFile);
+    }
+
+    /**
+     * Obtain the filename to use for a custom template file.
+     * 
+     * @return a filename
+     */
+    protected abstract String getTemplateFilename();
 
     /**
      * @param inputStream an input stream to read the file contents from
