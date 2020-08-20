@@ -63,7 +63,7 @@ public class TestArtifactServerUtil implements IArtifactServerUtil {
         // DO NOTHING
         if (addLicense && inputStream != null) {
             License license = licenseStoreData.getLicenseBySpdxIdentifier("Apache-2.0");
-            archive.addLicense(license, "");
+            archive.addDetectedLicense(license, "");
             return true;
         } else {
             return false;

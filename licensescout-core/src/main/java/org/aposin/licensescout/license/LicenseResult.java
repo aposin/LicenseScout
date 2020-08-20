@@ -25,8 +25,10 @@ import org.aposin.licensescout.model.Provider;
  * 
  * <p>Contains:</p>
  * <ul>
- * <li>a list of licenses</li>
+ * <li>a list of licenses (may be empty)</li>
  * <li>a documentation URL (optional)</li>
+ * <li>a notice (optional)</li>
+ * <li>a provider (optional)</li>
  * </ul>
  * 
  * @see LicenseCheckedList

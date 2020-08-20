@@ -20,6 +20,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -69,8 +71,11 @@ public class DatabaseWriter {
             final int buildPK = insertBuild(buildInfo, connection);
             for (final Archive archive : archives) {
                 final int libraryPK = insertLibrary(buildPK, archive, connection);
-                final List<License> detectedLicenses = archive.getDetectedLicenses();
-                for (final License detectedLicense : detectedLicenses) {
+                final Set<License> detectedLicenses = archive.getDetectedLicenses();
+                List<License> detectedLicensesList = new ArrayList<>(detectedLicenses);
+                // sort to get unique order for unit test
+                Collections.sort(detectedLicensesList);
+                for (final License detectedLicense : detectedLicensesList) {
                     insertDetectedLicense(libraryPK, detectedLicense, connection);
                 }
             }
@@ -160,7 +165,7 @@ public class DatabaseWriter {
     }
 
     private static String getLicenseName(final Archive archive) {
-        final Set<License> licenses = archive.getLicenses();
+        final Set<License> licenses = archive.getResultingLicenses();
         switch (licenses.size()) {
             case 0:
                 return "";

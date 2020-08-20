@@ -580,7 +580,6 @@ public class JavaJarFinderTest extends BaseFinderTest {
         assertEquals(messagePrefix + "vendor", expectedVendor, archive.getVendor());
         assertEquals(messagePrefix + "detectionStatus", null, archive.getDetectionStatus());
         assertEquals(messagePrefix + "legalStatus", null, archive.getLegalStatus());
-        assertEquals(messagePrefix + "detectedLicenses", null, archive.getDetectedLicenses());
         if (expectMessageDigest) {
             assertEquals(messagePrefix + "message digest string length", EXPECTED_MESSAGE_DIGEST_STRING_LENGTH,
                     archive.getMessageDigestString().length());
@@ -590,7 +589,7 @@ public class JavaJarFinderTest extends BaseFinderTest {
         assertEquals(messagePrefix + "number of license candidate files", expectedLicenseCandidateFilesCount,
                 archive.getLicenseCandidateFiles().size());
 
-        final Set<License> licenses = archive.getLicenses();
+        final Set<License> licenses = archive.getDetectedLicenses();
         if (expectedLicenses == null) {
             assertEquals(messagePrefix + "licenses size", 0, licenses.size());
         } else {

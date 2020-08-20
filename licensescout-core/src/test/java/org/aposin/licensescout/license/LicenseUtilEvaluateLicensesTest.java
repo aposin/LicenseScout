@@ -167,7 +167,7 @@ public class LicenseUtilEvaluateLicensesTest {
         final List<License> originalDetectedLicenses = LicenseUtilTestUtil
                 .createLicenseList(originalDetectedLicenseIdentifiers, licenseStoreData);
         for (final License license : originalDetectedLicenses) {
-            archive.addLicense(license, "path");
+            archive.addDetectedLicense(license, "path");
         }
         final List<Archive> archives = new ArrayList<>();
         archives.add(archive);
@@ -178,7 +178,7 @@ public class LicenseUtilEvaluateLicensesTest {
         Assert.assertEquals("archive list length", 1, archives.size());
         Assert.assertEquals("DetectionStatus", expectedDetectionStatus, archive.getDetectionStatus());
         Assert.assertEquals("LegalStatus", expectedLegalStatus, archive.getLegalStatus());
-        final Collection<License> resultLicenses = archive.getLicenses();
-        Assert.assertTrue("license list", LicenseUtilTestUtil.areEqual(resultLicenses, expectedLicenses));
+        final Collection<License> resultingLicenses = archive.getResultingLicenses();
+        Assert.assertTrue("license list", LicenseUtilTestUtil.areEqual(resultingLicenses, expectedLicenses));
     }
 }

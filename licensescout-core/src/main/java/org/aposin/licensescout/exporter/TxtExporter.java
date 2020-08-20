@@ -99,7 +99,7 @@ public class TxtExporter extends AbstractVelocityExporter {
     private Map<License, List<Archive>> collectLicenses(final List<Archive> archiveFiles) {
         final Map<License, List<Archive>> licenseMap = new TreeMap<>();
         for (final Archive archive : archiveFiles) {
-            final Set<License> licenses = archive.getLicenses();
+            final Set<License> licenses = archive.getResultingLicenses();
             for (final License license : licenses) {
                 List<Archive> archivesPerLicense = licenseMap.get(license);
                 if (archivesPerLicense == null) {
@@ -152,7 +152,7 @@ public class TxtExporter extends AbstractVelocityExporter {
         for (final Archive archive : archiveFiles) {
             final Notice notice = archive.getNotice();
             addNotice(usedNotices, notice);
-            for (License license : archive.getLicenses()) {
+            for (License license : archive.getResultingLicenses()) {
                 final Notice notice2 = license.getNotice();
                 addNotice(usedNotices, notice2);
             }

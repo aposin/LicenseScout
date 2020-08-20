@@ -277,7 +277,7 @@ public abstract class AbstractExporterTest {
         archive.setLegalStatus(LegalStatus.CONFLICTING);
         License license = new License("spdxIdentifier11", "name11", LegalStatus.UNKNOWN, "author", "version",
                 "urlPublic", "text", null);
-        archive.addLicense(license, "licensepath");
+        archive.addResultingLicense(license, "licensepath");
         archive.setDocumentationUrl("docUrl01");
         final Provider provider = new Provider("Foundation", "Foundation name", "http://www.foundation.org/");
         archive.setProvider(provider);

@@ -16,8 +16,7 @@
 		Provider="" Selected_License="" Type="JAVA" Version="version2" />
 
 	<DetectedLicenses Id="1" FK_LibraryData_Id="1"
-		License_Name="MIT License" />
-	<DetectedLicenses Id="2" FK_LibraryData_Id="1"
 		License_Name="Apache License Version 2.0" />
-
+	<DetectedLicenses Id="2" FK_LibraryData_Id="1"
+		License_Name="MIT License" />
 </dataset>
