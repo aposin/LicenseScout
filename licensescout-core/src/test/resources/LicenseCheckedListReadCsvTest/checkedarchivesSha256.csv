@@ -13,3 +13,7 @@ JAVASCRIPT,=testarchive6,0.0.4,,,,MIT,,
 JAVASCRIPT,==testarchive7,0.0.4,,,,MIT,,
 # error case
 JAVASCRIPT,testarchive8,,,,,MIT,,
+# LicenseProcessingMode.OVERWRITE_EMPTY_LIST
+JAVASCRIPT,testarchive9,0.0.4,a,b,c,
+# LicenseProcessingMode.NO_OVERWRITE
+JAVASCRIPT,testarchive10,0.0.4,,,,-

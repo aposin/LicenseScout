@@ -92,4 +92,13 @@ public class ArchiveIdentifierMessageDigest extends ArchiveIdentifier {
         return Objects.equals(messageDigest, other.messageDigest);
     }
 
+    /**
+     *{@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "ArchiveIdentifierMessageDigest [archiveType=" + getArchiveType() + ", nameMatchingType="
+                + getNameMatchingType() + ", name=" + getName() + ", messageDigest=" + messageDigest + "]";
+    }
+
 }

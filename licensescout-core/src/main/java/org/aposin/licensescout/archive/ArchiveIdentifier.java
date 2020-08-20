@@ -75,16 +75,29 @@ public abstract class ArchiveIdentifier {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (!(o instanceof ArchiveIdentifier)) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ArchiveIdentifier)) {
+            return false;
+        }
         ArchiveIdentifier that = (ArchiveIdentifier) o;
-        return getArchiveType() == that.getArchiveType() &&
-            getNameMatchingType() == that.getNameMatchingType() &&
-            Objects.equals(getName(), that.getName());
+        return getArchiveType() == that.getArchiveType() && getNameMatchingType() == that.getNameMatchingType()
+                && Objects.equals(getName(), that.getName());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(getArchiveType(), getNameMatchingType(), getName());
     }
+
+    /**
+     *{@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "ArchiveIdentifier [archiveType=" + archiveType + ", nameMatchingType=" + nameMatchingType + ", name="
+                + name + "]";
+    }
+
 }

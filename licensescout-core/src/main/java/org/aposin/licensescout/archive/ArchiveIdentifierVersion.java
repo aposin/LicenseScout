@@ -46,15 +46,34 @@ public class ArchiveIdentifierVersion extends ArchiveIdentifier {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (!(o instanceof ArchiveIdentifierVersion)) { return false; }
-        if (!super.equals(o)) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ArchiveIdentifierVersion)) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
         ArchiveIdentifierVersion that = (ArchiveIdentifierVersion) o;
         return Objects.equals(getVersion(), that.getVersion());
     }
 
+    /**
+     *{@inheritDoc}
+     */
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), getVersion());
     }
+
+    /**
+     *{@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "ArchiveIdentifierVersion [archiveType=" + getArchiveType() + ", nameMatchingType="
+                + getNameMatchingType() + ", name=" + getName() + ", version=" + version + "]";
+    }
+
 }

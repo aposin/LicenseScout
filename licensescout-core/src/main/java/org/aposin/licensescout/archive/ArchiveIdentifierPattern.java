@@ -71,6 +71,9 @@ public class ArchiveIdentifierPattern extends ArchiveIdentifier {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -84,6 +87,16 @@ public class ArchiveIdentifierPattern extends ArchiveIdentifier {
         }
         ArchiveIdentifierPattern other = (ArchiveIdentifierPattern) obj;
         return Objects.equals(pattern.pattern(), other.pattern.pattern()) && patternType == other.patternType;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "ArchiveIdentifierPattern [archiveType=" + getArchiveType() + ", nameMatchingType="
+                + getNameMatchingType() + ", name=" + getName() + ", patternType=" + patternType + ", pattern="
+                + pattern + "]";
     }
 
 }

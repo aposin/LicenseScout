@@ -30,7 +30,6 @@ import org.aposin.licensescout.model.LSMessageDigest;
 import org.aposin.licensescout.model.LicenseText;
 import org.aposin.licensescout.model.Notice;
 import org.aposin.licensescout.model.Provider;
-import org.aposin.licensescout.util.MiscUtil;
 
 /**
  * Representation of an archive or other artifact found during scanning.
@@ -240,7 +239,7 @@ public class Archive implements Comparable<Archive> {
      */
     public final String getMessageDigestString() {
         if (messageDigest != null) {
-            return MiscUtil.getHexString(messageDigest.getBytes());
+            return messageDigest.toString();
         } else {
             return "";
         }
@@ -392,7 +391,7 @@ public class Archive implements Comparable<Archive> {
         builder.append(", legalStatus=");
         builder.append(legalStatus);
         builder.append(", messageDigest=");
-        builder.append(messageDigest);
+        builder.append(LSMessageDigest.toString(messageDigest));
         builder.append("]");
         return builder.toString();
     }

@@ -538,6 +538,8 @@ The sixth column is an identifier of a notive. This is optional. The value may b
 
 The seventh and any further column are license identifiers.
   An archive can have one multiple or no license assigned. If no license is assigned, it will get the status `MANUALLY_NOT_DETECTED`.
+A single license identifier "-" is interpreted as "no modify" (the detected licenses are taken over unmodified).
+This can be used if only provider, notice or documentation URL should be configured.
 
 Empty lines and lines starting with '#' are ignored.
 
@@ -545,7 +547,8 @@ Empty lines and lines starting with '#' are ignored.
 [source, csv]
 ----
 JAVA, bcprov-ext-jdk15on-155.jar, 2FBFC48DA088C1223ADB84A928ABEA4083C2702F4C06CC9692736627DD50C59B,http://dummy,,, MIT
-JAVA, xpp3_min.jar, 8D60778CD5018E7A130B3FB6C96A57DD9E1877B9EFBF76B4B63A8DD395128EAEhttp://path/to/cpp3-license-documentation,, ExtremeLab-1.1.1, Apache-1.1,EclipseFoundation,EPL-Notice-1, PublicDomain
+JAVA, xpp3_min.jar, 8D60778CD5018E7A130B3FB6C96A57DD9E1877B9EFBF76B4B63A8DD395128EAE,http://path/to/xpp3-license-documentation,, ExtremeLab-1.1.1, Apache-1.1,EclipseFoundation,EPL-Notice-1, PublicDomain
+JAVA, jersey-core.jar, 2.27,http://path/to/jersey-license-documentation,, , ,EclipseFoundation,EPL-Notice-1, -
 JAVASCRIPT, indexof, 0.0.1,,,, MIT
 ----
 
