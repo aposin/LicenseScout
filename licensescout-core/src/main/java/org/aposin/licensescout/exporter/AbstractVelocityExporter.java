@@ -114,7 +114,7 @@ public abstract class AbstractVelocityExporter implements IReportExporter {
     private List<License> collectDistinctLicenses(final List<Archive> archiveFiles) {
         final Set<License> allLicenses = new HashSet<>();
         for (final Archive archive : archiveFiles) {
-            allLicenses.addAll(archive.getLicenses());
+            allLicenses.addAll(archive.getResultingLicenses());
         }
         final List<License> distinctLicenses = new ArrayList<>(allLicenses);
 

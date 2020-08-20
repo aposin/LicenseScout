@@ -249,7 +249,7 @@ table.tablesorter thead tr .tablesorter-headerDesc {
 	<td class="$style"><span title="$archive.detectionStatus">$archive.detectionStatus</span></td>
 	<td class="$style"><span title="$archive.legalStatus">$archive.legalStatus</span></td>
 	<td class="$style" style="white-space:normal">
-		#foreach($license in $archive.licenses)
+		#foreach($license in $archive.resultingLicenses)
 		
 			#set ($files = "<ul>")
 			#foreach($path in $archive.getFilePaths($license))

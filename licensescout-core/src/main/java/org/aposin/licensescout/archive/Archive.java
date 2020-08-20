@@ -46,8 +46,8 @@ public class Archive implements Comparable<Archive> {
 
     private final String path;
 
-    private final MultiValuedMap<License, String> licenseList = new ArrayListValuedHashMap<>();
-    private List<License> detectedLicenses;
+    private final MultiValuedMap<License, String> detectedLicenses = new ArrayListValuedHashMap<>();
+    private MultiValuedMap<License, String> resultingLicenses = new ArrayListValuedHashMap<>();
 
     private DetectionStatus detectionStatus;
 
@@ -116,52 +116,81 @@ public class Archive implements Comparable<Archive> {
     }
 
     /**
-     * Adds a license
+     * Adds a detected license.
+     * 
      * @param license a license object
      * @param path the path to the file containing the license
      */
-    public void addLicense(final License license, final String path) {
-        licenseList.put(license, path);
+    public void addDetectedLicense(final License license, final String path) {
+        detectedLicenses.put(license, path);
     }
 
     /**
-     * Clears the list of licenses.
+     * Clears the list of resulting licenses.
      */
-    public void clearLicenses() {
-        licenseList.clear();
+    public void clearResultingLicenses() {
+        resultingLicenses.clear();
+    }
+
+    /**
+     * Adds a resulting license.
+     * 
+     * @param license a license object
+     * @param path the path to the file containing the license
+     */
+    public void addResultingLicense(final License license, final String path) {
+        resultingLicenses.put(license, path);
     }
 
     /**
      * Gets the licenses.
      * 
+     * <p>NOTE: used by templates</p>
+     * 
      * @return the licenses
+     * @deprecated use either {@link #getDetectedLicenses()} or {@link #getResultingLicenses()}. Method is
+     * kept for backward compatibility with existing templates.
      */
+    @Deprecated
     public Set<License> getLicenses() {
-        return licenseList.keySet();
+        return getResultingLicenses();
     }
 
     /**
-     * Gets the file paths.
+     * Gets the file paths for a license from the resulting licenses.
+     * 
+     * <p>NOTE: used by templates</p>
      * 
      * @param license the license
      * @return the file paths
      */
     public Collection<String> getFilePaths(final License license) {
-        return licenseList.get(license);
+        return resultingLicenses.get(license);
     }
 
     /**
+     * Gets the detected licenses.
+     * 
      * @return the detectedLicenses
      */
-    public final List<License> getDetectedLicenses() {
-        return detectedLicenses;
+    public final Set<License> getDetectedLicenses() {
+        return detectedLicenses.keySet();
     }
 
     /**
-     * @param detectedLicenses the detectedLicenses to set
+     * Gets the resulting licenses.
+     * 
+     * @return the resulting licenses
      */
-    public final void setDetectedLicenses(List<License> detectedLicenses) {
-        this.detectedLicenses = detectedLicenses;
+    public final Set<License> getResultingLicenses() {
+        return resultingLicenses.keySet();
+    }
+
+    /**
+     * Sets the collection of resulting licenses to the content of the collection of detected licenses.
+     */
+    public void setResultingLicensesFromDetected() {
+        resultingLicenses = new ArrayListValuedHashMap<>(detectedLicenses);
     }
 
     /**
@@ -354,8 +383,10 @@ public class Archive implements Comparable<Archive> {
         builder.append(version);
         builder.append(", path=");
         builder.append(path);
-        builder.append(", licenseList=");
-        builder.append(licenseList);
+        builder.append(", detectedLicenses=");
+        builder.append(detectedLicenses);
+        builder.append(", resultingLicenses=");
+        builder.append(resultingLicenses);
         builder.append(", detectionStatus=");
         builder.append(detectionStatus);
         builder.append(", legalStatus=");

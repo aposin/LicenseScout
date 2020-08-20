@@ -159,7 +159,7 @@ public class DoxiaExporter implements IReportExporter {
             final String documentationUrl = archive.getDocumentationUrl();
             createTableCell(documentationUrl);
         }
-        final Set<License> licensesSet = archive.getLicenses();
+        final Set<License> licensesSet = archive.getResultingLicenses();
         sink.tableCell();
         if (!licensesSet.isEmpty()) {
             // sort by SPDX identifier so that we get a unique order for archives that appear multiple times

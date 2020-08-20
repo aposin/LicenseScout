@@ -30,7 +30,6 @@ import org.aposin.licensescout.configuration.ExecutionDatabaseConfiguration;
 import org.aposin.licensescout.core.test.util.TestUtil;
 import org.aposin.licensescout.license.DetectionStatus;
 import org.aposin.licensescout.license.LegalStatus;
-import org.aposin.licensescout.license.License;
 import org.aposin.licensescout.license.LicenseStoreData;
 import org.aposin.licensescout.util.ILSLog;
 import org.dbunit.Assertion;
@@ -152,11 +151,9 @@ public class DatabaseWriterTest extends DBTestCase {
         final Archive archive = new Archive(ArchiveType.JAVA, "fileName1", "version1", "path1");
         archive.setDetectionStatus(DetectionStatus.DETECTED);
         archive.setLegalStatus(LegalStatus.ACCEPTED);
-        final List<License> detectedLicenses = new ArrayList<>();
-        detectedLicenses.add(licenseStoreData.getLicenseBySpdxIdentifier("MIT"));
-        detectedLicenses.add(licenseStoreData.getLicenseBySpdxIdentifier("Apache-2.0"));
-        archive.setDetectedLicenses(detectedLicenses);
-        archive.addLicense(licenseStoreData.getLicenseBySpdxIdentifier("MIT"), "path");
+        archive.addDetectedLicense(licenseStoreData.getLicenseBySpdxIdentifier("MIT"), "path");
+        archive.addDetectedLicense(licenseStoreData.getLicenseBySpdxIdentifier("Apache-2.0"), "path");
+        archive.addResultingLicense(licenseStoreData.getLicenseBySpdxIdentifier("MIT"), "path");
         return archive;
     }
 
@@ -167,8 +164,6 @@ public class DatabaseWriterTest extends DBTestCase {
         final Archive archive = new Archive(ArchiveType.JAVA, "fileName2", "version2", "path2");
         archive.setDetectionStatus(DetectionStatus.DETECTED);
         archive.setLegalStatus(LegalStatus.ACCEPTED);
-        final List<License> detectedLicenses = new ArrayList<>();
-        archive.setDetectedLicenses(detectedLicenses);
         return archive;
     }
 

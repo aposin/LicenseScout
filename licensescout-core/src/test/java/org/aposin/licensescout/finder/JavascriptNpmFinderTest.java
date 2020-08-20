@@ -177,18 +177,16 @@ public class JavascriptNpmFinderTest extends BaseFinderTest {
         assertEquals("version", expectedVersion, archive.getVersion());
         assertEquals("vendor", "Unknown", archive.getVendor());
         assertEquals("detectionStatus", null, archive.getDetectionStatus());
-        assertEquals("detectedLicenses", null, archive.getDetectedLicenses());
-        final Set<License> licenses = archive.getLicenses();
+        final Set<License> licenses = archive.getDetectedLicenses();
         if (expectedLicense == null) {
-            // assertNull("licenses present", licenses);
-            assertEquals("licenses size", 0, licenses.size());
+            assertEquals("detected licenses size", 0, licenses.size());
         } else {
-            assertNotNull("licenses not present", licenses);
-            assertEquals("licenses size", 1, licenses.size());
+            assertNotNull("detected licenses not present", licenses);
+            assertEquals("detected licenses size", 1, licenses.size());
             if (expectedLicense instanceof License) {
-                Assert.assertTrue("licenses[0]", licenses.contains(expectedLicense));
+                Assert.assertTrue("detected licenses[0]", licenses.contains(expectedLicense));
             } else if (expectedLicense instanceof String) {
-                assertEquals("licenses[0]", expectedLicense, licenses.iterator().next().getName());
+                assertEquals("detected licenses[0]", expectedLicense, licenses.iterator().next().getName());
             }
         }
     }

@@ -190,7 +190,7 @@ public abstract class AbstractFinder {
     public void printArchiveList(final List<Archive> archiveFiles) {
         for (final Archive archive : archiveFiles) {
             getLog().debug(archive.getFileName() + "     " + archive.getPath());
-            for (final License license : archive.getLicenses()) {
+            for (final License license : archive.getDetectedLicenses()) {
                 getLog().debug(license.getName());
             }
         }
@@ -200,7 +200,7 @@ public abstract class AbstractFinder {
         if (licenses != null) {
             for (final License license : licenses) {
                 if (license != null) {
-                    archive.addLicense(license, filePath);
+                    archive.addDetectedLicense(license, filePath);
                 }
             }
         }

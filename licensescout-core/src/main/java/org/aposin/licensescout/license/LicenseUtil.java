@@ -267,9 +267,7 @@ public class LicenseUtil {
      */
     private static void evaluateLicenses(final LicenseCheckedList licenseCheckedList, final Archive archive,
                                          final LicenseStoreData licenseStoreData) {
-        final Set<License> licenses = archive.getLicenses();
-        final List<License> detectedLicenses = new ArrayList<>(licenses);
-        archive.setDetectedLicenses(detectedLicenses);
+        final Set<License> licenses = archive.getDetectedLicenses();
         final boolean overWriteMode = !licenses.isEmpty();
         final DetectionStatus detectionStatus = addManualLicenses(licenseCheckedList, archive, overWriteMode);
         setDetectionStatus(archive, detectionStatus, licenseStoreData);
@@ -354,18 +352,19 @@ public class LicenseUtil {
      */
     private static DetectionStatus calculateDetectionStatus(final Archive archive, final boolean overWriteMode,
                                                             final List<License> allManualLicenses) {
-        final boolean multipleLicensesDetected = archive.getLicenses().size() > 1;
+        final boolean multipleLicensesDetected = archive.getDetectedLicenses().size() > 1;
         final DetectionStatus detectionStatus;
         if (!allManualLicenses.isEmpty()) {
             if (overWriteMode) {
-                archive.clearLicenses();
                 detectionStatus = MANUAL_SELECTED;
             } else {
                 detectionStatus = MANUAL_DETECTED;
+                archive.setResultingLicensesFromDetected();
             }
             addManualLicenses(archive, allManualLicenses);
         } else {
             detectionStatus = multipleLicensesDetected ? MULTIPLE_DETECTED : DETECTED;
+            archive.setResultingLicensesFromDetected();
         }
         return detectionStatus;
     }
@@ -379,7 +378,7 @@ public class LicenseUtil {
         if (manualLicenses != null && !manualLicenses.isEmpty()) {
             for (final License manualLicense : manualLicenses) {
                 final String absolutePath = "[added from list of exceptions]";
-                archive.addLicense(manualLicense, absolutePath);
+                archive.addResultingLicense(manualLicense, absolutePath);
             }
             return true;
         }
@@ -388,7 +387,7 @@ public class LicenseUtil {
 
     private static void setDetectionStatus(final Archive archive, final DetectionStatus manualDetectionStatus,
                                            final LicenseStoreData licenseStoreData) {
-        final Set<License> licenses = archive.getLicenses();
+        final Set<License> licenses = archive.getResultingLicenses();
         final boolean noManualInformation = licenses
                 .contains(licenseStoreData.getLicenseBySpdxIdentifier(LicenseSpdxIdentifier.NO_MANUAL_INFORMATION));
         final boolean hasLicenses = !licenses.isEmpty();
@@ -396,7 +395,7 @@ public class LicenseUtil {
         if (noManualInformation) {
             detectionStatus = DetectionStatus.MANUAL_NOT_DETECTED;
             // remove the "no manual information" placeholder license
-            archive.clearLicenses();
+            archive.clearResultingLicenses();
         } else {
             if (hasLicenses) {
                 detectionStatus = manualDetectionStatus;
@@ -408,7 +407,7 @@ public class LicenseUtil {
     }
 
     private static void setLegalStatus(final Archive archive) {
-        final Set<License> licenses = archive.getLicenses();
+        final Set<License> licenses = archive.getResultingLicenses();
         boolean hasAcceptedLicense = false;
         boolean hasBlacklistedLicense = false;
         boolean hasUnknownLicense = false;
@@ -544,7 +543,7 @@ public class LicenseUtil {
         boolean licenseFound = false;
         final License license = licenseStoreData.getLicenseByPublicUrl(licenseUrl);
         if (license != null) {
-            archive.addLicense(license, licenseFileName);
+            archive.addDetectedLicense(license, licenseFileName);
             licenseFound = true;
         } else {
             log.debug("License URL not found in store: " + licenseUrl);
@@ -576,7 +575,7 @@ public class LicenseUtil {
         boolean licenseFound = false;
         final License license = licenseStoreData.getLicenseBySpdxIdentifier(licenseName);
         if (license != null) {
-            archive.addLicense(license, licenseFileName);
+            archive.addDetectedLicense(license, licenseFileName);
             licenseFound = true;
         } else {
             log.debug("License name not found in store: " + licenseName);
@@ -603,7 +602,7 @@ public class LicenseUtil {
         boolean licenseFound = false;
         for (final License license : licenses) {
             if (license != null) {
-                archive.addLicense(license, licenseFileName);
+                archive.addDetectedLicense(license, licenseFileName);
                 licenseFound = true;
             }
         }

@@ -60,7 +60,7 @@ public class CleanArchiveListFilter extends SimpleArchiveListFilter {
     @Override
     protected boolean archiveIncluded(Archive archive) {
         return !legalStatesToFilterOut.contains(archive.getLegalStatus())
-                && !hasLicenseToFilterOut(archive.getLicenses());
+                && !hasLicenseToFilterOut(archive.getResultingLicenses());
     }
 
     private boolean hasLicenseToFilterOut(final Set<License> actualLicenses) {
