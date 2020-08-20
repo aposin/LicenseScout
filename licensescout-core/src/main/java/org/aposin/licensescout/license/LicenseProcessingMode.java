@@ -16,17 +16,24 @@
 package org.aposin.licensescout.license;
 
 /**
- * Constants for SPDX identifiers of licenses.
- * 
- * <p>Note: no longer used for real SPDX identifiers, since they are specified in the license.xml file.</p>
- * 
- * <p>See <a href="https://spdx.org/licenses/">Source of names</a>.</p>
- * 
- */
-public interface LicenseSpdxIdentifier {
+* How to deal with manually configured licenses opposed to detected ones.
+*/
+public enum LicenseProcessingMode {
 
     /**
-     * No SPDX defined identifier.
+     * Overwrite the detected licenses with a non-empty list.
      */
-    public static final String NO_MANUAL_INFORMATION = "no manual information";
+    OVERWRITE_NORMAL,
+    /**
+     * Overwrite the detected licenses with an empty list.
+     */
+    OVERWRITE_EMPTY_LIST,
+    /**
+     * Take over the list of detected Licenses.
+     */
+    NO_OVERWRITE,
+    /**
+     * No processing information.
+     */
+    NONE;
 }

@@ -27,7 +27,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Unit tests for {@link LicenseUtil#evaluateLicenses(LicenseCheckedList, java.util.Collection, LicenseStoreData)}.
+ * Unit tests for {@link LicenseUtil#evaluateLicenses(LicenseCheckedList, java.util.Collection)}.
  * 
  * @see LicenseUtil
  * @see LicenseUtilGetMatchedVersionFromLineTest
@@ -47,37 +47,74 @@ public class LicenseUtilEvaluateLicensesTest {
         final LegalStatus expectedLegalStatus = LegalStatus.UNKNOWN;
         final String[] expectedLicenseIdentifiers = new String[0];
 
-        doTestEvaluateLicenses(archive, originalDetectedLicenseIdentifiers, expectedDetectionStatus,
+        assertTestEvaluateLicenses(archive, originalDetectedLicenseIdentifiers, expectedDetectionStatus,
                 expectedLegalStatus, expectedLicenseIdentifiers);
     }
 
     /**
+     * <p>Matches against no entry in checkedarchives.csv.</p>
      * @throws Exception 
      */
     @Test
-    public void testEvaluateLicensesSingleDetectedNotOverridden() throws Exception {
+    public void testEvaluateLicensesSingleDetectedNotOverriddenNoException() throws Exception {
         final Archive archive = new Archive(ArchiveType.JAVA, "fileName", "1.0", "path");
         final String[] originalDetectedLicenseIdentifiers = new String[] { "Apache-2.0" };
         final DetectionStatus expectedDetectionStatus = DetectionStatus.DETECTED;
         final LegalStatus expectedLegalStatus = LegalStatus.ACCEPTED;
         final String[] expectedLicenseIdentifiers = new String[] { "Apache-2.0" };
 
-        doTestEvaluateLicenses(archive, originalDetectedLicenseIdentifiers, expectedDetectionStatus,
+        assertTestEvaluateLicenses(archive, originalDetectedLicenseIdentifiers, expectedDetectionStatus,
                 expectedLegalStatus, expectedLicenseIdentifiers);
     }
 
     /**
+     * <p>Matches against an entry in checkedarchives.csv with license identifier '-'.</p>
+     * 
      * @throws Exception 
      */
     @Test
-    public void testEvaluateLicensesMultipleDetectedNotOverridden() throws Exception {
+    public void testEvaluateLicensesSingleDetectedNotOverriddenByException() throws Exception {
+        final Archive archive = new Archive(ArchiveType.JAVASCRIPT, "testarchive5", "0.0.4", "path");
+        final String[] originalDetectedLicenseIdentifiers = new String[] { "Apache-2.0" };
+        final DetectionStatus expectedDetectionStatus = DetectionStatus.DETECTED;
+        final LegalStatus expectedLegalStatus = LegalStatus.ACCEPTED;
+        final String[] expectedLicenseIdentifiers = new String[] { "Apache-2.0" };
+
+        assertTestEvaluateLicenses(archive, originalDetectedLicenseIdentifiers, expectedDetectionStatus,
+                expectedLegalStatus, expectedLicenseIdentifiers);
+    }
+
+    /**
+     * <p>Matches against no entry in checkedarchives.csv.</p>
+     * 
+     * @throws Exception 
+     */
+    @Test
+    public void testEvaluateLicensesMultipleDetectedNotOverriddenNoException() throws Exception {
         final Archive archive = new Archive(ArchiveType.JAVA, "fileName", "1.0", "path");
         final String[] originalDetectedLicenseIdentifiers = new String[] { "Apache-2.0", "NPL-1.0" };
         final DetectionStatus expectedDetectionStatus = DetectionStatus.MULTIPLE_DETECTED;
         final LegalStatus expectedLegalStatus = LegalStatus.ACCEPTED;
         final String[] expectedLicenseIdentifiers = new String[] { "Apache-2.0", "NPL-1.0" };
 
-        doTestEvaluateLicenses(archive, originalDetectedLicenseIdentifiers, expectedDetectionStatus,
+        assertTestEvaluateLicenses(archive, originalDetectedLicenseIdentifiers, expectedDetectionStatus,
+                expectedLegalStatus, expectedLicenseIdentifiers);
+    }
+
+    /**
+     * <p>Matches against an entry in checkedarchives.csv with license identifier '-'.</p>
+     * 
+     * @throws Exception 
+     */
+    @Test
+    public void testEvaluateLicensesMultipleDetectedNotOverriddenByException() throws Exception {
+        final Archive archive = new Archive(ArchiveType.JAVASCRIPT, "testarchive5", "0.0.4", "path");
+        final String[] originalDetectedLicenseIdentifiers = new String[] { "Apache-2.0", "NPL-1.0" };
+        final DetectionStatus expectedDetectionStatus = DetectionStatus.MULTIPLE_DETECTED;
+        final LegalStatus expectedLegalStatus = LegalStatus.ACCEPTED;
+        final String[] expectedLicenseIdentifiers = new String[] { "Apache-2.0", "NPL-1.0" };
+
+        assertTestEvaluateLicenses(archive, originalDetectedLicenseIdentifiers, expectedDetectionStatus,
                 expectedLegalStatus, expectedLicenseIdentifiers);
     }
 
@@ -93,7 +130,7 @@ public class LicenseUtilEvaluateLicensesTest {
         final LegalStatus expectedLegalStatus = LegalStatus.ACCEPTED;
         final String[] expectedLicenseIdentifiers = new String[] { "MIT" };
 
-        doTestEvaluateLicenses(archive, originalDetectedLicenseIdentifiers, expectedDetectionStatus,
+        assertTestEvaluateLicenses(archive, originalDetectedLicenseIdentifiers, expectedDetectionStatus,
                 expectedLegalStatus, expectedLicenseIdentifiers);
     }
 
@@ -111,7 +148,7 @@ public class LicenseUtilEvaluateLicensesTest {
         final LegalStatus expectedLegalStatus = LegalStatus.ACCEPTED;
         final String[] expectedLicenseIdentifiers = new String[] { "DOM4J" };
 
-        doTestEvaluateLicenses(archive, originalDetectedLicenseIdentifiers, expectedDetectionStatus,
+        assertTestEvaluateLicenses(archive, originalDetectedLicenseIdentifiers, expectedDetectionStatus,
                 expectedLegalStatus, expectedLicenseIdentifiers);
     }
 
@@ -127,7 +164,7 @@ public class LicenseUtilEvaluateLicensesTest {
         final LegalStatus expectedLegalStatus = LegalStatus.ACCEPTED;
         final String[] expectedLicenseIdentifiers = new String[] { "MIT" };
 
-        doTestEvaluateLicenses(archive, originalDetectedLicenseIdentifiers, expectedDetectionStatus,
+        assertTestEvaluateLicenses(archive, originalDetectedLicenseIdentifiers, expectedDetectionStatus,
                 expectedLegalStatus, expectedLicenseIdentifiers);
     }
 
@@ -145,7 +182,7 @@ public class LicenseUtilEvaluateLicensesTest {
         final LegalStatus expectedLegalStatus = LegalStatus.ACCEPTED;
         final String[] expectedLicenseIdentifiers = new String[] { "DOM4J" };
 
-        doTestEvaluateLicenses(archive, originalDetectedLicenseIdentifiers, expectedDetectionStatus,
+        assertTestEvaluateLicenses(archive, originalDetectedLicenseIdentifiers, expectedDetectionStatus,
                 expectedLegalStatus, expectedLicenseIdentifiers);
     }
 
@@ -158,7 +195,7 @@ public class LicenseUtilEvaluateLicensesTest {
      * @throws Exception
      * @throws IOException
      */
-    private void doTestEvaluateLicenses(final Archive archive, String[] originalDetectedLicenseIdentifiers,
+    private void assertTestEvaluateLicenses(final Archive archive, String[] originalDetectedLicenseIdentifiers,
                                         final DetectionStatus expectedDetectionStatus,
                                         final LegalStatus expectedLegalStatus,
                                         final String[] expectedLicenseIdentifiers)
@@ -174,7 +211,7 @@ public class LicenseUtilEvaluateLicensesTest {
         final LicenseCheckedList licenseCheckedList = LicenseUtilTestUtil.createLicenseCheckedList(licenseStoreData);
         final List<License> expectedLicenses = LicenseUtilTestUtil.createLicenseList(expectedLicenseIdentifiers,
                 licenseStoreData);
-        LicenseUtil.evaluateLicenses(licenseCheckedList, archives, licenseStoreData);
+        LicenseUtil.evaluateLicenses(licenseCheckedList, archives);
         Assert.assertEquals("archive list length", 1, archives.size());
         Assert.assertEquals("DetectionStatus", expectedDetectionStatus, archive.getDetectionStatus());
         Assert.assertEquals("LegalStatus", expectedLegalStatus, archive.getLegalStatus());

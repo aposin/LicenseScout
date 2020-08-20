@@ -18,7 +18,7 @@ package org.aposin.licensescout.license;
 /**
  * Status of license checking for an archive.
  * 
- * @see LicenseUtil#evaluateLicenses(LicenseCheckedList, java.util.Collection, LicenseStoreData)
+ * @see LicenseUtil#evaluateLicenses(LicenseCheckedList, java.util.Collection)
  *
  */
 public enum DetectionStatus {
