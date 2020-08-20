@@ -242,16 +242,14 @@ public class LicenseUtil {
      * 
      * @param checkedArchives information on archives with manually assigned licenses
      * @param archives collection of archives to process
-     * @param licenseStoreData the data object containing information on licenses
-     * @see #evaluateLicenses(LicenseCheckedList, Archive, LicenseStoreData)
+     * @see #evaluateLicenses(LicenseCheckedList, Archive)
      * 
      * @see DetectionStatus
      * @see LegalStatus
      */
-    public static void evaluateLicenses(final LicenseCheckedList checkedArchives, final Collection<Archive> archives,
-                                        final LicenseStoreData licenseStoreData) {
+    public static void evaluateLicenses(final LicenseCheckedList checkedArchives, final Collection<Archive> archives) {
         for (final Archive archive : archives) {
-            evaluateLicenses(checkedArchives, archive, licenseStoreData);
+            evaluateLicenses(checkedArchives, archive);
         }
     }
 
@@ -260,60 +258,43 @@ public class LicenseUtil {
      * 
      * @param licenseCheckedList information on archives with manually assigned licenses
      * @param archive the archive to evaluate
-     * @param licenseStoreData the data object containing information on licenses
-     * 
      * @see DetectionStatus
      * @see LegalStatus
      */
-    private static void evaluateLicenses(final LicenseCheckedList licenseCheckedList, final Archive archive,
-                                         final LicenseStoreData licenseStoreData) {
+    private static void evaluateLicenses(final LicenseCheckedList licenseCheckedList, final Archive archive) {
         final Set<License> licenses = archive.getDetectedLicenses();
         final boolean overWriteMode = !licenses.isEmpty();
-        final DetectionStatus detectionStatus = addManualLicenses(licenseCheckedList, archive, overWriteMode);
-        setDetectionStatus(archive, detectionStatus, licenseStoreData);
+        addManualLicenses(licenseCheckedList, archive, overWriteMode);
         setLegalStatus(archive);
     }
 
     /**
+     * Adds manually configured licenses and sets the detection status of the archive.
+     * 
      * @param licenseCheckedList information on archives with manually assigned licenses
      * @param archive the archive to process
      * @param overWriteMode if true and manual configured licenses are found, only these licenses are used (others are removed) and the returned
      * status is {@link DetectionStatus#MANUAL_SELECTED} (instead of {@link DetectionStatus#MANUAL_DETECTED})
-     * @return the detection status to use in {@link #setDetectionStatus(Archive, DetectionStatus, LicenseStoreData)} if the status is not
-     * recognized to be {@link DetectionStatus#MANUAL_NOT_DETECTED}. The values can be {@link DetectionStatus#MANUAL_DETECTED},
-     * {@link DetectionStatus#MANUAL_SELECTED}, {@link DetectionStatus#DETECTED} or {@link DetectionStatus#MULTIPLE_DETECTED}.
      */
-    private static DetectionStatus addManualLicenses(final LicenseCheckedList licenseCheckedList, final Archive archive,
-                                                     final boolean overWriteMode) {
+    private static void addManualLicenses(final LicenseCheckedList licenseCheckedList, final Archive archive,
+                                          final boolean overWriteMode) {
         final List<License> allManualLicenses = new ArrayList<>();
         String documentationUrl = null;
         Provider provider = null;
         Notice notice = null;
+        LicenseResult licenseResultToProcess = null;
         if (hasVersion(archive)) {
-            final LicenseResult manualLicenses = licenseCheckedList.getManualLicense(archive.getArchiveType(),
+            licenseResultToProcess = licenseCheckedList.getManualLicense(archive.getArchiveType(),
                     archive.getFileName(), archive.getVersion());
-            if (manualLicenses != null) {
-                allManualLicenses.addAll(manualLicenses.getLicenses());
-                documentationUrl = manualLicenses.getDocumentationUrl();
-                provider = manualLicenses.getProvider();
-                notice = manualLicenses.getNotice();
-            }
         }
         if (archive.getMessageDigest() != null) {
-            final LicenseResult manualLicenses = licenseCheckedList.getManualLicense(archive.getArchiveType(),
+            licenseResultToProcess = licenseCheckedList.getManualLicense(archive.getArchiveType(),
                     archive.getFileName(), archive.getMessageDigest());
-            if (manualLicenses != null) {
-                allManualLicenses.addAll(manualLicenses.getLicenses());
-                documentationUrl = manualLicenses.getDocumentationUrl();
-                provider = manualLicenses.getProvider();
-                notice = manualLicenses.getNotice();
-            }
         }
         // do pattern matching only if we haven't found a license yet
-        if (allManualLicenses.isEmpty()) {
-            final Set<Entry<ArchiveIdentifierPattern, LicenseResult>> archivePatterns = licenseCheckedList
-                    .getManualPatternArchives();
-            final Iterator<Entry<ArchiveIdentifierPattern, LicenseResult>> iter = archivePatterns.iterator();
+        if (licenseResultToProcess == null) {
+            final Iterator<Entry<ArchiveIdentifierPattern, LicenseResult>> iter = licenseCheckedList
+                    .getManualPatternArchives().iterator();
             final String name = archive.getFileName();
             final String path = archive.getPath();
             while (iter.hasNext()) {
@@ -323,15 +304,32 @@ public class LicenseUtil {
                 final String checkedString = aip.getPatternType() == PatternType.PATTERN_ON_FILENAME ? name : path;
                 final Matcher matcher = pattern.matcher(checkedString);
                 if (matcher.matches()) {
-                    final LicenseResult licenseResult = entry.getValue();
-                    final List<License> licenses = licenseResult.getLicenses();
-                    allManualLicenses.addAll(licenses);
-                    documentationUrl = licenseResult.getDocumentationUrl();
-                    provider = licenseResult.getProvider();
-                    notice = licenseResult.getNotice();
+                    licenseResultToProcess = entry.getValue();
                 }
             }
         }
+        LicenseProcessingMode licenseProcessingMode = LicenseProcessingMode.NONE;
+        if (licenseResultToProcess != null) {
+            licenseProcessingMode = licenseResultToProcess.getLicenseProcessingMode();
+            if (licenseResultToProcess.getLicenseProcessingMode() == LicenseProcessingMode.OVERWRITE_NORMAL) {
+                allManualLicenses.addAll(licenseResultToProcess.getLicenses());
+            }
+            documentationUrl = licenseResultToProcess.getDocumentationUrl();
+            provider = licenseResultToProcess.getProvider();
+            notice = licenseResultToProcess.getNotice();
+        }
+        setDocumentationUrlAndProviderAndNotice(archive, documentationUrl, provider, notice);
+        calculateAndSetDetectionStatus(licenseProcessingMode, archive, overWriteMode, allManualLicenses);
+    }
+
+    /**
+     * @param archive
+     * @param documentationUrl
+     * @param provider
+     * @param notice
+     */
+    private static void setDocumentationUrlAndProviderAndNotice(final Archive archive, String documentationUrl,
+                                                                Provider provider, Notice notice) {
         if (documentationUrl != null) {
             archive.setDocumentationUrl(documentationUrl);
         }
@@ -341,32 +339,54 @@ public class LicenseUtil {
         if (notice != null) {
             archive.setNotice(notice);
         }
-        return calculateDetectionStatus(archive, overWriteMode, allManualLicenses);
     }
 
     /**
+     * @param licenseProcessingMode
      * @param archive
      * @param overWriteMode
      * @param allManualLicenses
-     * @return a detection status
      */
-    private static DetectionStatus calculateDetectionStatus(final Archive archive, final boolean overWriteMode,
-                                                            final List<License> allManualLicenses) {
+    private static void calculateAndSetDetectionStatus(final LicenseProcessingMode licenseProcessingMode,
+                                                       final Archive archive, final boolean overWriteMode,
+                                                       final List<License> allManualLicenses) {
         final boolean multipleLicensesDetected = archive.getDetectedLicenses().size() > 1;
         final DetectionStatus detectionStatus;
-        if (!allManualLicenses.isEmpty()) {
-            if (overWriteMode) {
-                detectionStatus = MANUAL_SELECTED;
-            } else {
-                detectionStatus = MANUAL_DETECTED;
+        switch (licenseProcessingMode) {
+            case OVERWRITE_NORMAL:
+                if (!allManualLicenses.isEmpty()) {
+                    if (overWriteMode) {
+                        detectionStatus = MANUAL_SELECTED;
+                    } else {
+                        detectionStatus = MANUAL_DETECTED;
+                        archive.setResultingLicensesFromDetected();
+                    }
+                    addManualLicenses(archive, allManualLicenses);
+                } else {
+                    detectionStatus = multipleLicensesDetected ? MULTIPLE_DETECTED : DETECTED;
+                    archive.setResultingLicensesFromDetected();
+                }
+                break;
+            case OVERWRITE_EMPTY_LIST:
+                detectionStatus = DetectionStatus.MANUAL_NOT_DETECTED;
+                archive.clearResultingLicenses();
+                break;
+            case NO_OVERWRITE:
+            case NONE:
                 archive.setResultingLicensesFromDetected();
-            }
-            addManualLicenses(archive, allManualLicenses);
-        } else {
-            detectionStatus = multipleLicensesDetected ? MULTIPLE_DETECTED : DETECTED;
-            archive.setResultingLicensesFromDetected();
+                final Set<License> licenses = archive.getResultingLicenses();
+                final boolean hasLicenses = !licenses.isEmpty();
+                if (hasLicenses) {
+                    detectionStatus = multipleLicensesDetected ? MULTIPLE_DETECTED : DETECTED;
+                } else {
+                    detectionStatus = DetectionStatus.NOT_DETECTED;
+                }
+                break;
+            default:
+                detectionStatus = null;
+                break;
         }
-        return detectionStatus;
+        archive.setDetectionStatus(detectionStatus);
     }
 
     /**
@@ -383,27 +403,6 @@ public class LicenseUtil {
             return true;
         }
         return false;
-    }
-
-    private static void setDetectionStatus(final Archive archive, final DetectionStatus manualDetectionStatus,
-                                           final LicenseStoreData licenseStoreData) {
-        final Set<License> licenses = archive.getResultingLicenses();
-        final boolean noManualInformation = licenses
-                .contains(licenseStoreData.getLicenseBySpdxIdentifier(LicenseSpdxIdentifier.NO_MANUAL_INFORMATION));
-        final boolean hasLicenses = !licenses.isEmpty();
-        final DetectionStatus detectionStatus;
-        if (noManualInformation) {
-            detectionStatus = DetectionStatus.MANUAL_NOT_DETECTED;
-            // remove the "no manual information" placeholder license
-            archive.clearResultingLicenses();
-        } else {
-            if (hasLicenses) {
-                detectionStatus = manualDetectionStatus;
-            } else {
-                detectionStatus = DetectionStatus.NOT_DETECTED;
-            }
-        }
-        archive.setDetectionStatus(detectionStatus);
     }
 
     private static void setLegalStatus(final Archive archive) {
