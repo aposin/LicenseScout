@@ -379,6 +379,7 @@ public class SimpleExecutionTest {
         executionParameters.setValidateLicenseXml(false);
         executionParameters.setArtifactServerUtil(new TestArtifactServerUtil());
         executionParameters.setMessageDigestAlgorithm(CryptUtil.DEFAULT_MD_ALGORITHM);
+        executionParameters.setConfigurationFileEncoding("UTF-8");
         return executionParameters;
     }
 

@@ -51,12 +51,13 @@ public class GlobalFilters {
      * Reads global filters from a file.
      * 
      * @param inputStream an input stream to read the file contents from
+     * @param encoding an encoding name to use for the input file
      * @throws IOException if an error occurs
      */
-    public void read(final InputStream inputStream) throws IOException {
+    public void read(final InputStream inputStream, String encoding) throws IOException {
         String line = "";
 
-        try (final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"))) {
+        try (final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, encoding))) {
             while ((line = br.readLine()) != null) {
 
                 // ignore lines commented out
