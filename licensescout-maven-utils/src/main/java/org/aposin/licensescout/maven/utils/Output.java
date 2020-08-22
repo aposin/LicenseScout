@@ -62,7 +62,7 @@ public class Output {
     private File template;
 
     /**
-     * Encoding of the output file.
+     * Encoding of the template file.
      * 
      * <p>A JAVA encoding name to use for reading the template file.
      * If not configured, the value of 'project.build.sourceEncoding' is used.

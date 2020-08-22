@@ -34,8 +34,8 @@ import org.aposin.licensescout.configuration.BuildInfo;
 import org.aposin.licensescout.configuration.ConfigFileHandler;
 import org.aposin.licensescout.configuration.ExecutionDatabaseConfiguration;
 import org.aposin.licensescout.configuration.ExecutionOutput;
-import org.aposin.licensescout.configuration.OutputFileType;
 import org.aposin.licensescout.configuration.FinderParameters;
+import org.aposin.licensescout.configuration.OutputFileType;
 import org.aposin.licensescout.database.DatabaseWriter;
 import org.aposin.licensescout.exporter.GeneralStatistics;
 import org.aposin.licensescout.exporter.IDetectionStatusStatistics;
@@ -540,7 +540,7 @@ public class Executor {
             throws LicenseScoutExecutionException {
         try (final InputStream inputStream = getConfigFileHandler().getLicenseUrlMappingsInputStream()) {
             if (inputStream != null) {
-                licenseStoreData.readUrlMappings(inputStream, log);
+                licenseStoreData.readUrlMappings(inputStream, getConfigurationFileEncoding(), log);
             }
         } catch (IOException e) {
             throw new LicenseScoutExecutionException("cannot read license URL mappings", e);
@@ -556,7 +556,7 @@ public class Executor {
             throws LicenseScoutExecutionException {
         try (final InputStream inputStream = getConfigFileHandler().getLicenseNameMappingsInputStream()) {
             if (inputStream != null) {
-                licenseStoreData.readNameMappings(inputStream, log);
+                licenseStoreData.readNameMappings(inputStream, getConfigurationFileEncoding(), log);
             }
         } catch (IOException e) {
             throw new LicenseScoutExecutionException("cannot read license name mappings", e);
@@ -572,7 +572,7 @@ public class Executor {
         final GlobalFilters globalFilters = new GlobalFilters();
         try (final InputStream inputStream = getConfigFileHandler().getGlobalFiltersInputStream()) {
             if (inputStream != null) {
-                globalFilters.read(inputStream);
+                globalFilters.read(inputStream, getConfigurationFileEncoding());
             }
         } catch (IOException e) {
             throw new LicenseScoutExecutionException("cannot read global filters", e);
@@ -659,7 +659,8 @@ public class Executor {
         final LicenseCheckedList checkedArchives = new LicenseCheckedList();
         try (final InputStream inputStream = getConfigFileHandler().getCheckedArchivesInputStream()) {
             if (inputStream != null) {
-                checkedArchives.readCsv(inputStream, licenseStoreData, providers, notices, log);
+                checkedArchives.readCsv(inputStream, getConfigurationFileEncoding(), licenseStoreData, providers,
+                        notices, log);
             }
         } catch (IOException e) {
             throw new LicenseScoutExecutionException("cannot read check archives list", e);
@@ -680,7 +681,8 @@ public class Executor {
         }
         try (final InputStream inputStream = getConfigFileHandler().getFilteredVendorNamesInputStream()) {
             if (inputStream != null) {
-                final List<String> tmpResultList = readFilteredVendorNamesFromFile(inputStream, log);
+                final List<String> tmpResultList = readFilteredVendorNamesFromFile(inputStream,
+                        getConfigurationFileEncoding(), log);
                 resultFilteredVendorNames.addAll(tmpResultList);
             }
         } catch (IOException e) {
@@ -697,12 +699,13 @@ public class Executor {
      * @return a list of strings
      * @throws IOException if an error occurred while reading from the file
      */
-    protected static List<String> readFilteredVendorNamesFromFile(final InputStream inputStream, final ILSLog log)
+    protected static List<String> readFilteredVendorNamesFromFile(final InputStream inputStream, String encoding,
+                                                                  final ILSLog log)
             throws IOException {
         final List<String> resultList = new ArrayList<>();
         String line = "";
 
-        try (final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
+        try (final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, encoding))) {
             while ((line = br.readLine()) != null) {
 
                 // ignore lines commented out
@@ -750,6 +753,10 @@ public class Executor {
 
     private static boolean isSnapshotVersion(final String version) {
         return version.endsWith("-SNAPSHOT");
+    }
+
+    private String getConfigurationFileEncoding() {
+        return getExecutionParameters().getConfigurationFileEncoding();
     }
 
 }
