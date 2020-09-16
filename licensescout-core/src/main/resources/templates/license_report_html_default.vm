@@ -221,14 +221,14 @@ table.tablesorter thead tr .tablesorter-headerDesc {
 			#if($reportConfiguration.showPathColumn)
 			<th>Path</th>
 			#end
+			#if($reportConfiguration.showProviderColumn)
+			<th>Provider</th>
+			#end
 			#if($reportConfiguration.showMessageDigestColumn)
 			<th>Message digest ($messageDigestAlgorithm)</th>
 			#end
 			#if($reportConfiguration.showLicenseCandidateFilesColumn)
 			<th>Candidate License files</th>
-			#end
-			#if($reportConfiguration.showProviderColumn)
-			<th>Provider</th>
 			#end
 		</tr>	
 	</thead>
@@ -291,6 +291,13 @@ table.tablesorter thead tr .tablesorter-headerDesc {
 	#if($reportConfiguration.showPathColumn)
 	<td class="$style"><span title="$archive.path">$archive.path</span></td>
 	#end
+	#if($reportConfiguration.showProviderColumn)
+	<td class="$style">
+		#if($archive.provider)
+			<a href="$archive.provider.url" title="$archive.provider.name" target="_blank">$archive.provider.name</a>
+		#end	
+	</td>
+	#end
 	#if($reportConfiguration.showMessageDigestColumn)
 	<td class="$style"><span title="$archive.messageDigestString">$archive.messageDigestString</span></td>
 	#end
@@ -299,13 +306,6 @@ table.tablesorter thead tr .tablesorter-headerDesc {
 		#foreach($candidateFilePath in $archive.licenseCandidateFiles)
 		$candidateFilePath <br/>
 		#end
-	</td>
-	#end
-	#if($reportConfiguration.showProviderColumn)
-	<td class="$style">
-		#if($archive.provider)
-			<a href="$archive.provider.url" title="$archive.provider.name" target="_blank">$archive.provider.name</a>
-		#end	
 	</td>
 	#end
 </tr>
