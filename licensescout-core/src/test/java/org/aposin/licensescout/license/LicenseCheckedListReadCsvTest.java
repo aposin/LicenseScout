@@ -81,11 +81,20 @@ public class LicenseCheckedListReadCsvTest {
         try (final InputStream inputStream = new FileInputStream(CONFIGURATION_BASE_PATH + checkedArchivesFilename)) {
             checkedArchives.readCsv(inputStream, "UTF-8", licenseStoreData, providers, notices, log);
         }
-        checkArchiveLicensesVersion(checkedArchives, ArchiveType.JAVA, "not_existing", "not_existing", false);
-        checkArchiveLicensesVersion(checkedArchives, ArchiveType.JAVASCRIPT, "testarchive1", "0.0.4", true);
-        checkArchiveLicensesVersion(checkedArchives, ArchiveType.JAVA, "testarchive2", "0.0.4", false);
-        checkArchiveLicensesMD(checkedArchives, ArchiveType.JAVA, "testarchive2", messageDigestValueString, true);
-        checkArchiveLicensesVersion(checkedArchives, ArchiveType.JAVASCRIPT, "testarchive8", "", false);
+        checkArchiveLicensesVersion(checkedArchives, ArchiveType.JAVA, "not_existing", "not_existing", false,
+                LicenseProcessingMode.OVERWRITE_NORMAL, 1);
+        checkArchiveLicensesVersion(checkedArchives, ArchiveType.JAVASCRIPT, "testarchive1", "0.0.4", true,
+                LicenseProcessingMode.OVERWRITE_NORMAL, 1);
+        checkArchiveLicensesVersion(checkedArchives, ArchiveType.JAVA, "testarchive2", "0.0.4", false,
+                LicenseProcessingMode.OVERWRITE_NORMAL, 1);
+        checkArchiveLicensesMD(checkedArchives, ArchiveType.JAVA, "testarchive2", messageDigestValueString, true,
+                LicenseProcessingMode.OVERWRITE_NORMAL, 1);
+        checkArchiveLicensesVersion(checkedArchives, ArchiveType.JAVASCRIPT, "testarchive8", "", false,
+                LicenseProcessingMode.OVERWRITE_NORMAL, 1);
+        checkArchiveLicensesVersion(checkedArchives, ArchiveType.JAVASCRIPT, "testarchive9", "0.0.4", true,
+                LicenseProcessingMode.OVERWRITE_EMPTY_LIST, 0);
+        checkArchiveLicensesVersion(checkedArchives, ArchiveType.JAVASCRIPT, "testarchive10", "0.0.4", true,
+                LicenseProcessingMode.NO_OVERWRITE, 0);
         final Set<Entry<ArchiveIdentifierPattern, LicenseResult>> patternArchives = checkedArchives
                 .getManualPatternArchives();
         Assert.assertEquals("patternArchives size", 2, patternArchives.size());
@@ -97,12 +106,17 @@ public class LicenseCheckedListReadCsvTest {
      * @param archiveName
      * @param version
      * @param expectedExistance
+     * @param expectedLicenseProcessingMode 
+     * @param expectedLicenseCount 
      */
     private void checkArchiveLicensesVersion(final LicenseCheckedList checkedArchives, final ArchiveType archiceType,
                                              final String archiveName, final String version,
-                                             final boolean expectedExistance) {
+                                             final boolean expectedExistance,
+                                             LicenseProcessingMode expectedLicenseProcessingMode,
+                                             int expectedLicenseCount) {
         final LicenseResult licenseResult = checkedArchives.getManualLicense(archiceType, archiveName, version);
-        checkArchiveLicensesCommon(licenseResult, expectedExistance);
+        checkArchiveLicensesCommon(licenseResult, expectedExistance, expectedLicenseProcessingMode,
+                expectedLicenseCount);
     }
 
     /**
@@ -111,23 +125,33 @@ public class LicenseCheckedListReadCsvTest {
      * @param archiveName
      * @param messageDigestString
      * @param expectedExistance
+     * @param expectedLicenseProcessingMode
+     * @param expectedLicenseCount
      */
     private void checkArchiveLicensesMD(final LicenseCheckedList checkedArchives, final ArchiveType archiceType,
                                         final String archiveName, final String messageDigestString,
-                                        final boolean expectedExistance) {
+                                        final boolean expectedExistance,
+                                        LicenseProcessingMode expectedLicenseProcessingMode, int expectedLicenseCount) {
         final LSMessageDigest messageDigest = MiscUtil.getLSMessageDigestFromHexString(messageDigestString);
         final LicenseResult licenseResult = checkedArchives.getManualLicense(archiceType, archiveName, messageDigest);
-        checkArchiveLicensesCommon(licenseResult, expectedExistance);
+        checkArchiveLicensesCommon(licenseResult, expectedExistance, expectedLicenseProcessingMode,
+                expectedLicenseCount);
     }
 
     /**
      * @param licenseResult
      * @param expectedExistance
+     * @param expectedLicenseProcessingMode
+     * @param expectedLicenseCount
      */
-    private void checkArchiveLicensesCommon(final LicenseResult licenseResult, final boolean expectedExistance) {
+    private void checkArchiveLicensesCommon(final LicenseResult licenseResult, final boolean expectedExistance,
+                                            LicenseProcessingMode expectedLicenseProcessingMode,
+                                            int expectedLicenseCount) {
         if (expectedExistance) {
             Assert.assertNotNull("existing archive", licenseResult);
-            Assert.assertEquals("License count", 1, licenseResult.getLicenses().size());
+            Assert.assertEquals("LicenseProcessingMode", expectedLicenseProcessingMode,
+                    licenseResult.getLicenseProcessingMode());
+            Assert.assertEquals("License count", expectedLicenseCount, licenseResult.getLicenses().size());
         } else {
             Assert.assertNull("not existing archive", licenseResult);
         }

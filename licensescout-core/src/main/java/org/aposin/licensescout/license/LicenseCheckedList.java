@@ -65,7 +65,7 @@ import org.xml.sax.XMLReader;
  * <p>Note that this class contains a hard-coded constant for the length of the message digest values. This should correspond to the algorithm returned by {@link CryptUtil#getMessageDigestAlgorithm()}.
  * But while the algorithm can be changed, but this length of the message digests is currently fixed.</p>
  * 
- * @see LicenseUtil#evaluateLicenses(LicenseCheckedList, Archive, LicenseStoreData)
+ * @see LicenseUtil#evaluateLicenses(LicenseCheckedList)
  * @see CryptUtil#getMessageDigestAlgorithm()
  */
 public class LicenseCheckedList {
@@ -210,26 +210,32 @@ public class LicenseCheckedList {
                                              final String[] values, final String documentationUrl, final Notice notice,
                                              final Provider provider) {
         final int numLicenseNames = values.length - LICENSE_NAMES_OFFSET;
+        LicenseProcessingMode licenseProcessingMode;
         final List<License> licenses = new ArrayList<>();
         if (numLicenseNames == 0) {
-            licenses.add(licenseStoreData.getLicenseBySpdxIdentifier(LicenseSpdxIdentifier.NO_MANUAL_INFORMATION));
+            licenseProcessingMode = LicenseProcessingMode.OVERWRITE_EMPTY_LIST;
         } else {
-            for (int i = 0; i < numLicenseNames; i++) {
-                final String licenseName = values[i + LICENSE_NAMES_OFFSET].trim();
-                final License license = licenseStoreData.getLicenseBySpdxIdentifier(licenseName);
-                if (license == null) {
-                    log.error("License not found in store: '" + licenseName + "'");
-                } else {
-                    licenses.add(license);
+            if (values[LICENSE_NAMES_OFFSET].trim().equals("-")) {
+                licenseProcessingMode = LicenseProcessingMode.NO_OVERWRITE;
+            } else {
+                licenseProcessingMode = LicenseProcessingMode.OVERWRITE_NORMAL;
+                for (int i = 0; i < numLicenseNames; i++) {
+                    final String licenseName = values[i + LICENSE_NAMES_OFFSET].trim();
+                    final License license = licenseStoreData.getLicenseBySpdxIdentifier(licenseName);
+                    if (license == null) {
+                        log.error("License not found in store: '" + licenseName + "'");
+                    } else {
+                        licenses.add(license);
+                    }
                 }
             }
         }
-        return new LicenseResult(licenses, documentationUrl, notice, provider);
+        return new LicenseResult(licenseProcessingMode, licenses, documentationUrl, notice, provider);
     }
 
     private LicenseResult fetchLicenseResult(final List<License> licenses, final String documentationUrl,
                                              final Notice notice, final Provider provider) {
-        return new LicenseResult(licenses, documentationUrl, notice, provider);
+        return new LicenseResult(LicenseProcessingMode.OVERWRITE_NORMAL, licenses, documentationUrl, notice, provider);
     }
 
     private static ArchiveType getArchiveType(final String name) {
