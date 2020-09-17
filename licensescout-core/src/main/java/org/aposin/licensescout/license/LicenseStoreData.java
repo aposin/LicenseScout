@@ -183,14 +183,6 @@ public class LicenseStoreData {
         final XMLReader xmlReader = saxParser.getXMLReader();
         xmlReader.setContentHandler(new LicenseSaxHandler(notices, log));
         xmlReader.parse(MiscUtil.getInputSource(inputStream));
-
-        addNoManualInformationLicense(log);
-    }
-
-    private void addNoManualInformationLicense(final ILSLog log) {
-        final License license = new License(LicenseSpdxIdentifier.NO_MANUAL_INFORMATION, "no manual information",
-                LegalStatus.UNKNOWN, "", "", "", "", null);
-        addToSpdxAndUrlStore(license, log);
     }
 
     /**

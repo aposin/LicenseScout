@@ -15,10 +15,12 @@
  */
 package org.aposin.licensescout.license;
 
+import org.aposin.licensescout.util.ILSLog;
+
 /**
  * Status of license checking for an archive.
  * 
- * @see LicenseUtil#evaluateLicenses(LicenseCheckedList, java.util.Collection, LicenseStoreData)
+ * @see LicenseUtil#evaluateLicenses(LicenseCheckedList, java.util.Collection, ILSLog)
  *
  */
 public enum DetectionStatus {

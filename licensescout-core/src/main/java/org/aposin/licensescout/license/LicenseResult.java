@@ -25,17 +25,20 @@ import org.aposin.licensescout.model.Provider;
  * 
  * <p>Contains:</p>
  * <ul>
+ * <li>a license processing mode (overwrite/no overwrite/empty list)</li>
  * <li>a list of licenses (may be empty)</li>
  * <li>a documentation URL (optional)</li>
  * <li>a notice (optional)</li>
  * <li>a provider (optional)</li>
  * </ul>
  * 
+ * @see LicenseProcessingMode
  * @see LicenseCheckedList
  *
  */
 public class LicenseResult {
 
+    private final LicenseProcessingMode licenseProcessingMode;
     private final List<License> licenses;
     private final String documentationUrl;
     private final Notice notice;
@@ -43,17 +46,27 @@ public class LicenseResult {
 
     /**
      * Constructor.
+     * @param licenseProcessingMode 
      * @param licenses list of licenses (may be empty, but should not be null)
      * @param documentationUrl an URL to add to the result object as a link to license documentation (may be empty)
      * @param notice a notice (may be null)
      * @param provider a provider (may be null)
      */
-    public LicenseResult(final List<License> licenses, final String documentationUrl, final Notice notice,
-            final Provider provider) {
+    public LicenseResult(final LicenseProcessingMode licenseProcessingMode, final List<License> licenses,
+            final String documentationUrl, final Notice notice, final Provider provider) {
+        this.licenseProcessingMode = licenseProcessingMode;
         this.licenses = licenses;
         this.documentationUrl = documentationUrl;
         this.notice = notice;
         this.provider = provider;
+    }
+
+    /**
+     * Obtains the license processing mode.
+     * @return the licenseProcessingMode
+     */
+    public final LicenseProcessingMode getLicenseProcessingMode() {
+        return licenseProcessingMode;
     }
 
     /**
@@ -82,6 +95,15 @@ public class LicenseResult {
      */
     public final Provider getProvider() {
         return provider;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "LicenseResult [licenseProcessingMode=" + licenseProcessingMode + ", licenses=" + licenses
+                + ", documentationUrl=" + documentationUrl + ", notice=" + notice + ", provider=" + provider + "]";
     }
 
 }

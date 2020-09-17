@@ -17,6 +17,8 @@ package org.aposin.licensescout.model;
 
 import java.util.Arrays;
 
+import org.aposin.licensescout.util.MiscUtil;
+
 /**
  * Container for a message digest.
  * 
@@ -70,4 +72,19 @@ public class LSMessageDigest {
         return Arrays.equals(bytes, other.bytes);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return MiscUtil.getHexString(this.getBytes());
+    }
+
+    public static final String toString(LSMessageDigest messageDigest) {
+        if (messageDigest != null) {
+            return messageDigest.toString();
+        } else {
+            return "null";
+        }
+    }
 }
