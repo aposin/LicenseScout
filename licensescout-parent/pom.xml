@@ -97,7 +97,7 @@
 		<doxia-site-renderer.version>1.9.1</doxia-site-renderer.version>
 		<doxia-decoration-model.version>1.9.1</doxia-decoration-model.version>
 		<jaxb-api.version>2.3.2</jaxb-api.version>
-		<junit.version>4.12</junit.version>
+		<junit.version>4.13.1</junit.version>
 		<json.version>20190722</json.version>
 		<maven-core.version>3.6.0</maven-core.version>
 		<maven-model.version>3.6.0</maven-model.version>
@@ -1084,7 +1084,7 @@
 												</goals>
 											</pluginExecutionFilter>
 											<action>
-												<ignore></ignore>
+												<ignore/>
 											</action>
 										</pluginExecution>
 										<pluginExecution>
@@ -1097,7 +1097,7 @@
 												</goals>
 											</pluginExecutionFilter>
 											<action>
-												<ignore></ignore>
+												<ignore/>
 											</action>
 										</pluginExecution>
 									</pluginExecutions>
