@@ -60,7 +60,7 @@ jobs:
     #    uses a compiled language
 
     - run: |
-       cd licensescout-parent && mvn -DskipTests=true -Pci-modules clean install
+       cd licensescout-parent && mvn -DskipTests=true -Pci-modules clean compile
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
