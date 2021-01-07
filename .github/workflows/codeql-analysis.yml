@@ -23,7 +23,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    runs-on: ubuntu-latest
+    runs-on: openjdk:11.0.9-jdk
 
     strategy:
       fail-fast: false
