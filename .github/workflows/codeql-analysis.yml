@@ -60,7 +60,7 @@ jobs:
     #    uses a compiled language
 
     - run: |
-       mvn -DskipTests=true -Pci-modules clean install
+       mvn -DskipTests=true clean install
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
