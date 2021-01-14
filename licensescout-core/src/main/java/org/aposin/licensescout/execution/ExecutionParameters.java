@@ -234,6 +234,17 @@ public class ExecutionParameters {
     private String messageDigestAlgorithm;
 
     /**
+     * Encoding of the configuration files.
+     * 
+     * <p>A JAVA encoding name to use for reading the configuration files.
+     * If not configured, the value of 'project.build.sourceEncoding' is used.
+     * If this is not configured, too, the platform specific default encoding is used.</p>
+     * 
+     * @since 1.4.0
+     */
+    private String configurationFileEncoding;
+
+    /**
      * @return the archiveType
      */
     public final ArchiveType getArchiveType() {
@@ -665,6 +676,20 @@ public class ExecutionParameters {
      */
     public final void setMessageDigestAlgorithm(String messageDigestAlgorithm) {
         this.messageDigestAlgorithm = messageDigestAlgorithm;
+    }
+
+    /**
+     * @return the configurationFileEncoding
+     */
+    public final String getConfigurationFileEncoding() {
+        return configurationFileEncoding;
+    }
+
+    /**
+     * @param configurationFileEncoding the configurationFileEncoding to set
+     */
+    public final void setConfigurationFileEncoding(String configurationFileEncoding) {
+        this.configurationFileEncoding = configurationFileEncoding;
     }
 
 }

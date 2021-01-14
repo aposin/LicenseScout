@@ -189,12 +189,13 @@ public class LicenseStoreData {
      * Reads license URL mappings from a CSV file.
      * 
      * @param inputStream an input stream to read the file contents from
+     * @param encoding an encoding name to use for the input file
      * @param log the logger
      * @throws IOException
      */
-    public void readUrlMappings(final InputStream inputStream, final ILSLog log) throws IOException {
+    public void readUrlMappings(final InputStream inputStream,String encoding, final ILSLog log) throws IOException {
         final CSVFormat csvFormat = CSVFormat.DEFAULT.withDelimiter(',').withCommentMarker('#');
-        try (final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"))) {
+        try (final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, encoding))) {
             final CSVParser csvParser = csvFormat.parse(br);
             for (final CSVRecord record : csvParser) {
                 final String url = record.get(0).trim();
@@ -218,12 +219,13 @@ public class LicenseStoreData {
      * Reads license name mappings from a CSV file.
      * 
      * @param inputStream an input stream to read the file contents from
+     * @param encoding an encoding name to use for the input file
      * @param log the logger
      * @throws IOException
      */
-    public void readNameMappings(final InputStream inputStream, final ILSLog log) throws IOException {
+    public void readNameMappings(final InputStream inputStream, String encoding, final ILSLog log) throws IOException {
         final CSVFormat csvFormat = CSVFormat.DEFAULT.withDelimiter(',').withCommentMarker('#');
-        try (final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"))) {
+        try (final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, encoding))) {
             final CSVParser csvParser = csvFormat.parse(br);
             for (final CSVRecord record : csvParser) {
                 final String mappedName = record.get(0).trim();

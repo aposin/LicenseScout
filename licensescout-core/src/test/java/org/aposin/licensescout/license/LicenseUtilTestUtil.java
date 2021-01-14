@@ -65,7 +65,7 @@ public class LicenseUtilTestUtil {
         final LicenseCheckedList checkedArchives = new LicenseCheckedList();
         final File checkedArchivesPathname = new File(CHECKEDARCHIVES_PATH);
         try (final InputStream inputStream = new FileInputStream(checkedArchivesPathname)) {
-            checkedArchives.readCsv(inputStream, licenseStoreData, new Providers(), new Notices(), new NullLog());
+            checkedArchives.readCsv(inputStream, "UTF-8", licenseStoreData, new Providers(), new Notices(), new NullLog());
         }
         return checkedArchives;
     }

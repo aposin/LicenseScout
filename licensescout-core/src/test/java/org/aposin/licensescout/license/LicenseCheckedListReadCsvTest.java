@@ -79,7 +79,7 @@ public class LicenseCheckedListReadCsvTest {
         final Notices notices = new Notices();
         final LicenseCheckedList checkedArchives = new LicenseCheckedList();
         try (final InputStream inputStream = new FileInputStream(CONFIGURATION_BASE_PATH + checkedArchivesFilename)) {
-            checkedArchives.readCsv(inputStream, licenseStoreData, providers, notices, log);
+            checkedArchives.readCsv(inputStream, "UTF-8", licenseStoreData, providers, notices, log);
         }
         checkArchiveLicensesVersion(checkedArchives, ArchiveType.JAVA, "not_existing", "not_existing", false,
                 LicenseProcessingMode.OVERWRITE_NORMAL, 1);

@@ -92,13 +92,14 @@ public class LicenseCheckedList {
      * Reads a CSV file containing checked archives.
      * 
      * @param inputStream an input stream to read the file contents from
+     * @param encoding an encoding name to use for the input file
      * @param licenseStoreData the data object containing information on licenses
      * @param providers the data object containing information on providers
      * @param notices the data object containing information on notices
      * @param log the logger
      * @throws IOException if an error occurred while reading from the file
      */
-    public void readCsv(final InputStream inputStream, final LicenseStoreData licenseStoreData,
+    public void readCsv(final InputStream inputStream,String encoding, final LicenseStoreData licenseStoreData,
                         final Providers providers, final Notices notices, final ILSLog log)
             throws IOException {
         /*
@@ -110,7 +111,7 @@ public class LicenseCheckedList {
         String line = "";
         String cvsSplitBy = ",";
         int lineNumber = 0;
-        try (final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
+        try (final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, encoding))) {
 
             while ((line = br.readLine()) != null) {
                 lineNumber++;

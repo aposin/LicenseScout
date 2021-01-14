@@ -515,6 +515,18 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
     private String messageDigestAlgorithm;
 
     /**
+     * Encoding of the configuration files.
+     * 
+     * <p>A JAVA encoding name to use for reading the configuration files.
+     * If not configured, the value of 'project.build.sourceEncoding' is used.
+     * If this is not configured, too, the platform specific default encoding is used.</p>
+     * 
+     * @since 1.4.0
+     */
+    @Parameter(property = "configurationFileEncoding", required = false, defaultValue = "${project.build.sourceEncoding}")
+    private String configurationFileEncoding;
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -586,7 +598,6 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
         return showDocumentationUrlColumn;
     }
 
-    
     /**
      * @return the showLicenseCandidateFilesColumn
      */
@@ -594,7 +605,6 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
         return showLicenseCandidateFilesColumn;
     }
 
-    
     /**
      * @return the showProviderColumn
      */
@@ -883,6 +893,13 @@ public abstract class AbstractScanMojo extends AbstractMojo implements IReposito
      */
     public String getMessageDigestAlgorithm() {
         return messageDigestAlgorithm;
+    }
+
+    /**
+     * @return the configFileEncoding
+     */
+    public final String getConfigurationFileEncoding() {
+        return configurationFileEncoding;
     }
 
     /**
