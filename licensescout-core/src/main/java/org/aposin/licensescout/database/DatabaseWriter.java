@@ -125,18 +125,19 @@ public class DatabaseWriter {
     private static int insertLibrary(final int buildPK, final Archive archive, final Connection connection)
             throws SQLException {
         try (final PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO LibraryData (FK_Build_Id, Selected_License, Filename, Provider, Version, Type, Message_Digest, Detection_Status, Legal_Status, Documentation_Link) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO LibraryData (FK_Build_Id, Selected_License, Filename, Path, Provider, Version, Type, Message_Digest, Detection_Status, Legal_Status, Documentation_Link) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 Statement.RETURN_GENERATED_KEYS)) {
             statement.setInt(1, buildPK);
             statement.setString(2, getLicenseName(archive));
             statement.setString(3, convertNull(archive.getFileName()));
-            statement.setString(4, getProviderName(archive));
-            statement.setString(5, getLibraryVersion(archive));
-            statement.setString(6, archive.getArchiveType().name());
-            statement.setString(7, archive.getMessageDigestString());
-            statement.setString(8, archive.getDetectionStatus().name());
-            statement.setString(9, archive.getLegalStatus().name());
-            statement.setString(10, convertNull(archive.getDocumentationUrl()));
+            statement.setString(4, convertNull(archive.getPath()));
+            statement.setString(5, getProviderName(archive));
+            statement.setString(6, getLibraryVersion(archive));
+            statement.setString(7, archive.getArchiveType().name());
+            statement.setString(8, archive.getMessageDigestString());
+            statement.setString(9, archive.getDetectionStatus().name());
+            statement.setString(10, archive.getLegalStatus().name());
+            statement.setString(11, convertNull(archive.getDocumentationUrl()));
             statement.executeUpdate();
             try (final ResultSet keysResultSet = statement.getGeneratedKeys();) {
                 if (keysResultSet.next()) {
