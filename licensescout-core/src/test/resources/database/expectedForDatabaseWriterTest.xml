@@ -7,12 +7,12 @@
 
 	<LibraryData Id="1" FK_Build_Id="1"
 		Detection_Status="DETECTED" Documentation_Link="(null)"
-		Filename="fileName1" Legal_Status="ACCEPTED" Message_Digest=""
+		Filename="fileName1" Path="path1" Legal_Status="ACCEPTED" Message_Digest=""
 		Provider="" Selected_License="MIT License" Type="JAVA"
 		Version="version1" />
 	<LibraryData Id="2" FK_Build_Id="1"
 		Detection_Status="DETECTED" Documentation_Link="(null)"
-		Filename="fileName2" Legal_Status="ACCEPTED" Message_Digest=""
+		Filename="fileName2" Path="path2" Legal_Status="ACCEPTED" Message_Digest=""
 		Provider="" Selected_License="" Type="JAVA" Version="version2" />
 
 	<DetectedLicenses Id="1" FK_LibraryData_Id="1"

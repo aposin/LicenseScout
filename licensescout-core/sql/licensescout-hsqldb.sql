@@ -48,6 +48,7 @@ CREATE TABLE "LibraryData" (
   `FK_Build_Id` int(11) NOT NULL,
   `Selected_License` varchar(500) NOT NULL,
   `Filename` varchar(500) NOT NULL,
+  `Path` varchar(500) NOT NULL,
   `Provider` varchar(500) NOT NULL,
   `Version` varchar(255) NOT NULL,
   `Type` varchar(100) NOT NULL,
