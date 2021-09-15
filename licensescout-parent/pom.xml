@@ -90,26 +90,26 @@
 		<commons-codec.version>1.14</commons-codec.version>
 		<commons-collections4.version>4.4</commons-collections4.version>
 		<commons-csv.version>1.8</commons-csv.version>
-		<commons-lang3.version>3.9</commons-lang3.version>
-		<commons-io.version>2.6</commons-io.version>
-		<doxia-sink-api.version>1.9</doxia-sink-api.version>
-		<doxia-core.version>1.9</doxia-core.version>
-		<doxia-site-renderer.version>1.9.1</doxia-site-renderer.version>
-		<doxia-decoration-model.version>1.9.1</doxia-decoration-model.version>
+		<commons-lang3.version>3.12.0</commons-lang3.version>
+		<commons-io.version>2.7</commons-io.version>
+		<doxia-sink-api.version>1.10</doxia-sink-api.version>
+		<doxia-core.version>1.10</doxia-core.version>
+		<doxia-site-renderer.version>1.10</doxia-site-renderer.version>
+		<doxia-decoration-model.version>1.10</doxia-decoration-model.version>
 		<jaxb-api.version>2.3.2</jaxb-api.version>
 		<junit.version>4.13.1</junit.version>
 		<json.version>20190722</json.version>
-		<maven-core.version>3.6.0</maven-core.version>
-		<maven-model.version>3.6.0</maven-model.version>
-		<maven-plugin-annotations.version>3.6.0</maven-plugin-annotations.version>
-		<maven-plugin-api.version>3.6.0</maven-plugin-api.version>
+		<maven-core.version>3.8.1</maven-core.version>
+		<maven-model.version>3.8.1</maven-model.version>
+		<maven-plugin-annotations.version>3.6.1</maven-plugin-annotations.version>
+		<maven-plugin-api.version>3.8.1</maven-plugin-api.version>
 		<maven-reporting-api.version>3.0</maven-reporting-api.version>
 		<maven-reporting-impl.version>3.0.0</maven-reporting-impl.version>
 		<maven-resolver.version>1.4.1</maven-resolver.version>
-		<maven-shared-utils.version>3.2.1</maven-shared-utils.version>
+		<maven-shared-utils.version>3.3.4</maven-shared-utils.version>
 		<org.eclipse.aether.version>1.1.0</org.eclipse.aether.version>
-		<plexus-utils.version>3.1.1</plexus-utils.version>
-		<velocity.version>2.1</velocity.version>
+		<plexus-utils.version>3.2.1</plexus-utils.version>
+		<velocity.version>2.3</velocity.version>
 
 		<!-- Test dependencies version definitions -->
 		<org.jsoup.version>1.12.1</org.jsoup.version>
@@ -159,7 +159,7 @@
 		<nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
 
 		<license-maven-plugin.version>3.0</license-maven-plugin.version>
-		<org.dbunit.version>2.6.0</org.dbunit.version>
+		<org.dbunit.version>2.7.2</org.dbunit.version>
 		<com.h2database.version>1.4.200</com.h2database.version>
 
 		<!-- ==================== -->
