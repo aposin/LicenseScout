@@ -91,7 +91,7 @@
 		<commons-collections4.version>4.4</commons-collections4.version>
 		<commons-csv.version>1.8</commons-csv.version>
 		<commons-lang3.version>3.9</commons-lang3.version>
-		<commons-io.version>2.6</commons-io.version>
+		<commons-io.version>2.7</commons-io.version>
 		<doxia-sink-api.version>1.9</doxia-sink-api.version>
 		<doxia-core.version>1.9</doxia-core.version>
 		<doxia-site-renderer.version>1.9.1</doxia-site-renderer.version>
@@ -1084,7 +1084,7 @@
 												</goals>
 											</pluginExecutionFilter>
 											<action>
-												<ignore></ignore>
+												<ignore/>
 											</action>
 										</pluginExecution>
 										<pluginExecution>
@@ -1097,7 +1097,7 @@
 												</goals>
 											</pluginExecutionFilter>
 											<action>
-												<ignore></ignore>
+												<ignore/>
 											</action>
 										</pluginExecution>
 									</pluginExecutions>
