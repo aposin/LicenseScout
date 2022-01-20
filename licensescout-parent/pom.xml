@@ -160,7 +160,7 @@
 
 		<license-maven-plugin.version>3.0</license-maven-plugin.version>
 		<org.dbunit.version>2.6.0</org.dbunit.version>
-		<com.h2database.version>1.4.200</com.h2database.version>
+		<com.h2database.version>2.1.210</com.h2database.version>
 
 		<!-- ==================== -->
 		<!-- Compiler definitions -->
@@ -1084,7 +1084,7 @@
 												</goals>
 											</pluginExecutionFilter>
 											<action>
-												<ignore></ignore>
+												<ignore/>
 											</action>
 										</pluginExecution>
 										<pluginExecution>
@@ -1097,7 +1097,7 @@
 												</goals>
 											</pluginExecutionFilter>
 											<action>
-												<ignore></ignore>
+												<ignore/>
 											</action>
 										</pluginExecution>
 									</pluginExecutions>
