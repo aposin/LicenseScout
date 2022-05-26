@@ -106,7 +106,7 @@
 		<maven-reporting-api.version>3.0</maven-reporting-api.version>
 		<maven-reporting-impl.version>3.0.0</maven-reporting-impl.version>
 		<maven-resolver.version>1.4.1</maven-resolver.version>
-		<maven-shared-utils.version>3.2.1</maven-shared-utils.version>
+		<maven-shared-utils.version>3.3.3</maven-shared-utils.version>
 		<org.eclipse.aether.version>1.1.0</org.eclipse.aether.version>
 		<plexus-utils.version>3.1.1</plexus-utils.version>
 		<velocity.version>2.1</velocity.version>
