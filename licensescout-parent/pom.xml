@@ -112,7 +112,7 @@
 		<velocity.version>2.1</velocity.version>
 
 		<!-- Test dependencies version definitions -->
-		<org.jsoup.version>1.12.1</org.jsoup.version>
+		<org.jsoup.version>1.15.3</org.jsoup.version>
 
 		<!-- ================================ -->
 		<!-- Maven plugin version definitions -->
