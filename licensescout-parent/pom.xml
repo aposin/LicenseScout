@@ -93,18 +93,18 @@
 		<commons-lang3.version>3.9</commons-lang3.version>
 		<commons-io.version>2.6</commons-io.version>
 		<doxia-sink-api.version>1.9</doxia-sink-api.version>
-		<doxia-core.version>1.9</doxia-core.version>
+		<doxia-core.version>1.10</doxia-core.version>
 		<doxia-site-renderer.version>1.9.1</doxia-site-renderer.version>
 		<doxia-decoration-model.version>1.9.1</doxia-decoration-model.version>
 		<jaxb-api.version>2.3.2</jaxb-api.version>
 		<junit.version>4.13.1</junit.version>
 		<json.version>20190722</json.version>
-		<maven-core.version>3.6.0</maven-core.version>
+		<maven-core.version>3.8.2</maven-core.version>
 		<maven-model.version>3.6.0</maven-model.version>
 		<maven-plugin-annotations.version>3.6.0</maven-plugin-annotations.version>
 		<maven-plugin-api.version>3.6.0</maven-plugin-api.version>
 		<maven-reporting-api.version>3.0</maven-reporting-api.version>
-		<maven-reporting-impl.version>3.0.0</maven-reporting-impl.version>
+		<maven-reporting-impl.version>3.1.0</maven-reporting-impl.version>
 		<maven-resolver.version>1.4.1</maven-resolver.version>
 		<maven-shared-utils.version>3.2.1</maven-shared-utils.version>
 		<org.eclipse.aether.version>1.1.0</org.eclipse.aether.version>
@@ -1084,7 +1084,7 @@
 												</goals>
 											</pluginExecutionFilter>
 											<action>
-												<ignore></ignore>
+												<ignore/>
 											</action>
 										</pluginExecution>
 										<pluginExecution>
@@ -1097,7 +1097,7 @@
 												</goals>
 											</pluginExecutionFilter>
 											<action>
-												<ignore></ignore>
+												<ignore/>
 											</action>
 										</pluginExecution>
 									</pluginExecutions>
