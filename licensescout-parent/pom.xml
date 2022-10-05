@@ -99,7 +99,7 @@
 		<jaxb-api.version>2.3.2</jaxb-api.version>
 		<junit.version>4.13.1</junit.version>
 		<json.version>20190722</json.version>
-		<maven-core.version>3.6.0</maven-core.version>
+		<maven-core.version>3.8.2</maven-core.version>
 		<maven-model.version>3.6.0</maven-model.version>
 		<maven-plugin-annotations.version>3.6.0</maven-plugin-annotations.version>
 		<maven-plugin-api.version>3.6.0</maven-plugin-api.version>
@@ -109,7 +109,7 @@
 		<maven-shared-utils.version>3.2.1</maven-shared-utils.version>
 		<org.eclipse.aether.version>1.1.0</org.eclipse.aether.version>
 		<plexus-utils.version>3.1.1</plexus-utils.version>
-		<velocity.version>2.1</velocity.version>
+		<velocity.version>2.3</velocity.version>
 
 		<!-- Test dependencies version definitions -->
 		<org.jsoup.version>1.12.1</org.jsoup.version>
@@ -1084,7 +1084,7 @@
 												</goals>
 											</pluginExecutionFilter>
 											<action>
-												<ignore></ignore>
+												<ignore/>
 											</action>
 										</pluginExecution>
 										<pluginExecution>
@@ -1097,7 +1097,7 @@
 												</goals>
 											</pluginExecutionFilter>
 											<action>
-												<ignore></ignore>
+												<ignore/>
 											</action>
 										</pluginExecution>
 									</pluginExecutions>
